@@ -5,137 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mutant: Year Zero - Character Sheet</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
-  <style>
-    body {
-      margin: 20px;
-    }
-    /* Existing element styles … */
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input,
-    textarea {
-      width: 100%;
-      padding: 5px;
-      margin-bottom: 10px;
-    }
-    input,
-    text,
-    select {
-      width: 100%;
-      height: 100%;
-      margin-bottom: unset !important;
-    }
-    table {
-      width: 100%;
-      border: none !important;
-      border-collapse: collapse;
-      margin-bottom: 15px;
-      border-radius: 5px;
-    }
-    th,
-    td {
-      padding: 5px;
-      border-bottom: 1px solid var(--form-element-border-color);
-      border-top: 1px solid var(--form-element-border-color);
-      text-align: left;
-    }
-    .section {
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-    }
-    input[type="radio"] {
-      margin-left: 2px;
-      margin-right: 2px;
-    }
-    h3 {
-      margin-bottom: 10px; 
-      border-bottom: 1px solid #ccc;
-    }
-    .tillstand label {
-      display: inline-block;
-      margin-right: 10px;
-    }
-    .tillstand td input {
-      width: 100%;
-    }
-    .fardigheter td {
-      width: 90px;
-    }
-    .vapen input[type="number"],
-    .fardigheter input[type="number"],
-    .grundeegenskaper input[type="number"] {
-      width: 70px;
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-      margin: 0;
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    
-    /* New layout styles */
-    .columns {
-      display: flex;
-      gap: 20px;
-    }
-    /* Left column (c1) remains as before */
-    .column.left {
-      flex: 1;
-    }
-    /* Right side container: will hold c2 and c3 in the top row plus Vapen below */
-    .column.right {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    /* Top row inside right column: c2 and c3 side by side */
-    .row.top {
-      display: flex;
-      gap: 20px;
-    }
-    .subcolumn {
-      flex: 1;
-    }
-    /* Additional relationer table rules */
-    .relationer td:has(input[type="radio"]) {
-      width: 50px;
-    }
-    .relationer td:first-child {
-      width: 90px;
-    }
+  <link rel="stylesheet" href="style/app.css" />
+  <!-- <link rel="stylesheet" href="style/pico.pumpkin.min.css" /> -->
 
-    .button-group {
-        display: flex;
-        gap: 10px;
-    }
-
-  </style>
 </head>
 <body>
   <main class="container">
     <h2>Rollformulär Mutant år: Noll</h2>
-    <!-- make small buttons that will -->
-
     <div class="button-group">
         <button onclick="saveForm()" class="secondary" title="Spara" ><svg style="max-width: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M48 96l0 320c0 8.8 7.2 16 16 16l320 0c8.8 0 16-7.2 16-16l0-245.5c0-4.2-1.7-8.3-4.7-11.3l33.9-33.9c12 12 18.7 28.3 18.7 45.3L448 416c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96C0 60.7 28.7 32 64 32l245.5 0c17 0 33.3 6.7 45.3 18.7l74.5 74.5-33.9 33.9L320.8 84.7c-.3-.3-.5-.5-.8-.8L320 184c0 13.3-10.7 24-24 24l-192 0c-13.3 0-24-10.7-24-24L80 80 64 80c-8.8 0-16 7.2-16 16zm80-16l0 80 144 0 0-80L128 80zm32 240a64 64 0 1 1 128 0 64 64 0 1 1 -128 0z"/></svg></button>
         <button onclick="loadForm()" class="secondary" title="Ladda in from cache">
             <svg style="max-width: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 64c0-35.3 28.7-64 64-64L352 0l0 128c0 17.7 14.3 32 32 32l128 0 0 288c0 35.3-28.7 64-64 64l-256 0c-35.3 0-64-28.7-64-64l0-112 174.1 0-39 39c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l39 39L128 288l0-224zm0 224l0 48L24 336c-13.3 0-24-10.7-24-24s10.7-24 24-24l104 0zM512 128l-128 0L384 0 512 128z"/></svg>
         </button>
             
-        <button onclick="loadForm()" class="secondary" title="Ladda in från fil">
+        <button onclick="importForm()" class="secondary" title="Ladda in från fil">
             <svg style="max-width: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M288 109.3L288 352c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-242.7-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352l128 0c0 35.3 28.7 64 64 64s64-28.7 64-64l128 0c35.3 0 64 28.7 64 64l0 32c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64l0-32c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg></button>
         <button onclick="exportForm()" class="secondary" title="Exportera till fil">
             <svg style="max-width: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg></button>
       </div>
-      
-
     <div class="columns">
       <!-- Left Column (c1) -->
       <div class="column left">
@@ -147,45 +34,61 @@
               <tr>
                 <th>Styrka</th>
                 <td>
-                  <input type="number" id="styrka" maxlength="2" value="0">
-                  <input type="radio" name="styrka1" value="1">
-                  <input type="radio" name="styrka2" value="2">
-                  <input type="radio" name="styrka3" value="3">
-                  <input type="radio" name="styrka4" value="4">
-                  <input type="radio" name="styrka5" value="5">
+                  <input style="float:left;" type="number" id="styrka" maxlength="2" value="0">
+
+                  <div>
+                    <span class="dmg_type">Skada:</span>
+                    <input type="radio" name="styrka1" value="1">
+                    <input type="radio" name="styrka2" value="2">
+                    <input type="radio" name="styrka3" value="3">
+                    <input type="radio" name="styrka4" value="4">
+                    <input type="radio" name="styrka5" value="5">
+                  </div>
+                  
+
                 </td>
               </tr>
               <tr>
                 <th>Kyla</th>
                 <td>
-                  <input type="number" id="kyla" maxlength="2" value="0">
-                  <input type="radio" name="kyla1" value="1">
-                  <input type="radio" name="kyla2" value="2">
-                  <input type="radio" name="kyla3" value="3">
-                  <input type="radio" name="kyla4" value="4">
-                  <input type="radio" name="kyla5" value="5">
+                  <input type="number" style="float:left;" id="kyla" maxlength="2" value="0">
+                  <div>
+                    <span class="dmg_type">Stress:</span>
+                    <input type="radio" name="kyla1" value="1">
+                    <input type="radio" name="kyla2" value="2">
+                    <input type="radio" name="kyla3" value="3">
+                    <input type="radio" name="kyla4" value="4">
+                    <input type="radio" name="kyla5" value="5">
+                  </div>
                 </td>
               </tr>
               <tr>
                 <th>Skärpa</th>
                 <td>
-                  <input type="number" id="skarpa" maxlength="2" value="0">
-                  <input type="radio" name="skarpa1" value="1">
-                  <input type="radio" name="skarpa2" value="2">
-                  <input type="radio" name="skarpa3" value="3">
-                  <input type="radio" name="skarpa4" value="4">
-                  <input type="radio" name="skarpa5" value="5">
+                  <input type="number" style="float:left;" id="skarpa" maxlength="2" value="0">
+                  <div>
+                    <span class="dmg_type">Förvirring:</span>
+                    <input type="radio" name="skarpa1" value="1">
+                    <input type="radio" name="skarpa2" value="2">
+                    <input type="radio" name="skarpa3" value="3">
+                    <input type="radio" name="skarpa4" value="4">
+                    <input type="radio" name="skarpa5" value="5">
+                  </div>
                 </td>
               </tr>
               <tr>
                 <th>Känsla</th>
                 <td>
-                  <input type="number" id="kansla" maxlength="2" value="0">
-                  <input type="radio" name="kansla1" value="1">
-                  <input type="radio" name="kansla2" value="2">
-                  <input type="radio" name="kansla3" value="3">
-                  <input type="radio" name="kansla4" value="4">
-                  <input type="radio" name="kansla5" value="5">
+                  <input type="number" style="float:left;" id="kansla" maxlength="2" value="0">
+
+                  <div>
+                    <span class="dmg_type">Tvivel:</span>
+                    <input type="radio" name="kansla1" value="1">
+                    <input type="radio" name="kansla2" value="2">
+                    <input type="radio" name="kansla3" value="3">
+                    <input type="radio" name="kansla4" value="4">
+                    <input type="radio" name="kansla5" value="5">
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -293,7 +196,14 @@
               <tr>
                 <th>
                   <select name="fardighet1" id="fardighet1">
-                    <!-- Options here -->
+                    <option value="1">MECKA (SKP)</option>
+                    <option value="2">MUCKA (STY)</option>
+                    <option value="3">LEDA VÄGEN (SKP)</option>
+                    <option value="4">SCHACKRA (KNS)</option>
+                    <option value="5">BUSSA PÅ (KYL)</option>
+                    <option value="6">INSPIRERA (KNS)</option>
+                    <option value="7">KOMMENDERA (KNS)</option>
+                    <option value="8">UTHÄRDA (KYL)</option>
                   </select>
                 </th>
                 <td><input type="number" id="fardighetValue1" maxlength="2" value="0"></td>
@@ -301,7 +211,14 @@
               <tr>
                 <th>
                   <select name="fardighet2" id="fardighet2">
-                    <!-- Options here -->
+                    <option value="1">MECKA (SKP)</option>
+                    <option value="2">MUCKA (STY)</option>
+                    <option value="3">LEDA VÄGEN (SKP)</option>
+                    <option value="4">SCHACKRA (KNS)</option>
+                    <option value="5">BUSSA PÅ (KYL)</option>
+                    <option value="6">INSPIRERA (KNS)</option>
+                    <option value="7">KOMMENDERA (KNS)</option>
+                    <option value="8">UTHÄRDA (KYL)</option>
                   </select>
                 </th>
                 <td><input type="number" id="fardighetValue2" maxlength="2" value="0"></td>
@@ -342,15 +259,15 @@
             <tbody>
               <tr>
                 <th>Ansikte</th>
-                <td><input type="text" id="utseende_ansikte"></td>
+                <td><textarea type="text" id="utseende_ansikte"></textarea></td>
               </tr>
               <tr>
                 <th>Kropp</th>
-                <td><input type="text" id="utseende_kropp"></td>
+                <td><textarea type="text" id="utseende_kropp"></textarea></td>
               </tr>
               <tr>
                 <th>Klädsel</th>
-                <td><input type="text" id="utseende_klader"></td>
+                <td><textarea type="text" id="utseende_klader"></textarea></td>
               </tr>
             </tbody>
           </table>
@@ -550,6 +467,10 @@
 
   </main>
   <script>
+
+    // on load, load the form from local storage
+    loadForm();
+
     // Toggle radio buttons: clicking an already checked radio unchecks it.
     document.querySelectorAll('input[type="radio"]').forEach(radio => {
       radio.addEventListener('mousedown', function () {
@@ -607,7 +528,6 @@
           el.value = data[key];
         }
       });
-      alert('Formulär laddat!');
     }
 
     // Auto-save every 25 seconds.
@@ -633,6 +553,7 @@
     }
 
     function importForm() {
+
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';

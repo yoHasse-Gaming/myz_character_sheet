@@ -1,61 +1,61 @@
 body {
-  margin: 20px;
+    margin: 20px;
 }
 /* Existing element styles … */
 label {
-  display: block;
-  margin-bottom: 5px;
+    display: block;
+    margin-bottom: 5px;
 }
 input,
 textarea {
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
 }
 input,
 text,
 select {
-  width: 100%;
-  height: 100%;
-  margin-bottom: unset !important;
+    width: 100%;
+    height: 100%;
+    margin-bottom: unset !important;
 }
 table {
-  width: 100%;
-  border: none !important;
-  border-collapse: collapse;
-  margin-bottom: 15px;
-  border-radius: 5px;
+    width: 100%;
+    border: none !important;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    border-radius: 5px;
 }
 th,
 td {
-  padding: 5px;
-  border-bottom: 1px solid var(--form-element-border-color);
-  border-top: 1px solid var(--form-element-border-color);
-  text-align: left;
+    padding: 5px;
+    border-bottom: 1px solid var(--form-element-border-color);
+    border-top: 1px solid var(--form-element-border-color);
+    text-align: left;
 }
 .section {
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
 }
 input[type="radio"] {
-  margin-left: 2px;
-  margin-right: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 h3 {
-  margin-bottom: 10px; 
-  border-bottom: 1px solid #ccc;
+    margin-bottom: 10px; 
+    border-bottom: 1px solid #ccc;
 }
 .tillstand label {
-  display: inline-block;
-  margin-right: 10px;
+    display: inline-block;
+    margin-right: 10px;
 }
 .tillstand td input {
-  width: 100%;
+    width: 100%;
 }
 .fardigheter td {
-  width: 90px;
+    width: 90px;
 }
 .vapen input[type="number"],
 .fardigheter input[type="number"],
@@ -71,36 +71,57 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
+.section .met_people .grid {
+    /* make 2nd column width smaller than all 3 */  
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+}
+
+.met_people td:first-child {
+    width: 250px;
+}
+
+.met_people td:nth-child(2) {
+    width: 150px;
+}
+
+.met_people textarea {
+    /* disable resizing on width */
+    resize: vertical;
+}
+
+
 /* New layout styles */
 .columns {
-  display: flex;
-  gap: 20px;
+    display: flex;
+    gap: 20px;
 }
 /* Left column (c1) remains as before */
 .column.left {
-  flex: 1;
+    flex: 1;
 }
 /* Right side container: will hold c2 and c3 in the top row plus Vapen below */
 .column.right {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 /* Top row inside right column: c2 and c3 side by side */
 .row.top {
-  display: flex;
-  gap: 20px;
+    display: flex;
+    gap: 20px;
 }
 .subcolumn {
-  flex: 1;
+    flex: 1;
 }
 /* Additional relationer table rules */
 .relationer td:has(input[type="radio"]) {
-  width: 50px;
+    width: 50px;
 }
 .relationer td:first-child {
-  width: 90px;
+    width: 90px;
 }
 
 .button-group {

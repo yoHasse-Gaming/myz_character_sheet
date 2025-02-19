@@ -38,11 +38,11 @@
 
                   <div>
                     <span class="dmg_type">Skada:</span>
-                    <input type="radio" name="styrka1" value="1">
-                    <input type="radio" name="styrka2" value="2">
-                    <input type="radio" name="styrka3" value="3">
-                    <input type="radio" name="styrka4" value="4">
-                    <input type="radio" name="styrka5" value="5">
+                    <input type="radio" name="styrka1" title="Mat. Du återhämtar en poäng  STY för varje ranson mat du äter." value="1">
+                    <input type="radio" name="styrka2" title="Mat. Du återhämtar en poäng  STY för varje ranson mat du äter." value="2">
+                    <input type="radio" name="styrka3" title="Mat. Du återhämtar en poäng  STY för varje ranson mat du äter." value="3">
+                    <input type="radio" name="styrka4" title="Mat. Du återhämtar en poäng  STY för varje ranson mat du äter." value="4">
+                    <input type="radio" name="styrka5" title="Mat. Du återhämtar en poäng  STY för varje ranson mat du äter." value="5">
                   </div>
                   
 
@@ -54,11 +54,11 @@
                   <input type="number" style="float:left;" id="kyla" maxlength="2" value="0">
                   <div>
                     <span class="dmg_type">Stress:</span>
-                    <input type="radio" name="kyla1" value="1">
-                    <input type="radio" name="kyla2" value="2">
-                    <input type="radio" name="kyla3" value="3">
-                    <input type="radio" name="kyla4" value="4">
-                    <input type="radio" name="kyla5" value="5">
+                    <input type="radio" name="kyla1" title="Vatten. Du återhämtar en poäng kyl för varje ranson vatten du dricker." value="1">
+                    <input type="radio" name="kyla2" title="Vatten. Du återhämtar en poäng kyl för varje ranson vatten du dricker." value="2">
+                    <input type="radio" name="kyla3" title="Vatten. Du återhämtar en poäng kyl för varje ranson vatten du dricker." value="3">
+                    <input type="radio" name="kyla4" title="Vatten. Du återhämtar en poäng kyl för varje ranson vatten du dricker." value="4">
+                    <input type="radio" name="kyla5" title="Vatten. Du återhämtar en poäng kyl för varje ranson vatten du dricker." value="5">
                   </div>
                 </td>
               </tr>
@@ -68,11 +68,11 @@
                   <input type="number" style="float:left;" id="skarpa" maxlength="2" value="0">
                   <div>
                     <span class="dmg_type">Förvirring:</span>
-                    <input type="radio" name="skarpa1" value="1">
-                    <input type="radio" name="skarpa2" value="2">
-                    <input type="radio" name="skarpa3" value="3">
-                    <input type="radio" name="skarpa4" value="4">
-                    <input type="radio" name="skarpa5" value="5">
+                    <input type="radio" name="skarpa1" title="Minst fyra timmars sömn. Återställer all förlorad SKP" value="1">
+                    <input type="radio" name="skarpa2" title="Minst fyra timmars sömn. Återställer all förlorad SKP" value="2">
+                    <input type="radio" name="skarpa3" title="Minst fyra timmars sömn. Återställer all förlorad SKP" value="3">
+                    <input type="radio" name="skarpa4" title="Minst fyra timmars sömn. Återställer all förlorad SKP" value="4">
+                    <input type="radio" name="skarpa5" title="Minst fyra timmars sömn. Återställer all förlorad SKP" value="5">
                   </div>
                 </td>
               </tr>
@@ -83,11 +83,11 @@
 
                   <div>
                     <span class="dmg_type">Tvivel:</span>
-                    <input type="radio" name="kansla1" value="1">
-                    <input type="radio" name="kansla2" value="2">
-                    <input type="radio" name="kansla3" value="3">
-                    <input type="radio" name="kansla4" value="4">
-                    <input type="radio" name="kansla5" value="5">
+                    <input type="radio" name="kansla1" title="För att återhämta en poäng KNS krävs en stunds närhet med en annan" value="1">
+                    <input type="radio" name="kansla2" title="För att återhämta en poäng KNS krävs en stunds närhet med en annan" value="2">
+                    <input type="radio" name="kansla3" title="För att återhämta en poäng KNS krävs en stunds närhet med en annan" value="3">
+                    <input type="radio" name="kansla4" title="För att återhämta en poäng KNS krävs en stunds närhet med en annan" value="4">
+                    <input type="radio" name="kansla5" title="För att återhämta en poäng KNS krävs en stunds närhet med en annan" value="5">
                   </div>
                 </td>
               </tr>
@@ -428,38 +428,113 @@
         <tbody>
           <tr>
             <td>RP1</td>
-            <td><input type="text" name="relation_relation1"></td>
+            <td><textarea type="text" name="relation_relation1"></textarea></td>
             <td><input type="radio" name="rp1_close" value="0"></td>
           </tr>
           <tr>
             <td>RP2</td>
-            <td><input type="text" name="relation_relation2"></td>
+            <td><textarea type="text" name="relation_relation2"></textarea></td>
             <td><input type="radio" name="rp2_close" value="0"></td>
           </tr>
           <tr>
             <td>RP3</td>
-            <td><input type="text" name="relation_relation3"></td>
+            <td><textarea type="text" name="relation_relation3"></textarea></td>
             <td><input type="radio" name="rp3_close" value="0"></td>
           </tr>
           <tr>
             <td>RP4</td>
-            <td><input type="text" name="relation_relation4"></td>
+            <td><textarea type="text" name="relation_relation4"></textarea></td>
             <td><input type="radio" name="rp4_close" value="0"></td>
           </tr>
           <tr>
             <td>Jag hatar</td>
-            <td><input type="text" name="hate_relation"></td>
+            <td><textarea type="text" name="hate_relation"></textarea></td>
             <td></td>
           </tr>
           <tr>
             <td>Jag vill skydda</td>
-            <td><input type="text" name="love_relation"></td>
+            <td><textarea type="text" name="love_relation"></textarea></td>
             <td></td>
           </tr>
           <tr>
             <td>Min stora dröm</td>
-            <td><input type="text" name="my_dream"></td>
+            <td><textarea type="text" name="my_dream"></textarea></td>
             <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section met_people">
+      <h3>Personer jag mött</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Namn</th>
+            <th>Syssla</th>
+            <th>Övrigt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" name="met_name1" ></td>
+            <td><input type="text" name="met_relation1"></td>
+            <td><textarea type="text" name="met_ovrigt1"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name2"></td>
+            <td><input type="text" name="met_relation2"></td>
+            <td><textarea type="text" name="met_ovrigt2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name3"></td>
+            <td><input type="text" name="met_relation3"></td>
+            <td><textarea type="text" name="met_ovrigt3"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name4"></td>
+            <td><input type="text" name="met_relation4"></td>
+            <td><textarea type="text" name="met_ovrigt4"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name5"></td>
+            <td><input type="text" name="met_relation5"></td>
+            <td><textarea type="text" name="met_ovrigt5"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name6"></td>
+            <td><input type="text" name="met_relation6"></td>
+            <td><textarea type="text" name="met_ovrigt6"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name7"></td>
+            <td><input type="text" name="met_relation7"></td>
+            <td><textarea type="text" name="met_ovrigt7"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name8"></td>
+            <td><input type="text" name="met_relation8"></td>
+            <td><textarea type="text" name="met_ovrigt8"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name9"></td>
+            <td><input type="text" name="met_relation9"></td>
+            <td><textarea type="text" name="met_ovrigt9"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name10"></td>
+            <td><input type="text" name="met_relation10"></td>
+            <td><textarea type="text" name="met_ovrigt10"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name11"></td>
+            <td><input type="text" name="met_relation11"></td>
+            <td><textarea type="text" name="met_ovrigt11"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="met_name12"></td>
+            <td><input type="text" name="met_relation12"></td>
+            <td><textarea type="text" name="met_ovrigt12"></textarea></td>
           </tr>
         </tbody>
       </table>

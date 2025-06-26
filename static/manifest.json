@@ -2,6 +2,7 @@
   "name": "Mutant: Year Zero Character Sheet",
   "version": "1.0.0",
   "manifest_version": 1,
+  "homepage_url": "https://yohasse-gaming.github.io/myz_character_sheet/",
   "action": {
     "title": "Mutant: Year Zero Character Sheet",
     "icon": "/icon.svg",

@@ -1,0 +1,12 @@
+{
+  "name": "Mutant: Year Zero Character Sheet",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "action": {
+    "title": "Mutant: Year Zero Character Sheet",
+    "icon": "/icon.svg",
+    "popover": "/",
+    "height": 720,
+    "width": 1280
+  }
+}

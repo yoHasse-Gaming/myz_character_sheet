@@ -6,7 +6,7 @@
   "action": {
     "title": "Mutant: Year Zero Character Sheet",
     "icon": "/icon.svg",
-    "popover": "/",
+    "popover": "https://yohasse-gaming.github.io/myz_character_sheet/",
     "height": 720,
     "width": 1280
   }

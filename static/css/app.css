@@ -1,0 +1,11 @@
+
+
+body {
+    min-width: 1024px;
+    background-image: url('/img/sheet_bg.png');
+    height: 100vh;
+    background-position: top 2rem right 50%;
+
+}
+
+

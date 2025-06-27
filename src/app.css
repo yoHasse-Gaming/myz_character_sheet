@@ -8,6 +8,20 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 
+https://www.dafont.com/friendly-stranger.font
+by Excellent Ritma Florendia
+*/
+@font-face {
+  font-family: "FriendlyStranger";
+  src:
+    local("FriendlyStranger"),
+    url("fonts/FriendlyStranger.otf") format("opentype"),
+    url("fonts/FriendlyStranger.ttf") format("opentype"),
+    url("fonts/FriendlyStranger.woff") format("woff");
+}
+
+
 
 
 /* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
@@ -41,6 +55,7 @@
     --color-warning-600: #991b1b;
 
     --font-user: Kalam, sans-serif;
+    --form-labels: FriendlyStranger, sans-serif;
 }
 
 body {
@@ -445,4 +460,12 @@ body::before {
 
 .input.font-user {
     font-family: var(--font-user), sans-serif;
+}
+
+label {
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.05em;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
 }

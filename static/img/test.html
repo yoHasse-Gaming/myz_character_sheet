@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Outpost Contact Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#2c251f; /* fallback */
+  background-image:url('postapoc-tile.png');
+  background-size:512px 512px;
+  background-repeat:repeat;
+  font-family:'Inter',sans-serif;
+  color:#261d15;
+  animation:flicker 12s infinite;
+}
+
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:.96}}
+
+.scrap-form{
+  width:clamp(300px,90vw,460px);
+  padding:2rem 2.5rem;
+  background:rgba(255,248,230,.88);
+  border:1px solid #5e493c;
+  border-radius:6px 18px 10px 4px;
+  box-shadow:inset 0 0 2px 1px #0002,0 6px 14px -4px #0006;
+  position:relative;
+}
+.scrap-form::before,.scrap-form::after{
+  content:"";
+  position:absolute;
+  width:80px;height:18px;
+  background:rgba(230,230,230,.32);
+  top:-9px;transform:rotate(-4deg);
+  left:50%;translate:-50%;
+  pointer-events:none;
+}
+.scrap-form::after{
+  background:rgba(230,230,230,.28);
+  top:auto;bottom:-9px;transform:rotate(3deg);
+}
+
+.scrap-form h2{
+  font-family:'Special Elite',monospace;
+  margin-bottom:1.25rem;
+  font-size:1.4rem;
+  text-shadow:0 1px 0 #0002;
+}
+.scrap-form label{
+  display:block;
+  margin-bottom:1.15rem;
+  font-family:'Special Elite',monospace;
+  letter-spacing:.4px;
+}
+.scrap-form input,.scrap-form textarea{
+  display:block;
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px dashed #6b5b4a;
+  font:inherit;
+  padding:.4rem 0 .3rem;
+  color:inherit;
+  resize:vertical;
+}
+.scrap-form input:focus,.scrap-form textarea:focus{
+  outline:none;
+  border-bottom:1px solid #6b5b4a;
+  box-shadow:0 1px 0 #d6b98e inset;
+}
+.scrap-form button{
+  margin-top:.7rem;
+  padding:.6rem 1.6rem;
+  font-family:'Special Elite',monospace;
+  font-size:.95rem;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  background:#6e4d34;
+  color:#f3e8d1;
+  border:none;
+  border-radius:3px;
+  cursor:pointer;
+  box-shadow:inset 0 0 0 1px #8e725d,0 3px 0 #0003;
+  transition:transform .15s ease,filter .15s;
+}
+.scrap-form button:hover{
+  filter:brightness(.9);
+  transform:translateY(-1px) rotate(-0.5deg);
+}
+</style>
+</head>
+<body>
+<form class="scrap-form">
+  <h2>Contact the Outpost</h2>
+  <label>Codename
+    <input type="text" placeholder="Nomad-42" required>
+  </label>
+  <label>Message
+    <textarea rows="4" placeholder="Report your findings…" required></textarea>
+  </label>
+  <button type="submit">Transmit</button>
+</form>
+</body>
+</html>

@@ -19,7 +19,7 @@
 <div class="character-tab space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-            <label for="name" class="text-sm font-bold text-surface-900 dark:text-surface-200 uppercase tracking-wide">👤 Mutantnamn</label>
+            <label for="name" class="text-sm font-bold text-surface-900 dark:text-surface-200 uppercase tracking-wide">👤 Namn</label>
             <input type="text" 
                    class="input font-user" 
                    data-tooltip="Vad kallar dig de andra överlevarna?" 

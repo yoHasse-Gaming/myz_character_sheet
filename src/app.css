@@ -1,21 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
 @import 'tailwindcss';
 
+
+
 @import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/themes/terminus';
+@import '@skeletonlabs/skeleton/themes/vintage';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 
 /* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
 :root {
     /* Override theme colors for post-apocalyptic feel */
-    --color-surface-50: #0f0f0f;
-    --color-surface-100: #1a1a1a;
-    --color-surface-200: #262626;
-    --color-surface-300: #404040;
-    --color-surface-400: #525252;
-    --color-surface-500: #737373;
-    --color-surface-600: #a3a3a3;
-    --color-surface-700: #d4d4d4;
-    --color-surface-800: #e5e5e5;
-    --color-surface-900: #f5f5f5;
+    --color-surface-50: #f5f5f5;
+    --color-surface-100: #e5e5e5;
+    --color-surface-200: #d4d4d4;
+    --color-surface-300: #a3a3a3;
+    --color-surface-400: #737373;
+    --color-surface-500: #525252;
+    --color-surface-600: #404040;
+    --color-surface-700: #262626;
+    --color-surface-800: #1a1a1a;
+    --color-surface-900: #0f0f0f;
     
     --color-primary-50: #fef3c7;
     --color-primary-100: #fde68a;
@@ -32,6 +39,8 @@
     --color-warning-400: #dc2626;
     --color-warning-500: #b91c1c;
     --color-warning-600: #991b1b;
+
+    --font-user: Kalam, sans-serif;
 }
 
 body {
@@ -43,6 +52,16 @@ body {
     font-family: 'Courier New', monospace;
     min-height: 100vh;
     position: relative;
+}
+
+
+
+/* Light mode body styling */
+.light body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, #e5e5e5 0%, #f5f5f5 100%);
 }
 
 body::before {
@@ -73,16 +92,25 @@ body::before {
 
 /* Wasteland styling */
 .sheet-container {
+    background: var(--color-surface-100);
+    border: 2px solid var(--color-surface-400);
+    border-radius: 4px;
+    box-shadow: 
+        0 0 30px rgba(217, 119, 6, 0.1),
+        inset 0 0 30px rgba(0, 0, 0, 0.1),
+        0 0 60px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.dark .sheet-container {
     background: rgba(26, 26, 26, 0.95);
     border: 2px solid #404040;
-    border-radius: 4px;
     box-shadow: 
         0 0 30px rgba(217, 119, 6, 0.15),
         inset 0 0 30px rgba(0, 0, 0, 0.5),
         0 0 60px rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
 }
 
 .sheet-container::before {
@@ -103,7 +131,7 @@ body::before {
             rgba(220, 38, 38, 0.03) 0%, 
             transparent 50%
         );
-    animation: contamination 20s linear infinite;
+    /* animation: contamination 20s linear infinite; */
     pointer-events: none;
     z-index: -1;
 }
@@ -116,13 +144,21 @@ body::before {
 
 /* Gritty form sections */
 .card {
+    background: var(--color-surface-200) !important;
+    border: 1px solid var(--color-surface-400);
+    border-radius: 2px;
+    box-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(115, 115, 115, 0.1);
+    position: relative;
+}
+
+.dark .card {
     background: rgba(38, 38, 38, 0.9) !important;
     border: 1px solid #525252;
-    border-radius: 2px;
     box-shadow: 
         0 2px 10px rgba(0, 0, 0, 0.7),
         inset 0 1px 0 rgba(115, 115, 115, 0.1);
-    position: relative;
 }
 
 .card::before {
@@ -177,16 +213,29 @@ body::before {
 
 /* Distressed input fields */
 .input {
+    background: var(--color-surface-50) !important;
+    border: 1px solid var(--color-surface-400) !important;
+    color: var(--color-surface-900) !important;
+    font-family: 'Courier New', monospace;
+    border-radius: 0 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .input {
     background: rgba(15, 15, 15, 0.8) !important;
     border: 1px solid #525252 !important;
     color: #d4d4d4 !important;
-    font-family: 'Courier New', monospace;
-    border-radius: 0 !important;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
 .input:focus {
     border-color: #d97706 !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.2),
+        0 0 0 2px rgba(217, 119, 6, 0.2) !important;
+}
+
+.dark .input:focus {
     box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.6),
         0 0 0 2px rgba(217, 119, 6, 0.2) !important;
@@ -229,19 +278,35 @@ body::before {
 /* Radioactive tab styling */
 .tab-content {
     border-top: 2px solid #d97706;
-    background: rgba(38, 38, 38, 0.7);
+    background: var(--color-surface-200);
     padding: 1.5rem;
     position: relative;
 }
 
+.dark .tab-content {
+    background: var(--color-surface-900);
+}
+
+
 /* Contaminated table styling */
 .table {
+    background: var(--color-surface-100) !important;
+    border: 1px solid var(--color-surface-400);
+}
+
+.dark .table {
     background: rgba(15, 15, 15, 0.6) !important;
     border: 1px solid #525252;
 }
 
 .table th,
 .table td {
+    border-color: var(--color-surface-400) !important;
+    color: var(--color-surface-900);
+}
+
+.dark .table th,
+.dark .table td {
     border-color: #404040 !important;
     color: #d4d4d4;
 }
@@ -252,9 +317,14 @@ body::before {
 
 /* Checkbox mutations */
 .checkbox {
+    border: 2px solid var(--color-surface-500);
+    background: var(--color-surface-50);
+    border-radius: 0;
+}
+
+.dark .checkbox {
     border: 2px solid #737373;
     background: rgba(15, 15, 15, 0.8);
-    border-radius: 0;
 }
 
 .checkbox:checked {
@@ -265,26 +335,44 @@ body::before {
 /* Typography */
 .h2 {
     color: #d97706;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-family: 'Courier New', monospace;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
+.light .h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
 .h4 {
-    color: #fef3c7;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    color: var(--color-surface-900);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     font-family: 'Courier New', monospace;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+.dark .h4 {
+    color: #fef3c7;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
 /* Ground abilities wasteland styling */
 .ground-ability-grid {
-    background: rgba(15, 15, 15, 0.8) !important;
-    border: 1px solid #525252;
+    background: var(--color-surface-100) !important;
+    border: 1px solid var(--color-surface-400);
     border-radius: 0;
     position: relative;
+}
+
+.dark .ground-ability-grid {
+    background: rgba(15, 15, 15, 0.8) !important;
+    border: 1px solid #525252;
 }
 
 .ground-ability-grid::before {
@@ -305,9 +393,14 @@ body::before {
 
 /* Skills contamination effect */
 .skill-item {
+    border: 1px solid var(--color-surface-400) !important;
+    background: var(--color-surface-100) !important;
+    transition: all 0.3s ease;
+}
+
+.dark .skill-item {
     border: 1px solid #404040 !important;
     background: rgba(15, 15, 15, 0.6) !important;
-    transition: all 0.3s ease;
 }
 
 .skill-item:hover {
@@ -339,4 +432,8 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+.input.font-user {
+    font-family: var(--font-user), sans-serif;
 }

@@ -1,10 +1,63 @@
 
 <script lang="ts">
     import { onMount } from 'svelte';
-    import tooltip from "$lib/tooltip";
+    import {
+        FloatingArrow,
+        arrow,
+        autoUpdate,
+        flip,
+        offset,
+        shift,
+        useClick,
+        useDismiss,
+        useFloating,
+        useInteractions,
+        useRole,
+    } from "@skeletonlabs/floating-ui-svelte";
+    import { fade } from "svelte/transition";
+    import { useHover } from '@skeletonlabs/floating-ui-svelte';
 
+    let openSkillIndex = $state<number | null>(null);
+    let elemArrow: HTMLElement | null = $state(null);
 
-let skills = [
+    // Create floating instance for each skill
+    function createFloatingForSkill(skillIndex: number) {
+        const isOpen = () => openSkillIndex === skillIndex;
+        
+        const floating = useFloating({
+            whileElementsMounted: autoUpdate,
+            get open() {
+                return isOpen();
+            },
+            onOpenChange: (v) => {
+                openSkillIndex = v ? skillIndex : null;
+            },
+            placement: "top",
+            get middleware() {
+                return [offset(10), flip(), shift({ padding: 8 }), elemArrow && arrow({ element: elemArrow })];
+            },
+        });
+
+        const hover = useHover(floating.context, {
+            delay: { open: 300, close: 100 }
+        });
+        const dismiss = useDismiss(floating.context);
+        const role = useRole(floating.context, { role: "tooltip" });
+        const interactions = useInteractions([hover, dismiss, role]);
+
+        return { floating, interactions };
+    }
+
+    type Skill = {
+        name: string;
+        baseAbility: string;
+        description: string;
+        bonusEffects: string;
+        examples?: string;
+        value: number;
+    };
+
+    let skills: Skill[] = [
 
     {
         name: "Kämpa på",
@@ -117,38 +170,126 @@ let skills = [
 ];
 
 
-    // onMount(() => {
-    //     // Initialize tooltips for each skill
-    //     skills.forEach(skill => {
-    //         tippy(`#${skill.name}`, {
-    //             content: skill.description,
-    //             placement: 'bottom',
-    //             theme: 'light',
-    //             arrow: true,
-    //             delay: 100
-    //         });
-    //     });
-    // });
+
 
 </script>
 
 <div class="skills-tab space-y-3">
-    {#each skills as skill}
+    {#each skills as skill, index}
+        {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item flex items-center justify-between p-2 bg-surface-200 dark:bg-surface-700 rounded">
-            <label class="label cursor-pointer flex-grow mr-4"
-                   use:tooltip={{ 
-                       content: skill.description + (skill.bonusEffects ? `<br><strong>Bonus:</strong> ${skill.bonusEffects}` : '') + (skill.examples ? `<br><strong>Exempel:</strong> ${skill.examples}` : ''),
-                       allowHTML: true,
-                   }} 
-                   for={skill.name}>
-                <span class="text-sm font-medium">{skill.name} ({skill.baseAbility})</span>
-            </label>
+            <div class="flex items-center flex-grow mr-4">
+                <label class="label cursor-pointer">
+                    <span class="text-sm font-medium">{skill.name} ({skill.baseAbility})</span>
+                </label>
+                <button 
+                    class="info-icon ml-2 p-1 rounded-full hover:bg-surface-300 dark:hover:bg-surface-600 transition-colors"
+                    bind:this={floating.elements.reference}
+                    {...interactions.getReferenceProps()}
+                    aria-label="Show skill information"
+                >
+                    <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        stroke-width="2" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round"
+                        class="text-surface-600 dark:text-surface-400"
+                    >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14"></path>
+                        <circle cx="12" cy="17" r=".5"></circle>
+                    </svg>
+                </button>
+            </div>
             <input name={skill.name} 
                    type="number" 
                    min="0" 
-                   class="input input-sm w-16 text-center" 
+                   class="input input-sm w-16 text-center font-user" 
                    bind:value={skill.value} />
         </div>
+
+        {#if openSkillIndex === index}
+            <div
+                bind:this={floating.elements.floating}
+                style={floating.floatingStyles}
+                class="floating-tooltip"
+                {...interactions.getFloatingProps()}
+                transition:fade={{ duration: 150 }}
+            >
+                <div class="tooltip-content bg-surface-100 dark:bg-surface-700 border border-surface-300 dark:border-surface-300 rounded-lg p-4 shadow-lg max-w-sm">
+                    <h3 class="font-bold text-lg mb-2 text-orange-400">{skill.name}</h3>
+                    <div class="mb-3">
+                        <h4 class="font-semibold text-sm mb-1 text-surface-800 dark:text-surface-100">Beskrivning:</h4>
+                        <div class="text-sm text-surface-700 dark:text-surface-300 italic">{@html skill.description}</div>
+                    </div>
+                    <div class="mb-2">
+                        <h4 class="font-semibold text-sm mb-1 text-surface-800 dark:text-surface-100">Bonuseffekter:</h4>
+                        <div class="text-sm text-surface-700 dark:text-surface-200">{@html skill.bonusEffects}</div>
+                    </div>
+                    {#if skill.examples}
+                        <div>
+                            <h4 class="font-semibold text-sm mb-1 text-surface-800 dark:text-surface-100">Exempel:</h4>
+                            <div class="text-sm text-surface-700 dark:text-surface-200">{@html skill.examples}</div>
+                        </div>
+                    {/if}
+                </div>
+                <FloatingArrow bind:ref={elemArrow} context={floating.context} class="fill-surface-100" />
+            </div>
+        {/if}
     {/each}
 </div>
 
+<style>
+    .floating-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        max-width: 320px;
+    }
+
+    .tooltip-content {
+        line-height: 1.4;
+    }
+
+    .tooltip-content :global(strong) {
+        font-weight: 600;
+        color: var(--color-warning-500);
+    }
+
+    .tooltip-content :global(ul) {
+        margin: 0.5rem 0;
+        padding-left: 1rem;
+    }
+
+    .tooltip-content :global(li) {
+        margin: 0.25rem 0;
+        color: inherit;
+    }
+
+    .tooltip-content :global(p) {
+        margin: 0.5rem 0;
+        color: inherit;
+    }
+
+    .info-icon {
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+    }
+
+    .info-icon:hover {
+        opacity: 1;
+    }
+
+    .info-icon svg {
+        transition: transform 0.2s ease;
+    }
+
+    .info-icon:hover svg {
+        transform: scale(1.1);
+    }
+</style>

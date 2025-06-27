@@ -1,11 +1,11 @@
 <script lang="ts">
     import FormSection from '$lib/components/FormSection.svelte';
-    import GroundAbility from '$lib/components/GroundAbility.svelte';
+    import BaseAbility from '$lib/components/BaseAbility.svelte';
     import { onMount } from 'svelte';
     import Skills from '../Skills.svelte';
-    import type { GroundAbilityType } from '$lib/types';
+    import type { BaseAbilityType } from '$lib/types';
 
-    export let groundAbilities: GroundAbilityType[] = [
+    export let baseAbilities: BaseAbilityType[] = [
         { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0 },
         { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0 },
         { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0 },
@@ -27,12 +27,12 @@
                 <div class="space-y-6">
                     <FormSection header="⚠️ GRUNDEGENSKAPER">
                         <div class="space-y-4">
-                            {#each groundAbilities as ability}
-                                <GroundAbility
-                                    groundAbilityLabel={ability.label}
-                                    groundAbilityDmgLabel={ability.damageLabel}
-                                    bind:groundAbilityValue={ability.value}
-                                    bind:groundAbilityDmg={ability.damage}
+                            {#each baseAbilities as ability}
+                                <BaseAbility
+                                    baseAbilityLabel={ability.label}
+                                    baseAbilityDmgLabel={ability.damageLabel}
+                                    bind:baseAbilityValue={ability.value}
+                                    bind:baseAbilityDmg={ability.damage}
                                 />
                             {/each}
                         </div>
@@ -57,7 +57,7 @@
                                     <tr class="hover:bg-warning-500/10">
                                         <td class="font-medium text-warning-400">💀 Kritiska skador:</td>
                                         <td colspan="3">
-                                            <input type="text" class="input input-sm w-full" placeholder="Beskrivning av allvarliga skador..." />
+                                            <input type="text" class="input input-sm w-full font-user" placeholder="Beskrivning av allvarliga skador..." />
                                         </td>
                                     </tr>
                                 </tbody>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import FormSection from '$lib/components/FormSection.svelte';
-    import GroundAbility from '$lib/components/GroundAbility.svelte';
+    import GroundAbility from '$lib/components/BaseAbility.svelte';
     import Skills from '$lib/components/Skills.svelte';
     import AbilitiesTab from '$lib/components/tabs/AbilitiesTab.svelte';
     import CharacterTab from '$lib/components/tabs/CharacterTab.svelte';
@@ -65,18 +65,18 @@
 </script>
 
 <main class="sheet-container">
-<div class="text-center mb-8">
+<!-- <div class="text-center mb-8">
     <h2 class="h2 mb-2">☢️ ROLLFORMULÄR ☢️</h2>
     <h3 class="text-lg text-surface-400 uppercase tracking-wider">Mutant: År Noll</h3>
     <div class="border-t-2 border-primary-500 w-32 mx-auto mt-4"></div>
-</div>
+</div> -->
 
 <!-- Tab Navigation using post-apocalyptic styling -->
-<div class="flex border-b-2 border-primary-600 mb-8 bg-surface-100 p-1">
+<div class="flex border-b-2 border-primary-600 mb-0 bg-surface-200 dark:bg-surface-900 p-1">
     {#each tabs as tab}
         <button 
-            class="px-6 py-3 font-bold text-sm uppercase tracking-wide transition-all duration-200 {activeTab === tab.id ? 'bg-primary-500 text-surface-50 shadow-lg' : 'text-surface-400 hover:text-surface-200 hover:bg-surface-200'}"
-            on:click={() => activeTab = tab.id}
+            class="px-6 py-3 font-bold text-sm uppercase tracking-wide transition-all duration-200 {activeTab === tab.id ? 'bg-primary-500 text-surface-50 shadow-lg' : 'text-surface-400 hover:dark:text-surface-100 hover:text-surface-800 hover:bg-surface-300 hover:dark:bg-surface-700'}"
+            onclick={() => activeTab = tab.id}
         >
             {tab.label}
         </button>

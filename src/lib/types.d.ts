@@ -50,7 +50,7 @@ export type KeyValuePair = {
     value: string;
 }
 
-export type GroundAbilityType = {
+export type BaseAbilityType = {
     label: string;
     damageLabel: string;
     value: number;

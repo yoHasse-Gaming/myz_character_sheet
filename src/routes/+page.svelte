@@ -5,109 +5,7 @@
     import AbilitiesTab from '$lib/components/tabs/AbilitiesTab.svelte';
     import CharacterTab from '$lib/components/tabs/CharacterTab.svelte';
     import { onMount } from 'svelte';
-
-    type Talent = {
-        name: string;
-        description: string;
-    }
-
-    type Mutation = {
-        name: string;
-        description: string;
-    }
-
-    type Skill = {
-        name: string;
-        description: string;
-        value: number;
-        groundAbility: string;
-    }
-
-    type Equipment = {
-        name: string;
-        description: string;
-        total: number;
-        weight: number;
-    }
-
-    type Armor = {
-        name: string;
-        description: string;
-        protection: number;
-        weight: number;
-    }
-
-    type Weapon = {
-        name: string;
-        description: string;
-        bonus: number;
-        damage: number;
-        range: number;
-        weight: number;
-    }
-
-    type RPRelation = {
-        name: string;
-        description: string;
-        isClose: boolean;
-    }
-
-    type KeyValuePair = {
-        key: string;
-        value: string;
-    }
-
-    type MyCharSheet = {
-        name: string;
-        job: string;
-        appearance: {
-            face: string;
-            body: string;
-            clothes: string;
-        };
-        groundAbilities: {
-            strength: {
-                value: number;
-                damage: number;
-            };
-            coolness: {
-                value: number;
-                damage: number;
-            };
-            sharpness: {
-                value: number;
-                damage: number;
-            };
-            feeling: {
-                value: number;
-                damage: number;
-            }
-        };
-        condition: {
-            isStarving: boolean;
-            isSleepDeprived: boolean;
-            isDehydrated: boolean;
-            isFreezing: boolean;
-        };
-        acuteWounds: string[];
-
-        talents: Talent[];
-        mutations: Mutation[];
-        skills: Skill[];
-        talentPoints: number;
-        mutationPoints: number;
-        equipment: Equipment[];
-        zoneRot: number;
-        shells: number;
-        armor: Armor[];
-        weapons: Weapon[];
-        rPRelations: RPRelation[];
-        hates: KeyValuePair,
-        loves: KeyValuePair,
-        myBiggestDream: KeyValuePair,
-
-        notes: string[];
-    }
+    import type { MyCharSheet, KeyValuePair } from '$lib/types';
 
     const formData: MyCharSheet = {
         name: '',
@@ -164,25 +62,26 @@
         { id: 4, label: 'Övrigt' }
     ];
 
-
 </script>
 
-<main class="container">
-<h2>Rollformulär Mutant År: Noll</h2>
+<main class="sheet-container">
+<div class="text-center mb-8">
+    <h2 class="h2 mb-2">☢️ ROLLFORMULÄR ☢️</h2>
+    <h3 class="text-lg text-surface-400 uppercase tracking-wider">Mutant: År Noll</h3>
+    <div class="border-t-2 border-primary-500 w-32 mx-auto mt-4"></div>
+</div>
 
-<!-- Tab Navigation -->
-<nav class="tab-nav">
-    <div role="group">
+<!-- Tab Navigation using post-apocalyptic styling -->
+<div class="flex border-b-2 border-primary-600 mb-8 bg-surface-100 p-1">
     {#each tabs as tab}
         <button 
-            class="tab-button {activeTab === tab.id ? 'active' : ''}"
+            class="px-6 py-3 font-bold text-sm uppercase tracking-wide transition-all duration-200 {activeTab === tab.id ? 'bg-primary-500 text-surface-50 shadow-lg' : 'text-surface-400 hover:text-surface-200 hover:bg-surface-200'}"
             on:click={() => activeTab = tab.id}
         >
             {tab.label}
         </button>
     {/each}
-    </div>
-</nav>
+</div>
 
 <!-- Tab Content -->
 <div class="tab-content">
@@ -190,7 +89,6 @@
     <!-- Tab 1: Karaktär -->
     {#if activeTab === 1}
         <CharacterTab />
-
     {/if}
 
     <!-- Tab 2: Egenskaper -->
@@ -201,12 +99,20 @@
     <!-- Tab 3: Talanger & Mutationer -->
     {#if activeTab === 3}
         <div class="talents-mutations-tab">
-            <div class="grid">
-                <FormSection header="TALANGER">
-                    <p></p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <FormSection header="⚡ TALANGER">
+                    <div class="text-center py-8 text-surface-400">
+                        <div class="text-4xl mb-2">🎯</div>
+                        <p class="italic">Överlevnadsfärdigheter från Zonen...</p>
+                        <p class="text-sm mt-2">Kommer implementeras</p>
+                    </div>
                 </FormSection>
-                <FormSection header="MUTATIONER">
-                    <p>Mutationer kommer här...</p>
+                <FormSection header="🧬 MUTATIONER">
+                    <div class="text-center py-8 text-surface-400">
+                        <div class="text-4xl mb-2">☢️</div>
+                        <p class="italic">Zonens gåva... eller förbannelse</p>
+                        <p class="text-sm mt-2">Kommer implementeras</p>
+                    </div>
                 </FormSection>
             </div>
         </div>
@@ -214,18 +120,30 @@
 
     <!-- Tab 4: Övrigt -->
     {#if activeTab === 4}
-        <div class="other-tab">
-            <FormSection header="UTRUSTNING">
-                <p>Utrustning kommer här...</p>
+        <div class="other-tab space-y-6">
+            <FormSection header="🎒 UTRUSTNING">
+                <div class="text-center py-6 text-surface-400">
+                    <div class="text-3xl mb-2">📦</div>
+                    <p class="italic">Skrot och rost som håller dig vid liv...</p>
+                </div>
             </FormSection>
-            <FormSection header="VAPEN & RUSTNING">
-                <p>Vapen och rustning kommer här...</p>
+            <FormSection header="⚔️ VAPEN & RUSTNING">
+                <div class="text-center py-6 text-surface-400">
+                    <div class="text-3xl mb-2">🛡️</div>
+                    <p class="italic">Ditt skydd mot Zonens faror</p>
+                </div>
             </FormSection>
-            <FormSection header="RELATIONER">
-                <p>Relationer kommer här...</p>
+            <FormSection header="👥 RELATIONER">
+                <div class="text-center py-6 text-surface-400">
+                    <div class="text-3xl mb-2">🤝</div>
+                    <p class="italic">Vänner och fiender i ödemarken</p>
+                </div>
             </FormSection>
-            <FormSection header="ANTECKNINGAR">
-                <p>Anteckningar kommer här...</p>
+            <FormSection header="📝 ANTECKNINGAR">
+                <div class="text-center py-6 text-surface-400">
+                    <div class="text-3xl mb-2">📋</div>
+                    <p class="italic">Minnen från den gamla världen...</p>
+                </div>
             </FormSection>
         </div>
     {/if}
@@ -233,49 +151,4 @@
 </div>
 
 </main>
-<style>
 
-    .container {
-        min-width: 1024px;
-        /* max-width: 1024px; */
-        overflow: hidden;
-    }
-
-    /* Tab Navigation Styles */
-    .tab-nav {
-        display: flex;
-        gap: 0;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid #ccc;
-    }
-
-    .tab-button {
-        background: #f5f5f5;
-        border: 1px solid #ccc;
-        border-bottom: none;
-        padding: 1rem 1.5rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        font-weight: 500;
-        color: black;
-    }
-
-    .tab-button:hover {
-        background: #e9e9e9;
-        color: black;
-    }
-
-    .tab-button.active {
-        background: white;
-        border-bottom: 2px solid white;
-        margin-bottom: -2px;
-        z-index: 1;
-        position: relative;
-        color: black;
-    }
-
-    .tab-content {
-        padding: 1rem 0;
-    }
-
-</style>

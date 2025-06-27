@@ -24,96 +24,54 @@
 </script>
 
 
-<div class="grid ground-ability">
-
-    <label for={groundAbilityLabel} class="ground-ability-value-label">{groundAbilityLabel}</label>
-    <input type="number" max="10" min="1" class="ground-ability-value" name={groundAbilityLabel} bind:value={groundAbilityValue} />
-    <div>
-        <span class="ground-ability-damage-label">{groundAbilityDmgLabel}</span>
-        <div class="grid ground-ability-damage">
+<div class="ground-ability-grid bg-surface-200 dark:bg-surface-700 p-4 rounded-lg">
+    <label for={groundAbilityLabel} class="label font-semibold">{groundAbilityLabel}</label>
+    <input type="number" 
+           max="10" 
+           min="1" 
+           class="input input-sm w-16" 
+           name={groundAbilityLabel} 
+           bind:value={groundAbilityValue} />
+    <div class="space-y-2">
+        <span class="text-sm font-medium">{groundAbilityDmgLabel}</span>
+        <div class="flex gap-1">
             {#each [0, 1, 2, 3, 4, 5] as idx}
                 <input 
                     type="radio" 
                     disabled
-                    style="opacity: 1;"
-                    name="{groundAbilityLabel}_{idx}" readonly checked={groundAbilityDmg > idx ? true : null} />
+                    class="radio radio-sm opacity-100"
+                    name="{groundAbilityLabel}_{idx}" 
+                    readonly 
+                    checked={groundAbilityDmg > idx ? true : null} />
             {/each}
         </div>
     </div>
-    <div class="ground-ability-damage-buttons">
-        <button onclick={increasGroundAbilityDmg} aria-label="Increase damage" >
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M9 12h6" /><path d="M12 9v6" /></svg>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-sm variant-filled-primary" onclick={increasGroundAbilityDmg} aria-label="Increase damage">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                <path d="M9 12h6" />
+                <path d="M12 9v6" />
+            </svg>
         </button>
-        <button onclick={decreaseGroundAbilityDmg} aria-label="Decrease damage" >
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l6 0" /></svg>
+        <button type="button" class="btn btn-sm variant-filled-primary" onclick={decreaseGroundAbilityDmg} aria-label="Decrease damage">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                <path d="M9 12l6 0" />
+            </svg>
         </button>
-
     </div>
-
-
-
-
-
 </div>
-<!-- Make these buttons to appear at the end of the ground ability section, next to the damage inputs. -->
 
-
+<!-- Custom styling overrides for ground abilities -->
 
 <style>
-
-    .ground-ability {
-        width: auto;
-        grid-template-columns: 5rem 4rem 10rem 1.5rem;
-
-        /* grid-template-columns: 100px 50px 1fr; */
-
+    .ground-ability-grid {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto;
+        gap: 1rem;
+        align-items: start;
     }
-
-
-
-    .ground-ability-value {
-        max-width: 100px;
-    }
-
-    .ground-ability-damage-label {
-        margin-bottom: 1rem;
-    }
-
-    .ground-ability-damage {
-        gap: 24px;
-        max-width: 10rem;
-    }
-
-    .ground-ability-damage-buttons {
-        max-height: 24px;
-        
-    }
-    .ground-ability-damage-buttons>button {
-        padding: 0;
-        min-height: 12px;
-    }
-
-    .ground-ability-damage-buttons>button:nth-child(1) {
-        border-bottom-left-radius: 0px;
-        border-bottom-right-radius: 0px;
-    }
-    .ground-ability-damage-buttons>button:nth-child(2) {
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-    }
-
-    .ground-ability-damage-buttons>button svg {
-        width: 24px;
-        height: 24px;
-        float: inline-end;
-    }
-
-    
-
-    label {
-        font-weight: bold;
-    }
-
-
-
 </style>

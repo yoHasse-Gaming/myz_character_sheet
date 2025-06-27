@@ -2,23 +2,20 @@
     export let label = '';
     export let type = 'text';
     export let bindValue: any;
-  </script>
-  
-  <div class="input-field">
-    <label>{label}</label>
-    <input type={type} bind:value={bindValue} />
-  </div>
-  
-<style>
-.input-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-</style>
+</script>
+
+<div class="space-y-2">
+    {#if label}
+        <label class="label" for={label.toLowerCase().replace(' ', '-')}>
+            <span class="text-sm font-medium">{label}</span>
+        </label>
+    {/if}
+    <input 
+        class="input" 
+        id={label.toLowerCase().replace(' ', '-')}
+        {type} 
+        bind:value={bindValue} 
+        placeholder={label}
+    />
+</div>
   

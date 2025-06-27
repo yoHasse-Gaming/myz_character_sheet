@@ -1,23 +1,11 @@
-<script>
+<script lang="ts">
     export let label = '';
-    export let bindValue;
-  </script>
-  
-  <div class="text-area">
-    <label>{label}</label>
-    <textarea bind:value={bindValue}></textarea>
-  </div>
-  
-  <style>
-    .text-area {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    textarea {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: vertical;
-    }
-  </style>
+    export let bindValue: string;
+</script>
+
+<div class="form-control w-full">
+    <label class="label">
+        <span class="label-text">{label}</span>
+    </label>
+    <textarea class="textarea textarea-bordered h-24" bind:value={bindValue}></textarea>
+</div>

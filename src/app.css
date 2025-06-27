@@ -1,0 +1,342 @@
+@import 'tailwindcss';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/themes/terminus';
+
+/* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
+:root {
+    /* Override theme colors for post-apocalyptic feel */
+    --color-surface-50: #0f0f0f;
+    --color-surface-100: #1a1a1a;
+    --color-surface-200: #262626;
+    --color-surface-300: #404040;
+    --color-surface-400: #525252;
+    --color-surface-500: #737373;
+    --color-surface-600: #a3a3a3;
+    --color-surface-700: #d4d4d4;
+    --color-surface-800: #e5e5e5;
+    --color-surface-900: #f5f5f5;
+    
+    --color-primary-50: #fef3c7;
+    --color-primary-100: #fde68a;
+    --color-primary-200: #fcd34d;
+    --color-primary-300: #fbbf24;
+    --color-primary-400: #f59e0b;
+    --color-primary-500: #d97706;
+    --color-primary-600: #b45309;
+    --color-primary-700: #92400e;
+    --color-primary-800: #78350f;
+    --color-primary-900: #451a03;
+    
+    /* Rust and decay colors */
+    --color-warning-400: #dc2626;
+    --color-warning-500: #b91c1c;
+    --color-warning-600: #991b1b;
+}
+
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+    background-attachment: fixed;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 100px,
+            rgba(217, 119, 6, 0.02) 100px,
+            rgba(217, 119, 6, 0.02) 101px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 100px,
+            rgba(220, 38, 38, 0.02) 100px,
+            rgba(220, 38, 38, 0.02) 101px
+        );
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Wasteland styling */
+.sheet-container {
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid #404040;
+    border-radius: 4px;
+    box-shadow: 
+        0 0 30px rgba(217, 119, 6, 0.15),
+        inset 0 0 30px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.sheet-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(
+            circle at 30% 70%, 
+            rgba(217, 119, 6, 0.05) 0%, 
+            transparent 50%
+        ),
+        radial-gradient(
+            circle at 70% 30%, 
+            rgba(220, 38, 38, 0.03) 0%, 
+            transparent 50%
+        );
+    animation: contamination 20s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes contamination {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Gritty form sections */
+.card {
+    background: rgba(38, 38, 38, 0.9) !important;
+    border: 1px solid #525252;
+    border-radius: 2px;
+    box-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(115, 115, 115, 0.1);
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(64, 64, 64, 0.1) 2px,
+            rgba(64, 64, 64, 0.1) 4px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Rusted header styling */
+.card-header {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    border-bottom: 2px solid #78350f;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(120, 53, 15, 0.3) 10px,
+            rgba(120, 53, 15, 0.3) 20px
+        );
+}
+
+/* Distressed input fields */
+.input {
+    background: rgba(15, 15, 15, 0.8) !important;
+    border: 1px solid #525252 !important;
+    color: #d4d4d4 !important;
+    font-family: 'Courier New', monospace;
+    border-radius: 0 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.input:focus {
+    border-color: #d97706 !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.6),
+        0 0 0 2px rgba(217, 119, 6, 0.2) !important;
+}
+
+.input::placeholder {
+    color: #737373;
+}
+
+/* Weathered buttons */
+.btn {
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0 !important;
+    border: 1px solid #525252;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(115, 115, 115, 0.1);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(115, 115, 115, 0.2);
+}
+
+.variant-filled-primary {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: #fef3c7 !important;
+}
+
+.variant-filled-secondary {
+    background: linear-gradient(135deg, #525252, #404040) !important;
+    color: #d4d4d4 !important;
+}
+
+/* Radioactive tab styling */
+.tab-content {
+    border-top: 2px solid #d97706;
+    background: rgba(38, 38, 38, 0.7);
+    padding: 1.5rem;
+    position: relative;
+}
+
+/* Contaminated table styling */
+.table {
+    background: rgba(15, 15, 15, 0.6) !important;
+    border: 1px solid #525252;
+}
+
+.table th,
+.table td {
+    border-color: #404040 !important;
+    color: #d4d4d4;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(217, 119, 6, 0.1) !important;
+}
+
+/* Checkbox mutations */
+.checkbox {
+    border: 2px solid #737373;
+    background: rgba(15, 15, 15, 0.8);
+    border-radius: 0;
+}
+
+.checkbox:checked {
+    background: #d97706;
+    border-color: #b45309;
+}
+
+/* Typography */
+.h2 {
+    color: #d97706;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.h4 {
+    color: #fef3c7;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Ground abilities wasteland styling */
+.ground-ability-grid {
+    background: rgba(15, 15, 15, 0.8) !important;
+    border: 1px solid #525252;
+    border-radius: 0;
+    position: relative;
+}
+
+.ground-ability-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(
+            circle at 20% 50%, 
+            rgba(217, 119, 6, 0.1) 0%, 
+            transparent 50%
+        );
+    pointer-events: none;
+}
+
+/* Skills contamination effect */
+.skill-item {
+    border: 1px solid #404040 !important;
+    background: rgba(15, 15, 15, 0.6) !important;
+    transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+    border-color: #d97706;
+    background: rgba(217, 119, 6, 0.1) !important;
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.2);
+}
+
+/* Custom utility classes for consistent styling */
+.btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-group-vertical .btn {
+    margin-bottom: 0.25rem;
+    border-radius: 0;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Character sheet specific styles */
+.sheet-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}

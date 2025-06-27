@@ -132,43 +132,23 @@ let skills = [
 
 </script>
 
-<div class="skills-tab">
-    
-        {#each skills as skill}
-            <div class="skill-item">
-                <label use:tooltip={{ 
-                    content: skill.description + (skill.bonusEffects ? `<br><strong>Bonus:</strong> ${skill.bonusEffects}` : '') + (skill.examples ? `<br><strong>Exempel:</strong> ${skill.examples}` : ''),
-                    allowHTML: true,
-                }} for={skill.name}>{skill.name} ({skill.baseAbility})</label>
-
-                <input name={skill.name} type="number" min="0" bind:value={skill.value} />
-            </div>
-        {/each}
-    
+<div class="skills-tab space-y-3">
+    {#each skills as skill}
+        <div class="skill-item flex items-center justify-between p-2 bg-surface-200 dark:bg-surface-700 rounded">
+            <label class="label cursor-pointer flex-grow mr-4"
+                   use:tooltip={{ 
+                       content: skill.description + (skill.bonusEffects ? `<br><strong>Bonus:</strong> ${skill.bonusEffects}` : '') + (skill.examples ? `<br><strong>Exempel:</strong> ${skill.examples}` : ''),
+                       allowHTML: true,
+                   }} 
+                   for={skill.name}>
+                <span class="text-sm font-medium">{skill.name} ({skill.baseAbility})</span>
+            </label>
+            <input name={skill.name} 
+                   type="number" 
+                   min="0" 
+                   class="input input-sm w-16 text-center" 
+                   bind:value={skill.value} />
+        </div>
+    {/each}
 </div>
 
-<style>
-
-    .skill-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        height: 3rem;
-    }
-
-    .skill-item label {
-        flex-grow: 1;
-        margin-right: 1rem;
-    }
-
-    .skill-details {
-        flex-grow: 2;
-        color: var(--color-secondary-text);
-    }
-
-    input[type="number"] {
-        width: 4rem;
-    }
-
-</style>

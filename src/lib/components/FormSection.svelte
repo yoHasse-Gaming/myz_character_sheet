@@ -1,37 +1,18 @@
 <script lang="ts">
-
     let {header, children}: {
         header?: string | undefined,
         children?: () => any
     } = $props();
-
-
 </script>
 
-<div>
-
-
-<article>
+<div class="card bg-surface-100 dark:bg-surface-800 shadow-lg">
     {#if header}
-    <header>
-        <span>{header}</span>
-    </header>
+    <div class="card-header bg-primary-500 text-white p-4" 
+         style="background-image: url('/img/details/ground_abilities_bg.png'); background-size: cover; background-position: center;">
+        <h3 class="h4 font-bold">{header}</h3>
+    </div>
     {/if}
-    {@render children?.()}
-</article>
-
+    <div class="p-4">
+        {@render children?.()}
+    </div>
 </div>
-
-
-<style>
-    article {
-        overflow: hidden;
-        /* max-width: 983px; */
-    }
-
-    article>header {
-        background-image: url('/img/details/ground_abilities_bg.png');
-        background-size: cover;
-        background-position: center;
-    }
-</style>

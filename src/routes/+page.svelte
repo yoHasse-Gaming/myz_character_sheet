@@ -64,6 +64,8 @@
 
 </script>
 
+
+
 <main class="sheet-container">
 <!-- <div class="text-center mb-8">
     <h2 class="h2 mb-2">☢️ ROLLFORMULÄR ☢️</h2>
@@ -83,8 +85,9 @@
     {/each}
 </div>
 
+
 <!-- Tab Content -->
-<div class="tab-content">
+<div class="tab-content ripped-background relative overflow-hidden">
     
     <!-- Tab 1: Karaktär -->
     {#if activeTab === 1}
@@ -152,3 +155,77 @@
 
 </main>
 
+<style>
+    .ripped-background {
+        position: relative;
+        /* background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); */
+    }
+
+    .ripped-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/img/card_bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        mask: url('/img/ripped_3.svg');
+        mask-size: auto;
+        mask-repeat: no-repeat;
+        mask-position: center;
+        -webkit-mask: url('/img/ripped_3.svg');
+        -webkit-mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        pointer-events: none;
+        z-index: 1;
+        /* max-height: 430px; */
+    }
+
+    /* .ripped-background::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/img/card_bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 0;
+    } */
+
+
+    .tab-content {
+        position: relative;
+        z-index: 2;
+        /* backdrop-filter: blur(2px); */
+        /* border-radius: 8px; */
+        padding: 2rem;
+        margin: 2rem;
+        box-shadow: 
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* Dark mode compatibility */
+    :global(.dark) .tab-content {
+        background: rgba(26, 26, 26, 0.1);
+        color: #f5f5f5;
+    }
+
+
+    /* Ensure content stays above the mask */
+    .tab-content > * {
+        position: relative;
+        z-index: 1;
+    }
+
+</style>

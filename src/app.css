@@ -73,6 +73,9 @@ body {
     font-family: 'Courier New', monospace;
     min-height: 100vh;
     position: relative;
+
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
 }
 
 

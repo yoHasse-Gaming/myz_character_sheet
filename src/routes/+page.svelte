@@ -110,18 +110,18 @@
     width="0"
 >
     <defs>
-        <filter id="squiggle_sheet">
+        <filter id="squiggle_lines">
             <feTurbulence
                 type="fractalNoise"
                 id="turbulence"
-                baseFrequency=".18"
+                baseFrequency=".05"
                 numOctaves="4"
-                seed="2"
+                seed="1"
             />
             <feDisplacementMap
                 id="displacement"
                 in="SourceGraphic"
-                scale="12"
+                scale="4"
                 xChannelSelector="R"
                 yChannelSelector="G"
             />

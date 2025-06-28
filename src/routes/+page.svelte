@@ -173,11 +173,11 @@
         background-repeat: no-repeat;
         background-position: center;
         mask: url('/img/ripped_3.svg');
-        mask-size: auto;
+        mask-size: 100% 100%;
         mask-repeat: no-repeat;
         mask-position: center;
         -webkit-mask: url('/img/ripped_3.svg');
-        -webkit-mask-size: contain;
+        -webkit-mask-size: 100% 100%;
         -webkit-mask-repeat: no-repeat;
         -webkit-mask-position: center;
         pointer-events: none;

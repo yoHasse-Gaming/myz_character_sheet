@@ -98,7 +98,7 @@
                         max="5"
                         class="torn-input skill-input font-user" 
                         value={skill.value} 
-                        oninput={(e) => handleSkillChange(index, parseInt(e.target.value) || 0)}
+                        oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
                         placeholder="0"
                     />
                 </div>

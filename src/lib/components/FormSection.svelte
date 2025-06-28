@@ -5,7 +5,7 @@
     } = $props();
 </script>
 
-<div class="card" style="border: 1px solid #FFF;">
+<div class="card" >
     {#if header}
     <h3 class="h4 font-bold form-labels friendly-stranger text-surface-800">{header}</h3>
     {/if}

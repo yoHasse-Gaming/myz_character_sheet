@@ -73,6 +73,32 @@
     <div class="border-t-2 border-primary-500 w-32 mx-auto mt-4"></div>
 </div> -->
 
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    height="0"
+    width="0"
+>
+    <defs>
+        <filter id="squiggle">
+            <feTurbulence
+                type="fractalNoise"
+                id="turbulence"
+                baseFrequency=".18"
+                numOctaves="4"
+                seed="2"
+            />
+            <feDisplacementMap
+                id="displacement"
+                in="SourceGraphic"
+                scale="12"
+                xChannelSelector="R"
+                yChannelSelector="G"
+            />
+        </filter>
+    </defs>
+</svg>
+
 <!-- Tab Navigation using post-apocalyptic styling -->
 <div class="flex border-b-2 border-primary-600 mb-0 bg-surface-200 dark:bg-surface-900 p-1">
     {#each tabs as tab}
@@ -87,7 +113,7 @@
 
 
 <!-- Tab Content -->
-<div class="tab-content ripped-background relative overflow-hidden">
+<div class="tab-content relative overflow-hidden">
     
     <!-- Tab 1: Karaktär -->
     {#if activeTab === 1}
@@ -156,76 +182,147 @@
 </main>
 
 <style>
-    .ripped-background {
+    /* Input fields with paper background */
+    /* :global(.tab-content input),
+    :global(.tab-content textarea) {
+        background: url('/img/paper_bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        border: 2px solid rgba(0, 0, 0, 0.1);
         position: relative;
-        /* background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); */
-    }
-
-    .ripped-background::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('/img/card_bg.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        mask: url('/img/ripped_3.svg');
-        mask-size: 100% 100%;
-        mask-repeat: no-repeat;
-        mask-position: center;
-        -webkit-mask: url('/img/ripped_3.svg');
-        -webkit-mask-size: 100% 100%;
-        -webkit-mask-repeat: no-repeat;
-        -webkit-mask-position: center;
-        pointer-events: none;
-        z-index: 1;
-        /* max-height: 430px; */
-    }
-
-    /* .ripped-background::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('/img/card_bg.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.3;
-        pointer-events: none;
-        z-index: 0;
+        z-index: 3;
     } */
 
+    /* Labels and text with ripped mask effect */
+
+    /* Create wrapper for inputs with jagged background */
+    :global(.tab-content .input-wrapper) {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        transform: scale(1);
+    }
+
+    :global(.tab-content .input-wrapper):hover {
+        /* Popout, like it's raising from the paper */
+        transform: scale(1.01); /* slightly larger */
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    :global(.tab-content .input-wrapper)::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/img/card_bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: url(#squiggle);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    :global(.tab-content input),
+    :global(.tab-content textarea) {
+        content: '';
+        min-height: 4rem;
+        position: relative;
+        border-radius: 0;
+        padding-left: 2rem;
+        font-size: x-large;
+        
+        /* Remove hover effects from inputs */
+        /* Remove filter from the input itself */
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        z-index: 2;
+        width: 100%;
+        
+        /* Override any framework styles */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    /* Remove focus outline while keeping accessibility and override all focus styles */
+    :global(.tab-content input):focus,
+    :global(.tab-content textarea):focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-color: transparent !important;
+        /* You could add a custom focus style here if needed */
+    }
+
+    /* Override dark mode specific styles that might add borders */
+    :global(.dark) :global(.tab-content input),
+    :global(.dark) :global(.tab-content textarea) {
+        border: none !important;
+        border-color: transparent !important;
+        background: transparent !important;
+    }
+
+    :global(.dark) :global(.tab-content input):focus,
+    :global(.dark) :global(.tab-content textarea):focus {
+        border: none !important;
+        border-color: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+
+    /* Dark mode compatibility */
+
+/* :global(.tab-content input):focus,
+:global(.tab-content textarea):focus {
+    outline: 2px solid rgba(217, 119, 6, 0.5);
+} */
 
     .tab-content {
         position: relative;
         z-index: 2;
-        /* backdrop-filter: blur(2px); */
-        /* border-radius: 8px; */
         padding: 2rem;
         margin: 2rem;
-        box-shadow: 
-            0 10px 15px -3px rgba(0, 0, 0, 0.1),
-            0 4px 6px -2px rgba(0, 0, 0, 0.05),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    /* Dark mode compatibility */
-    :global(.dark) .tab-content {
-        background: rgba(26, 26, 26, 0.1);
-        color: #f5f5f5;
-    }
-
-
-    /* Ensure content stays above the mask */
-    .tab-content > * {
+    /* Apply torn paper effect to the main sheet container */
+    .sheet-container {
         position: relative;
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        /* Ensure content stays above the background */
         z-index: 1;
+    }
+
+    .sheet-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/img/sheet_bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: url(#squiggle);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    /* Ensure all content stays above the torn background */
+    .sheet-container > * {
+        position: relative;
+        z-index: 2;
     }
 
 </style>

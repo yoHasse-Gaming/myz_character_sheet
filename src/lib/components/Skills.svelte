@@ -59,7 +59,7 @@
 
 </script>
 
-<div class="skills-tab space-y-4">
+<div class="skills-tab grid grid-cols-2 gap-4 space-y-4">
     {#each sheetState.skills as skill, index}
         {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item-wrapper">
@@ -118,7 +118,7 @@
                     <div class="tooltip-background"></div>
                     <!-- Content element without the effect -->
                     <div class="tooltip-content">
-                        <h3 class="skill-title">☢️ {skill.name}</h3>
+                        <h3 class="skill-title">({skill.name})</h3>
                         <div class="skill-section">
                             <h4 class="section-title">Beskrivning:</h4>
                             <div class="section-content">{@html skill.description}</div>
@@ -144,12 +144,14 @@
 <style>
     /* Skills container */
     .skills-tab {
-        padding: 1rem;
+        /* max-width: 500px; */
+        float: right;
     }
 
     /* Individual skill item wrapper */
     .skill-item-wrapper {
         margin-bottom: 1rem;
+        /* max-width: 300px; */
     }
 
     /* Content inside torn paper wrapper */
@@ -216,55 +218,13 @@
         font-size: 1.2rem;
     }
 
-    /* Floating tooltip */
-    .floating-tooltip {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        max-width: 380px;
-    }
 
-    .tooltip-wrapper {
-        position: relative;
-        border-radius: 0.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-
-    .tooltip-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('/img/card_bg.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        filter: url(#squiggle);
-        border-radius: 0.5rem;
-        z-index: 1;
-    }
-
-    .tooltip-content {
-        position: relative;
-        z-index: 2;
-        background: rgba(245, 245, 245, 0.95);
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        line-height: 1.5;
-    }
-
-    .dark .tooltip-content {
-        background: rgba(26, 26, 26, 0.95);
-        color: var(--color-surface-100);
-    }
 
     .skill-title {
         font-family: var(--form-labels), serif;
         font-weight: bold;
         font-size: 1.25rem;
-        color: var(--color-primary-600);
+        color: var(--color-primary-900);
         margin-bottom: 1rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
@@ -280,7 +240,6 @@
     }
 
     .section-title {
-        font-family: 'Courier New', monospace;
         font-weight: bold;
         font-size: 0.9rem;
         color: var(--color-surface-800);
@@ -295,7 +254,7 @@
 
     .section-content {
         font-size: 0.9rem;
-        color: var(--color-surface-700);
+        color: var(--color-surface-900);
         font-family: var(--font-user), sans-serif;
     }
 

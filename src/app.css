@@ -296,7 +296,7 @@ body::before {
 
 /* Radioactive tab styling */
 .tab-content {
-    border-top: 2px solid #d97706;
+    /* border-top: 2px solid #d97706; */
     /* background: var(--color-surface-200); */
     /* background-image: url(/img/card_bg.png); */
   

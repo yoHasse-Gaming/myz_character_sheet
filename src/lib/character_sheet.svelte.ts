@@ -148,6 +148,13 @@ export const characterActions = {
         }
     },
     
+    setAbilityDamage(abilityIndex: number, damage: number) {
+        const ability = sheetState.baseAbilities[abilityIndex];
+        if (ability) {
+            ability.damage = Math.max(0, Math.min(5, damage));
+        }
+    },
+    
     // Set ability value
     setAbilityValue(abilityIndex: number, value: number) {
         const ability = sheetState.baseAbilities[abilityIndex];

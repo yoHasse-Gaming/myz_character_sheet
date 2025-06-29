@@ -327,3 +327,49 @@ textarea.torn-input {
 }
 
 
+/* Floating tooltip */
+.floating-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: unset !important;
+    z-index: 1000;
+    max-width: 380px;
+}
+
+.tooltip-wrapper {
+    position: relative;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/img/popout_bg.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: url(#squiggle);
+    border-radius: 0.5rem;
+    z-index: 1;
+}
+
+.tooltip-content {
+    position: relative;
+    z-index: 2;
+    /* background: rgba(245, 245, 245, 0.95); */
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    line-height: 1.5;
+    font-weight: bold;
+
+}
+
+.dark .tooltip-content {
+    /* background: rgba(26, 26, 26, 0.1); */
+    color: var(--color-surface-900);
+}

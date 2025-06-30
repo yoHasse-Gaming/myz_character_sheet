@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import SizeControls from '$lib/components/SizeControls.svelte';
+	import { characterActions } from '$lib/character_sheet.svelte';
     
 
     let { children } = $props();
@@ -8,6 +10,9 @@
 	const browser = typeof window !== 'undefined';
 
 	let isDarkMode = $state(true); // Default to dark mode for your apocalyptic theme
+	let showSizeControls = $state(false);
+	let containerWidth = $state(800);
+	let containerHeight = $state(600);
 
 	// Theme toggle functionality
 	function toggleTheme() {
@@ -35,7 +40,12 @@
 		}
 	}
 
-	// Initialize theme on mount
+	function handleResize(event: CustomEvent<{ width: number; height: number }>) {
+		containerWidth = event.detail.width;
+		containerHeight = event.detail.height;
+	}
+
+	// Initialize theme and Owlbear sync on mount
 	onMount(() => {
 		if (browser) {
 			const savedTheme = localStorage.getItem('theme');
@@ -46,6 +56,9 @@
 				isDarkMode = true;
 			}
 			updateTheme();
+			
+			// Initialize Owlbear Rodeo sync
+			characterActions.setupOwlbearSync();
 		}
 	});
 </script>
@@ -77,8 +90,32 @@
 	</button>
 </div>
 
-<!-- Main Content -->
-<main class="container mx-auto px-4 py-8">
+<!-- Size Controls Toggle Button -->
+<div class="size-toggle-container">
+	<button 
+		class="btn variant-filled-surface size-toggle-btn"
+		onclick={() => showSizeControls = !showSizeControls}
+		aria-label="Toggle size controls"
+		title={showSizeControls ? 'Hide Size Controls' : 'Show Size Controls'}
+	>
+		📏
+	</button>
+</div>
+
+<!-- Size Controls -->
+{#if showSizeControls}
+	<SizeControls 
+		currentWidth={containerWidth}
+		currentHeight={containerHeight}
+		onresize={handleResize}
+	/>
+{/if}
+
+<!-- Main Content with dynamic sizing -->
+<main 
+	class="container mx-auto px-4 py-8 dynamic-container"
+	style="max-width: {containerWidth}px; min-height: {containerHeight}px;"
+>
 	{@render children?.()}
 </main>
 
@@ -90,7 +127,15 @@
 		z-index: 999;
 	}
 
-	.theme-toggle-btn {
+	.size-toggle-container {
+		position: fixed;
+		top: 1rem;
+		right: 5rem;
+		z-index: 999;
+	}
+
+	.theme-toggle-btn,
+	.size-toggle-btn {
 		width: 3rem;
 		height: 3rem;
 		border-radius: 50%;
@@ -104,14 +149,29 @@
 		color: #fef3c7 !important;
 	}
 
-	.theme-toggle-btn:hover {
+	.theme-toggle-btn:hover,
+	.size-toggle-btn:hover {
 		transform: scale(1.05);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 	}
 
-	:global(.light) .theme-toggle-btn {
+	:global(.light) .theme-toggle-btn,
+	:global(.light) .size-toggle-btn {
 		background: linear-gradient(135deg, #525252, #404040) !important;
 		border-color: #737373;
 		color: #f5f5f5 !important;
+	}
+
+	.dynamic-container {
+		transition: all 0.3s ease;
+		border: 2px dashed rgba(217, 119, 6, 0.3);
+		box-sizing: border-box;
+	}
+
+	/* Hide the dashed border in production */
+	@media (max-width: 0px) {
+		.dynamic-container {
+			border: none;
+		}
 	}
 </style>

@@ -7,8 +7,8 @@
 </script> 
 
         <div class="properties-tab">
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+                <div class="space-y-4 lg:space-y-6">
                     <FormSection header="GRUNDEGENSKAPER">
                         <div class="space-y-4">
                             {#each sheetState.baseAbilities as ability, index}

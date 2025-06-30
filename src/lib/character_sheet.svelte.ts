@@ -2,6 +2,7 @@
 // This provides reactive state management across all components
 
 import type { BaseAbilityType } from './types';
+import { useOwlbearSync } from './owlbear-integration';
 
 // Define the character sheet state structure
 export const sheetState = $state({
@@ -218,6 +219,30 @@ export const characterActions = {
         } catch (error) {
             console.error('Failed to import character:', error);
         }
+    },
+    
+    // Owlbear Rodeo integration
+    setupOwlbearSync() {
+        const owlbearSync = useOwlbearSync(() => ({
+            ...sheetState,
+            timestamp: Date.now()
+        }));
+        
+        if (owlbearSync.isInOwlbear) {
+            owlbearSync.setupAutoSync(60000); // Sync every minute
+            console.log('🦉 Owlbear Rodeo sync enabled');
+        }
+        
+        return owlbearSync;
+    },
+    
+    syncToOwlbear() {
+        const owlbearSync = useOwlbearSync(() => ({
+            ...sheetState,
+            timestamp: Date.now()
+        }));
+        
+        owlbearSync.syncNow();
     }
 };
 

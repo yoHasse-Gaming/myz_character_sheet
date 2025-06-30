@@ -25,7 +25,7 @@
     // Create floating instance for each skill
     function createFloatingForSkill(skillIndex: number) {
         const isOpen = () => openSkillIndex === skillIndex;
-        
+
         const floating = useFloating({
             whileElementsMounted: autoUpdate,
             get open() {
@@ -59,29 +59,28 @@
 
 </script>
 
-<div class="skills-tab grid grid-cols-2 gap-4 space-y-4">
+<div class="skills-tab">
     {#each sheetState.skills as skill, index}
         {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item-wrapper">
             <div class="torn-input-wrapper {skillVariants[index]}">
                 <div class="skill-item-content">
-                    <div class="skill-info">
+                    <div class="skill-header">
                         <span class="skill-name">{skill.name}</span>
-                        <span class="skill-ability">({skill.baseAbility})</span>
-                        <button 
+                        <button
                             class="info-icon"
                             bind:this={floating.elements.reference}
                             {...interactions.getReferenceProps()}
                             aria-label="Visa färdighetsinformation för {skill.name}"
                         >
-                            <svg 
-                                width="16" 
-                                height="16" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                stroke-width="2" 
-                                stroke-linecap="round" 
+                        <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
                                 stroke-linejoin="round"
                             >
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -90,17 +89,20 @@
                             </svg>
                         </button>
                     </div>
-                    <input 
-                        id="skill-{index}"
-                        name={skill.name} 
-                        type="number" 
-                        min="0" 
-                        max="5"
-                        class="torn-input skill-input font-user" 
-                        value={skill.value} 
-                        oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                        placeholder="0"
-                    />
+                    <div class="skill-controls">
+                        <span class="skill-ability">({skill.baseAbility})</span>
+                        <input
+                            id="skill-{index}"
+                            name={skill.name}
+                            type="number"
+                            min="0"
+                            max="5"
+                            class="torn-input skill-input font-user"
+                            value={skill.value}
+                            oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                            placeholder="0"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,66 +144,127 @@
 </div>
 
 <style>
-    /* Skills container */
+    /* Skills container - responsive grid */
     .skills-tab {
-        /* max-width: 500px; */
-        float: right;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        width: 100%;
+        container-type: inline-size;
+    }
+
+    /* Responsive breakpoints using container queries */
+    @container (min-width: 500px) {
+        .skills-tab {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    @container (min-width: 800px) {
+        .skills-tab {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
 
     /* Individual skill item wrapper */
     .skill-item-wrapper {
-        margin-bottom: 1rem;
-        /* max-width: 300px; */
+        margin-bottom: 0.5rem;
+        width: 100%;
+        min-width: 0; /* Allow flex items to shrink */
     }
 
     /* Content inside torn paper wrapper */
     .skill-item-content {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 1.5rem;
+        flex-direction: column;
+        padding: 0.75rem;
         position: relative;
         z-index: 2;
+        gap: 0.5rem;
     }
 
-    /* Skill info section */
-    .skill-info {
+    @container (min-width: 400px) {
+        .skill-item-content {
+            /* padding: 1rem 1.5rem; */
+            gap: 0.75rem;
+        }
+
+        .skill-item-wrapper {
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* Skill header with name and info button */
+    .skill-header {
         display: flex;
         align-items: center;
-        flex-grow: 1;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    /* Skill controls with ability and input */
+    .skill-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
         gap: 0.5rem;
+        max-height: 2rem; /* Limit height for controls */
     }
 
     .skill-name {
         font-family: var(--form-labels), serif;
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         letter-spacing: 0.05em;
         color: var(--color-surface-900);
         text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    @container (min-width: 400px) {
+        .skill-name {
+            font-size: 1.1rem;
+        }
     }
 
     .skill-ability {
-        
-
         font-weight: bold;
         color: var(--color-primary-600);
-        padding: 0.25rem 0.5rem;
+        padding: 0.2rem 0.4rem;
         border-radius: 0.25rem;
-        font-size: 0.8rem;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        flex-shrink: 0; /* Don't shrink the ability badge */
+    }
+
+    @container (min-width: 400px) {
+        .skill-ability {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
     }
 
     /* Info button styling */
     .info-icon {
-        padding: 0.5rem;
+        padding: 0.3rem;
         border-radius: 50%;
-        background: rgba(217, 119, 6, 0.1);
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        color: var(--color-primary-600);
+        /* border: 1px solid rgba(217, 119, 6, 0.3); */
+        color: var(--color-surface-900);
         cursor: pointer;
         transition: all 0.2s ease;
-        margin-left: auto;
-        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    @container (min-width: 400px) {
+        .info-icon {
+            padding: 0.5rem;
+        }
     }
 
     .info-icon:hover {
@@ -212,10 +275,22 @@
 
     /* Skill input styling */
     .skill-input {
-        width: 4rem;
+        width: 3rem;
         text-align: center;
         font-weight: bold;
-        font-size: 1.2rem;
+        font-size: 1rem;
+        flex-shrink: 0;
+        padding-left: unset;
+        max-height: 2rem; /* Limit height for controls */
+
+
+    }
+
+    @container (min-width: 400px) {
+        .skill-input {
+            width: 4rem;
+            font-size: 1.2rem;
+        }
     }
 
 

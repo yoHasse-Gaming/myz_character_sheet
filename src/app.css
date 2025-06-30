@@ -449,13 +449,36 @@ body::before {
 
 /* Character sheet specific styles */
 .sheet-container {
-    max-width: 1200px;
-    min-height: calc(100vh - (var(--spacing) * 8) * 2); /* Adjust height based on spacing */
+    max-width: 100%;
+    min-width: 320px;
+    width: 100%;
+    min-height: 100vh;
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    box-sizing: border-box;
+}
+
+.torn-input {
+    min-width: 3rem;
+    
+}
+
+/* Responsive breakpoints */
+@container (min-width: 768px) {
+    .sheet-container {
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+}
+
+@container (min-width: 1024px) {
+    .sheet-container {
+        max-width: 1200px;
+        min-height: calc(100vh - (var(--spacing) * 8) * 2);
+    }
 }
 
 .input.font-user {
@@ -479,6 +502,87 @@ label {
 
 :global(.dark) .tab-content {
     color: #f5f5f5;
+}
+
+/* Responsive improvements for mobile and small screens */
+@media (max-width: 767px) {
+    .sheet-container {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+    
+    /* Reduce font sizes on mobile */
+    .h2 {
+        font-size: 1.5rem;
+    }
+    
+    .h4 {
+        font-size: 1.1rem;
+    }
+    
+    /* Reduce form padding */
+    .card .p-4 {
+        padding: 0.75rem;
+    }
+    
+    /* Stack grids on mobile */
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid.md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Reduce torn input padding */
+    .torn-input {
+        font-size: large;
+        padding-left: 1rem;
+        min-height: 3rem;
+    }
+    
+    /* Smaller gaps */
+    .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-4 > * + * {
+        margin-top: 0.75rem;
+    }
+}
+
+/* Tablet responsive improvements */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sheet-container {
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+}
+
+/* Ensure tooltips don't overflow on small screens */
+@media (max-width: 480px) {
+    .floating-tooltip {
+        max-width: 90vw;
+        left: 5vw !important;
+        right: auto !important;
+    }
+}
+
+/* Grid responsive improvements */
+@media (max-width: 640px) {
+    .lg\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .xl\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    .xl\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 

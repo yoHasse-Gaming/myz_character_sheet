@@ -81,7 +81,6 @@
     .base-ability-container {
         width: 100%;
         max-width: 350px;
-        min-width: 300px;
         padding: 0.5rem;
         /* No background - text rests on parent background */
     }

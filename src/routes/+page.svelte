@@ -221,10 +221,13 @@
     .sheet-container {
         position: relative;
         width: 100%;
-        max-width: 1024px; /* Adjust as needed */
-        min-width: 1023px;
+        max-width: 100%;
+        min-width: 320px; /* Mobile minimum */
         margin: 0 auto;
         /* Ensure content stays above the background */
         z-index: 1;
+        /* Make it responsive */
+        overflow-x: auto;
+        container-type: inline-size;
     }
 </style>

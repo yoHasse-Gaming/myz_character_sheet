@@ -26,7 +26,7 @@
         
         // Also send to Owlbear Rodeo if we're running inside it
         if (isInOwlbear && owlbearResize) {
-            owlbearResize.requestResize(width, height);
+            owlbearResize.setSize(width, height);
         }
     }
     

@@ -224,13 +224,25 @@ export const characterActions = {
     // Owlbear Rodeo integration
     setupOwlbearSync() {
         const owlbearSync = useOwlbearSync(() => ({
-            ...sheetState,
+            name: sheetState.name,
+            baseAbilities: sheetState.baseAbilities,
+            skills: sheetState.skills,
+            conditions: sheetState.conditions,
             timestamp: Date.now()
         }));
         
         if (owlbearSync.isInOwlbear) {
             owlbearSync.setupAutoSync(60000); // Sync every minute
             console.log('🦉 Owlbear Rodeo sync enabled');
+            
+            // Load existing character data
+            owlbearSync.loadData().then((data) => {
+                if (data) {
+                    console.log('Loading character data from Owlbear:', data);
+                    // Update local state with loaded data
+                    Object.assign(sheetState, data);
+                }
+            });
         }
         
         return owlbearSync;
@@ -238,7 +250,10 @@ export const characterActions = {
     
     syncToOwlbear() {
         const owlbearSync = useOwlbearSync(() => ({
-            ...sheetState,
+            name: sheetState.name,
+            baseAbilities: sheetState.baseAbilities,
+            skills: sheetState.skills,
+            conditions: sheetState.conditions,
             timestamp: Date.now()
         }));
         

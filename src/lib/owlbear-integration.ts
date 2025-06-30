@@ -1,159 +1,217 @@
 /**
  * Owlbear Rodeo Integration utilities
- * Provides methods to communicate with Owlbear Rodeo when running as a popover
+ * Provides methods to communicate with Owlbear Rodeo using the official SDK
  */
 
-interface OwlbearMessage {
-    type: string;
-    data?: any;
-}
-
-interface SizeData {
-    width: number;
-    height: number;
+interface CharacterData {
+    name: string;
+    baseAbilities: any[];
+    skills: any[];
+    conditions: any;
+    // Add other character sheet properties as needed
 }
 
 class OwlbearIntegration {
-    private isInOwlbear: boolean = false;
-    private callbacks: Map<string, Function[]> = new Map();
+    private isInitialized: boolean = false;
+    private characterData: CharacterData | null = null;
     private isBrowser: boolean = false;
+    private OBR: any = null;
 
     constructor() {
         this.isBrowser = typeof window !== 'undefined';
         if (this.isBrowser) {
-            this.isInOwlbear = this.detectOwlbearEnvironment();
-            this.setupMessageListener();
+            this.initializeOBR();
         }
     }
 
     /**
-     * Detect if we're running inside Owlbear Rodeo
+     * Initialize Owlbear Rodeo SDK
      */
-    private detectOwlbearEnvironment(): boolean {
-        if (!this.isBrowser) return false;
-        
-        try {
-            // Check if we're in an iframe and have access to parent
-            return window !== window.parent && 
-                   window.location !== window.parent.location &&
-                   document.referrer.includes('owlbear.rodeo');
-        } catch (e) {
-            // Cross-origin restrictions mean we're likely in an iframe
-            return window !== window.parent;
-        }
-    }
-
-    /**
-     * Setup listener for messages from Owlbear Rodeo
-     */
-    private setupMessageListener(): void {
+    private async initializeOBR(): Promise<void> {
+        console.log('Initializing Owlbear Rodeo SDK...');
         if (!this.isBrowser) return;
         
-        window.addEventListener('message', (event) => {
-            if (this.isValidOwlbearMessage(event)) {
-                this.handleOwlbearMessage(event.data);
+        try {
+            // Dynamic import to avoid SSR issues
+            const { default: OBR } = await import('@owlbear-rodeo/sdk');
+            this.OBR = OBR;
+
+            console.log('Owlbear Rodeo SDK loaded:', this.OBR);
+
+            if(!OBR.isAvailable) {
+                console.warn('Owlbear Rodeo SDK is not available in this environment');
+                return;
+            }
+            
+            // Wait for OBR to be ready
+            await this.OBR.onReady(() => {
+                this.isInitialized = true;
+                console.log('🦉 Owlbear Rodeo SDK initialized successfully');
+                
+                // Set up the extension metadata
+                this.setupExtension();
+                
+                // Listen for character data updates
+                this.setupCharacterDataListener();
+                console.log('Character data listener set up');
+            });
+        } catch (error) {
+            console.warn('Owlbear Rodeo SDK not available:', error);
+            this.isInitialized = false;
+        }
+    }
+
+    /**
+     * Set up extension metadata
+     */
+    private async setupExtension(): Promise<void> {
+        if (!this.isInitialized || !this.OBR) return;
+
+        try {
+            // Set the extension metadata for action/popover
+            await this.OBR.action.setTitle('Mutant: Year Zero Character Sheet');
+            await this.OBR.action.setIcon('/favicon.png');
+            await this.OBR.action.setWidth(800);
+            await this.OBR.action.setHeight(600);
+        } catch (error) {
+            console.warn('Failed to set up extension metadata:', error);
+        }
+    }
+
+    /**
+     * Set up listener for character data changes
+     */
+    private setupCharacterDataListener(): void {
+        if (!this.isInitialized || !this.OBR) return;
+
+        // Listen for room metadata changes where character data might be stored
+        this.OBR.room.onMetadataChange((metadata: any) => {
+            const characterKey = `myz-character-sheet`;
+            if (metadata[characterKey]) {
+                this.characterData = metadata[characterKey] as CharacterData;
+                console.log('Character data updated from Owlbear:', this.characterData);
             }
         });
     }
 
     /**
-     * Validate that the message is from Owlbear Rodeo
+     * Save character data to Owlbear room metadata
      */
-    private isValidOwlbearMessage(event: MessageEvent): boolean {
-        // Add validation logic based on Owlbear Rodeo's message format
-        return event.data && typeof event.data === 'object' && event.data.type;
-    }
+    public async saveCharacterData(characterData: CharacterData): Promise<void> {
+        if (!this.isInitialized || !this.OBR) return;
 
-    /**
-     * Handle messages from Owlbear Rodeo
-     */
-    private handleOwlbearMessage(message: OwlbearMessage): void {
-        const callbacks = this.callbacks.get(message.type) || [];
-        callbacks.forEach(callback => callback(message.data));
-    }
-
-    /**
-     * Register a callback for a specific message type
-     */
-    public on(messageType: string, callback: Function): void {
-        if (!this.callbacks.has(messageType)) {
-            this.callbacks.set(messageType, []);
-        }
-        this.callbacks.get(messageType)!.push(callback);
-    }
-
-    /**
-     * Remove a callback for a specific message type
-     */
-    public off(messageType: string, callback: Function): void {
-        const callbacks = this.callbacks.get(messageType) || [];
-        const index = callbacks.indexOf(callback);
-        if (index > -1) {
-            callbacks.splice(index, 1);
+        try {
+            const characterKey = `myz-character-sheet`;
+            await this.OBR.room.setMetadata({
+                [characterKey]: {
+                    ...characterData,
+                    lastUpdated: Date.now()
+                }
+            });
+            console.log('Character data saved to Owlbear room');
+        } catch (error) {
+            console.warn('Failed to save character data:', error);
         }
     }
 
     /**
-     * Send a message to Owlbear Rodeo
+     * Load character data from Owlbear room metadata
      */
-    public sendMessage(type: string, data?: any): void {
-        if (this.isInOwlbear && this.isBrowser && window.parent) {
-            try {
-                window.parent.postMessage({ type, data }, '*');
-            } catch (e) {
-                console.warn('Failed to send message to Owlbear Rodeo:', e);
-            }
+    public async loadCharacterData(): Promise<CharacterData | null> {
+        if (!this.isInitialized || !this.OBR) return null;
+
+        try {
+            const metadata = await this.OBR.room.getMetadata();
+            const characterKey = `myz-character-sheet`;
+            return metadata[characterKey] as CharacterData || null;
+        } catch (error) {
+            console.warn('Failed to load character data:', error);
+            return null;
         }
     }
 
     /**
-     * Request to resize the popover
+     * Set the popover size
      */
-    public requestResize(width: number, height: number): void {
-        this.sendMessage('resize', { width, height });
+    public async setSize(width: number, height: number): Promise<void> {
+        if (!this.isInitialized || !this.OBR) return;
+
+        try {
+            await this.OBR.action.setWidth(width);
+            await this.OBR.action.setHeight(height);
+            console.log(`Popover size set to ${width}x${height}`);
+        } catch (error) {
+            console.warn('Failed to set popover size:', error);
+        }
     }
 
     /**
-     * Request to close the popover
+     * Close the popover
      */
-    public requestClose(): void {
-        this.sendMessage('close');
-    }
+    public async close(): Promise<void> {
+        if (!this.isInitialized || !this.OBR) return;
 
-    /**
-     * Send character data to Owlbear Rodeo
-     */
-    public sendCharacterData(characterData: any): void {
-        this.sendMessage('character-update', characterData);
-    }
-
-    /**
-     * Request character data from Owlbear Rodeo
-     */
-    public requestCharacterData(): void {
-        this.sendMessage('character-request');
+        try {
+            await this.OBR.action.close();
+        } catch (error) {
+            console.warn('Failed to close popover:', error);
+        }
     }
 
     /**
      * Check if we're running in Owlbear Rodeo
      */
     public get isOwlbearEnvironment(): boolean {
-        return this.isInOwlbear;
+        return this.isInitialized;
     }
 
     /**
      * Set up automatic character data sync
      */
-    public setupAutoSync(getCharacterData: () => any, interval: number = 30000): void {
-        if (!this.isInOwlbear || !this.isBrowser) return;
+    public setupAutoSync(getCharacterData: () => CharacterData, interval: number = 30000): void {
+        if (!this.isInitialized || !this.isBrowser) return;
 
         // Send initial data
-        this.sendCharacterData(getCharacterData());
+        this.saveCharacterData(getCharacterData());
 
         // Set up periodic sync
         setInterval(() => {
-            this.sendCharacterData(getCharacterData());
+            this.saveCharacterData(getCharacterData());
         }, interval);
+    }
+
+    /**
+     * Get player info
+     */
+    public async getPlayerInfo() {
+        if (!this.isInitialized || !this.OBR) return null;
+
+        try {
+            const name = await this.OBR.player.getName();
+            const role = await this.OBR.player.getRole();
+            const id = await this.OBR.player.getId();
+            return { name, role, id };
+        } catch (error) {
+            console.warn('Failed to get player info:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Notify other players of character updates
+     */
+    public async notifyCharacterUpdate(characterData: CharacterData): Promise<void> {
+        if (!this.isInitialized || !this.OBR) return;
+
+        try {
+            // Use the broadcast API to notify other players
+            await this.OBR.broadcast.sendMessage('character-sheet-update', {
+                characterData,
+                timestamp: Date.now()
+            });
+        } catch (error) {
+            console.warn('Failed to broadcast character update:', error);
+        }
     }
 }
 
@@ -163,16 +221,17 @@ export const owlbearIntegration = new OwlbearIntegration();
 // Utility functions for common operations
 export function useOwlbearResize() {
     return {
-        requestResize: (width: number, height: number) => {
-            owlbearIntegration.requestResize(width, height);
+        setSize: async (width: number, height: number) => {
+            await owlbearIntegration.setSize(width, height);
         },
         isInOwlbear: owlbearIntegration.isOwlbearEnvironment
     };
 }
 
-export function useOwlbearSync(getCharacterData: () => any) {
+export function useOwlbearSync(getCharacterData: () => CharacterData) {
     return {
-        syncNow: () => owlbearIntegration.sendCharacterData(getCharacterData()),
+        syncNow: () => owlbearIntegration.saveCharacterData(getCharacterData()),
+        loadData: () => owlbearIntegration.loadCharacterData(),
         setupAutoSync: (interval?: number) => owlbearIntegration.setupAutoSync(getCharacterData, interval),
         isInOwlbear: owlbearIntegration.isOwlbearEnvironment
     };

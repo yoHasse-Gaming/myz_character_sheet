@@ -1,12 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
 @import 'tailwindcss';
 
-
-
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton/themes/vintage';
 
+@font-face {
+  font-family: "FriendlyStranger";
+  src:
+    local("FriendlyStranger"),
+    url("fonts/FriendlyStranger.otf") format("opentype"),
+    url("fonts/FriendlyStranger.ttf") format("opentype"),
+    url("fonts/FriendlyStranger.woff") format("woff");
+}
+
+/* Import torn paper input styles */
+
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* 
+https://www.dafont.com/friendly-stranger.font
+by Excellent Ritma Florendia
+*/
+
+
 
 
 
@@ -41,7 +57,11 @@
     --color-warning-600: #991b1b;
 
     --font-user: Kalam, sans-serif;
+    --form-labels: FriendlyStranger, sans-serif;
 }
+
+@import './lib/styles/torn-paper.css';
+
 
 body {
     background: 
@@ -53,6 +73,9 @@ body {
     font-family: 'Courier New', monospace;
     min-height: 100vh;
     position: relative;
+
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
 }
 
 
@@ -97,23 +120,18 @@ body::before {
     /* background: var(--color-surface-100); */
     background-image: url('/img/sheet_bg.png') !important;
     border: 2px solid var(--color-surface-400);
-    border-radius: 4px;
-    box-shadow: 
-        0 0 30px rgba(217, 119, 6, 0.1),
-        inset 0 0 30px rgba(0, 0, 0, 0.1),
-        0 0 60px rgba(0, 0, 0, 0.2);
+
+
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
+    
 }
 
 .dark .sheet-container {
     background: rgba(26, 26, 26, 0.95);
     border: 2px solid #404040;
-    box-shadow: 
-        0 0 30px rgba(217, 119, 6, 0.15),
-        inset 0 0 30px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(0, 0, 0, 0.8);
+
 }
 
 .sheet-container::before {
@@ -147,21 +165,16 @@ body::before {
 
 /* Gritty form sections */
 .card {
-    background: var(--color-surface-200) !important;
-    border: 1px solid var(--color-surface-400);
+    /* background: var(--color-surface-200) !important; */
+    /* border: 1px solid var(--color-surface-400); */
     border-radius: 2px;
-    box-shadow: 
-        0 2px 10px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(115, 115, 115, 0.1);
     position: relative;
 }
 
 .dark .card {
-    background: rgba(38, 38, 38, 0.9) !important;
-    border: 1px solid #525252;
-    box-shadow: 
-        0 2px 10px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(115, 115, 115, 0.1);
+    /* background: rgba(38, 38, 38, 0.9) !important; */
+    /* border: 1px solid #525252; */
+
 }
 
 .card::before {
@@ -171,14 +184,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(64, 64, 64, 0.1) 2px,
-            rgba(64, 64, 64, 0.1) 4px
-        );
+
     pointer-events: none;
     z-index: 1;
 }
@@ -191,12 +197,11 @@ body::before {
 /* Rusted header styling */
 .card-header {
     /* background: linear-gradient(135deg, #d9770627, #b453093f) !important; */
-    background-image: url(/img/details/ground_abilities_bg.png);
-    border-bottom: 2px solid #78350f;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    /* background-image: url(/img/details/ground_abilities_bg.png); */
+    /* border-bottom: 2px solid #78350f; */
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
     position: relative;
     overflow: hidden;
-
 }
 
 
@@ -207,50 +212,57 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    /* background: 
         repeating-linear-gradient(
             45deg,
             transparent,
             transparent 10px,
             rgba(120, 53, 15, 0.3) 10px,
             rgba(120, 53, 15, 0.3) 20px
-        );
+        ); */
 
 }
 
 /* Distressed input fields */
 .input {
-    background: var(--color-surface-50) !important;
-    border: 1px solid var(--color-surface-400) !important;
+    /* background: var(--color-surface-50) !important; */
+    /* border: 1px solid var(--color-surface-400) !important; */
+    border: none;
     color: var(--color-surface-900) !important;
     font-family: 'Courier New', monospace;
-    border-radius: 0 !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    /* border-radius: 0 !important; */
+    /* box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important; */
 }
 
 .dark .input {
-    background: rgba(15, 15, 15, 0.8) !important;
-    border: 1px solid #525252 !important;
-    color: #d4d4d4 !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    /* background: rgba(15, 15, 15, 0.8) !important; */
+    border: none;
+    color: var(--color-surface-900) !important;
+    /* box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important; */
+    appearance: none;
+    -webkit-appearance: none;
+    outline-color: transparent;
 }
 
-.input:focus {
+.input:focus:not(.tab-content input):not(.tab-content textarea) {
     border-color: #d97706 !important;
-    box-shadow: 
+    /* box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.2),
-        0 0 0 2px rgba(217, 119, 6, 0.2) !important;
+        0 0 0 2px rgba(217, 119, 6, 0.2) !important; */
 }
 
 .dark .input:focus {
-    box-shadow: 
+    /* box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.6),
-        0 0 0 2px rgba(217, 119, 6, 0.2) !important;
+        0 0 0 2px rgba(217, 119, 6, 0.2) !important; */
 }
 
 .input::placeholder {
-    color: #737373;
+    color: var(--color-surface-900);
 }
+
+/* input {-webkit-appearance: none; box-shadow: none !important; }
+:-webkit-autofill { color: #fff !important; } */
 
 /* Weathered buttons */
 .btn {
@@ -284,16 +296,20 @@ body::before {
 
 /* Radioactive tab styling */
 .tab-content {
-    border-top: 2px solid #d97706;
-    background: var(--color-surface-200);
+    /* border-top: 2px solid #d97706; */
+    /* background: var(--color-surface-200); */
+    /* background-image: url(/img/card_bg.png); */
+  
     padding: 1.5rem;
     position: relative;
-    /* opacity: 0.85; */
+    /* box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.2); */
+
 }
 
-.dark .tab-content {
+
+/* .dark .tab-content {
     background: var(--color-surface-900);
-}
+} */
 
 
 /* Contaminated table styling */
@@ -359,15 +375,14 @@ body::before {
 
 .h4 {
     color: var(--color-surface-900);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    font-family: 'Courier New', monospace;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .dark .h4 {
-    color: #fef3c7;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    color: var(--color-surface-800);
+    font-size: x-large;
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
 }
 
 /* Ground abilities wasteland styling */
@@ -434,15 +449,140 @@ body::before {
 
 /* Character sheet specific styles */
 .sheet-container {
-    max-width: 1200px;
-    min-height: calc(100vh - (var(--spacing) * 8) * 2); /* Adjust height based on spacing */
+    max-width: 100%;
+    min-width: 320px;
+    width: 100%;
+    min-height: 100vh;
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    box-sizing: border-box;
+}
+
+.torn-input {
+    min-width: 3rem;
+    
+}
+
+/* Responsive breakpoints */
+@container (min-width: 768px) {
+    .sheet-container {
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+}
+
+@container (min-width: 1024px) {
+    .sheet-container {
+        max-width: 1200px;
+        min-height: calc(100vh - (var(--spacing) * 8) * 2);
+    }
 }
 
 .input.font-user {
     font-family: var(--font-user), sans-serif;
 }
+
+label {
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.friendly-stranger {
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
+    font-size: large;
+    font-weight: bold;
+}
+
+:global(.dark) .tab-content {
+    color: #f5f5f5;
+}
+
+/* Responsive improvements for mobile and small screens */
+@media (max-width: 767px) {
+    .sheet-container {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+    
+    /* Reduce font sizes on mobile */
+    .h2 {
+        font-size: 1.5rem;
+    }
+    
+    .h4 {
+        font-size: 1.1rem;
+    }
+    
+    /* Reduce form padding */
+    .card .p-4 {
+        padding: 0.75rem;
+    }
+    
+    /* Stack grids on mobile */
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid.md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Reduce torn input padding */
+    .torn-input {
+        font-size: large;
+        padding-left: 1rem;
+        min-height: 3rem;
+    }
+    
+    /* Smaller gaps */
+    .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-4 > * + * {
+        margin-top: 0.75rem;
+    }
+}
+
+/* Tablet responsive improvements */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sheet-container {
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+}
+
+/* Ensure tooltips don't overflow on small screens */
+@media (max-width: 480px) {
+    .floating-tooltip {
+        max-width: 90vw;
+        left: 5vw !important;
+        right: auto !important;
+    }
+}
+
+/* Grid responsive improvements */
+@media (max-width: 640px) {
+    .lg\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .xl\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    .xl\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+

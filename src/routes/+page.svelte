@@ -5,6 +5,7 @@
     import AbilitiesTab from '$lib/components/tabs/AbilitiesTab.svelte';
     import CharacterTab from '$lib/components/tabs/CharacterTab.svelte';
     import { onMount } from 'svelte';
+    import { generateUniqueVariants } from '$lib';
     import type { MyCharSheet, KeyValuePair } from '$lib/types';
 
     const formData: MyCharSheet = {
@@ -62,7 +63,12 @@
         { id: 4, label: 'Övrigt' }
     ];
 
+    // Generate unique variants for tabs
+    const tabVariants = ['tab-variant-1', 'tab-variant-2', 'tab-variant-3', 'tab-variant-4'];
+
 </script>
+
+
 
 <main class="sheet-container">
 <!-- <div class="text-center mb-8">
@@ -71,20 +77,75 @@
     <div class="border-t-2 border-primary-500 w-32 mx-auto mt-4"></div>
 </div> -->
 
-<!-- Tab Navigation using post-apocalyptic styling -->
-<div class="flex border-b-2 border-primary-600 mb-0 bg-surface-200 dark:bg-surface-900 p-1">
-    {#each tabs as tab}
-        <button 
-            class="px-6 py-3 font-bold text-sm uppercase tracking-wide transition-all duration-200 {activeTab === tab.id ? 'bg-primary-500 text-surface-50 shadow-lg' : 'text-surface-400 hover:dark:text-surface-100 hover:text-surface-800 hover:bg-surface-300 hover:dark:bg-surface-700'}"
-            onclick={() => activeTab = tab.id}
-        >
-            {tab.label}
-        </button>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    height="0"
+    width="0"
+>
+    <defs>
+        <filter id="squiggle">
+            <feTurbulence
+                type="fractalNoise"
+                id="turbulence"
+                baseFrequency=".06"
+                numOctaves="4"
+                seed="2"
+            />
+            <feDisplacementMap
+                id="displacement"
+                in="SourceGraphic"
+                scale="12"
+                xChannelSelector="R"
+                yChannelSelector="G"
+            />
+        </filter>
+    </defs>
+</svg>
+
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    height="0"
+    width="0"
+>
+    <defs>
+        <filter id="squiggle_lines">
+            <feTurbulence
+                type="fractalNoise"
+                id="turbulence"
+                baseFrequency=".05"
+                numOctaves="4"
+                seed="1"
+            />
+            <feDisplacementMap
+                id="displacement"
+                in="SourceGraphic"
+                scale="4"
+                xChannelSelector="R"
+                yChannelSelector="G"
+            />
+        </filter>
+    </defs>
+</svg>
+
+<!-- Tab Navigation with torn paper styling -->
+<div class="tab-nav">
+    {#each tabs as tab, index}
+        <div class="tab-button-wrapper {tabVariants[index]} {activeTab === tab.id ? 'active' : ''}">
+            <button 
+                class="tab-button {activeTab === tab.id ? 'active' : ''}"
+                onclick={() => activeTab = tab.id}
+            >
+                {tab.label}
+            </button>
+        </div>
     {/each}
 </div>
 
+
 <!-- Tab Content -->
-<div class="tab-content">
+<div class="tab-content relative overflow-hidden">
     
     <!-- Tab 1: Karaktär -->
     {#if activeTab === 1}
@@ -152,3 +213,21 @@
 
 </main>
 
+<style>
+    /* Tab content styling */
+
+
+    /* Sheet container with torn paper background */
+    .sheet-container {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        min-width: 320px; /* Mobile minimum */
+        margin: 0 auto;
+        /* Ensure content stays above the background */
+        z-index: 1;
+        /* Make it responsive */
+        overflow-x: auto;
+        container-type: inline-size;
+    }
+</style>

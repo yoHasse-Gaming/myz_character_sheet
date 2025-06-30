@@ -2,12 +2,18 @@
   "name": "Mutant: Year Zero Character Sheet",
   "version": "1.0.0",
   "manifest_version": 1,
+  "description": "A responsive character sheet for Mutant: Year Zero RPG with real-time sync capabilities",
   "homepage_url": "https://yohasse-gaming.github.io/myz_character_sheet/",
   "action": {
     "title": "Mutant: Year Zero Character Sheet",
-    "icon": "/icon.svg",
+    "icon": "/favicon.png",
     "popover": "https://yohasse-gaming.github.io/myz_character_sheet/",
-    "height": 720,
-    "width": 1280
-  }
+    "height": 600,
+    "width": 800
+  },
+  "permissions": [
+    "room.metadata",
+    "room.broadcast",
+    "player.info"
+  ]
 }

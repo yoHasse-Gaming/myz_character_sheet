@@ -5,12 +5,9 @@
     } = $props();
 </script>
 
-<div class="card bg-surface-100 dark:bg-surface-800 shadow-lg">
+<div class="card" >
     {#if header}
-    <div class="card-header bg-primary-500 text-white p-4" 
-         style="background-image: url('/img/details/ground_abilities_bg.png'); background-size: cover; background-position: center;">
-        <h3 class="h4 font-bold">{header}</h3>
-    </div>
+    <h4 class="h4 font-bold form-labels friendly-stranger text-surface-800">{header}</h4>
     {/if}
     <div class="p-4">
         {@render children?.()}

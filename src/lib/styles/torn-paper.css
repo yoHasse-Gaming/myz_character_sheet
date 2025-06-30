@@ -27,7 +27,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/img/card_bg.png');
+    background: var(--img-card-bg);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -123,7 +123,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/img/card_bg.png');
+    background: var(--img-card-bg);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -309,7 +309,7 @@ textarea.torn-input {
 /* Active tab styling */
 .tab-button-wrapper.active::before {
     opacity: 1;
-    background: url('/img/stroke.png');
+    background: var(--img-stroke);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -389,7 +389,7 @@ textarea.torn-input {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/img/popout_bg.png');
+    background: var(--img-popout-bg);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

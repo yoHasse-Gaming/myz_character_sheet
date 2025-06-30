@@ -323,28 +323,16 @@
         letter-spacing: 0.05em;
     }
 
-    .dark .section-title {
-        color: var(--color-surface-200);
-    }
-
     .section-content {
         font-size: 0.9rem;
         color: var(--color-surface-900);
         font-family: var(--font-user), sans-serif;
     }
 
-    .dark .section-content {
-        color: var(--color-surface-300);
-    }
-
     /* HTML content styling */
     .section-content :global(strong) {
         font-weight: 600;
         color: var(--color-primary-600);
-    }
-
-    .dark .section-content :global(strong) {
-        color: var(--color-primary-400);
     }
 
     .section-content :global(ul) {

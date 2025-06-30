@@ -33,12 +33,14 @@ export function generateUniqueVariants(count: number): string[] {
     return variants;
 }
 
+import { strokePath } from './utils/paths.js';
+
 /**
  * Get a random circle stroke image (o1.png - o4.png)
  */
 export function getRandomCircleStroke(): string {
     const circleNumber = Math.floor(Math.random() * 4) + 1;
-    return `/img/strokes/o${circleNumber}.png`;
+    return strokePath('o', circleNumber);
 }
 
 /**
@@ -46,7 +48,7 @@ export function getRandomCircleStroke(): string {
  */
 export function getRandomXStroke(): string {
     const xNumber = Math.floor(Math.random() * 4) + 1;
-    return `/img/strokes/x${xNumber}.png`;
+    return strokePath('x', xNumber);
 }
 
 /**

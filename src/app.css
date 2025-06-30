@@ -118,7 +118,7 @@ body::before {
 /* Wasteland styling */
 .sheet-container {
     /* background: var(--color-surface-100); */
-    background-image: url('/img/sheet_bg.png') !important;
+    background-image: var(--img-sheet-bg) !important;
     border: 2px solid var(--color-surface-400);
 
 

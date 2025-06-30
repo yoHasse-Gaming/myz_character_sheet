@@ -8,6 +8,7 @@
     export let maxWidth: number = 1200;
     export let minHeight: number = 400;
     export let maxHeight: number = 1000;
+    export let onresize: ((event: CustomEvent<{ width: number; height: number }>) => void) | undefined = undefined;
     
     const dispatch = createEventDispatcher<{
         resize: { width: number; height: number };
@@ -22,7 +23,9 @@
     });
     
     function handleResize(width: number, height: number) {
+        const resizeEvent = new CustomEvent('resize', { detail: { width, height } });
         dispatch('resize', { width, height });
+        onresize?.(resizeEvent);
         
         // Also send to Owlbear Rodeo if we're running inside it
         if (isInOwlbear && owlbearResize) {
@@ -160,6 +163,7 @@
         border-radius: 2px;
         outline: none;
         -webkit-appearance: none;
+        appearance: none;
     }
 
     .slider::-webkit-slider-thumb {

@@ -10,4 +10,10 @@ declare global {
 	}
 }
 
+// Extend the existing declarations for SvelteKit paths
+declare module '$app/paths' {
+	export const base: string;
+	export const assets: string;
+}
+
 export {};

@@ -6,7 +6,7 @@
   "homepage_url": "https://yohasse-gaming.github.io/myz_character_sheet/",
   "action": {
     "title": "Mutant: Year Zero Character Sheet",
-    "icon": "/favicon.png",
+    "icon": "https://yohasse-gaming.github.io/myz_character_sheet/favicon.png",
     "popover": "https://yohasse-gaming.github.io/myz_character_sheet/",
     "height": 600,
     "width": 800

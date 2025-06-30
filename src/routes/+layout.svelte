@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import SizeControls from '$lib/components/SizeControls.svelte';
 	import { characterActions } from '$lib/character_sheet.svelte';
+	import { base } from '$app/paths';
+	import { assetPath } from '$lib/utils/paths.js';
     
 
     let { children } = $props();
@@ -120,6 +122,13 @@
 </main>
 
 <style>
+	/* CSS Custom Properties for dynamic asset paths */
+	:root {
+		--img-sheet-bg: url('{assetPath('/img/sheet_bg.png')}');
+		--img-card-bg: url('{assetPath('/img/card_bg.png')}');
+		--img-stroke: url('{assetPath('/img/stroke.png')}');
+		--img-popout-bg: url('{assetPath('/img/popout_bg.png')}');
+	}
 	.theme-toggle-container {
 		position: fixed;
 		top: 1rem;

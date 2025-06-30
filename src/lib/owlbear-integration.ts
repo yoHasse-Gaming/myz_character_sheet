@@ -4,6 +4,8 @@
  * Also includes localStorage failsafe and JSON export/import functionality
  */
 
+import { assetPath } from './utils/paths.js';
+
 export interface CharacterData {
     name: string;
     baseAbilities: any[];
@@ -85,7 +87,7 @@ class OwlbearIntegration {
         try {
             // Set the extension metadata for action/popover
             await this.OBR.action.setTitle('Mutant: Year Zero Character Sheet');
-            await this.OBR.action.setIcon('/favicon.png');
+            await this.OBR.action.setIcon(assetPath('/favicon.png'));
             await this.OBR.action.setWidth(800);
             await this.OBR.action.setHeight(600);
         } catch (error) {

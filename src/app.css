@@ -8,9 +8,9 @@
   font-family: "FriendlyStranger";
   src:
     local("FriendlyStranger"),
-    url("fonts/FriendlyStranger.otf") format("opentype"),
-    url("fonts/FriendlyStranger.ttf") format("opentype"),
-    url("fonts/FriendlyStranger.woff") format("woff");
+    var(--font-friendly-stranger-otf) format("opentype"),
+    var(--font-friendly-stranger-ttf) format("opentype"),
+    var(--font-friendly-stranger-woff) format("woff");
 }
 
 /* Import torn paper input styles */

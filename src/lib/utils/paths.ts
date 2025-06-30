@@ -3,7 +3,14 @@
  * Automatically handles GitHub Pages subdirectory paths
  */
 
-import { base } from '$app/paths';
+let base: string;
+try {
+    const { base: appBase } = await import('$app/paths');
+    base = appBase;
+} catch {
+    // Fallback for environments where $app/paths is not available
+    base = '';
+}
 
 /**
  * Get the correct asset path with base path prefix
@@ -36,4 +43,13 @@ export function imgPath(imagePath: string): string {
  */
 export function strokePath(type: 'x' | 'o', number: number): string {
     return assetPath(`/img/strokes/${type}${number}.png`);
+}
+
+/**
+ * Get font path
+ * @param fontName - The font filename
+ * @returns Full font path with base
+ */
+export function fontPath(fontName: string): string {
+    return assetPath(`/fonts/${fontName}`);
 }

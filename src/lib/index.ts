@@ -33,37 +33,36 @@ export function generateUniqueVariants(count: number): string[] {
     return variants;
 }
 
-import { strokePath } from './utils/paths.js';
 
-/**
- * Get a random circle stroke image (o1.png - o4.png)
- */
-export function getRandomCircleStroke(): string {
-    const circleNumber = Math.floor(Math.random() * 4) + 1;
-    return strokePath('o', circleNumber);
-}
+// /**
+//  * Get a random circle stroke image (o1.png - o4.png)
+//  */
+// export function getRandomCircleStroke(): string {
+//     const circleNumber = Math.floor(Math.random() * 4) + 1;
+//     return strokePath('o', circleNumber);
+// }
 
-/**
- * Get a random X stroke image (x1.png - x4.png)
- */
-export function getRandomXStroke(): string {
-    const xNumber = Math.floor(Math.random() * 4) + 1;
-    return strokePath('x', xNumber);
-}
+// /**
+//  * Get a random X stroke image (x1.png - x4.png)
+//  */
+// export function getRandomXStroke(): string {
+//     const xNumber = Math.floor(Math.random() * 4) + 1;
+//     return strokePath('x', xNumber);
+// }
 
-/**
- * Generate random stroke images for damage indicators
- * Returns array of objects with circle and x image paths
- */
-export function generateRandomStrokes(count: number): Array<{circle: string, x: string}> {
-    const strokes: Array<{circle: string, x: string}> = [];
+// /**
+//  * Generate random stroke images for damage indicators
+//  * Returns array of objects with circle and x image paths
+//  */
+// export function generateRandomStrokes(count: number): Array<{circle: string, x: string}> {
+//     const strokes: Array<{circle: string, x: string}> = [];
     
-    for (let i = 0; i < count; i++) {
-        strokes.push({
-            circle: getRandomCircleStroke(),
-            x: getRandomXStroke()
-        });
-    }
+//     for (let i = 0; i < count; i++) {
+//         strokes.push({
+//             circle: getRandomCircleStroke(),
+//             x: getRandomXStroke()
+//         });
+//     }
     
-    return strokes;
-}
+//     return strokes;
+// }

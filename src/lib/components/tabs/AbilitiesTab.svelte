@@ -4,7 +4,8 @@
     import { onMount } from 'svelte';
     import Skills from '../Skills.svelte';
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
-    import { imgPath } from '../../utils/paths.js';
+    import o from '$lib/img/o.svg';
+    import x from '$lib/img/x.svg';
 </script> 
 
         <div class="properties-tab">
@@ -32,9 +33,9 @@
                                         onclick={() => characterActions.toggleCondition('isStarving')}
                                         aria-label="Toggle utsvulten tillstånd"
                                     >
-                                        <img src={imgPath('o.svg')} alt="Inaktiv" class="condition-circle" />
+                                        <img src={o} alt="Inaktiv" class="condition-circle" />
                                         {#if sheetState.conditions.isStarving}
-                                            <img src={imgPath('x.svg')} alt="Aktiv" class="condition-x" />
+                                            <img src={x} alt="Aktiv" class="condition-x" />
                                         {/if}
                                     </button>
                                 </div>
@@ -45,9 +46,9 @@
                                         onclick={() => characterActions.toggleCondition('isSleepDeprived')}
                                         aria-label="Toggle sömnlös tillstånd"
                                     >
-                                        <img src={imgPath('o.svg')} alt="Inaktiv" class="condition-circle" />
+                                        <img src={o} alt="Inaktiv" class="condition-circle" />
                                         {#if sheetState.conditions.isSleepDeprived}
-                                            <img src={imgPath('x.svg')} alt="Aktiv" class="condition-x" />
+                                            <img src={x} alt="Aktiv" class="condition-x" />
                                         {/if}
                                     </button>
                                 </div>
@@ -60,9 +61,9 @@
                                         onclick={() => characterActions.toggleCondition('isDehydrated')}
                                         aria-label="Toggle uttorkad tillstånd"
                                     >
-                                        <img src={imgPath('o.svg')} alt="Inaktiv" class="condition-circle" />
+                                        <img src={o} alt="Inaktiv" class="condition-circle" />
                                         {#if sheetState.conditions.isDehydrated}
-                                            <img src={imgPath('x.svg')} alt="Aktiv" class="condition-x" />
+                                            <img src={x} alt="Aktiv" class="condition-x" />
                                         {/if}
                                     </button>
                                 </div>
@@ -73,9 +74,9 @@
                                         onclick={() => characterActions.toggleCondition('isFreezing')}
                                         aria-label="Toggle nedkyld tillstånd"
                                     >
-                                        <img src={imgPath('o.svg')} alt="Inaktiv" class="condition-circle" />
+                                        <img src={o} alt="Inaktiv" class="condition-circle" />
                                         {#if sheetState.conditions.isFreezing}
-                                            <img src={imgPath('x.svg')} alt="Aktiv" class="condition-x" />
+                                            <img src={x} alt="Aktiv" class="condition-x" />
                                         {/if}
                                     </button>
                                 </div>

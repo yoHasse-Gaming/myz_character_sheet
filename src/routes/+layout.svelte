@@ -3,8 +3,6 @@
 	import { onMount } from 'svelte';
 	import SizeControls from '$lib/components/SizeControls.svelte';
 	import { characterActions } from '$lib/character_sheet.svelte';
-	import { base } from '$app/paths';
-	import { assetPath, fontPath } from '$lib/utils/paths.js';
     
 
     let { children } = $props();
@@ -60,15 +58,6 @@
 			updateTheme();
 			
 			// Set CSS custom properties for dynamic asset paths
-			const root = document.documentElement;
-			root.style.setProperty('--img-sheet-bg', `url('${assetPath('/img/sheet_bg.png')}')`);
-			root.style.setProperty('--img-card-bg', `url('${assetPath('/img/card_bg.png')}')`);
-			root.style.setProperty('--img-stroke', `url('${assetPath('/img/stroke.png')}')`);
-			root.style.setProperty('--img-popout-bg', `url('${assetPath('/img/popout_bg.png')}')`);
-			root.style.setProperty('--font-friendly-stranger-otf', `url('${fontPath('FriendlyStranger.otf')}')`);
-			root.style.setProperty('--font-friendly-stranger-ttf', `url('${fontPath('FriendlyStranger.ttf')}')`);
-			root.style.setProperty('--font-friendly-stranger-woff', `url('${fontPath('FriendlyStranger.woff')}')`);
-			
 			// Initialize Owlbear Rodeo sync
 			characterActions.setupOwlbearSync();
 		}

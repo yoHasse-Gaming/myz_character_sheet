@@ -1,5 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 
+const repo = 'myz_character_sheet';              // <= your repo folder on GH Pages
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
@@ -7,8 +9,9 @@ const config = {
 			fallback: '404.html'
 		}),
 		paths: {
-			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
-		}
+			base: `/${repo}`                  // no dev/prod switch
+		},
+		prerender: { entries: ['*'] } 
 	}
 };
 

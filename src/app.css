@@ -4,14 +4,7 @@
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton/themes/vintage';
 
-@font-face {
-  font-family: "FriendlyStranger";
-  src:
-    local("FriendlyStranger"),
-    var(--font-friendly-stranger-otf) format("opentype"),
-    var(--font-friendly-stranger-ttf) format("opentype"),
-    var(--font-friendly-stranger-woff) format("woff");
-}
+
 
 /* Import torn paper input styles */
 
@@ -57,7 +50,7 @@ by Excellent Ritma Florendia
     --color-warning-600: #991b1b;
 
     --font-user: Kalam, sans-serif;
-    --form-labels: FriendlyStranger, sans-serif;
+    --form-labels: Kalam, sans-serif;
 }
 
 @import './lib/styles/torn-paper.css';
@@ -115,18 +108,7 @@ body::before {
     z-index: -1;
 }
 
-/* Wasteland styling */
-.sheet-container {
-    /* background: var(--color-surface-100); */
-    background-image: var(--img-sheet-bg) !important;
-    border: 2px solid var(--color-surface-400);
 
-
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-    
-}
 
 .dark .sheet-container {
     background: rgba(26, 26, 26, 0.95);

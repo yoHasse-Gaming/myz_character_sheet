@@ -1,6 +1,31 @@
 
+@font-face {
+  font-family: "FriendlyStranger";
+  src:
+    local("FriendlyStranger"),
+    url('../fonts/FriendlyStranger.otf') format("opentype"),
+    url('../fonts/FriendlyStranger.ttf') format("truetype"),
+    url('../fonts/FriendlyStranger.woff') format("woff");
+}
+
+
 :root {
     --torn-filter-effect: url('#squiggle');
+    --font-user: Kalam, sans-serif;
+    --form-labels: FriendlyStranger, sans-serif;
+}
+
+/* Wasteland styling */
+.sheet-container {
+    /* background: var(--color-surface-100); */
+    background-image: url('../img/sheet_bg.png') !important;
+    border: 2px solid var(--color-surface-400);
+
+
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    
 }
 
 /* Torn Paper Input Effects */
@@ -27,7 +52,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--img-card-bg);
+    background: url('../img/card_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -123,7 +148,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--img-card-bg);
+    background: url('../img/card_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -309,7 +334,7 @@ textarea.torn-input {
 /* Active tab styling */
 .tab-button-wrapper.active::before {
     opacity: 1;
-    background: var(--img-stroke);
+    background: url('../img/stroke.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -389,7 +414,7 @@ textarea.torn-input {
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--img-popout-bg);
+    background: url('../img/popout_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

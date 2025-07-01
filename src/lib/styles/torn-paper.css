@@ -3,9 +3,8 @@
   font-family: "FriendlyStranger";
   src:
     local("FriendlyStranger"),
-    url('../fonts/FriendlyStranger.otf') format("opentype"),
-    url('../fonts/FriendlyStranger.ttf') format("truetype"),
-    url('../fonts/FriendlyStranger.woff') format("woff");
+    url("/myz_character_sheet/fonts/FriendlyStranger.ttf") format("truetype"),
+    url("/myz_character_sheet/fonts/FriendlyStranger.woff") format("woff2");
 }
 
 
@@ -18,7 +17,7 @@
 /* Wasteland styling */
 .sheet-container {
     /* background: var(--color-surface-100); */
-    background-image: url('../img/sheet_bg.png') !important;
+    background-image: url('/myz_character_sheet/img/sheet_bg.png') !important;
     border: 2px solid var(--color-surface-400);
 
 
@@ -52,7 +51,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../img/card_bg.png'); /* Use a torn paper background image */
+    background: url('/myz_character_sheet/img/card_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -148,7 +147,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../img/card_bg.png'); /* Use a torn paper background image */
+    background: url('/myz_character_sheet/img/card_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -334,7 +333,7 @@ textarea.torn-input {
 /* Active tab styling */
 .tab-button-wrapper.active::before {
     opacity: 1;
-    background: url('../img/stroke.png');
+    background: url('/myz_character_sheet/img/stroke.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -414,7 +413,7 @@ textarea.torn-input {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../img/popout_bg.png'); /* Use a torn paper background image */
+    background: url('/myz_character_sheet/img/popout_bg.png'); /* Use a torn paper background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

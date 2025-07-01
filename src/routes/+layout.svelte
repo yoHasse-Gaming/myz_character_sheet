@@ -57,7 +57,6 @@
 			}
 			updateTheme();
 			
-			// Set CSS custom properties for dynamic asset paths
 			// Initialize Owlbear Rodeo sync
 			characterActions.setupOwlbearSync();
 		}

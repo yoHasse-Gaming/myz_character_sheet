@@ -1,7 +1,7 @@
 // Global character sheet state using Svelte 5 runes
 // This provides reactive state management across all components
 
-import type { BaseAbilityType } from './types';
+import type { BaseAbilityType, SelectedOptionalSkill } from './types';
 import { useOwlbearSync } from './owlbear-integration';
 
 // Define the character sheet state structure
@@ -120,6 +120,9 @@ export const sheetState = $state({
         }
     ],
     
+    // Optional skills selected by the user
+    optionalSkills: [] as SelectedOptionalSkill[],
+    
     // Character conditions
     conditions: {
         isStarving: false,
@@ -167,6 +170,29 @@ export const characterActions = {
     // Set skill value
     setSkillValue(skillIndex: number, value: number) {
         const skill = sheetState.skills[skillIndex];
+        if (skill) {
+            skill.value = Math.max(0, Math.min(5, value));
+        }
+    },
+    
+    // Optional skills management
+    addOptionalSkill(optionalSkill: SelectedOptionalSkill) {
+        // Check if skill is already added
+        const existingIndex = sheetState.optionalSkills.findIndex(s => s.id === optionalSkill.id);
+        if (existingIndex === -1) {
+            sheetState.optionalSkills.push(optionalSkill);
+        }
+    },
+    
+    removeOptionalSkill(skillId: string) {
+        const index = sheetState.optionalSkills.findIndex(s => s.id === skillId);
+        if (index !== -1) {
+            sheetState.optionalSkills.splice(index, 1);
+        }
+    },
+    
+    setOptionalSkillValue(skillId: string, value: number) {
+        const skill = sheetState.optionalSkills.find(s => s.id === skillId);
         if (skill) {
             skill.value = Math.max(0, Math.min(5, value));
         }

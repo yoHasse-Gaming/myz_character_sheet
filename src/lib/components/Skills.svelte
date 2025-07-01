@@ -18,9 +18,11 @@
     import { useHover } from '@skeletonlabs/floating-ui-svelte';
     import { generateUniqueVariants } from '$lib';
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
+    import OptionalSkillsModal from './OptionalSkillsModal.svelte';
 
     let openSkillIndex = $state<number | null>(null);
     let elemArrow: HTMLElement | null = $state(null);
+    let isOptionalSkillsModalOpen = $state(false);
 
     // Create floating instance for each skill
     function createFloatingForSkill(skillIndex: number) {
@@ -51,15 +53,43 @@
     }
 
     // Generate unique variants for skill items to make them look different
-    const skillVariants = generateUniqueVariants(sheetState.skills.length);
+    const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
 
     function handleSkillChange(skillIndex: number, value: number) {
         characterActions.setSkillValue(skillIndex, value);
+    }
+    
+    function handleOptionalSkillChange(skillId: string, value: number) {
+        characterActions.setOptionalSkillValue(skillId, value);
+    }
+    
+    function removeOptionalSkill(skillId: string) {
+        characterActions.removeOptionalSkill(skillId);
     }
 
 </script>
 
 <div class="skills-tab">
+    <!-- Add Optional Skills Button -->
+    <div class="optional-skills-section">
+        <button 
+            class="add-optional-skills-button"
+            onclick={() => isOptionalSkillsModalOpen = true}
+        >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Lägg till valfria färdigheter
+        </button>
+        {#if sheetState.optionalSkills.length > 0}
+            <span class="optional-skills-count">
+                {sheetState.optionalSkills.length} valfria färdigheter
+            </span>
+        {/if}
+    </div>
+
+    <!-- Core Skills -->
     {#each sheetState.skills as skill, index}
         {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item-wrapper">
@@ -141,7 +171,110 @@
             </div>
         {/if}
     {/each}
+
+    <!-- Optional Skills -->
+    {#each sheetState.optionalSkills as skill, index}
+        {@const skillIndex = sheetState.skills.length + index}
+        {@const { floating, interactions } = createFloatingForSkill(skillIndex)}
+        <div class="skill-item-wrapper optional-skill">
+            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper">
+                <div class="skill-item-content">
+                    <div class="skill-header">
+                        <span class="skill-name">{skill.name}</span>
+                        <div class="skill-header-controls">
+                            <button
+                                class="info-icon"
+                                bind:this={floating.elements.reference}
+                                {...interactions.getReferenceProps()}
+                                aria-label="Visa färdighetsinformation för {skill.name}"
+                            >
+                            <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14"></path>
+                                    <circle cx="12" cy="17" r=".5"></circle>
+                                </svg>
+                            </button>
+                            <button
+                                class="remove-skill-button"
+                                onclick={() => removeOptionalSkill(skill.id)}
+                                aria-label="Ta bort {skill.name}"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="skill-controls">
+                        <span class="skill-ability">({skill.baseAbility})</span>
+                        <input
+                            id="optional-skill-{skill.id}"
+                            name={skill.name}
+                            type="number"
+                            min="0"
+                            max="5"
+                            class="torn-input skill-input font-user"
+                            value={skill.value}
+                            oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {#if openSkillIndex === skillIndex}
+            <div
+                bind:this={floating.elements.floating}
+                style={floating.floatingStyles}
+                class="floating-tooltip"
+                {...interactions.getFloatingProps()}
+                transition:fade={{ duration: 150 }}
+            >
+                <div class="tooltip-wrapper">
+                    <!-- Background element with the torn paper effect -->
+                    <div class="tooltip-background"></div>
+                    <!-- Content element without the effect -->
+                    <div class="tooltip-content">
+                        <h3 class="skill-title">({skill.name})</h3>
+                        <div class="skill-section">
+                            <h4 class="section-title">Kategori:</h4>
+                            <div class="section-content">{skill.category}</div>
+                        </div>
+                        <div class="skill-section">
+                            <h4 class="section-title">Beskrivning:</h4>
+                            <div class="section-content">{@html skill.description}</div>
+                        </div>
+                        <div class="skill-section">
+                            <h4 class="section-title">Bonuseffekter:</h4>
+                            <div class="section-content">{@html skill.bonusEffects}</div>
+                        </div>
+                        {#if skill.examples}
+                            <div class="skill-section">
+                                <h4 class="section-title">Exempel:</h4>
+                                <div class="section-content">{@html skill.examples}</div>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                <FloatingArrow bind:ref={elemArrow} context={floating.context} class="fill-surface-700 dark:fill-surface-300" />
+            </div>
+        {/if}
+    {/each}
 </div>
+
+<!-- Optional Skills Modal -->
+<OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} />
 
 <style>
     /* Skills container - responsive grid */
@@ -151,6 +284,59 @@
         gap: 0.75rem;
         width: 100%;
         container-type: inline-size;
+    }
+
+    /* Optional skills section */
+    .optional-skills-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        grid-column: 1 / -1;
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.5rem;
+        border: 1px dashed rgba(217, 119, 6, 0.3);
+    }
+
+    .add-optional-skills-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        border: 2px solid var(--color-primary-600);
+        color: var(--color-primary-600);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+    }
+
+    .add-optional-skills-button:hover {
+        background: var(--color-primary-600);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    }
+
+    .optional-skills-count {
+        font-size: 0.9rem;
+        color: var(--color-surface-700);
+        font-weight: 600;
+    }
+
+    :global(.dark) .optional-skills-count {
+        color: var(--color-surface-300);
+    }
+
+    :global(.dark) .optional-skills-section {
+        background: rgba(217, 119, 6, 0.1);
+        border-color: rgba(217, 119, 6, 0.4);
     }
 
     /* Responsive breakpoints using container queries */
@@ -201,6 +387,50 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
+    }
+
+    .skill-header-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Optional skill styling */
+    .optional-skill-wrapper {
+        border: 2px solid rgba(217, 119, 6, 0.4);
+        position: relative;
+    }
+
+    .optional-skill-wrapper::before {
+        content: 'VALFRI';
+        position: absolute;
+        top: -0.5rem;
+        right: 0.5rem;
+        background: var(--color-primary-600);
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.6rem;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        z-index: 10;
+    }
+
+    .remove-skill-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-error-500);
+        background: transparent;
+        color: var(--color-error-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .remove-skill-button:hover {
+        background: var(--color-error-600);
+        color: white;
+        transform: scale(1.1);
     }
 
     /* Skill controls with ability and input */

@@ -16,6 +16,28 @@ export type Skill = {
     groundAbility: string;
 }
 
+// New optional skill types
+export type OptionalSkill = {
+    id: string;
+    name: string;
+    baseAbility: string;
+    description: string;
+    bonusEffects: string;
+    examples?: string;
+    category: string;
+}
+
+export type SelectedOptionalSkill = {
+    id: string;
+    name: string;
+    baseAbility: string;
+    value: number;
+    description: string;
+    bonusEffects: string;
+    examples?: string;
+    category: string;
+}
+
 export type Equipment = {
     name: string;
     description: string;

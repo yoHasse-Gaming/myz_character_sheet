@@ -1,0 +1,195 @@
+{
+  "skills": [
+    {
+      "id": "sk_7x9m2n8p",
+      "name": "Kämpa på",
+      "baseAbility": "STY",
+      "value": 0,
+      "description": "<p>Används när du måste uthärda hårt väder, långa vandringar eller annan fysisk pina för att fortsätta framåt.</p>",
+      "bonusEffects": "<ul><li>Varje extra framgång låter dig hjälpa en vän ur samma knipa utan tärningsslag.</li></ul>",
+      "examples": "<p>Exempel: Gruppen försöker korsa en bitande snöstorm - spelaren slår Kämpa&nbsp;på för att inte kollapsa.</p>"
+    },
+    {
+      "id": "sk_4h6j1k5l",
+      "name": "Ta krafttag",
+      "baseAbility": "STY",
+      "value": 0,
+      "description": "<p>Rulla när du lyfter, bär eller knuffar något extremt tungt - alla rena styrkeprov.</p>",
+      "bonusEffects": "<ul><li>Kasta eller knuffa föremålet och ge skada lika med antalet extra framgångar.</li><li>Upptäck en dold passage / ett dolt föremål.</li></ul>",
+      "examples": "<p>Exempel: Krossaren försöker välta en rosthög tillfälligt för att spärra en gång.</p>"
+    },
+    {
+      "id": "sk_9q3w7e2r",
+      "name": "Slåss",
+      "baseAbility": "STY",
+      "value": 0,
+      "description": "<p>Närstridsattacker mot fiender på armlängds avstånd.</p>",
+      "bonusEffects": "<ul><li>+1 skada per extra framgång (valbart flera gånger).</li><li>Ge fienden 1 stress.</li><li>+2 initiativ nästa runda.</li><li>Fienden tappar ett föremål.</li><li>Fienden faller/knuffas tillbaka.</li><li>Sätt grepp på fienden.</li></ul>",
+      "examples": "<p>Exempel: Hugust drämmer till med slagträ mot en zon-gast.</p>"
+    },
+    {
+      "id": "sk_8t5y1u6i",
+      "name": "Smyga",
+      "baseAbility": "KYL",
+      "value": 0,
+      "description": "<p>Ta dig fram osedd eller lägg bakhåll.</p>",
+      "bonusEffects": "<ul><li>Varje extra framgång ger +1 modifikation till kommande smygattack.</li></ul>",
+      "examples": "<p>Exempel: Krin kryper ljudlöst genom ett bilvrak förbi patrullerande gastare.</p>"
+    },
+    {
+      "id": "sk_2o9p4a3s",
+      "name": "Fly",
+      "baseAbility": "KYL",
+      "value": 0,
+      "description": "<p>Försök att komma undan strid, fara eller att snabbt balansera/hoppa.</p>",
+      "bonusEffects": "<ul><li>Varje extra framgång låter dig dra med en vän i flykten.</li></ul>",
+      "examples": "<p>Exempel: Spelarna rusar över ett ruttnande tak medan skotten viner.</p>"
+    },
+    {
+      "id": "sk_6d8f2g5h",
+      "name": "Skjuta",
+      "baseAbility": "KYL",
+      "value": 0,
+      "description": "<p>Avfyra skrot- eller artefaktvapen på avstånd.</p>",
+      "bonusEffects": "<ul><li>+1 skada (flera ggr).</li><li>Fienden tvingas till skydd (1 stress).</li><li>+2 initiativ nästa runda.</li><li>Fienden tappar föremål.</li><li>Fienden faller/knuffas bort.</li></ul>",
+      "examples": "<p>Exempel: Sixter tömmer sin skrotpistol mot en zonstrykare som laddar anfall.</p>"
+    },
+    {
+      "id": "sk_1j7k9l3m",
+      "name": "Speja",
+      "baseAbility": "SKP",
+      "value": 0,
+      "description": "<p>Används för att upptäcka varelser, faror eller detaljer på avstånd.</p>",
+      "bonusEffects": "<ul><li>Ställ en fråga per extra framgång: \"Är den ute efter mig?\", \"Finns fler?\", \"Hur tar jag mig förbi?\"</li></ul>",
+      "examples": "<p>Exempel: Uppe i ett utsiktstorn scannar gruppen en ruin efter rörelse.</p>"
+    },
+    {
+      "id": "sk_5n8b4v6c",
+      "name": "Förstå sig på",
+      "baseAbility": "SKP",
+      "value": 0,
+      "description": "<p>Tolka texter, ruiner eller artefakter från den gamla tiden.</p>",
+      "bonusEffects": "<ul><li>Lär ut förståelsen till en medspelare.</li></ul>",
+      "examples": "<p>Exempel: Skrotskallen studerar en trasig radio och förklarar dess funktion.</p>"
+    },
+    {
+      "id": "sk_3x7z2q8w",
+      "name": "Känna Zonen",
+      "baseAbility": "SKP",
+      "value": 0,
+      "description": "<p>Identifiera zon­bestar eller märkliga fenomen.</p>",
+      "bonusEffects": "<ul><li>Fråga: \"Hur skadar den mig?\"</li><li>Fråga: \"Hur skadar jag den?\"</li></ul>",
+      "examples": "<p>Exempel: Krönikören analyserar en rötpöl som bubblar giftig gas.</p>"
+    },
+    {
+      "id": "sk_9e4r7t1y",
+      "name": "Genomskåda",
+      "baseAbility": "KNS",
+      "value": 0,
+      "description": "<p>Läs en annan mutants sinnesstämning.</p>",
+      "bonusEffects": "<ul><li>Ställ frågor: \"Talar han sanning?\", \"Vill han mig illa?\", \"Vill han ha något?\"</li></ul>",
+      "examples": "<p>Exempel: Fixaren försöker avgöra om bossen ljuger om patronpriset.</p>"
+    },
+    {
+      "id": "sk_6u2i5o8p",
+      "name": "Manipulera",
+      "baseAbility": "KNS",
+      "value": 0,
+      "description": "<p>Övertala, hota, locka eller lura en annan mutant.</p>",
+      "bonusEffects": "<ul><li>Varje extra framgång ger ytterligare 1 tvivel <em>eller</em> 1 stress till motparten.</li></ul>",
+      "examples": "<p>Exempel: Slaven lovar vakten skrot för att få kedjorna lossade.</p>"
+    },
+    {
+      "id": "sk_4a7s1d9f",
+      "name": "Vårda",
+      "baseAbility": "KNS",
+      "value": 0,
+      "description": "<p>Läka trauma eller stabilisera kritiska skador.</p>",
+      "bonusEffects": "<ul><li>Återställ ytterligare 1 GE-poäng per extra framgång.</li></ul>",
+      "examples": "<p>Exempel: Zonstrykaren lappar ihop en kamrat som brutit benet.</p>"
+    }
+  ],
+  "optionalSkills": [
+  {
+    "id": "sk_8g3h6j9k",
+    "name": "Mucka",
+    "baseAbility": "STY",
+    "value": 0,
+    "description": "<p>Intimidera så att offret måste anfalla dig eller vika sig för din vilja.</p>",
+    "bonusEffects": "<ul><li>Varje extra framgång ger offret 1 stress.</li></ul>",
+    "examples": "<p>Exempel: Krossaren stirrar ned en rival så hårt att denne tappar fattningen.</p>",
+    "occupation": "Krossare"
+  },
+  {
+    "id": "sk_2l5z8x1c",
+    "name": "Mecka",
+    "baseAbility": "SKP",
+    "value": 0,
+    "description": "<p>Bygg hemmabyggen eller reparera trasiga prylar av zon­skrot.</p>",
+    "bonusEffects": "<ul><li>Gör bygget hållbart längre.</li><li>Öka prylbonus eller skada.</li><li>Lägg magasin, pansar m.m.</li></ul>",
+    "examples": "<p>Exempel: Skrotskallen fogar ihop en skrämmande skrotkanon av gamla rör.</p>",
+    "occupation": "Skrotskalle"
+  },
+  {
+    "id": "sk_7v4b9n6m",
+    "name": "Leda vägen",
+    "baseAbility": "SKP",
+    "value": 0,
+    "description": "<p>Navigera säkert in i nya sektorer i Zonen.</p>",
+    "bonusEffects": "<ul><li>Hitta artefakter.</li><li>Mät rötnivå.</li><li>Fynda patroner/krubb/vatten.</li><li>Halvera eller fjärdedels resa-tid.</li></ul>",
+    "examples": "<p>Exempel: Zonstrykaren pekar ut den minst rötiga rutten mot en ruin.</p>",
+    "occupation": "Zonstrykare"
+  },
+  {
+    "id": "sk_5q8w3e7r",
+    "name": "Schackra",
+    "baseAbility": "KNS",
+    "value": 0,
+    "description": "<p>Spåra upp kontakter eller driva småaffärer med patroner, krubb, vatten eller hållhakar.</p>",
+    "bonusEffects": "<ul><li>Välj per framgång: tjäna T6 patroner, T6 krubb, 2T6 vatten, 2T6 sprit eller få en hållhake.</li></ul>",
+    "examples": "<p>Exempel: Fixaren fixar två ransoner rent vatten genom ett snabbt byte.</p>",
+    "occupation": "Fixare"
+  },
+  {
+    "id": "sk_1t6y4u8i",
+    "name": "Bussa på",
+    "baseAbility": "KYL",
+    "value": 0,
+    "description": "<p>Kommendera din hund att slåss, speja eller spåra.</p>",
+    "bonusEffects": "<ul><li>Vid spårning: fråga \"Hur långt före?\", \"Är målet skadat?\", \"Är det ensamt?\"</li></ul>",
+    "examples": "<p>Exempel: Hunden kastar sig över en gast som hotar husse.</p>",
+    "occupation": "Hundförare (Mutant med hund)"
+  },
+  {
+    "id": "sk_9o2p5a6s",
+    "name": "Inspirera",
+    "baseAbility": "KNS",
+    "value": 0,
+    "description": "<p>Långe eller hindra andra - ge bort egna framgångar eller slå ut deras.</p>",
+    "bonusEffects": "<ul><li>Inga särskilda bonusar - framgångar överförs direkt.</li></ul>",
+    "examples": "<p>Exempel: Krönikören peppar zonstrykaren så hon orkar fly uppför fasaden.</p>",
+    "occupation": "Krönikör"
+  },
+  {
+    "id": "sk_3d7f1g4h",
+    "name": "Kommendera",
+    "baseAbility": "KNS",
+    "value": 0,
+    "description": "<p>Ge order till ditt gäng eller driva in \"beskydd\" från Folket.</p>",
+    "bonusEffects": "<ul><li>Lyckad order - gänget lyder; misslyckas du riskerar revolt.</li></ul>",
+    "examples": "<p>Exempel: Bossen skickar sina krossare att vakta porten mot en rivaliserande boss.</p>",
+    "occupation": "Boss"
+  },
+  {
+    "id": "sk_6j8k2l9m",
+    "name": "Uthärda",
+    "baseAbility": "KYL",
+    "value": 0,
+    "description": "<p>Skaka av dig trauma av vilket slag som helst genom ren viljestyrka.</p>",
+    "bonusEffects": "<ul><li>Varje framgång absorberar 1 trauma (skada, stress, förvirring eller tvivel).</li></ul>",
+    "examples": "<p>Exempel: Slaven ignorerar slaget från bossen och fortsätter jobba utan att blinka.</p>",
+    "occupation": "Slav"
+  }
+]
+
+}

@@ -3,8 +3,6 @@
 <script lang="ts">
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
     import { fade, scale } from 'svelte/transition';
-    import o from '$lib/img/o.svg';
-    import x from '$lib/img/x.svg';
 
     let { 
         baseAbilityLabel,
@@ -60,11 +58,11 @@
                             aria-label="Toggle damage for indicator {idx + 1}"
                         >
                             <!-- Always show the circle as base layer -->
-                            <img src={o} alt="No damage" class="stroke-image circle-layer" />
+                            <img src='/myz_character_sheet/img/strokes/o.svg' alt="No damage" class="stroke-image circle-layer" />
                             <!-- Show X on top if damaged with transition -->
                             {#if (ability?.damage || 0) > idx}
                                 <img 
-                                    src={x} 
+                                    src='/myz_character_sheet/img/strokes/x.svg' 
                                     alt="Damage" 
                                     class="stroke-image x-layer" 
                                     in:scale={{ duration: 200, start: 0.8 }}

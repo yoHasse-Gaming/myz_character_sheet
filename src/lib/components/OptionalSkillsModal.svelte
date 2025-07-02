@@ -1,46 +1,22 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import {
-        FloatingArrow,
-        arrow,
-        autoUpdate,
-        flip,
-        offset,
-        shift,
-        useClick,
-        useDismiss,
-        useFloating,
-        useInteractions,
-        useRole,
-    } from "@skeletonlabs/floating-ui-svelte";
     import { fade, scale } from "svelte/transition";
     import { generateUniqueVariants } from '$lib';
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
-    import type { OptionalSkill, SelectedOptionalSkill } from '$lib/types';
-    import optionalSkillsData from '$lib/data/optional-skills.json';
+    import type { OptionalSkill, SkillsData } from '$lib/types';
+    import skills from '$lib/data/skills.json';
 
     let { isOpen = $bindable(false) } = $props();
     
-    let modalElement: HTMLElement | null = $state(null);
-    let selectedCategory = $state<string>('all');
-    let searchTerm = $state('');
+    let carouselContainer: HTMLElement | null = $state(null);
+    let currentSkillIndex = $state(0);
+    let isScrolling = $state(false);
 
     // Get available optional skills
-    const optionalSkills: OptionalSkill[] = optionalSkillsData.optionalSkills;
+    const optionalSkills: OptionalSkill[] = skills.optionalSkills;
     
-    // Get unique categories
-    const categories = ['all', ...new Set(optionalSkills.map(skill => skill.category))];
-    
-    // Filter skills based on search and category
-    const filteredSkills = $derived(() => {
-        return optionalSkills.filter(skill => {
-            const matchesCategory = selectedCategory === 'all' || skill.category === selectedCategory;
-            const matchesSearch = searchTerm === '' || 
-                skill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                skill.category.toLowerCase().includes(searchTerm.toLowerCase());
-            return matchesCategory && matchesSearch;
-        });
-    });
+    // Use all skills without filtering
+    const filteredSkills = $derived(() => optionalSkills);
     
     // Check if a skill is already selected
     function isSkillSelected(skillId: string): boolean {
@@ -50,15 +26,18 @@
     // Generate unique variants for skill cards
     const skillVariants = generateUniqueVariants(optionalSkills.length);
     
-    function toggleSkill(skill: OptionalSkill) {
+    function selectSkill(skill: OptionalSkill) {
         if (isSkillSelected(skill.id)) {
             characterActions.removeOptionalSkill(skill.id);
         } else {
-            const selectedSkill: SelectedOptionalSkill = {
-                ...skill,
-                value: 0
-            };
+            // Remove any existing optional skill first (only allow one)
+            if (sheetState.optionalSkills.length > 0) {
+                characterActions.removeOptionalSkill(sheetState.optionalSkills[0].id);
+            }
+            const selectedSkill: OptionalSkill = skill;
             characterActions.addOptionalSkill(selectedSkill);
+            // Automatically close the modal after selection
+            setTimeout(() => closeModal(), 500);
         }
     }
     
@@ -66,15 +45,52 @@
         isOpen = false;
     }
     
+    // Navigate carousel
+    function nextSkill() {
+        if (currentSkillIndex < filteredSkills().length - 1) {
+            currentSkillIndex++;
+        }
+    }
+    
+    function prevSkill() {
+        if (currentSkillIndex > 0) {
+            currentSkillIndex--;
+        }
+    }
+    
+    // Handle scroll wheel navigation
+    function handleWheel(event: WheelEvent) {
+        event.preventDefault();
+        
+        if (isScrolling) return;
+        isScrolling = true;
+        
+        if (event.deltaY > 0) {
+            nextSkill();
+        } else {
+            prevSkill();
+        }
+        
+        setTimeout(() => {
+            isScrolling = false;
+        }, 300);
+    }
+    
     // Close modal on Escape key
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
             closeModal();
+        } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            nextSkill();
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            prevSkill();
         }
     }
     
-    // Prevent modal close when clicking inside modal content
-    function handleModalClick(event: MouseEvent) {
+    // Prevent modal close when clicking inside carousel
+    function handleCarouselClick(event: MouseEvent) {
         event.stopPropagation();
     }
 </script>
@@ -89,15 +105,9 @@
         onclick={closeModal}
         transition:fade={{ duration: 200 }}
     >
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-            class="modal-container"
-            onclick={handleModalClick}
-            bind:this={modalElement}
-            transition:scale={{ duration: 300, start: 0.9 }}
-        >
-            <div class="modal-header">
+        <!-- Floating Controls at the top -->
+        <!-- <div class="floating-controls">
+            <div class="controls-header">
                 <h2 class="modal-title">Valfria Färdigheter</h2>
                 <button class="close-button" onclick={closeModal} aria-label="Stäng modal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -106,84 +116,137 @@
                     </svg>
                 </button>
             </div>
-            
-            <div class="modal-controls">
-                <div class="search-container">
-                    <input 
-                        type="text" 
-                        bind:value={searchTerm}
-                        placeholder="Sök färdigheter..."
-                        class="search-input torn-input"
-                    />
-                </div>
-                
-                <div class="category-filters">
-                    {#each categories as category}
-                        <button 
-                            class="category-button {selectedCategory === category ? 'active' : ''}"
-                            onclick={() => selectedCategory = category}
-                        >
-                            {category === 'all' ? 'Alla' : category}
-                        </button>
-                    {/each}
-                </div>
-            </div>
-            
-            <div class="skills-grid">
+        </div> -->
+
+        <!-- Carousel Wheel Container -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div 
+            class="carousel-container"
+            bind:this={carouselContainer}
+            onclick={handleCarouselClick}
+            onwheel={handleWheel}
+        >
+            <div class="skill-stack">
                 {#each filteredSkills() as skill, index}
                     {@const variantIndex = optionalSkills.findIndex(s => s.id === skill.id)}
                     {@const isSelected = isSkillSelected(skill.id)}
-                    <div class="skill-card-wrapper">
-                        <div class="torn-input-wrapper {skillVariants[variantIndex]} {isSelected ? 'selected' : ''}">
-                            <div class="skill-card-content">
-                                <div class="skill-card-header">
-                                    <h3 class="skill-card-name">{skill.name}</h3>
-                                    <div class="skill-card-meta">
-                                        <span class="skill-ability">({skill.baseAbility})</span>
-                                        <span class="skill-category">{skill.category}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="skill-card-description">
-                                    {@html skill.description}
-                                </div>
-                                
-                                <div class="skill-card-effects">
-                                    <h4 class="effects-title">Bonuseffekter:</h4>
-                                    <div class="effects-content">
-                                        {@html skill.bonusEffects}
-                                    </div>
-                                </div>
-                                
-                                {#if skill.examples}
-                                    <div class="skill-card-examples">
-                                        <h4 class="examples-title">Exempel:</h4>
-                                        <div class="examples-content">
-                                            {@html skill.examples}
+                    {@const isCurrent = index === currentSkillIndex}
+                    {@const isNext = index === currentSkillIndex + 1}
+                    {@const isPrev = index === currentSkillIndex - 1}
+                    {@const distance = Math.abs(index - currentSkillIndex)}
+                    {@const isVisible = distance <= 3}
+                    
+                    {#if isVisible}
+                        <div 
+                            class="skill-card-wrapper {isCurrent ? 'current' : ''} {isNext ? 'next' : ''} {isPrev ? 'prev' : ''}"
+                            style="
+                                z-index: {100 - distance};
+                                transform: 
+                                    translateX({(index - currentSkillIndex) * 15}px)
+                                    translateY({distance * 15}px)
+                                    rotate({(index - currentSkillIndex) * 3}deg)
+                                    scale({1 - distance * 0.1});
+                                opacity: {1 - distance * 0.3};
+                            "
+                            transition:scale={{ duration: 400, delay: distance * 50 }}
+                            onclick={() => selectSkill(skill)}
+                        >
+                            <div class="torn-input-wrapper {skillVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                                <div class="skill-card-content">
+                                    <div class="skill-card-header">
+                                        <h3 class="skill-card-name">{skill.name}</h3>
+                                        <div class="skill-card-meta">
+                                            <span class="skill-ability">({skill.baseAbility})</span>
+                                            <span class="skill-category">{skill.occupation}</span>
                                         </div>
                                     </div>
-                                {/if}
-                                
-                                <button 
-                                    class="toggle-skill-button {isSelected ? 'remove' : 'add'}"
-                                    onclick={() => toggleSkill(skill)}
-                                >
-                                    {isSelected ? 'Ta bort' : 'Lägg till'}
-                                </button>
+                                    
+                                    <div class="skill-card-description">
+                                        {@html skill.description}
+                                    </div>
+                                    
+                                    <div class="skill-card-effects">
+                                        <h4 class="effects-title">Bonuseffekter:</h4>
+                                        <div class="effects-content">
+                                            {@html skill.bonusEffects}
+                                        </div>
+                                    </div>
+                                    
+                                    {#if skill.examples}
+                                        <div class="skill-card-examples">
+                                            <h4 class="examples-title">Exempel:</h4>
+                                            <div class="examples-content">
+                                                {@html skill.examples}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                    
+                                    <div class="skill-card-footer">
+                                        {#if isSelected}
+                                            <div class="selected-indicator">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                                </svg>
+                                                <span>Vald</span>
+                                            </div>
+                                        {:else}
+                                            <div class="select-hint">
+                                                Klicka för att välja
+                                            </div>
+                                        {/if}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {/if}
                 {/each}
             </div>
             
-            <div class="modal-footer">
-                <div class="selected-count">
-                    {sheetState.optionalSkills.length} valfria färdigheter valda
+            <!-- Navigation Controls -->
+            <div class="carousel-navigation">
+                <button 
+                    class="nav-button prev" 
+                    onclick={prevSkill}
+                    disabled={currentSkillIndex === 0}
+                    aria-label="Föregående färdighet"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="carousel-indicator">
+                    <span class="current-index">{currentSkillIndex + 1}</span>
+                    <span class="separator">/</span>
+                    <span class="total-count">{filteredSkills().length}</span>
                 </div>
-                <button class="done-button" onclick={closeModal}>
-                    Klar
+                
+                <button 
+                    class="nav-button next" 
+                    onclick={nextSkill}
+                    disabled={currentSkillIndex >= filteredSkills().length - 1}
+                    aria-label="Nästa färdighet"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                    </svg>
                 </button>
             </div>
+        </div>
+
+        <!-- Floating Footer -->
+        <div class="floating-footer">
+            <div class="selected-count">
+                {#if sheetState.optionalSkills.length > 0}
+                    Vald färdighet: {sheetState.optionalSkills[0].name}
+                {:else}
+                    Ingen färdighet vald
+                {/if}
+            </div>
+            <button class="done-button" onclick={closeModal}>
+                Klar
+            </button>
         </div>
     </div>
 {/if}
@@ -195,62 +258,48 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: rgba(0, 0, 0, 0.85);
         z-index: 1000;
-        padding: 1rem;
-    }
-    
-    .modal-container {
-        background: var(--color-surface-50);
-        border-radius: 1rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        max-width: 90vw;
-        max-height: 90vh;
-        width: 1200px;
-        display: flex;
-        flex-direction: column;
         overflow: hidden;
     }
     
-    :global(.dark) .modal-container {
-        background: var(--color-surface-900);
-        border: 1px solid var(--color-surface-700);
+    /* Floating Controls at Top */
+    .floating-controls {
+        position: absolute;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        min-width: 300px;
+        max-width: 80vw;
+        z-index: 110;
+        border: 1px solid rgba(217, 119, 6, 0.3);
     }
     
-    .modal-header {
+    .controls-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.5rem;
-        border-bottom: 1px solid var(--color-surface-200);
-    }
-    
-    :global(.dark) .modal-header {
-        border-bottom-color: var(--color-surface-700);
     }
     
     .modal-title {
         font-family: var(--form-labels), serif;
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: bold;
-        color: var(--color-surface-900);
+        color: #f5f5f5;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         margin: 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
-    
-    :global(.dark) .modal-title {
-        color: var(--color-surface-100);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     }
     
     .close-button {
         background: none;
         border: none;
-        color: var(--color-surface-600);
+        color: #a1a1aa;
         cursor: pointer;
         padding: 0.5rem;
         border-radius: 50%;
@@ -258,119 +307,75 @@
     }
     
     .close-button:hover {
-        background: var(--color-surface-200);
-        color: var(--color-surface-900);
+        background: rgba(217, 119, 6, 0.2);
+        color: #f5f5f5;
         transform: scale(1.1);
     }
     
-    :global(.dark) .close-button {
-        color: var(--color-surface-400);
+    /* Carousel Container */
+    .carousel-container {
+        position: absolute;
+        top: 250px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 500px;
+        perspective: 1000px;
+        perspective-origin: center center;
     }
     
-    :global(.dark) .close-button:hover {
-        background: var(--color-surface-700);
-        color: var(--color-surface-100);
-    }
-    
-    .modal-controls {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--color-surface-200);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    :global(.dark) .modal-controls {
-        border-bottom-color: var(--color-surface-700);
-    }
-    
-    .search-container {
-        display: flex;
-        align-items: center;
-    }
-    
-    .search-input {
-        flex: 1;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .category-filters {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-    
-    .category-button {
-        padding: 0.5rem 1rem;
-        border: 2px solid var(--color-surface-300);
-        background: var(--color-surface-100);
-        color: var(--color-surface-800);
-        border-radius: 0.5rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
-        text-transform: capitalize;
-    }
-    
-    .category-button:hover {
-        background: var(--color-surface-200);
-        border-color: var(--color-primary-400);
-    }
-    
-    .category-button.active {
-        background: var(--color-primary-600);
-        border-color: var(--color-primary-600);
-        color: white;
-    }
-    
-    :global(.dark) .category-button {
-        background: var(--color-surface-800);
-        border-color: var(--color-surface-600);
-        color: var(--color-surface-200);
-    }
-    
-    :global(.dark) .category-button:hover {
-        background: var(--color-surface-700);
-        border-color: var(--color-primary-500);
-    }
-    
-    :global(.dark) .category-button.active {
-        background: var(--color-primary-500);
-        border-color: var(--color-primary-500);
-    }
-    
-    .skills-grid {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1.5rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 1.5rem;
-        container-type: inline-size;
-    }
-    
-    @container (max-width: 400px) {
-        .skills-grid {
-            grid-template-columns: 1fr;
-        }
+    .skill-stack {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
     }
     
     .skill-card-wrapper {
-        width: 100%;
+        position: absolute;
+        width: 350px;
+        height: 450px;
+        transform-origin: center center;
+        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+    }
+    
+    .skill-card-wrapper.current {
+        transform: translate(-50%, -50%) scale(1) rotateZ(0deg);
+        z-index: 100;
+    }
+    
+    .skill-card-wrapper.next {
+        transform: translate(-30%, -50%) scale(0.9) rotateZ(5deg) translateZ(-50px);
+        z-index: 99;
+        opacity: 0.8;
+    }
+    
+    .skill-card-wrapper.prev {
+        transform: translate(-70%, -50%) scale(0.9) rotateZ(-5deg) translateZ(-50px);
+        z-index: 99;
+        opacity: 0.8;
+    }
+    
+    .skill-card-wrapper:not(.current):not(.next):not(.prev) {
+        transform: translate(-50%, -50%) scale(0.7) rotateZ(0deg) translateZ(-100px);
+        opacity: 0.4;
     }
     
     .skill-card-content {
-        padding: 1.25rem;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;
         height: 100%;
+        position: relative;
+        z-index: 2;
+        overflow-y: auto;
     }
     
     .torn-input-wrapper.selected {
-        transform: scale(0.98);
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
+        box-shadow: 0 0 20px rgba(217, 119, 6, 0.6);
+        transform: scale(1.02);
     }
     
     .skill-card-header {
@@ -381,12 +386,13 @@
     
     .skill-card-name {
         font-family: var(--form-labels), serif;
-        font-size: 1.25rem;
+        font-size: 1.4rem;
         font-weight: bold;
         color: var(--color-surface-900);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin: 0;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
     
     :global(.dark) .skill-card-name {
@@ -486,32 +492,135 @@
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
     
-    .modal-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid var(--color-surface-200);
+    .skill-card-footer {
+        margin-top: auto;
+        padding-top: 1rem;
         display: flex;
+        justify-content: center;
         align-items: center;
-        justify-content: space-between;
-        background: var(--color-surface-100);
     }
     
-    :global(.dark) .modal-footer {
-        border-top-color: var(--color-surface-700);
-        background: var(--color-surface-800);
+    .selected-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-success-600);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+    }
+    
+    :global(.dark) .selected-indicator {
+        color: var(--color-success-400);
+    }
+    
+    .selected-indicator svg {
+        color: var(--color-success-600);
+    }
+    
+    :global(.dark) .selected-indicator svg {
+        color: var(--color-success-400);
+    }
+    
+    .select-hint {
+        color: var(--color-surface-600);
+        font-style: italic;
+        font-size: 0.85rem;
+        text-align: center;
+        opacity: 0.8;
+    }
+    
+    :global(.dark) .select-hint {
+        color: var(--color-surface-400);
+    }
+    
+    /* Navigation Controls */
+    .carousel-navigation {
+        position: absolute;
+        bottom: -4rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 1rem 1.5rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+    
+    .nav-button {
+        background: none;
+        border: 2px solid rgba(217, 119, 6, 0.4);
+        color: #d97706;
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .nav-button:hover:not(:disabled) {
+        background: rgba(217, 119, 6, 0.2);
+        color: #f5f5f5;
+        transform: scale(1.1);
+    }
+    
+    .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+    
+    .carousel-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #f5f5f5;
+        font-weight: 600;
+        min-width: 4rem;
+        justify-content: center;
+    }
+    
+    .current-index {
+        color: #d97706;
+        font-size: 1.2rem;
+    }
+    
+    .separator {
+        color: #71717a;
+    }
+    
+    /* Floating Footer */
+    .floating-footer {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        z-index: 110;
     }
     
     .selected-count {
         font-weight: 600;
-        color: var(--color-surface-700);
-    }
-    
-    :global(.dark) .selected-count {
-        color: var(--color-surface-300);
+        color: #f5f5f5;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     }
     
     .done-button {
         padding: 0.75rem 2rem;
-        background: var(--color-primary-600);
+        background: #d97706;
         color: white;
         border: none;
         border-radius: 0.5rem;
@@ -523,9 +632,9 @@
     }
     
     .done-button:hover {
-        background: var(--color-primary-700);
+        background: #b45309;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
     }
     
     /* HTML content styling */
@@ -571,34 +680,47 @@
     
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .modal-container {
-            max-width: 95vw;
-            max-height: 95vh;
+        .floating-controls {
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            transform: none;
+            min-width: unset;
+            max-width: unset;
         }
         
-        .skills-grid {
-            grid-template-columns: 1fr;
+        .carousel-container {
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 400px;
+        }
+        
+        .skill-card-wrapper {
+            width: 280px;
+            height: 360px;
+        }
+        
+        .skill-card-content {
             padding: 1rem;
-            gap: 1rem;
         }
         
-        .modal-header {
-            padding: 1rem;
-        }
-        
-        .modal-controls {
-            padding: 0.75rem 1rem;
-        }
-        
-        .modal-footer {
-            padding: 0.75rem 1rem;
+        .floating-footer {
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            transform: none;
             flex-direction: column;
-            gap: 0.75rem;
-            align-items: stretch;
+            gap: 1rem;
         }
         
         .done-button {
             width: 100%;
+        }
+        
+        .carousel-navigation {
+            bottom: -3rem;
         }
     }
 </style>

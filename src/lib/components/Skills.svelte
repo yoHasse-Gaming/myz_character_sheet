@@ -17,12 +17,10 @@
     import { fade } from "svelte/transition";
     import { useHover } from '@skeletonlabs/floating-ui-svelte';
     import { generateUniqueVariants } from '$lib';
-    import { sheetState, characterActions } from '$lib/character_sheet.svelte';
-    import OptionalSkillsModal from './OptionalSkillsModal.svelte';
+    import { sheetState, characterActions, openDialogueOption } from '$lib/character_sheet.svelte';
 
     let openSkillIndex = $state<number | null>(null);
     let elemArrow: HTMLElement | null = $state(null);
-    let isOptionalSkillsModalOpen = $state(false);
 
     // Create floating instance for each skill
     function createFloatingForSkill(skillIndex: number) {
@@ -74,7 +72,7 @@
     <div class="optional-skills-section">
         <button 
             class="add-optional-skills-button"
-            onclick={() => isOptionalSkillsModalOpen = true}
+            onclick={() => openDialogueOption('optionalSkills')}
         >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -249,7 +247,7 @@
                         <h3 class="skill-title">({skill.name})</h3>
                         <div class="skill-section">
                             <h4 class="section-title">Kategori:</h4>
-                            <div class="section-content">{skill.category}</div>
+                            <div class="section-content">{skill.occupation}</div>
                         </div>
                         <div class="skill-section">
                             <h4 class="section-title">Beskrivning:</h4>
@@ -274,7 +272,8 @@
 </div>
 
 <!-- Optional Skills Modal -->
-<OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} />
+<!-- Remove the modal from here since it's now in the layout -->
+<!-- <OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} /> -->
 
 <style>
     /* Skills container - responsive grid */

@@ -2,11 +2,12 @@
     import { onMount } from 'svelte';
     import { fade, scale } from "svelte/transition";
     import { generateUniqueVariants } from '$lib';
-    import { sheetState, characterActions } from '$lib/character_sheet.svelte';
+    import { sheetState, characterActions, closeDialogueOption, isDialogueOpen } from '$lib/character_sheet.svelte';
     import type { OptionalSkill, SkillsData } from '$lib/types';
     import skills from '$lib/data/skills.json';
 
-    let { isOpen = $bindable(false) } = $props();
+    // Get the modal state from the global dialogue system
+
     
     let carouselContainer: HTMLElement | null = $state(null);
     let currentSkillIndex = $state(0);
@@ -42,7 +43,7 @@
     }
     
     function closeModal() {
-        isOpen = false;
+        closeDialogueOption('optionalSkills');
     }
     
     // Navigate carousel
@@ -97,7 +98,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-{#if isOpen}
+{#if isDialogueOpen('optionalSkills')}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div 
@@ -236,7 +237,7 @@
         </div>
 
         <!-- Floating Footer -->
-        <div class="floating-footer">
+        <!-- <div class="floating-footer">
             <div class="selected-count">
                 {#if sheetState.optionalSkills.length > 0}
                     Vald färdighet: {sheetState.optionalSkills[0].name}
@@ -247,20 +248,23 @@
             <button class="done-button" onclick={closeModal}>
                 Klar
             </button>
-        </div>
+        </div> -->
     </div>
 {/if}
 
 <style>
     .modal-backdrop {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.85);
-        z-index: 1000;
+        z-index: 9999;
         overflow: hidden;
+        margin: 0;
+        padding: 0;
+        transform: none;
     }
     
     /* Floating Controls at Top */
@@ -315,9 +319,9 @@
     /* Carousel Container */
     .carousel-container {
         position: absolute;
-        top: 250px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 50vh;
+        left: 50vw;
+        transform: translate(-50%, -50%);
         width: 400px;
         height: 500px;
         perspective: 1000px;
@@ -599,7 +603,7 @@
     .floating-footer {
         position: absolute;
         bottom: 2rem;
-        left: 50%;
+        left: 50vw;
         transform: translateX(-50%);
         background: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(10px);

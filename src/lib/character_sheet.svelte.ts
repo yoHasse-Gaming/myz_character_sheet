@@ -1,8 +1,9 @@
 // Global character sheet state using Svelte 5 runes
 // This provides reactive state management across all components
 
-import type { BaseAbilityType, SelectedOptionalSkill } from './types';
+import type { BaseAbilityType, OptionalSkill } from './types';
 import { useOwlbearSync } from './owlbear-integration';
+import { SvelteMap } from 'svelte/reactivity';
 
 // Define the character sheet state structure
 export const sheetState = $state({
@@ -121,7 +122,7 @@ export const sheetState = $state({
     ],
     
     // Optional skills selected by the user
-    optionalSkills: [] as SelectedOptionalSkill[],
+    optionalSkills: [] as OptionalSkill[],
     
     // Character conditions
     conditions: {
@@ -176,7 +177,7 @@ export const characterActions = {
     },
     
     // Optional skills management
-    addOptionalSkill(optionalSkill: SelectedOptionalSkill) {
+    addOptionalSkill(optionalSkill: OptionalSkill) {
         // Check if skill is already added
         const existingIndex = sheetState.optionalSkills.findIndex(s => s.id === optionalSkill.id);
         if (existingIndex === -1) {
@@ -286,6 +287,50 @@ export const characterActions = {
         owlbearSync.syncNow();
     }
 };
+
+// Define dialogue options for modals
+export type DialogueOption = 'optionalSkills';
+
+// Create a reactive map for dialogue states
+const openDialogue = new SvelteMap<DialogueOption, boolean>([
+    ['optionalSkills', false]
+]);
+
+// Convert to reactive state
+
+// Dialogue management functions
+export function isDialogueOpen(dialogue: DialogueOption | undefined = undefined) {
+    if (!dialogue) {
+        return Array.from(openDialogue.values()).some((value) => value === true);
+    }
+    return openDialogue.get(dialogue) ?? false;
+}
+
+export function toggleDialogueOption(dialogue: DialogueOption) {
+    const currentValue = openDialogue.get(dialogue) ?? false;
+    openDialogue.set(dialogue, !currentValue);
+}
+
+export function openDialogueOption(dialogue: DialogueOption) {
+    // Close all other dialogues first
+    openDialogue.forEach((value, key) => {
+        if (key !== dialogue) {
+            openDialogue.set(key, false);
+        }
+    });
+    openDialogue.set(dialogue, true);
+}
+
+export function closeDialogueOption(dialogue: DialogueOption | undefined = undefined) {
+    if (!dialogue) {
+        // Close all dialogues
+        openDialogue.forEach((value, key) => {
+            openDialogue.set(key, false);
+        });
+        return;
+    }
+    openDialogue.set(dialogue, false);
+}
 
 // Export types for TypeScript support
 export type CharacterSheet = typeof sheetState;

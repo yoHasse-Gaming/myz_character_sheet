@@ -2,7 +2,8 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import SizeControls from '$lib/components/SizeControls.svelte';
-	import { characterActions } from '$lib/character_sheet.svelte';
+	import OptionalSkillsModal from '$lib/components/OptionalSkillsModal.svelte';
+	import { characterActions, isDialogueOpen } from '$lib/character_sheet.svelte';
     
 
     let { children } = $props();
@@ -118,6 +119,9 @@
 >
 	{@render children?.()}
 </main>
+
+<!-- Global Modals -->
+<OptionalSkillsModal />
 
 <style>
 	.theme-toggle-container {

@@ -246,7 +246,7 @@
                     <div class="tooltip-content">
                         <h3 class="skill-title">({skill.name})</h3>
                         <div class="skill-section">
-                            <h4 class="section-title">Kategori:</h4>
+                            <h4 class="section-title">Syssla:</h4>
                             <div class="section-content">{skill.occupation}</div>
                         </div>
                         <div class="skill-section">
@@ -395,7 +395,7 @@
     }
 
     /* Optional skill styling */
-    .optional-skill-wrapper {
+    /* .optional-skill-wrapper {
         border: 2px solid rgba(217, 119, 6, 0.4);
         position: relative;
     }
@@ -413,7 +413,7 @@
         font-weight: bold;
         letter-spacing: 0.1em;
         z-index: 10;
-    }
+    } */
 
     .remove-skill-button {
         padding: 0.25rem;
@@ -443,7 +443,7 @@
     }
 
     .skill-name {
-        font-family: var(--form-labels), serif;
+        font-family: var(--font-user), serif;
         font-weight: bold;
         font-size: 0.9rem;
         letter-spacing: 0.05em;

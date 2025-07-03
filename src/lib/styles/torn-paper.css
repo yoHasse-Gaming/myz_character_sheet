@@ -7,11 +7,60 @@
     url("/myz_character_sheet/fonts/FriendlyStranger.woff") format("woff2");
 }
 
+@font-face {
+    font-family: "HigherJumpFont";
+    src:
+        local("HigherJumpFont"),
+        url("/myz_character_sheet/fonts/higher-jump.regular.ttf") format("truetype");
+    
+}
+
+/* CfWhiteTrashRegular-rqoO.ttf */
+@font-face {
+    font-family: "CfWhiteTrashRegular";
+    src:
+        local("CfWhiteTrashRegular"),
+        url("/myz_character_sheet/fonts/cf-white-trash-font/CfWhiteTrashRegular-rqoO.ttf") format("truetype");
+    font-size: small;
+}
+
+/* ganas-juice-font\GanasJuice-6RxPM.otf */
+@font-face {
+    font-family: "GanasJuice";
+    src:
+        local("GanasJuice"),
+        url("/myz_character_sheet/fonts/ganas-juice-font/GanasJuice-6RxPM.otf") format("opentype");
+}
+
+/* grindy-brush\Grindy Brush.otf */
+@font-face {
+    font-family: "GrindyBrush";
+    src:
+        local("GrindyBrush"),
+        url("/myz_character_sheet/fonts/grindy-brush/Grindy Brush.otf") format("opentype");
+}
+
+/* rusted-personal-use\RUSTED PERSONAL USE.ttf */
+
+@font-face {
+    font-family: "RustedPersonalUse";
+    src:
+        local("RustedPersonalUse"),
+        url("/myz_character_sheet/fonts/rusted-personal-use/RUSTED PERSONAL USE.ttf") format("truetype");
+}
+
 
 :root {
     --torn-filter-effect: url('#squiggle');
     --font-user: Kalam, sans-serif;
-    --form-labels: FriendlyStranger, sans-serif;
+    --form-labels: Kalam, sans-serif;
+    --heading-font-family: Kalam, sans-serif;
+    
+    
+}
+
+.h4 {
+    font-family: var(--form-labels), serif;
 }
 
 /* Wasteland styling */
@@ -67,7 +116,7 @@
     position: relative;
     border-radius: 0;
     padding-left: 2rem;
-    font-size: x-large;
+    /* font-size: x-large; */
 
     font-family: var(--font-user);
     color: var(--color-surface-900);
@@ -366,6 +415,7 @@ textarea.torn-input {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+    font-size: xx-large;
 }
 
 @media (min-width: 768px) {

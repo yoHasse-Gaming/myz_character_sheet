@@ -475,12 +475,12 @@ label {
     margin-bottom: 0.5rem;
 }
 
-.friendly-stranger {
+/* .friendly-stranger {
     font-family: var(--form-labels), serif;
     letter-spacing: 0.15em;
     font-size: large;
     font-weight: bold;
-}
+} */
 
 :global(.dark) .tab-content {
     color: #f5f5f5;
@@ -518,7 +518,7 @@ label {
     
     /* Reduce torn input padding */
     .torn-input {
-        font-size: large;
+        /* font-size: large; */
         padding-left: 1rem;
         min-height: 3rem;
     }

@@ -289,11 +289,19 @@ export const characterActions = {
 };
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills';
+export type DialogueOption = 'optionalSkills' | 'info';
+
+// Info modal state to hold content
+export const infoModalState = $state({
+    title: '',
+    content: '',
+    type: '' as 'skill' | 'trauma' | ''
+});
 
 // Create a reactive map for dialogue states
 const openDialogue = new SvelteMap<DialogueOption, boolean>([
-    ['optionalSkills', false]
+    ['optionalSkills', false],
+    ['info', false]
 ]);
 
 // Convert to reactive state
@@ -330,6 +338,14 @@ export function closeDialogueOption(dialogue: DialogueOption | undefined = undef
         return;
     }
     openDialogue.set(dialogue, false);
+}
+
+// Function to open info modal with specific content
+export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' = 'skill') {
+    infoModalState.title = title;
+    infoModalState.content = content;
+    infoModalState.type = type;
+    openDialogueOption('info');
 }
 
 // Export types for TypeScript support

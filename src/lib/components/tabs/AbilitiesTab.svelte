@@ -78,7 +78,7 @@
                         </div>
                     </FormSection>
                 </div>
-                <div class="">
+                <div >
                     <FormSection header="FÄRDIGHETER">
                         <Skills />
                     </FormSection>

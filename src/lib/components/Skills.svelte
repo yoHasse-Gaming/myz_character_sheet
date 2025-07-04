@@ -1,56 +1,36 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import {
-        FloatingArrow,
-        arrow,
-        autoUpdate,
-        flip,
-        offset,
-        shift,
-        useClick,
-        useDismiss,
-        useFloating,
-        useInteractions,
-        useRole,
-    } from "@skeletonlabs/floating-ui-svelte";
-    import { fade } from "svelte/transition";
-    import { useHover } from '@skeletonlabs/floating-ui-svelte';
     import { generateUniqueVariants } from '$lib';
-    import { sheetState, characterActions, openDialogueOption } from '$lib/character_sheet.svelte';
-
-    let openSkillIndex = $state<number | null>(null);
-    let elemArrow: HTMLElement | null = $state(null);
-
-    // Create floating instance for each skill
-    function createFloatingForSkill(skillIndex: number) {
-        const isOpen = () => openSkillIndex === skillIndex;
-
-        const floating = useFloating({
-            whileElementsMounted: autoUpdate,
-            get open() {
-                return isOpen();
-            },
-            onOpenChange: (v) => {
-                openSkillIndex = v ? skillIndex : null;
-            },
-            placement: "top",
-            get middleware() {
-                return [offset(10), flip(), shift({ padding: 8 }), elemArrow && arrow({ element: elemArrow })];
-            },
-        });
-
-        const hover = useHover(floating.context, {
-            delay: { open: 300, close: 100 }
-        });
-        const dismiss = useDismiss(floating.context);
-        const role = useRole(floating.context, { role: "tooltip" });
-        const interactions = useInteractions([hover, dismiss, role]);
-
-        return { floating, interactions };
-    }
+    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '$lib/character_sheet.svelte';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
+
+    function showSkillInfo(skill: any) {
+        const content = `
+            <div class="skill-section">
+                <h4 class="section-title">Grundegenskap:</h4>
+                <div class="section-content">
+                    <span class="skill-ability-tooltip">(${skill.baseAbility})</span>
+                </div>
+            </div>
+            <div class="skill-section">
+                <h4 class="section-title">Beskrivning:</h4>
+                <div class="section-content">${skill.description}</div>
+            </div>
+            <div class="skill-section">
+                <h4 class="section-title">Bonuseffekter:</h4>
+                <div class="section-content">${skill.bonusEffects}</div>
+            </div>
+            ${skill.examples ? `
+            <div class="skill-section">
+                <h4 class="section-title">Exempel:</h4>
+                <div class="section-content">${skill.examples}</div>
+            </div>
+            ` : ''}
+        `;
+        openInfoModal(skill.name, content, 'skill');
+    }
 
     function handleSkillChange(skillIndex: number, value: number) {
         characterActions.setSkillValue(skillIndex, value);
@@ -68,107 +48,67 @@
 
 <div class="skills-tab">
     <!-- Add Optional Skills Button -->
-    <div class="optional-skills-section">
-        <button 
-            class="add-optional-skills-button"
-            onclick={() => openDialogueOption('optionalSkills')}
-        >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Lägg till valfria färdigheter
-        </button>
-        {#if sheetState.optionalSkills.length > 0}
-            <span class="optional-skills-count">
-                {sheetState.optionalSkills.length} valfria färdigheter
-            </span>
-        {/if}
-    </div>
+
 
     <!-- Core Skills -->
     {#each sheetState.skills as skill, index}
-        {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item-wrapper">
             <div class="torn-input-wrapper {skillVariants[index]}">
-                <div 
-                    class="skill-item-content"
-                    bind:this={floating.elements.reference}
-                    {...interactions.getReferenceProps()}
-                >
+                <div class="skill-item-content">
                     <div class="skill-controls">
                         <span class="skill-name">{skill.name}</span>
-                        <input
-                            id="skill-{index}"
-                            name={skill.name}
-                            type="number"
-                            min="0"
-                            max="5"
-                            class="torn-input skill-input font-user"
-                            value={skill.value}
-                            oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                            placeholder="0"
-                        />
+                        <div class="skill-controls-right">
+                            <button 
+                                class="info-icon-button"
+                                onclick={() => showSkillInfo(skill)}
+                                aria-label="Information om {skill.name}"
+                                title="Visa information om {skill.name}"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9,9h6v6H9z"></path>
+                                    <path d="M9,9h6"></path>
+                                </svg>
+                            </button>
+                            <input
+                                id="skill-{index}"
+                                name={skill.name}
+                                type="number"
+                                min="0"
+                                max="5"
+                                class="torn-input skill-input font-user"
+                                value={skill.value}
+                                oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                                placeholder="0"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        {#if openSkillIndex === index}
-            <div
-                bind:this={floating.elements.floating}
-                style={floating.floatingStyles}
-                class="floating-tooltip"
-                {...interactions.getFloatingProps()}
-                transition:fade={{ duration: 150 }}
-            >
-                <div class="tooltip-wrapper">
-                    <!-- Background element with the torn paper effect -->
-                    <div class="tooltip-background"></div>
-                    <!-- Content element without the effect -->
-                    <div class="tooltip-content">
-                        <h3 class="skill-title">{skill.name}</h3>
-                        <div class="skill-section">
-                            <h4 class="section-title">Grundegenskap:</h4>
-                            <div class="section-content">
-                                <span class="skill-ability-tooltip">({skill.baseAbility})</span>
-                            </div>
-                        </div>
-                        <div class="skill-section">
-                            <h4 class="section-title">Beskrivning:</h4>
-                            <div class="section-content">{@html skill.description}</div>
-                        </div>
-                        <div class="skill-section">
-                            <h4 class="section-title">Bonuseffekter:</h4>
-                            <div class="section-content">{@html skill.bonusEffects}</div>
-                        </div>
-                        {#if skill.examples}
-                            <div class="skill-section">
-                                <h4 class="section-title">Exempel:</h4>
-                                <div class="section-content">{@html skill.examples}</div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-                <FloatingArrow bind:ref={elemArrow} context={floating.context} class="fill-surface-700 dark:fill-surface-300" />
-            </div>
-        {/if}
     {/each}
 
     <!-- Optional Skills -->
     {#each sheetState.optionalSkills as skill, index}
         {@const skillIndex = sheetState.skills.length + index}
-        {@const { floating, interactions } = createFloatingForSkill(skillIndex)}
         <div class="skill-item-wrapper optional-skill">
             <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper">
-                <div 
-                    class="skill-item-content"
-                    bind:this={floating.elements.reference}
-                    {...interactions.getReferenceProps()}
-                >
+                <div class="skill-item-content">
                     <div class="skill-controls">
                         <span class="skill-name">{skill.name}</span>
                         <div class="skill-controls-right">
+                            <button 
+                                class="info-icon-button"
+                                onclick={() => showSkillInfo(skill)}
+                                aria-label="Information om {skill.name}"
+                                title="Visa information om {skill.name}"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9,9h6v6H9z"></path>
+                                    <path d="M9,9h6"></path>
+                                </svg>
+                            </button>
                             <input
                                 id="optional-skill-{skill.id}"
                                 name={skill.name}
@@ -195,51 +135,25 @@
                 </div>
             </div>
         </div>
-
-        {#if openSkillIndex === skillIndex}
-            <div
-                bind:this={floating.elements.floating}
-                style={floating.floatingStyles}
-                class="floating-tooltip"
-                {...interactions.getFloatingProps()}
-                transition:fade={{ duration: 150 }}
-            >
-                <div class="tooltip-wrapper">
-                    <!-- Background element with the torn paper effect -->
-                    <div class="tooltip-background"></div>
-                    <!-- Content element without the effect -->
-                    <div class="tooltip-content">
-                        <h3 class="skill-title">{skill.name}</h3>
-                        <div class="skill-section">
-                            <h4 class="section-title">Grundegenskap:</h4>
-                            <div class="section-content">
-                                <span class="skill-ability-tooltip">({skill.baseAbility})</span>
-                            </div>
-                        </div>
-                        <div class="skill-section">
-                            <h4 class="section-title">Syssla:</h4>
-                            <div class="section-content">{skill.occupation}</div>
-                        </div>
-                        <div class="skill-section">
-                            <h4 class="section-title">Beskrivning:</h4>
-                            <div class="section-content">{@html skill.description}</div>
-                        </div>
-                        <div class="skill-section">
-                            <h4 class="section-title">Bonuseffekter:</h4>
-                            <div class="section-content">{@html skill.bonusEffects}</div>
-                        </div>
-                        {#if skill.examples}
-                            <div class="skill-section">
-                                <h4 class="section-title">Exempel:</h4>
-                                <div class="section-content">{@html skill.examples}</div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-                <FloatingArrow bind:ref={elemArrow} context={floating.context} class="fill-surface-700 dark:fill-surface-300" />
-            </div>
-        {/if}
     {/each}
+
+    <div class="optional-skills-section">
+        <button 
+            class="add-optional-skills-button"
+            onclick={() => openDialogueOption('optionalSkills')}
+        >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Lägg till valfria färdigheter
+        </button>
+        {#if sheetState.optionalSkills.length > 0}
+            <span class="optional-skills-count">
+                {sheetState.optionalSkills.length} valfria färdigheter
+            </span>
+        {/if}
+    </div>
 </div>
 
 <!-- Optional Skills Modal -->
@@ -367,6 +281,37 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+
+    .info-icon-button {
+        background: none;
+        border: none;
+        color: var(--color-surface-600);
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+    }
+
+    .info-icon-button:hover {
+        background: rgba(217, 119, 6, 0.1);
+        color: var(--color-primary-600);
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    :global(.dark) .info-icon-button {
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .info-icon-button:hover {
+        background: rgba(217, 119, 6, 0.2);
+        color: var(--color-primary-400);
     }
 
     .skill-name {

@@ -1,4 +1,3 @@
-
 <script lang="ts">
     import { onMount } from 'svelte';
     import {
@@ -92,33 +91,13 @@
         {@const { floating, interactions } = createFloatingForSkill(index)}
         <div class="skill-item-wrapper">
             <div class="torn-input-wrapper {skillVariants[index]}">
-                <div class="skill-item-content">
-                    <div class="skill-header">
-                        <span class="skill-name">{skill.name}</span>
-                        <button
-                            class="info-icon"
-                            bind:this={floating.elements.reference}
-                            {...interactions.getReferenceProps()}
-                            aria-label="Visa färdighetsinformation för {skill.name}"
-                        >
-                        <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14"></path>
-                                <circle cx="12" cy="17" r=".5"></circle>
-                            </svg>
-                        </button>
-                    </div>
+                <div 
+                    class="skill-item-content"
+                    bind:this={floating.elements.reference}
+                    {...interactions.getReferenceProps()}
+                >
                     <div class="skill-controls">
-                        <span class="skill-ability">({skill.baseAbility})</span>
+                        <span class="skill-name">{skill.name}</span>
                         <input
                             id="skill-{index}"
                             name={skill.name}
@@ -148,7 +127,13 @@
                     <div class="tooltip-background"></div>
                     <!-- Content element without the effect -->
                     <div class="tooltip-content">
-                        <h3 class="skill-title">({skill.name})</h3>
+                        <h3 class="skill-title">{skill.name}</h3>
+                        <div class="skill-section">
+                            <h4 class="section-title">Grundegenskap:</h4>
+                            <div class="section-content">
+                                <span class="skill-ability-tooltip">({skill.baseAbility})</span>
+                            </div>
+                        </div>
                         <div class="skill-section">
                             <h4 class="section-title">Beskrivning:</h4>
                             <div class="section-content">{@html skill.description}</div>
@@ -176,56 +161,36 @@
         {@const { floating, interactions } = createFloatingForSkill(skillIndex)}
         <div class="skill-item-wrapper optional-skill">
             <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper">
-                <div class="skill-item-content">
-                    <div class="skill-header">
+                <div 
+                    class="skill-item-content"
+                    bind:this={floating.elements.reference}
+                    {...interactions.getReferenceProps()}
+                >
+                    <div class="skill-controls">
                         <span class="skill-name">{skill.name}</span>
-                        <div class="skill-header-controls">
-                            <button
-                                class="info-icon"
-                                bind:this={floating.elements.reference}
-                                {...interactions.getReferenceProps()}
-                                aria-label="Visa färdighetsinformation för {skill.name}"
-                            >
-                            <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14"></path>
-                                    <circle cx="12" cy="17" r=".5"></circle>
-                                </svg>
-                            </button>
+                        <div class="skill-controls-right">
+                            <input
+                                id="optional-skill-{skill.id}"
+                                name={skill.name}
+                                type="number"
+                                min="0"
+                                max="5"
+                                class="torn-input skill-input font-user"
+                                value={skill.value}
+                                oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                                placeholder="0"
+                            />
                             <button
                                 class="remove-skill-button"
                                 onclick={() => removeOptionalSkill(skill.id)}
                                 aria-label="Ta bort {skill.name}"
                             >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
                                 </svg>
                             </button>
                         </div>
-                    </div>
-                    <div class="skill-controls">
-                        <span class="skill-ability">({skill.baseAbility})</span>
-                        <input
-                            id="optional-skill-{skill.id}"
-                            name={skill.name}
-                            type="number"
-                            min="0"
-                            max="5"
-                            class="torn-input skill-input font-user"
-                            value={skill.value}
-                            oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                            placeholder="0"
-                        />
                     </div>
                 </div>
             </div>
@@ -244,7 +209,13 @@
                     <div class="tooltip-background"></div>
                     <!-- Content element without the effect -->
                     <div class="tooltip-content">
-                        <h3 class="skill-title">({skill.name})</h3>
+                        <h3 class="skill-title">{skill.name}</h3>
+                        <div class="skill-section">
+                            <h4 class="section-title">Grundegenskap:</h4>
+                            <div class="section-content">
+                                <span class="skill-ability-tooltip">({skill.baseAbility})</span>
+                            </div>
+                        </div>
                         <div class="skill-section">
                             <h4 class="section-title">Syssla:</h4>
                             <div class="section-content">{skill.occupation}</div>
@@ -341,14 +312,14 @@
     /* Responsive breakpoints using container queries */
     @container (min-width: 500px) {
         .skills-tab {
-            grid-template-columns: repeat(2, 1fr);
+            /* grid-template-columns: repeat(2, 1fr); */
             gap: 1rem;
         }
     }
 
     @container (min-width: 800px) {
         .skills-tab {
-            grid-template-columns: repeat(3, 1fr);
+            /* grid-template-columns: repeat(3, 1fr); */
         }
     }
 
@@ -361,18 +332,21 @@
 
     /* Content inside torn paper wrapper */
     .skill-item-content {
-        display: flex;
-        flex-direction: column;
-        padding: 0.75rem;
+        padding: 0.2rem;
+        padding-left: 1rem;
         position: relative;
         z-index: 2;
-        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .skill-item-content:hover {
+        background: rgba(217, 119, 6, 0.05);
     }
 
     @container (min-width: 400px) {
         .skill-item-content {
             /* padding: 1rem 1.5rem; */
-            gap: 0.75rem;
         }
 
         .skill-item-wrapper {
@@ -380,66 +354,19 @@
         }
     }
 
-    /* Skill header with name and info button */
-    .skill-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .skill-header-controls {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Optional skill styling */
-    /* .optional-skill-wrapper {
-        border: 2px solid rgba(217, 119, 6, 0.4);
-        position: relative;
-    }
-
-    .optional-skill-wrapper::before {
-        content: 'VALFRI';
-        position: absolute;
-        top: -0.5rem;
-        right: 0.5rem;
-        background: var(--color-primary-600);
-        color: white;
-        padding: 0.2rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.6rem;
-        font-weight: bold;
-        letter-spacing: 0.1em;
-        z-index: 10;
-    } */
-
-    .remove-skill-button {
-        padding: 0.25rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-error-500);
-        background: transparent;
-        color: var(--color-error-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    .remove-skill-button:hover {
-        background: var(--color-error-600);
-        color: white;
-        transform: scale(1.1);
-    }
-
-    /* Skill controls with ability and input */
+    /* Skill controls - now single row with name and input */
     .skill-controls {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
         gap: 0.5rem;
-        max-height: 2rem; /* Limit height for controls */
+    }
+
+    .skill-controls-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .skill-name {
@@ -463,43 +390,12 @@
     }
 
     .skill-ability {
-        font-weight: bold;
-        color: var(--color-primary-600);
-        padding: 0.2rem 0.4rem;
-        border-radius: 0.25rem;
-        font-size: 0.7rem;
-        white-space: nowrap;
-        flex-shrink: 0; /* Don't shrink the ability badge */
+        /* Removed - now shown in tooltip instead */
     }
 
-    @container (min-width: 400px) {
-        .skill-ability {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
-        }
-    }
-
-    /* Info button styling */
+    /* Info button styling - removed since we hover the whole area now */
     .info-icon {
-        padding: 0.3rem;
-        border-radius: 50%;
-        /* border: 1px solid rgba(217, 119, 6, 0.3); */
-        color: var(--color-surface-900);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    @container (min-width: 400px) {
-        .info-icon {
-            padding: 0.5rem;
-        }
-    }
-
-    .info-icon:hover {
-        background: rgba(217, 119, 6, 0.2);
-        border-color: var(--color-primary-600);
-        transform: scale(1.1);
+        /* Removed - entire skill area is now hoverable */
     }
 
     /* Skill input styling */
@@ -552,12 +448,20 @@
         letter-spacing: 0.05em;
     }
 
+    :global(.dark) .section-title {
+        color: var(--color-surface-200);
+    }
+
     .section-content {
         font-size: 0.9rem;
         color: var(--color-surface-900);
         font-family: var(--font-user), sans-serif;
     }
 
+
+    :global(.dark) .section-content {
+        color: var(--color-surface-100);
+    }
     /* HTML content styling */
     .section-content :global(strong) {
         font-weight: 600;
@@ -580,23 +484,49 @@
     }
 
     /* Dark mode adjustments */
-    .dark .skill-name {
+    :global(.dark) .skill-name {
         color: var(--color-surface-100);
     }
 
-    .dark .skill-ability {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-primary-400);
+    :global(.dark) .skill-item-content:hover {
+        background: rgba(217, 119, 6, 0.1);
     }
 
-    .dark .info-icon {
-        background: rgba(217, 119, 6, 0.2);
-        border-color: rgba(217, 119, 6, 0.4);
-        color: var(--color-primary-400);
+    .remove-skill-button {
+        padding: 0.2rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-error-500);
+        background: transparent;
+        color: var(--color-error-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .dark .info-icon:hover {
-        background: rgba(217, 119, 6, 0.3);
-        border-color: var(--color-primary-400);
+    .remove-skill-button:hover {
+        background: var(--color-error-600);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* Skill ability tooltip styling */
+    .skill-ability-tooltip {
+        font-weight: bold;
+        color: var(--color-primary-600);
+        background: rgba(217, 119, 6, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    :global(.dark) .skill-ability-tooltip {
+        background: rgba(217, 119, 6, 0.2);
+        color: var(--color-primary-400);
     }
 </style>

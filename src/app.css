@@ -33,6 +33,19 @@ by Excellent Ritma Florendia
     --color-surface-800: #1a1a1a;
     --color-surface-900: #0f0f0f;
     
+    /* Dynamic filters based on theme colors */
+    --svg-filter-surface-100: brightness(0) saturate(100%) invert(89%) sepia(4%) saturate(134%) hue-rotate(186deg) brightness(97%) contrast(85%);
+    --svg-filter-surface-300: brightness(0) saturate(100%) invert(68%) sepia(7%) saturate(134%) hue-rotate(186deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-600: brightness(0) saturate(100%) invert(29%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-700: brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-800: brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-900: brightness(0) saturate(100%) invert(4%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    
+    /* Primary color filters */
+    --svg-filter-primary-400: brightness(0) saturate(100%) invert(63%) sepia(96%) saturate(664%) hue-rotate(356deg) brightness(99%) contrast(94%);
+    --svg-filter-primary-900: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
+    --svg-filter-warning-500: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
+    
     --color-primary-50: #fef3c7;
     --color-primary-100: #fde68a;
     --color-primary-200: #fcd34d;
@@ -51,6 +64,33 @@ by Excellent Ritma Florendia
 
     --font-user: Kalam, sans-serif;
     --form-labels: Kalam, sans-serif;
+}
+
+/* Dark mode SVG filter overrides */
+
+/* Dynamic SVG filter utility classes */
+.svg-surface-100 {
+    filter: var(--svg-filter-surface-100);
+}
+
+.svg-surface-300 {
+    filter: var(--svg-filter-surface-300);
+}
+
+.svg-surface-600 {
+    filter: var(--svg-filter-surface-600);
+}
+
+.svg-surface-900 {
+    filter: var(--svg-filter-surface-900);
+}
+
+.svg-primary {
+    filter: var(--svg-filter-primary-400);
+}
+
+.svg-warning {
+    filter: var(--svg-filter-warning-500);
 }
 
 @import './lib/styles/torn-paper.css';
@@ -109,6 +149,15 @@ body::before {
 }
 
 
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5 {
+    color: var(--color-surface-200);
+}
+
+
 
 .dark .sheet-container {
     background: rgba(26, 26, 26, 0.95);
@@ -156,7 +205,8 @@ body::before {
 .dark .card {
     /* background: rgba(38, 38, 38, 0.9) !important; */
     /* border: 1px solid #525252; */
-
+    /* Placeholder for future dark card styling */
+    opacity: 1;
 }
 
 .card::before {
@@ -237,6 +287,8 @@ body::before {
     /* box-shadow: 
         inset 0 2px 4px rgba(0, 0, 0, 0.6),
         0 0 0 2px rgba(217, 119, 6, 0.2) !important; */
+    /* Placeholder for future dark input focus styling */
+    outline: none;
 }
 
 .input::placeholder {
@@ -356,13 +408,11 @@ body::before {
 }
 
 .h4 {
-    color: var(--color-surface-900);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .dark .h4 {
-    color: var(--color-surface-800);
     font-size: x-large;
     /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
 }
@@ -565,6 +615,19 @@ label {
     .xl\:grid-cols-3 {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+
+.stroke-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+    transition: filter 0.2s ease;
+}
+
+.dark .stroke-image {
+    filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
 }
 
 

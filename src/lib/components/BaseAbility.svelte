@@ -3,6 +3,7 @@
 <script lang="ts">
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
     import { fade, scale } from 'svelte/transition';
+    
 
     let { 
         baseAbilityLabel,
@@ -225,13 +226,8 @@
         transform: scale(0.95);
     }
 
-    .stroke-image {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-    }
 
+    /* Circle indicators (empty state) should be lighter */
     .circle-layer {
         position: absolute;
         top: 0;
@@ -239,14 +235,13 @@
         z-index: 1;
     }
 
+    /* X marks (damage) should be more prominent and red-tinted */
     .x-layer {
         position: absolute;
         top: 0;
         left: 0;
         z-index: 2;
     }
-
-
 
     /* Responsive adjustments */
     @media (max-width: 639px) {

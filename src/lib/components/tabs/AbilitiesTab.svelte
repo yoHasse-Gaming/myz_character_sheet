@@ -4,15 +4,43 @@
     import { onMount } from 'svelte';
     import Skills from '../Skills.svelte';
     import { sheetState, characterActions } from '$lib/character_sheet.svelte';
-    import o from '$lib/img/o.svg';
-    import x from '$lib/img/x.svg';
+
+    type Condition = {
+        name: keyof typeof sheetState.conditions;
+        label: string;
+    }
+
+    const conditionAndToggle: Condition[] = [
+        { name: 'isStarving', label: 'Utsvulten' },
+        { name: 'isSleepDeprived', label: 'Sömnlös' },
+        { name: 'isDehydrated', label: 'Uttorkad' },
+        { name: 'isFreezing', label: 'Nedkyld' }
+    ];
+
+
 </script> 
 
+{#snippet conditionItem(condition: Condition)}
+<div class="condition-item">
+    <span class="condition-label">{condition.label}</span>
+    <button 
+        class="condition-indicator"
+        onclick={() => characterActions.toggleCondition(condition.name)}
+        aria-label={`Toggle ${condition.label.toLowerCase()} tillstånd`}
+    >
+        <img src='/myz_character_sheet/img/strokes/o.svg' alt="Inaktiv" class="stroke-image condition-circle" />
+        {#if sheetState.conditions[condition.name]}
+            <img src='/myz_character_sheet/img/strokes/x.svg' alt="Aktiv" class="stroke-image condition-x" />
+        {/if}
+    </button>
+</div>
+{/snippet}
+
         <div class="properties-tab">
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+            <div class="grid s:grid-cols-1 grid-cols-2 gap-4 lg:gap-6">
                 <div class="space-y-4 lg:space-y-6">
                     <FormSection header="GRUNDEGENSKAPER">
-                        <div class="space-y-4">
+                        <div class="space-y-4 ">
                             {#each sheetState.baseAbilities as ability, index}
                                 <BaseAbility
                                     baseAbilityLabel={ability.label}
@@ -25,62 +53,17 @@
                     
                     <FormSection header="TILLSTÅND">
                         <div class="conditions-container">
-                            <div class="condition-row">
-                                <div class="condition-item">
-                                    <span class="condition-label">Utsvulten</span>
-                                    <button 
-                                        class="condition-indicator"
-                                        onclick={() => characterActions.toggleCondition('isStarving')}
-                                        aria-label="Toggle utsvulten tillstånd"
-                                    >
-                                        <img src={o} alt="Inaktiv" class="condition-circle" />
-                                        {#if sheetState.conditions.isStarving}
-                                            <img src={x} alt="Aktiv" class="condition-x" />
+                            {#each conditionAndToggle as condition, index}
+                                {#if index % 2 === 0}
+                                    <div class="condition-row">
+                                        {@render conditionItem(condition)}
+                                        {#if conditionAndToggle[index + 1]}
+                                            {@render conditionItem(conditionAndToggle[index + 1])}
                                         {/if}
-                                    </button>
-                                </div>
-                                <div class="condition-item">
-                                    <span class="condition-label">Sömnlös</span>
-                                    <button 
-                                        class="condition-indicator"
-                                        onclick={() => characterActions.toggleCondition('isSleepDeprived')}
-                                        aria-label="Toggle sömnlös tillstånd"
-                                    >
-                                        <img src={o} alt="Inaktiv" class="condition-circle" />
-                                        {#if sheetState.conditions.isSleepDeprived}
-                                            <img src={x} alt="Aktiv" class="condition-x" />
-                                        {/if}
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="condition-row">
-                                <div class="condition-item">
-                                    <span class="condition-label">Uttorkad</span>
-                                    <button 
-                                        class="condition-indicator"
-                                        onclick={() => characterActions.toggleCondition('isDehydrated')}
-                                        aria-label="Toggle uttorkad tillstånd"
-                                    >
-                                        <img src={o} alt="Inaktiv" class="condition-circle" />
-                                        {#if sheetState.conditions.isDehydrated}
-                                            <img src={x} alt="Aktiv" class="condition-x" />
-                                        {/if}
-                                    </button>
-                                </div>
-                                <div class="condition-item">
-                                    <span class="condition-label">Nedkyld</span>
-                                    <button 
-                                        class="condition-indicator"
-                                        onclick={() => characterActions.toggleCondition('isFreezing')}
-                                        aria-label="Toggle nedkyld tillstånd"
-                                    >
-                                        <img src={o} alt="Inaktiv" class="condition-circle" />
-                                        {#if sheetState.conditions.isFreezing}
-                                            <img src={x} alt="Aktiv" class="condition-x" />
-                                        {/if}
-                                    </button>
-                                </div>
-                            </div>
+                                    </div>
+                                {/if}
+                            {/each}
+
                             <div class="condition-row critical-injuries">
                                 <div class="condition-item critical-item">
                                     <span class="condition-label critical-label">Kritiska skador:</span>
@@ -95,7 +78,7 @@
                         </div>
                     </FormSection>
                 </div>
-                <div class="xl:col-span-2">
+                <div >
                     <FormSection header="FÄRDIGHETER">
                         <Skills />
                     </FormSection>
@@ -121,7 +104,6 @@
             .condition-item {
                 display: flex;
                 align-items: center;
-                gap: 1rem;
                 flex: 1;
             }
 
@@ -167,22 +149,23 @@
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
-                filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
                 position: absolute;
                 top: 0;
                 left: 0;
                 z-index: 1;
+                /* filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3)); */
+                /* Filter applied via CSS class */
             }
 
             .condition-x {
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
-                filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
                 position: absolute;
                 top: 0;
                 left: 0;
                 z-index: 2;
+                /* Filter applied via CSS class */
             }
 
             .critical-injuries {

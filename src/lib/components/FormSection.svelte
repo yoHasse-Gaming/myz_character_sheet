@@ -7,7 +7,7 @@
 
 <div class="card" >
     {#if header}
-    <h4 class="h4 font-bold form-labels friendly-stranger text-surface-800">{header}</h4>
+    <h4 class="h4 font-bold form-labels">{header}</h4>
     {/if}
     <div class="p-4">
         {@render children?.()}

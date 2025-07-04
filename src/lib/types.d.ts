@@ -5,8 +5,10 @@ export type Talent = {
 }
 
 export type Mutation = {
+    id: string;
     name: string;
     description: string;
+    trigger_when: string;
 }
 
 export type Skill = {
@@ -14,6 +16,25 @@ export type Skill = {
     description: string;
     value: number;
     groundAbility: string;
+}
+
+export type SkillsData = {
+    skills: Skill[];
+    optionalSkills: OptionalSkill[];
+    talents: Talent[];
+    mutations: Mutation[];
+}
+
+// New optional skill types
+export type OptionalSkill = {
+    id: string;
+    name: string;
+    value: number;
+    baseAbility: string;
+    description: string;
+    bonusEffects: string;
+    examples?: string;
+    occupation: string;
 }
 
 export type Equipment = {

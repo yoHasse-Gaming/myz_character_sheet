@@ -7,11 +7,60 @@
     url("/myz_character_sheet/fonts/FriendlyStranger.woff") format("woff2");
 }
 
+@font-face {
+    font-family: "HigherJumpFont";
+    src:
+        local("HigherJumpFont"),
+        url("/myz_character_sheet/fonts/higher-jump.regular.ttf") format("truetype");
+    
+}
+
+/* CfWhiteTrashRegular-rqoO.ttf */
+@font-face {
+    font-family: "CfWhiteTrashRegular";
+    src:
+        local("CfWhiteTrashRegular"),
+        url("/myz_character_sheet/fonts/cf-white-trash-font/CfWhiteTrashRegular-rqoO.ttf") format("truetype");
+    font-size: small;
+}
+
+/* ganas-juice-font\GanasJuice-6RxPM.otf */
+@font-face {
+    font-family: "GanasJuice";
+    src:
+        local("GanasJuice"),
+        url("/myz_character_sheet/fonts/ganas-juice-font/GanasJuice-6RxPM.otf") format("opentype");
+}
+
+/* grindy-brush\Grindy Brush.otf */
+@font-face {
+    font-family: "GrindyBrush";
+    src:
+        local("GrindyBrush"),
+        url("/myz_character_sheet/fonts/grindy-brush/Grindy Brush.otf") format("opentype");
+}
+
+/* rusted-personal-use\RUSTED PERSONAL USE.ttf */
+
+@font-face {
+    font-family: "RustedPersonalUse";
+    src:
+        local("RustedPersonalUse"),
+        url("/myz_character_sheet/fonts/rusted-personal-use/RUSTED PERSONAL USE.ttf") format("truetype");
+}
+
 
 :root {
     --torn-filter-effect: url('#squiggle');
     --font-user: Kalam, sans-serif;
-    --form-labels: FriendlyStranger, sans-serif;
+    --form-labels: Kalam, sans-serif;
+    --heading-font-family: Kalam, sans-serif;
+    
+    
+}
+
+.h4 {
+    font-family: var(--form-labels), serif;
 }
 
 /* Wasteland styling */
@@ -25,6 +74,11 @@
     position: relative;
     overflow: hidden;
     
+}
+
+.dark .sheet-container {
+    background-image: url('/myz_character_sheet/img/sheet_bg_dark.png') !important;
+    border: 2px solid var(--color-surface-600);
 }
 
 /* Torn Paper Input Effects */
@@ -60,6 +114,10 @@
     pointer-events: none;
 }
 
+.dark .tab-content .input-wrapper::before {
+    background: url('/myz_character_sheet/img/card_bg_dark.png'); /* Use a torn paper background image */
+}
+
 .tab-content input,
 .tab-content textarea {
     content: '';
@@ -67,7 +125,7 @@
     position: relative;
     border-radius: 0;
     padding-left: 2rem;
-    font-size: x-large;
+    /* font-size: x-large; */
 
     font-family: var(--font-user);
     color: var(--color-surface-900);
@@ -159,6 +217,10 @@
     will-change: filter;
 }
 
+.dark .torn-input-wrapper::before {
+    background: url('/myz_character_sheet/img/card_bg_dark.png'); /* Use a torn paper background image */
+}
+
 /* Random variations for torn inputs */
 .torn-input-wrapper.variant-1::before {
     background-position: 15% 25%;
@@ -223,6 +285,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    color: var(--color-surface-800);
 }
 
 textarea.torn-input {
@@ -243,6 +306,7 @@ textarea.torn-input {
     border: none !important;
     border-color: transparent !important;
     background: transparent !important;
+    color: var(--color-surface-100);
 }
 
 .dark .torn-input:focus {
@@ -331,14 +395,17 @@ textarea.torn-input {
 }
 
 /* Active tab styling */
-.tab-button-wrapper.active::before {
+/* .tab-button-wrapper.active::before {
     opacity: 1;
     background: url('/myz_character_sheet/img/stroke.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
-    /* filter: url(#squiggle_lines) brightness(1.1); */
-    
+    filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+} */
+
+:global(.dark) .tab-button-wrapper.active::before {
+    filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
 }
 
 .tab-button-wrapper.active {
@@ -359,13 +426,13 @@ textarea.torn-input {
     border: none !important;
     
     font-family: var(--form-labels), serif;
-    color: var(--color-surface-900);
     
     letter-spacing: 0.1em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+    font-size: xx-large;
 }
 
 @media (min-width: 768px) {
@@ -381,12 +448,17 @@ textarea.torn-input {
     /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
 }
 
+.dark .tab-button.active {
+    color: var(--color-surface-50);
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
+}
+
 .tab-button:hover:not(.active) {
     color: var(--color-surface-800);
 }
 
 .dark .tab-button:hover:not(.active) {
-    color: var(--color-surface-700);
+    color: var(--color-surface-300);
 }
 
 
@@ -422,6 +494,10 @@ textarea.torn-input {
     z-index: 1;
 }
 
+.dark .tooltip-background {
+    background: url('/myz_character_sheet/img/popout_bg_dark.png'); /* Use a torn paper background image */
+}
+
 .tooltip-content {
     position: relative;
     z-index: 2;
@@ -430,10 +506,11 @@ textarea.torn-input {
     border-radius: 0.5rem;
     line-height: 1.5;
     font-weight: bold;
+    color: var(--color-surface-800);
 
 }
 
 .dark .tooltip-content {
     /* background: rgba(26, 26, 26, 0.1); */
-    color: var(--color-surface-900);
+    color: var(--color-surface-100);
 }

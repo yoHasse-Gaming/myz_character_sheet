@@ -23,7 +23,7 @@
     <div class="card">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
         <div class="space-y-2">
-            <label for="name" class="text-sm font-bold text-surface-900 dark:text-surface-900 uppercase tracking-wide">Namn</label>
+            <label for="name" class="text-sm font-bold uppercase tracking-wide">Namn</label>
             <div class="torn-input-wrapper {nameVariant}">
                 <input type="text" 
                     class="torn-input font-user" 
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="space-y-2">
-        <label for="job" class="text-sm font-bold text-surface-900 uppercase tracking-wide">Syssla</label>
+        <label for="job" class="text-sm font-bold uppercase tracking-wide">Syssla</label>
         <div class="torn-input-wrapper {jobVariant}">
             <input type="text" 
                     class="torn-input font-user" 
@@ -49,7 +49,7 @@
     <FormSection header="UTSEENDE">
         <div class="grid grid-cols-1 gap-4">
             <div class="space-y-2">
-                <label for="face" class="text-xs text-surface-900 uppercase">Ansikte</label>
+                <label for="face" class="text-xs uppercase">Ansikte</label>
                 <div class="torn-input-wrapper {faceVariant}">
                     <textarea 
                         class="torn-input font-user" 

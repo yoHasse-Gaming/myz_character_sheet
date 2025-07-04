@@ -1,0 +1,205 @@
+[
+  {
+    "id": "amf-7k9p-2x4q",
+    "name": "Amfibisk",
+    "description": "<p>Din kropp har ärvt egenskaper från fiskarna, och du rör dig lika effektivt under vatten som på land. Med denna mutation kan du:</p><ul><li>Andas under vattnet under några minuter. Kostnad 1 mp. Du simmar snabbt och obehindrat likt en fisk.</li><li>Absorbera skada med din hala, fjälliga hud. Varje mp eliminerar en poäng skada. (r)</li><li>Bita en fiende på armslängds avstånd med dina små men många och sylvassa tänder. Ger offret skada lika med antalet mp du lägger.</li></ul>",
+    
+    "trigger_when": "När du är under vatten eller angrips fysiskt."
+  },
+  {
+    "id": "dub-3m8n-5w7r",
+    "name": "Dubbelhjärna",
+    "description": "<p>Din skalle innehåller två separata hjärnor, vilket ger dig en enastående simultanförmåga. Du kan:</p><ul><li>Utföra två handlingar och två manövrer i en runda, så länge du använder olika kroppsdelar. Kostar 1 mp per runda. (f)</li><li>Avstå dygnsbehovet av sömn. De två hjärnorna turas om att slumra. Kostar 1 mp per dygn.</li><li>Ha en sekundär personlighet, med en egen närstående rp, slp som du hatar, slp som du vill skydda, och stor dröm. Du får erf även för den sekundära personligheten, men varje erf kostar en mp.</li></ul>",
+    
+    "trigger_when": "När du vill göra fler saker samtidigt eller skippa sömn."
+  },
+  {
+    "id": "eld-9q2t-6h5j",
+    "name": "Eldsprut",
+    "description": "<p>Du kan spy ut gaser och antända dem på vägen upp genom strupen för att skapa en kaskad av eld. Du kan:</p><ul><li>Tända eld på ett brännbart föremål. Kostar 1 mp.</li><li>Spruta eld mot en fiende på upp till nära avstånd. Han tar skada lika med antalet mp du lägger. Rustning skyddar.</li><li>Spruta eld mot ett antal fiender lika med antalet mp. Alla tar en poäng skada var. Pansar skyddar.</li></ul>",
+    
+    "trigger_when": "När du vill attackera eller antända något på nära håll."
+  },
+  {
+    "id": "elk-4r7s-8k3l",
+    "name": "Elektrisk",
+    "description": "<p>Likt en elektrisk ål kan din kropp generera ström, stark nog att döda. Du kan:</p><ul><li>Ge en kraftig elektrisk stöt till en fiende inom armslängds avstånd. Skadan är lika med antalet mp du använder. Varken rustning eller naturligt pansar skyddar.</li><li>Driva artefakter och projekt som kräver elström för att fungera. Varje mp ger en halvtimmes drift.</li><li>Skapa gnistor som kan tända en eld eller lysa upp ett område inom kort avstånd under T6 minuter.</li></ul>",
+    
+    "trigger_when": "När du vill skada, tända eld eller driva teknik."
+  },
+  {
+    "id": "fyr-6p9m-1z4n",
+    "name": "Fyrarmad",
+    "description": "<p>Du har fyra armar i stället för två. Du kan:</p><ul><li>Slåss två gånger i direkt följd i samma runda. Den extra handlingen kostar dig din manöver. Kostar 1 mp. (f)</li><li>Parera flera närstridsattacker i samma runda. Detta kostar dig 1 mp för varje parad efter den första. (f)</li><li>Klättra lätt och ledigt. Du kan spendera 1 mp i stället för att slå för att fly när du ska klara en svår klättring.</li></ul>",
+    
+    "trigger_when": "I strid eller vid klättring."
+  },
+  {
+    "id": "hop-8v2x-5q7w",
+    "name": "Hoppförmåga",
+    "description": "<p>Med dina abnorma, grodliknande benmuskler kan du hoppa mycket högt och långt. Du kan:</p><ul><li>Hoppa cirka tio meter långt eller fem meter högt. Kostar 1 mp.</li><li>Ta några skutt fram till en fiende på kort avstånd och direkt slåss i samma runda. Hoppet ersätter din manöver. Kostar 1 mp. (f)</li><li>Ta dig ur en farlig situation genom att hoppa i säkerhet. Du slipper slå för att fly från en konflikt. Kostar 1 mp.</li></ul>",
+    
+    "trigger_when": "När du vill hoppa långt, slåss direkt eller undvika fara."
+  },
+  {
+    "id": "hyp-3d8f-9j6k",
+    "name": "Hyperreflexer",
+    "description": "<p>Du har övermänskligt snabba reflexer. Du kan:</p><ul><li>Addera +5 till initiativslaget i början av en konflikt. (f)</li><li>Slåss eller skjuTa mot en fiende en andra gång i direkt följd i samma runda. Kostar 1 mp. (f)</li><li>Ducka undan vid anfall. Varje mp sänker skadan ett steg. (r)</li></ul>",
+    
+    "trigger_when": "I början eller mitt under en konflikt, eller vid försvar."
+  },
+  {
+    "id": "ins-7t5r-2b4g",
+    "name": "Insektoid",
+    "description": "<p>Din kropp har ärvt egenskaper från insekterna. Du kan:</p><ul><li>Skydda dig mot yttre våld med din pansarartade hud. Varje mp du spenderar eliminerar en poäng skada. (r)</li><li>Klättra på en helt vertikal yta under några minuter. Kostar 1 mp.</li><li>Fortsätta kämpa trots svåra skador. Varje mp läker en poäng skada – även om du är bruten (inte kritiska skador).</li></ul>",
+    
+    "trigger_when": "Vid skada, klättring eller när du är bruten."
+  },
+  {
+    "id": "isv-9h3y-6m8n",
+    "name": "Insektsvingar",
+    "description": "<p>Du har insektsvingar på ryggen. Du kan:</p><ul><li>Flyga 20–30 meter. Kostar 1 mp.</li><li>Flyga till fiende och slåss samma runda. Kostar 1 mp. (f)</li><li>Skapa surrande ljud som ger stress till flera fiender. En poäng stress per mp.</li></ul>",
+    
+    "trigger_when": "När du vill flyga, anfalla eller stressa fiender."
+  },
+  {
+    "id": "lik-4s7p-1v9q",
+    "name": "Likätare",
+    "description": "<p>Din metabolism är mycket robust. Du kan:</p><ul><li>Äta rått kött utan att ta rötpoäng. Ger krubb enligt sTy.</li><li>Bita fiender. Skadan = mp du spenderar.</li></ul>",
+    
+    "trigger_when": "När du saknar krubb eller är i strid."
+  },
+  {
+    "id": "lux-2w6e-8k4t",
+    "name": "Luxvarelse",
+    "description": "<p>Du kan alstra ljus. Du kan:</p><ul><li>Blända ett offer som agerar som i kolmörker. Varar lika många rundor som mp du använder.</li><li>Skingra mörker upp till kort avstånd under några minuter. Kostar 1 mp.</li><li>Bända ljuset och bli otydlig, ta dig ur konflikt utan att slå för att fly. Kostar 1 mp.</li></ul>",
+    
+    "trigger_when": "I mörker, vid flykt eller för att förvirra fiender."
+  },
+  {
+    "id": "mag-5x9c-3l7m",
+    "name": "Magnetism",
+    "description": "<p>Du är en mänsklig magnet. Du kan:</p><ul><li>Dra till dig eller stöta bort metallföremål. Maxvikt: lika mycket som du själv. Kostar 1 mp.</li><li>Skada fiender genom att slunga metallföremål. Skada = mp du lägger.</li><li>Stöta undan kulor/metallvapen och ta bort en / per mp. (r)</li></ul>",
+    
+    "trigger_when": "Mot metallfiender, i strid eller vid manipulation av objekt."
+  },
+  {
+    "id": "mad-8j2z-6r5u",
+    "name": "Mardrömmare",
+    "description": "<p>Du kan skapa hallucinationer. Du kan:</p><ul><li>Ge förvirring eller tvivel lika med antalet mp.</li><li>Få humanoider att missa sin nästa handling. Kostar 1 mp per offer.</li><li>Skapa en helt verklig illusion. Kostar 2 mp.</li></ul>",
+    
+    "trigger_when": "När du vill påverka eller förvirra fiender."
+  },
+  {
+    "id": "men-1b4f-9q3w",
+    "name": "Mental Dominans",
+    "description": "<p>Du kan kontrollera humanoida fiender. Du kan:</p><ul><li>Styra deras nästa handling. Du måste se dem i ögonen. Kostar 1 mp + ev. mutationens kostnad.</li><li>Tvinga självskada: vapen + 1 extra skada per mp.</li></ul>",
+    
+    "trigger_when": "När du vill ta kontroll över en fiende."
+  },
+  {
+    "id": "mpl-7g5h-2k8v",
+    "name": "Mänsklig Planta",
+    "description": "<p>Du har växtliknande egenskaper. Du kan:</p><ul><li>Suga näring ur solljus (1 mp = ersätter krubb). Endast utomhus.</li><li>Använda taggar som ger skada per mp.</li><li>Hård bark: minska fysisk skada med 1 per mp. (r)</li></ul>",
+    
+    "trigger_when": "Vid matbrist eller fysisk strid."
+  },
+  {
+    "id": "mon-4t8n-6p2y",
+    "name": "Monsterkontroll",
+    "description": "<p>Du kan kontrollera ointelligenta monster. Du kan:</p><ul><li>Ta kontroll över ett monster inom nära avstånd. Kostar mp = sTy / 4, avrundat uppåt.</li><li>Kontrollen varar i en timme, bryts om du blir bruten.</li><li>Endast ett monster åt gången.</li></ul>",
+    
+    "trigger_when": "Mot monster utan intelligens."
+  },
+  {
+    "id": "par-9x3d-5s7l",
+    "name": "Parasit",
+    "description": "<p>Du är en parasit som kan suga kraft från andra. Du kan:</p><ul><li>Stjäla en poäng av valfri ge från en fiende per mp. Går inte över maxvärde.</li><li>Stjäla en mutation tillfälligt (1 mp). Används i nästa runda.</li><li>Läka någon annans trauma. Du tar själv trauma av samma typ. Kritisk skada: 2 mp (icke-dödlig), 4 mp (dödlig).</li></ul>",
+    
+    "trigger_when": "När du vill hela, försvaga andra eller använda deras mutationer."
+  },
+  {
+    "id": "pat-6m1r-8j4z",
+    "name": "Patokinesi",
+    "description": "<p>Du kan påverka andras känslotillstånd. Du kan:</p><ul><li>Ge stress eller tvivel per mp på fiende inom nära avstånd.</li><li>Läka stress eller tvivel (hudkontakt). Kan även användas på dig själv.</li><li>Sprida känsla till folksamling: ilska, glädje, sorg, kärlek eller rädsla. Varar några minuter.</li></ul>",
+    
+    "trigger_when": "När du vill påverka känslor, lugna eller manipulera en grupp."
+  },
+  {
+    "id": "pyr-3v7k-9q2b",
+    "name": "Pyrokinesi",
+    "description": "<p>Du kan skapa eld med tankekraft. Du kan:</p><ul><li>Tända eld på föremål. Kostar 1 mp.</li><li>Sätta eld på levande varelse. Skada = mp. Pansar skyddar ej.</li><li>Värma upp kalla områden. Motverkar köldeffekter i en timme. Kostar 1 mp.</li></ul>",
+    
+    "trigger_when": "När du vill orsaka eld, värme eller elda fiender."
+  },
+  {
+    "id": "reg-8c5w-1h6e",
+    "name": "Regenerera",
+    "description": "<p>Du läker skador mycket snabbt. Du kan:</p><ul><li>Läka 1 skada per mp. Tar 1 runda, du kan agera samtidigt. (f)</li><li>Läka kritiska skador: 2 mp (icke-dödlig), 4 mp (dödlig).</li><li>Du måste äta lika många ransoner krubb som mp inom T6 minuter, annars blir du bruten.</li></ul>",
+    
+    "trigger_when": "Efter skada eller kritiska träffar – men kräver mat i tid."
+  },
+  {
+    "id": "rep-2f9t-7x4s",
+    "name": "Reptilisk",
+    "description": "<p>Du har egenskaper från reptiler. Du kan:</p><ul><li>Kameleonthud: lyckas automatiskt smyga, attacker mot dig som i mörker. Kostar 1 mp. Kräver att du är naken eller nästan.</li><li>Pressa dig genom små passager. Kostar 1 mp.</li><li>Hypnotisera med ögon. Förvirring per mp.</li></ul>",
+    
+    "trigger_when": "Vid flykt, smygande eller psykisk påverkan."
+  },
+  {
+    "id": "rik-5n8p-3d6g",
+    "name": "Riktningsknöl",
+    "description": "<p>Du känner alltid väderstreck och orientering. Du kan:</p><ul><li>Halvera tiden för att utforska en zonsektor. Kostar 1 mp.</li><li>Agera utan avdrag i totalt mörker i T6 minuter. Kostar 1 mp.</li><li>Störa balanssinnet hos fiender. Stress per mp, kan fördelas fritt.</li></ul>",
+    
+    "trigger_when": "När du navigerar, agerar i mörker eller vill störa flera fiender."
+  },
+  {
+    "id": "rot-7y4l-9k2m",
+    "name": "Röt-Ätare",
+    "description": "<p>Du är immun mot Rötans trauma. Du kan:</p><ul><li>1 mp = slippa ta trauma från Röta. (r)</li><li>1 mp = förbruka en rötpoäng och återhämta valfri ge ett steg.</li><li>Använda Rötan offensivt. Varje poäng trauma mot fiende kräver 1 rötpoäng och 1 mp.</li></ul>",
+    
+    "trigger_when": "När du exponeras för Röta eller vill utnyttja den offensivt."
+  },
+  {
+    "id": "spo-4u6h-8z3r",
+    "name": "Sporsäckar",
+    "description": "<p>Du kan sprida sporer. Du kan:</p><ul><li>Ge tvivel till fiende inom nära avstånd. 1 per mp.</li><li>Stinka: ger 1 skada per mp. Rustning skyddar ej.</li><li>Skym sikten och ta dig ur konflikt utan slag. Kostar 1 mp.</li></ul>",
+    
+    "trigger_when": "När du vill förvirra, skada eller fly från fiender."
+  },
+  {
+    "id": "spr-1q7v-5j9x",
+    "name": "Sprinter",
+    "description": "<p>Du är extremt snabb. Du kan:</p><ul><li>Fördubbla förflyttning. 1 mp. (f)</li><li>Fly från konflikt automatiskt. Kostar 1 mp.</li></ul>",
+    
+    "trigger_when": "När du vill röra dig snabbt eller fly säkert."
+  },
+  {
+    "id": "spa-6w3c-2l8f",
+    "name": "Spårsinne",
+    "description": "<p>Ditt luktsinne är extremt känsligt. Du kan:</p><ul><li>Följa luktspår. 1 mp per dygn.</li><li>Avslöja smygattacker. Varje mp slår ut en / i fiendens smyga.</li><li>Lukta dig till krubb. Kostar 1 mp, ger T6 ransoner.</li></ul>",
+    
+    "trigger_when": "När du letar efter någon eller spårar föda."
+  },
+  {
+    "id": "syr-9i5a-4b7k",
+    "name": "Syraspott",
+    "description": "<p>Din kropp producerar frätande syra. Du kan:</p><ul><li>Spotta syra mot fiende. 1 skada + 1/ronde tills han flyr. Kostar 1 mp.</li><li>Fräta föremål. 1 mp.</li><li>Öppna enkla lås. 1 mp.</li></ul>",
+    
+    "trigger_when": "När du vill lösa upp lås, föremål eller skada fiender över tid."
+  },
+  {
+    "id": "tel-3o8n-6p1q",
+    "name": "Telepati",
+    "description": "<p>Du kan läsa och påverka tankar. Du kan:</p><ul><li>Läsa tankar. 1 mp per fråga.</li><li>Plantera en tanke. Kostar 1 mp.</li><li>Orsaka mental kortslutning. Förvirring per mp.</li></ul>",
+    
+    "trigger_when": "Vid social manipulation eller psykisk strid."
+  },
+  {
+    "id": "vil-7e2m-9s4d",
+    "name": "Vilddjur",
+    "description": "<p>Du är hälften rovdjur. Du kan:</p><ul><li>Angripa flera fiender med klor och tänder. Skada per mp.</li><li>Vrål som ger stress till fiender. En per mp.</li><li>Resa dig igen om du blir bruten (ej kritisk skada). Återfår trauma = mp.</li></ul>",
+    
+    "trigger_when": "I strid, vid hot eller om du är bruten."
+  }
+]

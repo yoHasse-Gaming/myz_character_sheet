@@ -1,5 +1,6 @@
 <script lang="ts">
     import { sheetState, characterActions, openInfoModal } from '$lib/character_sheet.svelte';
+    import { fade, scale } from 'svelte/transition';
     
 
     let { 

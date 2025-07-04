@@ -395,14 +395,17 @@ textarea.torn-input {
 }
 
 /* Active tab styling */
-.tab-button-wrapper.active::before {
+/* .tab-button-wrapper.active::before {
     opacity: 1;
     background: url('/myz_character_sheet/img/stroke.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
-    /* filter: url(#squiggle_lines) brightness(1.1); */
-    
+    filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+} */
+
+:global(.dark) .tab-button-wrapper.active::before {
+    filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
 }
 
 .tab-button-wrapper.active {

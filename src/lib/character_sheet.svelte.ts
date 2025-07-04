@@ -1,7 +1,7 @@
 // Global character sheet state using Svelte 5 runes
 // This provides reactive state management across all components
 
-import type { BaseAbilityType, OptionalSkill } from './types';
+import type { BaseAbilityType, OptionalSkill, Mutation } from './types';
 import { useOwlbearSync } from './owlbear-integration';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -124,6 +124,12 @@ export const sheetState = $state({
     // Optional skills selected by the user
     optionalSkills: [] as OptionalSkill[],
     
+    // Mutations selected by the user
+    mutations: [] as Mutation[],
+    
+    // Mutation points available to spend
+    mutationPoints: 0,
+    
     // Character conditions
     conditions: {
         isStarving: false,
@@ -197,6 +203,26 @@ export const characterActions = {
         if (skill) {
             skill.value = Math.max(0, Math.min(5, value));
         }
+    },
+    
+    // Mutations management
+    addMutation(mutation: Mutation) {
+        // Check if mutation is already added
+        const existingIndex = sheetState.mutations.findIndex(m => m.id === mutation.id);
+        if (existingIndex === -1) {
+            sheetState.mutations.push(mutation);
+        }
+    },
+    
+    removeMutation(mutationId: string) {
+        const index = sheetState.mutations.findIndex(m => m.id === mutationId);
+        if (index !== -1) {
+            sheetState.mutations.splice(index, 1);
+        }
+    },
+    
+    setTotalMutationPoints(points: number) {
+        sheetState.mutationPoints = Math.max(0, points);
     },
     
     // Character info functions
@@ -289,18 +315,19 @@ export const characterActions = {
 };
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'info';
+export type DialogueOption = 'optionalSkills' | 'mutations' | 'info';
 
 // Info modal state to hold content
 export const infoModalState = $state({
     title: '',
     content: '',
-    type: '' as 'skill' | 'trauma' | ''
+    type: '' as 'skill' | 'trauma' | 'mutation' | ''
 });
 
 // Create a reactive map for dialogue states
 const openDialogue = new SvelteMap<DialogueOption, boolean>([
     ['optionalSkills', false],
+    ['mutations', false],
     ['info', false]
 ]);
 
@@ -341,7 +368,7 @@ export function closeDialogueOption(dialogue: DialogueOption | undefined = undef
 }
 
 // Function to open info modal with specific content
-export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' = 'skill') {
+export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' = 'skill') {
     infoModalState.title = title;
     infoModalState.content = content;
     infoModalState.type = type;

@@ -5,8 +5,10 @@ export type Talent = {
 }
 
 export type Mutation = {
+    id: string;
     name: string;
     description: string;
+    trigger_when: string;
 }
 
 export type Skill = {

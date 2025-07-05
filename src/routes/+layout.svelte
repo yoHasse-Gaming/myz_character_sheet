@@ -118,6 +118,17 @@
 	class="container mx-auto px-4 py-8 dynamic-container"
 	style="max-width: {containerWidth}px; min-height: {containerHeight}px;"
 >
+<a href="/myz_character_sheet/dicetests" class="absolute top-4 right-4 text-sm text-surface-500 hover:text-surface-700 dark:text-surface-300 dark:hover:text-surface-200">
+    <span class="icon icon-arrow-left"></span> Tillbaka till Dice Tester
+</a>
+
+<a href="/myz_character_sheet/dicetest2" class="absolute top-4 left-4 text-sm text-surface-500 hover:text-surface-700 dark:text-surface-300 dark:hover:text-surface-200">
+    <span class="icon icon-arrow-right"></span> Tillbaka till Dice Tester 2
+</a>
+
+<a href="/myz_character_sheet/" class="absolute top-4 left-1/2 transform -translate-x-1/2 text-sm text-surface-500 hover:text-surface-700 dark:text-surface-300 dark:hover:text-surface-200">
+    <span class="icon icon-home"></span> Hem
+</a>
 	{@render children?.()}
 </main>
 

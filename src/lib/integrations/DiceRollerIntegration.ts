@@ -56,21 +56,22 @@ class OBRWrapper {
 
 const obrWrapper = new OBRWrapper();
 
-// Type definitions (copy these to your plugin)
-export interface DiceRollConfig {
-  dice: {
-    style: "MYZBASE" | "MYZSKILL" | "MYZGEAR";
-    count?: number;
-  }[];
-  hidden?: boolean;
+export interface ExternalRollRequest {
+  type: "TRIGGER_ROLL";
+  rollId: string;
+  config: DiceRollConfig;
 }
 
-export interface DiceResult {
-  playerId: string;
-  playerName: string;
-  individualResults: Record<string, number>;
-  finalValue: number;
-  timestamp: number;
+export interface AvailabilityRequest {
+  type: "CHECK_AVAILABILITY";
+  requestId: string;
+}
+
+export interface AvailabilityResponse {
+  type: "AVAILABILITY_RESPONSE";
+  requestId: string;
+  available: boolean;
+  version?: string;
 }
 
 /**
@@ -119,27 +120,18 @@ export class DiceRollerIntegration {
     if (!obrWrapper.isAvailable) {
       console.warn("OBR SDK not available - cannot check dice plugin");
       return;
-    };
+    }
     
     try {
-      const players = await obrWrapper.instance.party.getPlayers();
+      // Use broadcast channel to check availability instead of direct window API calls
+      const availabilityCheck = await this.checkMYZDiceAvailability(3000);
+      this.isDicePluginAvailable = availabilityCheck.available;
       
-      // Check if any player has dice plugin metadata (indicates plugin is loaded)
-      const hasDiceMetadata = players.some((player: any) => 
-        player.metadata["rodeo.owlbear.dice/roll"] !== undefined ||
-        player.metadata["rodeo.owlbear.dice/rollValues"] !== undefined
-      );
-      
-      // Also check if we can access the dice plugin's stores (more reliable)
-      try {
-        // Try to access the dice plugin's window globals (if they exist)
-        const hasDiceStores = (window as any).MYZDiceAPI !== undefined;
-        this.isDicePluginAvailable = hasDiceMetadata || hasDiceStores;
-      } catch {
-        this.isDicePluginAvailable = hasDiceMetadata;
+      if (availabilityCheck.available) {
+        console.log(`MYZ Dice plugin detected (version: ${availabilityCheck.version || 'unknown'})`);
+      } else {
+        console.log("MYZ Dice plugin not found via broadcast");
       }
-      
-      console.log(`MYZ Dice plugin ${this.isDicePluginAvailable ? 'detected' : 'not found'}`);
     } catch (error) {
       console.warn("Failed to check dice plugin availability:", error);
       this.isDicePluginAvailable = false;
@@ -197,9 +189,77 @@ export class DiceRollerIntegration {
    * Check if dice plugin is available
    */
   public async isDiceAvailable(): Promise<boolean> {
-    await this.checkDicePluginAvailability();
-    return this.isDicePluginAvailable;
+    try {
+      const result = await this.checkMYZDiceAvailability(1000);
+      return result.available;
+    } catch {
+      return false;
+    }
   }
+
+  public async checkMYZDiceAvailability(timeoutMs: number = 3000): Promise<{ available: boolean; version?: string }> {
+  return new Promise((resolve) => {
+    if (!window.BroadcastChannel) {
+      console.warn("[MYZDiceIntegration] BroadcastChannel not supported");
+      resolve({ available: false });
+      return;
+    }
+
+    const channel = new BroadcastChannel("myz-dice-integration");
+    const requestId = `availability-${Date.now()}-${Math.random()}`;
+    let resolved = false;
+
+    console.log("[MYZDiceIntegration] Checking MYZ Dice availability...");
+
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        console.log("[MYZDiceIntegration] Availability check timed out");
+        channel.close();
+        resolve({ available: false });
+      }
+    }, timeoutMs);
+
+    channel.onmessage = (event) => {
+      const response = event.data as AvailabilityResponse;
+      if (response.type === "AVAILABILITY_RESPONSE" && response.requestId === requestId) {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timeout);
+          console.log("[MYZDiceIntegration] MYZ Dice availability confirmed:", response);
+          channel.close();
+          resolve({ available: response.available, version: response.version });
+        }
+      }
+    };
+
+    const request: AvailabilityRequest = {
+      type: "CHECK_AVAILABILITY",
+      requestId: requestId
+    };
+
+    console.log("[MYZDiceIntegration] Sending availability check request:", request);
+    channel.postMessage(request);
+  });
+}
+
+  /**
+   * Trigger a dice roll (only works if dice plugin is available)
+   */
+  // public async triggerRoll(config: DiceRollConfig): Promise<DiceResult> {
+  //   if (!this.isDicePluginAvailable) {
+  //     throw new Error("MYZ Dice plugin is not available");
+  //   }
+
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+
+  //       await this.triggerRollViaBroadcast(config, resolve, reject);
+  //     } catch (error) {
+  //       reject(error instanceof Error ? error : new Error("Failed to trigger dice roll"));
+  //     }
+  //   });
+  // }
 
   /**
    * Trigger a dice roll (only works if dice plugin is available)
@@ -209,21 +269,8 @@ export class DiceRollerIntegration {
       throw new Error("MYZ Dice plugin is not available");
     }
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Method 1: Try to use global API if exposed
-        if ((window as any).MYZDiceAPI) {
-          const api = (window as any).MYZDiceAPI;
-          const result = await api.triggerRoll(config);
-          resolve(result);
-          return;
-        }
-
-        // Method 2: Use BroadcastChannel to communicate with dice plugin
-        await this.triggerRollViaBroadcast(config, resolve, reject);
-      } catch (error) {
-        reject(error instanceof Error ? error : new Error("Failed to trigger dice roll"));
-      }
+    return new Promise((resolve, reject) => {
+      this.triggerRollViaBroadcast(config, resolve, reject);
     });
   }
 

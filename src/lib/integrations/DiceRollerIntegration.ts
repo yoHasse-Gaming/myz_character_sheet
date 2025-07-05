@@ -193,7 +193,8 @@ export class DiceRollerIntegration {
   /**
    * Check if dice plugin is available
    */
-  public isDiceAvailable(): boolean {
+  public async isDiceAvailable(): Promise<boolean> {
+    await this.checkDicePluginAvailability();
     return this.isDicePluginAvailable;
   }
 
@@ -250,7 +251,7 @@ export class DiceRollerIntegration {
         this.pendingRolls.delete(rollId);
         reject(new Error("Dice roll timed out"));
       }
-    }, 30000);
+    }, 10000);
   }
 
   /**

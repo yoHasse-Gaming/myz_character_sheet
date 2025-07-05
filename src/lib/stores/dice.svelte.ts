@@ -47,7 +47,7 @@ export async function initializeDiceState() {
     await diceIntegration.waitForInitialization();
     
     // Check initial availability
-    diceState.isDiceAvailable = DiceHelper.isAvailable();
+    diceState.isDiceAvailable = await DiceHelper.isAvailable();
     
     // Set up dice result listener
     if (cleanupDiceListener) {
@@ -156,9 +156,10 @@ export const diceActions = {
 /**
  * Convenience function to check if dice are available
  */
-export function checkDiceAvailability(): boolean {
+export async function checkDiceAvailability(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
-  const available = DiceHelper.isAvailable();
+  const available = await DiceHelper.isAvailable();
+  
   diceState.isDiceAvailable = available;
   return available;
 }

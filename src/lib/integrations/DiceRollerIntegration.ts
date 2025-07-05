@@ -116,7 +116,10 @@ export class DiceRollerIntegration {
    * Check if the MYZ Dice plugin is available
    */
   private async checkDicePluginAvailability(): Promise<void> {
-    if (!obrWrapper.isAvailable) return;
+    if (!obrWrapper.isAvailable) {
+      console.warn("OBR SDK not available - cannot check dice plugin");
+      return;
+    };
     
     try {
       const players = await obrWrapper.instance.party.getPlayers();

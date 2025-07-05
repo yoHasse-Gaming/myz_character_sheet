@@ -157,8 +157,10 @@ export const diceActions = {
  * Convenience function to check if dice are available
  */
 export async function checkDiceAvailability(): Promise<boolean> {
+    console.log("Checking dice availability...");
   if (typeof window === 'undefined') return false;
   const available = await DiceHelper.isAvailable();
+    console.log("Dice availability:", available);
   
   diceState.isDiceAvailable = available;
   return available;

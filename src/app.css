@@ -490,7 +490,7 @@ label {
 }
 
 
-:global(.dark) .tab-content {
+.dark .tab-content {
     color: #f5f5f5;
 }
 
@@ -589,3 +589,130 @@ label {
 }
 
 
+.circle-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.x-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+    /* Mutation points styling */
+    .mutation-points-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .mutation-points-display {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .mutation-points-label {
+        font-family: var(--form-labels), serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-surface-800);
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+        min-width: 8rem;
+    }
+
+    .dark .mutation-points-label {
+        color: var(--color-surface-200);
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    }
+
+    .mutation-points-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .mutation-points-indicators {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+
+.mutation-point-indicator {
+    width: 1.8rem;
+    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.mutation-point-indicator:hover {
+    transform: scale(1.1);
+}
+
+.mutation-point-indicator:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .mutation-points-display {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mutation-points-label {
+        min-width: auto;
+    }
+
+    .mutation-points-indicators {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .mutation-point-indicator {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+.util-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    border: 2px solid #78350f;
+    color: #fef3c7 !important;
+}
+
+.util-btn:hover {
+		transform: scale(1.05);
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.light .util-btn {
+    background: linear-gradient(135deg, #525252, #404040) !important;
+    border-color: #737373;
+    color: #f5f5f5 !important;
+}

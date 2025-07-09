@@ -1,9 +1,10 @@
 
 export const diceStates = $state({
     isDicePluginAvailable: false,
+    broadCastAvailabilityCheck: false,
+    timestamp: 0,
     isLoading: false,
     error: null as string | null,
-    lastRoll: null as DiceResult | null,
 });
 
 

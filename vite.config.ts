@@ -8,8 +8,15 @@ export default defineConfig({
     tailwindcss(),
     svelte()],
   server: {
+    port: 5173,
     cors: {
       origin: "https://www.owlbear.rodeo",
     },
+    proxy: {
+      '/diceroll': {
+        target: 'http://localhost:5174',
+        changeOrigin: true
+      },
+    }
   },
 })

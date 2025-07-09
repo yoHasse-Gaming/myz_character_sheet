@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { generateUniqueVariants } from '../utils/styleUtils';
-    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../states/character_sheet.svelte';
+    import { generateUniqueVariants } from '../../utils/styleUtils';
+    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../states/character_sheet.svelte';
+    import FormSection from '../FormSection.svelte';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
@@ -99,6 +100,55 @@
             <p class="no-mutations-subtext">Zonens gåvor väntar på att upptäckas...</p>
         </div>
     {/if}
+</div>
+
+            <!-- Mutation Points Section -->
+<div class="mt-6">
+    <FormSection header="🔬 MUTATIONSPOÄNG">
+        <div class="mutation-points-container">
+            <div class="mutation-points-display">
+                <span class="mutation-points-label">
+                    Mutationspoäng:
+                </span>
+                <div class="mutation-points-controls">
+                    <div class="mutation-points-indicators">
+                        {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                            <button 
+                                class="mutation-point-indicator"
+                                onclick={() => {
+                                    if (sheetState.mutationPoints > idx) {
+                                        // If this indicator is filled, reduce points to this level
+                                        characterActions.setTotalMutationPoints(idx);
+                                    } else {
+                                        // If this indicator is not filled, increase points to include this level
+                                        characterActions.setTotalMutationPoints(idx + 1);
+                                    }
+                                }}
+                                aria-label="Toggle mutation point {idx + 1}"
+                            >
+                                <!-- Always show the circle as base layer -->
+                                <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" />
+                                <!-- Show X on top if point is spent -->
+                                {#if sheetState.mutationPoints > idx}
+                                    <img 
+                                        src='/img/strokes/x.svg' 
+                                        alt="Point available" 
+                                        class="stroke-image x-layer" 
+                                    />
+                                {/if}
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+            <div class="mutation-points-info">
+                <p class="mutation-points-explanation">
+                    Mutationspoäng representerar din potentiella kraft från Zonen. 
+                    Klicka på cirklarna för att ställa in dina tillgängliga poäng.
+                </p>
+            </div>
+        </div>
+    </FormSection>
 </div>
 
 <style>

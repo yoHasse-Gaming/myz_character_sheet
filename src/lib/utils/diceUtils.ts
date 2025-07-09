@@ -1,6 +1,8 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { diceStates, type AvailabilityRequest, type AvailabilityResponse, type DiceRollConfig } from "../states/dice.svelte";
 
+
+
 export function getDiceRollerPluginId(path: string) {
     return `rodeo.owlbear.dice/${path}`;
 }
@@ -14,7 +16,7 @@ export async function focusDiceTray(): Promise<void> {
     }
 
     if (window.BroadcastChannel) {
-        const channel = new BroadcastChannel(getDiceRollerPluginId("focused-tray"));
+        const channel = new BroadcastChannel(getDiceRollerPluginId("focused-dice-tray"));
         channel.postMessage(playerConnectionId);
         channel.close();
     }
@@ -24,12 +26,32 @@ export async function checkDicePluginAvailability(): Promise<void> {
     try {
         console.log("🎲 Checking MYZ Dice plugin availability...");
         // Use broadcast channel to check availability instead of direct window API calls
-        const availabilityCheck = await checkMYZDiceAvailability();
+        const metadataCheck = await checkDiceExtensionMetadata();
+        if (!metadataCheck.available) {
+            console.log(`🎲 MYZ Dice plugin detected (version: ${metadataCheck.version || 'unknown'})`);
+            diceStates.isDicePluginAvailable = false;
+            return;
+        }
 
-        diceStates.isDicePluginAvailable = availabilityCheck.available;
+        diceStates.isDicePluginAvailable = true;
+
+        if(metadataCheck.available && !diceStates.broadCastAvailabilityCheck) {
+            // Wait 3 seconds before checking broadcast availability
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            
+            const broadcastCheck = await checkUsingBroadcastChannel();
+            if (!broadcastCheck.available) {
+                console.log("🎲 MYZ Dice plugin not found via broadcast");
+                diceStates.broadCastAvailabilityCheck = false;
+                return;
+            }
+            diceStates.broadCastAvailabilityCheck = true;
+        }
+
         
-        if (availabilityCheck.available) {
-            console.log(`🎲 MYZ Dice plugin detected (version: ${availabilityCheck.version || 'unknown'})`);
+        if (metadataCheck.available) {
+            console.log(`🎲 MYZ Dice plugin detected (version: ${metadataCheck.version || 'unknown'})`);
         } else {
             console.log("🎲 MYZ Dice plugin not found via broadcast");
         }
@@ -66,6 +88,26 @@ export async function triggerRoll(config: DiceRollConfig): Promise<void> {
     channel.close();
 }
 
+async function checkDiceExtensionMetadata(): Promise<{ available: boolean; version?: string }> {
+    const metadata = await OBR.room?.getMetadata();
+    if (!metadata) {
+        console.warn("[MYZDiceIntegration] No room metadata found", metadata);
+        return { available: false };
+    }
+    const key = getDiceRollerPluginId("diceRollerReady");
+    const metadataValue = metadata[key] as { timestamp?: number; version?: string };
+    const { timestamp, version } = metadataValue;
+    if (!metadataValue || (!timestamp || !version)) {
+        console.warn("[MYZDiceIntegration] MYZ Dice metadata not found:", metadata[key]);
+        return { available: false };
+    }
+    if (Date.now() - timestamp > 60000) { // 1 minute timeout
+        console.warn("[MYZDiceIntegration] MYZ Dice metadata is outdated");
+        return { available: false };
+    }
+    return { available: true, version: version };
+}
+
 async function checkMYZDiceAvailability(): Promise<{ available: boolean; version?: string }> {
     const metadata = await OBR.room?.getMetadata();
     if (!metadata) {
@@ -90,6 +132,7 @@ async function checkMYZDiceAvailability(): Promise<{ available: boolean; version
         // Check using BroadcastChannel as fallback
         return await checkUsingBroadcastChannel();
     }
+
 
     return { available: true, version: version };
 

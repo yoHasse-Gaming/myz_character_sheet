@@ -1,8 +1,8 @@
 <script lang="ts">
     import FormSection from '../FormSection.svelte';
-    import BaseAbility from '../BaseAbility.svelte';
+    import BaseAbility from './tabcontents/BaseAbility.svelte';
     import { onMount } from 'svelte';
-    import Skills from '../Skills.svelte';
+    import Skills from './tabcontents/Skills.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
 
     type Condition = {

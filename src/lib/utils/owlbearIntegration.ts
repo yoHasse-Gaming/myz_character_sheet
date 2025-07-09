@@ -5,6 +5,11 @@
  */
 
 import OBR from "@owlbear-rodeo/sdk";
+import { checkDicePluginAvailability } from "./diceUtils";
+
+export function getExtensionId(path: string): string {
+    return `rodeo.owlbear.myz_character_sheet/${path}`;
+}
 
 export interface CharacterData {
     name: string;
@@ -50,14 +55,13 @@ class OwlbearIntegration {
             }
             
             // Wait for OBR to be ready
-            OBR.onReady(() => {
+            OBR.onReady(async () => {
                 console.log('🦉 Owlbear Rodeo SDK initialized successfully');
-                
-                // Set up the extension metadata
-                this.setupExtension();
                 
                 // Listen for character data updates
                 this.setupCharacterDataListener();
+
+                await checkDicePluginAvailability()
 
                 // Initialize dice integration, if available
                 console.log('Character data listener set up');
@@ -68,22 +72,7 @@ class OwlbearIntegration {
         }
     }
 
-    /**
-     * Set up extension metadata
-     */
-    private async setupExtension(): Promise<void> {
-        if (!OBR.isAvailable) return;
-
-        try {
-            // Set the extension metadata for action/popover
-            await OBR.action.setTitle('Mutant: Year Zero Character Sheet');
-            await OBR.action.setIcon('../img/favicon.png');
-            await OBR.action.setWidth(800);
-            await OBR.action.setHeight(600);
-        } catch (error) {
-            console.warn('Failed to set up extension metadata:', error);
-        }
-    }
+    
 
     /**
      * Set up listener for character data changes
@@ -92,8 +81,8 @@ class OwlbearIntegration {
         if (!OBR.isAvailable) return;
 
         // Listen for room metadata changes where character data might be stored
-        OBR.room.onMetadataChange((metadata: any) => {
-            const characterKey = `myz-character-sheet`;
+        OBR.room.onMetadataChange(async (metadata: any) => {
+            const characterKey = getExtensionId(await OBR.player.getId());
             if (metadata[characterKey]) {
                 this.characterData = metadata[characterKey] as CharacterData;
                 console.log('Character data updated from Owlbear:', this.characterData);
@@ -108,7 +97,7 @@ class OwlbearIntegration {
         if (!OBR.isAvailable) return;
 
         try {
-            const characterKey = `myz-character-sheet`;
+            const characterKey = getExtensionId(await OBR.player.getId());
             await OBR.room.setMetadata({
                 [characterKey]: {
                     ...characterData,
@@ -129,7 +118,7 @@ class OwlbearIntegration {
 
         try {
             const metadata = await OBR.room.getMetadata();
-            const characterKey = `myz-character-sheet`;
+            const characterKey = getExtensionId(await OBR.player.getId());
             return metadata[characterKey] as CharacterData || null;
         } catch (error) {
             console.warn('Failed to load character data:', error);

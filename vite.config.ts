@@ -3,10 +3,11 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({command}) => ({
   plugins: [
     tailwindcss(),
     svelte()],
+  base: command === 'build' ? '/myz_character_sheet/' : '/',
   server: {
     port: 5173,
     cors: {
@@ -19,4 +20,4 @@ export default defineConfig({
       },
     }
   },
-})
+}));

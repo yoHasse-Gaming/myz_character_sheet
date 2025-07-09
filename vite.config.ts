@@ -13,7 +13,7 @@ export default defineConfig({
       origin: "https://www.owlbear.rodeo",
     },
     proxy: {
-      '/diceroll': {
+      '/owlbear_myz_dice': {
         target: 'http://localhost:5174',
         changeOrigin: true
       },

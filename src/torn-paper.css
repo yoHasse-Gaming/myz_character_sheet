@@ -1,0 +1,464 @@
+:root {
+    --torn-filter-effect: url('#squiggle');
+    --font-user: Kalam, sans-serif;
+    --form-labels: Kalam, sans-serif;
+    --heading-font-family: Kalam, sans-serif;
+    
+    
+}
+
+.h4 {
+    font-family: var(--form-labels), serif;
+}
+
+/* Wasteland styling */
+.sheet-container {
+    /* background: var(--color-surface-100); */
+    background-image: url('/img/sheet_bg.png') !important;
+    border: 2px solid var(--color-surface-400);
+
+
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    
+}
+
+.dark .sheet-container {
+    background-image: url('/img/sheet_bg_dark.png') !important;
+    border: 2px solid var(--color-surface-600);
+}
+
+/* Torn Paper Input Effects */
+/* Original input wrapper styles for backwards compatibility */
+.tab-content .input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    transform: scale(1);
+}
+
+.tab-content .input-wrapper:hover {
+    /* Popout, like it's raising from the paper */
+    transform: scale(1.01); /* slightly larger */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.tab-content .input-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/img/card_bg.png'); /* Use a torn paper background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: url(#squiggle);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.dark .tab-content .input-wrapper::before {
+    background: url('/img/card_bg_dark.png'); /* Use a torn paper background image */
+}
+
+.tab-content input,
+.tab-content textarea {
+    content: '';
+    min-height: 4rem;
+    position: relative;
+    border-radius: 0;
+    padding-left: 2rem;
+    /* font-size: x-large; */
+
+    font-family: var(--font-user);
+    color: var(--color-surface-900);
+    
+    /* Remove hover effects from inputs */
+    /* Remove filter from the input itself */
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    z-index: 2;
+    width: 100%;
+    
+    /* Override any framework styles */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    
+}
+
+/* Remove focus outline while keeping accessibility and override all focus styles */
+.tab-content input:focus,
+.tab-content textarea:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+    /* You could add a custom focus style here if needed */
+}
+
+/* Override dark mode specific styles that might add borders */
+.dark .tab-content input,
+.dark .tab-content textarea {
+    border: none !important;
+    border-color: transparent !important;
+    background: transparent !important;
+}
+
+.dark .tab-content input:focus,
+.dark .tab-content textarea:focus {
+    border: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* NEW: Torn paper input styles with randomization */
+/* Create wrapper for torn paper inputs with randomized backgrounds */
+.torn-input-wrapper {
+    position: relative;
+    display: inline-block;
+    filter: drop-shadow(black 0.01rem 0.01rem 2px);
+    width: 100%;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    -webkit-transition : transform 0.3s ease, -webkit-filter 0.3s ease;
+    transform: scale(1);
+}
+
+.torn-input-wrapper:hover {
+    /* Popout, like it's raising from the paper */
+    transform: scale(1.001);
+    filter: drop-shadow(black 0.01rem 0.5rem 7px);
+    transition: transform 0.3s ease, filter 0.3s ease;
+    -webkit-transition : transform 0.3s ease, -webkit-filter 0.3s ease;
+
+    /* filter: drop-shadow(black 0.01rem 0.1rem 10px); */
+
+    
+}
+
+/* Base torn input background */
+.torn-input-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/img/card_bg.png'); /* Use a torn paper background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: var(--torn-filter-effect);
+    z-index: 1;
+    pointer-events: none;
+    /* Default transform */
+    transform: rotate(0deg) scale(1);
+    will-change: filter;
+}
+
+.dark .torn-input-wrapper::before {
+    background: url('/img/card_bg_dark.png'); /* Use a torn paper background image */
+}
+
+/* Random variations for torn inputs */
+.torn-input-wrapper.variant-1::before {
+    background-position: 15% 25%;
+    transform: rotate(0.2deg) scale(1.02);
+}
+
+.torn-input-wrapper.variant-2::before {
+    background-position: 85% 75%;
+    transform: rotate(-0.8deg) scale(0.98);
+}
+
+.torn-input-wrapper.variant-3::before {
+    background-position: 30% 60%;
+    transform: rotate(0.5deg) scale(1.01);
+}
+
+.torn-input-wrapper.variant-4::before {
+    background-position: 70% 40%;
+    transform: rotate(-0.5deg) scale(1.05);
+}
+
+.torn-input-wrapper.variant-5::before {
+    background-position: 50% 10%;
+    transform: rotate(0.3deg) scale(1.03);
+}
+
+.torn-input-wrapper.variant-6::before {
+    background-position: 20% 90%;
+    transform: rotate(-0.6deg) scale(0.97);
+}
+
+.torn-input-wrapper.variant-7::before {
+    background-position: 90% 20%;
+    transform: rotate(1deg) scale(1.01);
+}
+
+.torn-input-wrapper.variant-8::before {
+    background-position: 40% 80%;
+    transform: rotate(-0.4deg) scale(1.02);
+}
+
+/* Torn input styling */
+.torn-input {
+    content: '';
+    min-height: 4rem;
+    position: relative;
+    border-radius: 0;
+    
+    padding-left: 2rem;
+    font-size: x-large;
+    
+    /* Remove hover effects from inputs */
+    /* Remove filter from the input itself */
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    z-index: 2;
+    width: 100%;
+    
+    /* Override any framework styles */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: var(--color-surface-800);
+}
+
+textarea.torn-input {
+    padding-top: 1rem;
+}
+
+/* Remove focus outline while keeping accessibility and override all focus styles */
+.torn-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+    /* You could add a custom focus style here if needed */
+}
+
+/* Override dark mode specific styles that might add borders */
+.dark .torn-input {
+    border: none !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    color: var(--color-surface-100);
+}
+
+.dark .torn-input:focus {
+    border: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Tab Navigation with Torn Paper Effect */
+.tab-nav {
+    position: relative;
+    display: flex;
+    margin-bottom: 0;
+    padding: 0.25rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .tab-nav {
+        gap: 0.125rem;
+        padding: 0.125rem;
+    }
+}
+
+.dark .tab-nav {
+}
+
+/* Tab button wrapper for torn paper effect */
+.tab-button-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 0.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .tab-button-wrapper {
+        margin-right: 0.125rem;
+    }
+}
+
+.tab-button-wrapper:hover {
+    transform: scale(1.02);
+
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); */
+}
+
+.tab-button-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+
+    /* filter: url(#squiggle); */
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+/* Tab button variations for randomness */
+.tab-button-wrapper.tab-variant-1::before {
+    background-position: 25% 15%;
+    transform: rotate(0.5deg) scale(1.01);
+}
+
+.tab-button-wrapper.tab-variant-2::before {
+    background-position: 75% 85%;
+    transform: rotate(-0.3deg) scale(0.99);
+}
+
+.tab-button-wrapper.tab-variant-3::before {
+    background-position: 60% 30%;
+    transform: rotate(0.2deg) scale(1.02);
+}
+
+.tab-button-wrapper.tab-variant-4::before {
+    background-position: 40% 70%;
+    transform: rotate(-0.4deg) scale(0.98);
+}
+
+/* Active tab styling */
+/* .tab-button-wrapper.active::before {
+    opacity: 1;
+    background: url('/img/stroke.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+} */
+
+:global(.dark) .tab-button-wrapper.active::before {
+    filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+.tab-button-wrapper.active {
+    transform: scale(1.05);
+    /* box-shadow: 0 6px 16px rgba(217, 119, 6, 0.4); */
+}
+
+/* Tab button styling */
+.tab-button {
+    position: relative;
+    z-index: 2;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    background: transparent !important;
+    border: none !important;
+    
+    font-family: var(--form-labels), serif;
+    
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    font-size: xx-large;
+}
+
+@media (min-width: 768px) {
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        letter-spacing: 0.15em;
+    }
+}
+
+.tab-button.active {
+    color: var(--color-surface-900);
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
+}
+
+.dark .tab-button.active {
+    color: var(--color-surface-50);
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
+}
+
+.tab-button:hover:not(.active) {
+    color: var(--color-surface-800);
+}
+
+.dark .tab-button:hover:not(.active) {
+    color: var(--color-surface-300);
+}
+
+
+/* Floating tooltip */
+.floating-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: unset !important;
+    z-index: 1000;
+    max-width: min(380px, 90vw);
+    width: max-content;
+}
+
+.tooltip-wrapper {
+    position: relative;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/img/popout_bg.png'); /* Use a torn paper background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: url(#squiggle);
+    border-radius: 0.5rem;
+    z-index: 1;
+}
+
+.dark .tooltip-background {
+    background: url('/img/popout_bg_dark.png'); /* Use a torn paper background image */
+}
+
+.tooltip-content {
+    position: relative;
+    z-index: 2;
+    /* background: rgba(245, 245, 245, 0.95); */
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    line-height: 1.5;
+    font-weight: bold;
+    color: var(--color-surface-800);
+
+}
+
+.dark .tooltip-content {
+    /* background: rgba(26, 26, 26, 0.1); */
+    color: var(--color-surface-100);
+}

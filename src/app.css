@@ -1,0 +1,591 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+@import 'tailwindcss';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/themes/vintage';
+
+
+
+/* Import torn paper input styles */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 
+https://www.dafont.com/friendly-stranger.font
+by Excellent Ritma Florendia
+*/
+
+
+
+
+
+/* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
+:root {
+    /* Override theme colors for post-apocalyptic feel */
+    --color-surface-50: #f5f5f5;
+    --color-surface-100: #e5e5e5;
+    --color-surface-200: #d4d4d4;
+    --color-surface-300: #a3a3a3;
+    --color-surface-400: #737373;
+    --color-surface-500: #525252;
+    --color-surface-600: #404040;
+    --color-surface-700: #262626;
+    --color-surface-800: #1a1a1a;
+    --color-surface-900: #0f0f0f;
+    
+    /* Dynamic filters based on theme colors */
+    --svg-filter-surface-100: brightness(0) saturate(100%) invert(89%) sepia(4%) saturate(134%) hue-rotate(186deg) brightness(97%) contrast(85%);
+    --svg-filter-surface-300: brightness(0) saturate(100%) invert(68%) sepia(7%) saturate(134%) hue-rotate(186deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-600: brightness(0) saturate(100%) invert(29%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-700: brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-800: brightness(0) saturate(100%) invert(10%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    --svg-filter-surface-900: brightness(0) saturate(100%) invert(4%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(87%);
+    
+    /* Primary color filters */
+    --svg-filter-primary-400: brightness(0) saturate(100%) invert(63%) sepia(96%) saturate(664%) hue-rotate(356deg) brightness(99%) contrast(94%);
+    --svg-filter-primary-900: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
+    --svg-filter-warning-500: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
+    
+    --color-primary-50: #fef3c7;
+    --color-primary-100: #fde68a;
+    --color-primary-200: #fcd34d;
+    --color-primary-300: #fbbf24;
+    --color-primary-400: #f59e0b;
+    --color-primary-500: #d97706;
+    --color-primary-600: #b45309;
+    --color-primary-700: #92400e;
+    --color-primary-800: #78350f;
+    --color-primary-900: #451a03;
+    
+    /* Rust and decay colors */
+    --color-warning-400: #dc2626;
+    --color-warning-500: #b91c1c;
+    --color-warning-600: #991b1b;
+
+    --font-user: Kalam, sans-serif;
+    --form-labels: Kalam, sans-serif;
+}
+
+/* Dark mode SVG filter overrides */
+
+/* Dynamic SVG filter utility classes */
+.svg-surface-100 {
+    filter: var(--svg-filter-surface-100);
+}
+
+.svg-surface-300 {
+    filter: var(--svg-filter-surface-300);
+}
+
+.svg-surface-600 {
+    filter: var(--svg-filter-surface-600);
+}
+
+.svg-surface-900 {
+    filter: var(--svg-filter-surface-900);
+}
+
+.svg-primary {
+    filter: var(--svg-filter-primary-400);
+}
+
+.svg-warning {
+    filter: var(--svg-filter-warning-500);
+}
+
+@import './torn-paper.css';
+
+
+
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, #e5e5e5 0%, #f5f5f5 100%);
+
+    background-attachment: fixed;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    position: relative;
+
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
+}
+
+
+
+/* Light mode body styling */
+.dark body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 100px,
+            rgba(217, 119, 6, 0.02) 100px,
+            rgba(217, 119, 6, 0.02) 101px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 100px,
+            rgba(220, 38, 38, 0.02) 100px,
+            rgba(220, 38, 38, 0.02) 101px
+        );
+    pointer-events: none;
+    z-index: -1;
+}
+
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5 {
+    color: var(--color-surface-200);
+}
+
+
+
+.dark .sheet-container {
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid #404040;
+
+}
+
+.sheet-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(
+            circle at 30% 70%, 
+            rgba(217, 119, 6, 0.05) 0%, 
+            transparent 50%
+        ),
+        radial-gradient(
+            circle at 70% 30%, 
+            rgba(220, 38, 38, 0.03) 0%, 
+            transparent 50%
+        );
+    /* animation: contamination 20s linear infinite; */
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes contamination {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Gritty form sections */
+.card {
+    border-radius: 2px;
+    position: relative;
+}
+
+.dark .card {
+    opacity: 1;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Rusted header styling */
+.card-header {
+    position: relative;
+    overflow: hidden;
+}
+
+
+.card-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+
+}
+
+/* Distressed input fields */
+.input {
+    border: none;
+    color: var(--color-surface-900) !important;
+    font-family: 'Courier New', monospace;
+}
+
+.dark .input {
+    border: none;
+    color: var(--color-surface-900) !important;
+    appearance: none;
+    -webkit-appearance: none;
+    outline-color: transparent;
+}
+
+.input:focus:not(.tab-content input):not(.tab-content textarea) {
+    border-color: #d97706 !important;
+}
+
+.dark .input:focus {
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--color-surface-900);
+}
+
+/* Weathered buttons */
+.btn {
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0 !important;
+    border: 1px solid #525252;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(115, 115, 115, 0.1);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(115, 115, 115, 0.2);
+}
+
+.variant-filled-primary {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: #fef3c7 !important;
+}
+
+.variant-filled-secondary {
+    background: linear-gradient(135deg, #525252, #404040) !important;
+    color: #d4d4d4 !important;
+}
+
+/* Radioactive tab styling */
+.tab-content {
+    padding: 1.5rem;
+    position: relative;
+
+}
+
+
+/* Contaminated table styling */
+.table {
+    background: var(--color-surface-100) !important;
+    border: 1px solid var(--color-surface-400);
+}
+
+.dark .table {
+    background: rgba(15, 15, 15, 0.6) !important;
+    border: 1px solid #525252;
+}
+
+.table th,
+.table td {
+    border-color: var(--color-surface-400) !important;
+    color: var(--color-surface-900);
+}
+
+.dark .table th,
+.dark .table td {
+    border-color: #404040 !important;
+    color: #d4d4d4;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(217, 119, 6, 0.1) !important;
+}
+
+/* Checkbox mutations */
+.checkbox {
+    border: 2px solid var(--color-surface-500);
+    background: var(--color-surface-50);
+    border-radius: 0;
+}
+
+.dark .checkbox {
+    border: 2px solid #737373;
+    background: rgba(15, 15, 15, 0.8);
+}
+
+.checkbox:checked {
+    background: #d97706;
+    border-color: #b45309;
+}
+
+/* Typography */
+.h2 {
+    color: #d97706;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.light .h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.h4 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dark .h4 {
+    font-size: x-large;
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); */
+}
+
+/* Ground abilities wasteland styling */
+.ground-ability-grid {
+    background: var(--color-surface-100) !important;
+    border: 1px solid var(--color-surface-400);
+    border-radius: 0;
+    position: relative;
+}
+
+.dark .ground-ability-grid {
+    background: rgba(15, 15, 15, 0.8) !important;
+    border: 1px solid #525252;
+}
+
+.ground-ability-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(
+            circle at 20% 50%, 
+            rgba(217, 119, 6, 0.1) 0%, 
+            transparent 50%
+        );
+    pointer-events: none;
+}
+
+/* Skills contamination effect */
+.skill-item {
+    border: 1px solid var(--color-surface-400) !important;
+    background: var(--color-surface-100) !important;
+    transition: all 0.3s ease;
+}
+
+.dark .skill-item {
+    border: 1px solid #404040 !important;
+    background: rgba(15, 15, 15, 0.6) !important;
+}
+
+.skill-item:hover {
+    border-color: #d97706;
+    background: rgba(217, 119, 6, 0.1) !important;
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.2);
+}
+
+/* Custom utility classes for consistent styling */
+.btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-group-vertical .btn {
+    margin-bottom: 0.25rem;
+    border-radius: 0;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Character sheet specific styles */
+.sheet-container {
+    position: relative;
+
+    max-width: 100%;
+    min-width: 320px;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-sizing: border-box;
+    container-type: inline-size;
+    z-index: 1;
+
+}
+
+.torn-input {
+    min-width: 3rem;
+    
+}
+
+/* Responsive breakpoints */
+@container (min-width: 768px) {
+    .sheet-container {
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+}
+
+@container (min-width: 1024px) {
+    .sheet-container {
+        max-width: 1200px;
+        min-height: calc(100vh - (var(--spacing) * 8) * 2);
+    }
+}
+
+.input.font-user {
+    font-family: var(--font-user), sans-serif;
+}
+
+label {
+    font-family: var(--form-labels), serif;
+    letter-spacing: 0.15em;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+
+:global(.dark) .tab-content {
+    color: #f5f5f5;
+}
+
+/* Responsive improvements for mobile and small screens */
+@media (max-width: 767px) {
+    .sheet-container {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+    
+    /* Reduce font sizes on mobile */
+    .h2 {
+        font-size: 1.5rem;
+    }
+    
+    .h4 {
+        font-size: 1.1rem;
+    }
+    
+    /* Reduce form padding */
+    .card .p-4 {
+        padding: 0.75rem;
+    }
+    
+    /* Stack grids on mobile */
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid.md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Reduce torn input padding */
+    .torn-input {
+        /* font-size: large; */
+        padding-left: 1rem;
+        min-height: 3rem;
+    }
+    
+    /* Smaller gaps */
+    .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-4 > * + * {
+        margin-top: 0.75rem;
+    }
+}
+
+/* Tablet responsive improvements */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sheet-container {
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+}
+
+/* Ensure tooltips don't overflow on small screens */
+@media (max-width: 480px) {
+    .floating-tooltip {
+        max-width: 90vw;
+        left: 5vw !important;
+        right: auto !important;
+    }
+}
+
+/* Grid responsive improvements */
+@media (max-width: 640px) {
+    .lg\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .xl\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    .xl\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+.stroke-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+    transition: filter 0.2s ease;
+}
+
+.dark .stroke-image {
+    filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+

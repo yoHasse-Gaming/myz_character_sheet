@@ -64,7 +64,7 @@
 /* Card Wrapper */
 .card-wrapper {
     width: 100%;
-    min-height: 420px;
+    min-height: 320px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     cursor: pointer;
     /* Add slight random rotation for organic feel */
@@ -144,7 +144,7 @@
     line-height: 1.2;
 }
 
-:global(.dark) .card-name {
+.dark .card-name {
     color: var(--color-surface-100);
 }
 
@@ -167,8 +167,8 @@
     white-space: nowrap;
 }
 
-:global(.dark) .card-id,
-:global(.dark) .card-ability {
+.dark .card-id,
+.dark .card-ability {
     background: rgba(217, 119, 6, 0.2);
     color: var(--color-primary-400);
 }
@@ -181,7 +181,7 @@
     font-weight: 600;
 }
 
-:global(.dark) .card-category {
+.dark .card-category {
     color: var(--color-surface-400);
 }
 
@@ -196,15 +196,15 @@
     line-height: 1.5;
 }
 
-:global(.dark) .card-description,
-:global(.dark) .card-effects-content,
-:global(.dark) .card-examples-content,
-:global(.dark) .card-trigger-content,
-:global(.dark) .card-occupation-content {
+.dark .card-description,
+.dark .card-effects-content,
+.dark .card-examples-content,
+.dark .card-trigger-content,
+.dark .card-occupation-content {
     color: var(--color-surface-200);
 }
 
-.card-effects,
+/* .card-effects,
 .card-examples,
 .card-trigger,
 .card-occupation {
@@ -212,15 +212,15 @@
     padding: 1rem;
     border-radius: 0.5rem;
     border: 1px solid rgba(217, 119, 6, 0.2);
-}
+} */
 
-:global(.dark) .card-effects,
-:global(.dark) .card-examples,
-:global(.dark) .card-trigger,
-:global(.dark) .card-occupation {
+/* .dark .card-effects,
+.dark .card-examples,
+.dark .card-trigger,
+.dark .card-occupation {
     background: rgba(217, 119, 6, 0.1);
     border-color: rgba(217, 119, 6, 0.3);
-}
+} */
 
 .card-effects-title,
 .card-examples-title,
@@ -234,10 +234,10 @@
     letter-spacing: 0.05em;
 }
 
-:global(.dark) .card-effects-title,
-:global(.dark) .card-examples-title,
-:global(.dark) .card-trigger-title,
-:global(.dark) .card-occupation-title {
+.dark .card-effects-title,
+.dark .card-examples-title,
+.dark .card-trigger-title,
+.dark .card-occupation-title {
     color: var(--color-surface-300);
 }
 
@@ -251,7 +251,7 @@
     border-top: 1px solid var(--color-surface-300);
 }
 
-:global(.dark) .card-footer {
+.dark .card-footer {
     border-top-color: var(--color-surface-600);
 }
 
@@ -266,7 +266,7 @@
     font-size: 0.9rem;
 }
 
-:global(.dark) .selected-indicator {
+.dark .selected-indicator {
     color: var(--color-success-400);
 }
 
@@ -274,20 +274,20 @@
     color: var(--color-success-600);
 }
 
-:global(.dark) .selected-indicator svg {
+.dark .selected-indicator svg {
     color: var(--color-success-400);
 }
 
 .select-hint {
-    color: var(--color-surface-600);
+    color: var(--color-surface-700);
     font-style: italic;
     font-size: 0.85rem;
     text-align: center;
     opacity: 0.8;
 }
 
-:global(.dark) .select-hint {
-    color: var(--color-surface-400);
+.dark .select-hint {
+    color: var(--color-surface-300);
 }
 
 /* HTML content styling */
@@ -326,20 +326,20 @@
     margin: 0.25rem 0;
 }
 
-.card-effects-content :global(strong),
-.card-examples-content :global(strong),
-.card-description :global(strong),
-.card-trigger-content :global(strong),
-.card-occupation-content :global(strong) {
+.card-effects-content strong,
+.card-examples-content strong,
+.card-description strong,
+.card-trigger-content strong,
+.card-occupation-content strong {
     color: var(--color-primary-600);
     font-weight: 600;
 }
 
-:global(.dark) .card-effects-content :global(strong),
-:global(.dark) .card-examples-content :global(strong),
-:global(.dark) .card-description :global(strong),
-:global(.dark) .card-trigger-content :global(strong),
-:global(.dark) .card-occupation-content :global(strong) {
+.dark .card-effects-content strong,
+.dark .card-examples-content strong,
+.dark .card-description strong,
+.dark .card-trigger-content strong,
+.dark .card-occupation-content strong {
     color: var(--color-primary-400);
 }
 
@@ -397,6 +397,6 @@
     }
     
     .card-wrapper {
-        min-height: 380px;
+        min-height: 240px;
     }
 }

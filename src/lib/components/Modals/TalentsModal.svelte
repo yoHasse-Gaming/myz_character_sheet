@@ -118,10 +118,6 @@
                             <div class="card-content">
                                 <div class="card-header">
                                     <h3 class="card-name">{talent.name}</h3>
-                                    <div class="card-meta">
-                                        <span class="talent-icon">⚔️</span>
-                                        <span class="card-id">{talent.id}</span>
-                                    </div>
                                 </div>
                                 
                                 <div class="card-description">

@@ -1,7 +1,9 @@
 // Character-related types
 export type Talent = {
+    id: string;
     name: string;
     description: string;
+    occupation: string;
 }
 
 export type Mutation = {

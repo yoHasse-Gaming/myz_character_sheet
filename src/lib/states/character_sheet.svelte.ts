@@ -1,7 +1,7 @@
 // Global character sheet state using Svelte 5 runes
 // This provides reactive state management across all components
 
-import type { BaseAbilityType, OptionalSkill, Mutation } from '../types';
+import type { BaseAbilityType, OptionalSkill, Mutation, Talent } from '../types';
 import { SvelteMap } from 'svelte/reactivity';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 
@@ -130,6 +130,9 @@ export const sheetState = $state({
     // Mutation points available to spend
     mutationPoints: 0,
     
+    // Talents selected by the user
+    talents: [] as Talent[],
+    
     // Character conditions
     conditions: {
         isStarving: false,
@@ -225,6 +228,47 @@ export const characterActions = {
         sheetState.mutationPoints = Math.max(0, points);
     },
     
+    // Talents management
+    addTalent(talent: Talent) {
+        // Check if talent is already added
+        const existingIndex = sheetState.talents.findIndex(t => t.id === talent.id);
+        if (existingIndex === -1) {
+            sheetState.talents.push(talent);
+        }
+    },
+    
+    removeTalent(talentId: string) {
+        const index = sheetState.talents.findIndex(t => t.id === talentId);
+        if (index !== -1) {
+            sheetState.talents.splice(index, 1);
+        }
+    },
+    
+    // Helper functions for talent validation
+    canAddOccupationalTalent(): boolean {
+        const occupationalTalents = sheetState.talents.filter(t => t.occupation !== 'generic');
+        return occupationalTalents.length < 2;
+    },
+    
+    canAddSecondOccupationalTalent(): boolean {
+        const occupationalTalents = sheetState.talents.filter(t => t.occupation !== 'generic');
+        const genericTalents = sheetState.talents.filter(t => t.occupation === 'generic');
+        return occupationalTalents.length < 2 && genericTalents.length >= 3;
+    },
+    
+    canAddGenericTalent(): boolean {
+        const genericTalents = sheetState.talents.filter(t => t.occupation === 'generic');
+        return genericTalents.length < 5;
+    },
+    
+    getOccupationalTalentCount(): number {
+        return sheetState.talents.filter(t => t.occupation !== 'generic').length;
+    },
+    
+    getGenericTalentCount(): number {
+        return sheetState.talents.filter(t => t.occupation === 'generic').length;
+    },
+    
     // Character info functions
     setName(name: string) {
         sheetState.name = name;
@@ -315,20 +359,22 @@ export const characterActions = {
 };
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info';
+export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents';
 
 // Info modal state to hold content
 export const infoModalState = $state({
     title: '',
     content: '',
-    type: '' as 'skill' | 'trauma' | 'mutation' | ''
+    type: '' as 'skill' | 'trauma' | 'mutation' | 'talent' | ''
 });
 
 // Create a reactive map for dialogue states
 const openDialogue = new SvelteMap<DialogueOption, boolean>([
     ['optionalSkills', false],
     ['mutations', false],
-    ['info', false]
+    ['info', false],
+    ['occupational-talents', false],
+    ['generic-talents', false]
 ]);
 
 // Convert to reactive state
@@ -369,7 +415,7 @@ export function closeDialogueOption(dialogue: DialogueOption | undefined = undef
 }
 
 // Function to open info modal with specific content
-export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' = 'skill') {
+export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' | 'talent' = 'skill') {
     infoModalState.title = title;
     infoModalState.content = content;
     infoModalState.type = type;

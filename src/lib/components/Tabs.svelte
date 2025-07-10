@@ -4,6 +4,7 @@
     import AbilitiesTab from "./tabs/AbilitiesTab.svelte";
     import CharacterTab from "./tabs/CharacterTab.svelte";
     import Mutations from "./tabs/Mutations.svelte";
+    import TalentsTab from "./tabs/TalentsTab.svelte";
 
     let activeTab = $state(1);
 
@@ -68,11 +69,7 @@
 
     {#if activeTab === 4}
         <FormSection header="⚡ TALANGER">
-            <div class="text-center py-8 text-surface-400">
-                <div class="text-4xl mb-2">🎯</div>
-                <p class="italic">Överlevnadsfärdigheter från Zonen...</p>
-                <p class="text-sm mt-2">Kommer implementeras</p>
-            </div>
+            <TalentsTab />
         </FormSection>
     {/if}
 

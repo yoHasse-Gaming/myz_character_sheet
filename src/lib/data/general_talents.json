@@ -1,0 +1,164 @@
+[
+  {
+    "id": "ana-4c79-ed8c",
+    "name": "Analytiker",
+    "description": "Du kan fly med Skärpa i stället för Kyla.",
+    "occupation": "generic"
+  },
+  {
+    "id": "beu-9e30-4599",
+    "name": "Beundrare",
+    "description": "Du har imponerat stort på en SLP, som nu gör allt för att hjälpa dig eller bara vara nära dig.",
+    "occupation": "generic"
+  },
+  {
+    "id": "ens-979a-596a",
+    "name": "Enstöring",
+    "description": "Du kan återhämta en poäng förlorad Känsla genom att dra dig undan och vara ensam några timmar.",
+    "occupation": "generic"
+  },
+  {
+    "id": "feg-4db1-598f",
+    "name": "Feg råtta",
+    "description": "Om någon skjuter mot dig och du har en vän på upp till nära håll kan du ta skydd bakom denne – men bara om din vän accepterar det.",
+    "occupation": "generic"
+  },
+  {
+    "id": "flu-d7fb-18f6",
+    "name": "Flugviktare",
+    "description": "När du parerar i närstrid kan du använda Kyla i stället för Styrka.",
+    "occupation": "generic"
+  },
+  {
+    "id": "kne-f597-82bb",
+    "name": "Knegare",
+    "description": "Du får modifikation +2 när du arbetar på ett av Folkets projekt.",
+    "occupation": "generic"
+  },
+  {
+    "id": "kra-973a-5f90",
+    "name": "Krafthugg",
+    "description": "Du får modifikation +1 när du slåss om du offrar din manöver i samma runda.",
+    "occupation": "generic"
+  },
+  {
+    "id": "kry-7957-24b2",
+    "name": "Krypskytt",
+    "description": "När du skjuter någon och träffar tar offret en poäng extra skada - men bara om du skjuter på långt avstånd och siktar noga.",
+    "occupation": "generic"
+  },
+  {
+    "id": "lit-1ad8-dc7d",
+    "name": "Liten i maten",
+    "description": "Du behöver bara äta en ranson krubb varannan dag för att inte förlora Styrka.",
+    "occupation": "generic"
+  },
+  {
+    "id": "liv-a582-cf6b",
+    "name": "Livvakt",
+    "description": "Om någon skjuter mot och träffar en person som är inom nära avstånd från dig kan du försöka kasta dig i vägen.",
+    "occupation": "generic"
+  },
+  {
+    "id": "lön-7c04-fc41",
+    "name": "Lönnmördare",
+    "description": "När du skjuter någon och träffar tar offret en poäng extra skada – men bara om du skjuter på nära eller armslängds avstånd.",
+    "occupation": "generic"
+  },
+  {
+    "id": "mån-fe60-7596",
+    "name": "Mångsysslare",
+    "description": "Du byter syssla och får FV 1 i den nya sysslans specialfärdighet, men kan inte längre höja FV i den gamla.",
+    "occupation": "generic"
+  },
+  {
+    "id": "obe-2f6a-f86d",
+    "name": "Oberörd",
+    "description": "Du kan kämpa på med Kyla i stället för Styrka.",
+    "occupation": "generic"
+  },
+  {
+    "id": "ond-c7b1-9c46",
+    "name": "Onda aningar",
+    "description": "Du kan speja med Känsla i stället för Skärpa.",
+    "occupation": "generic"
+  },
+  {
+    "id": "pac-e763-9a8f",
+    "name": "Packåsna",
+    "description": "Du kan bära dubbelt så många prylar som normalt utan att bli belastad.",
+    "occupation": "generic"
+  },
+  {
+    "id": "per-8fdd-1b36",
+    "name": "Personlig matematik",
+    "description": "Du kan genomskåda med Skärpa i stället för Känsla.",
+    "occupation": "generic"
+  },
+  {
+    "id": "pry-40bd-e4fb",
+    "name": "Prylvan",
+    "description": "Du får modifikation +1 när du förstår dig på en artefakt från den gamla tiden.",
+    "occupation": "generic"
+  },
+  {
+    "id": "res-0323-aed5",
+    "name": "Reser sig på nio",
+    "description": "När du blir bruten av skada kan du slå för att kämpa på (utan grundtärningar) för att komma tillbaka.",
+    "occupation": "generic"
+  },
+  {
+    "id": "rui-7b9f-38af",
+    "name": "Ruinkrälare",
+    "description": "Du får modifikation +2 när du försöker förstå dig på en ruin eller annan plats från den gamla världen.",
+    "occupation": "generic"
+  },
+  {
+    "id": "råd-1e39-c959",
+    "name": "Rådgivare",
+    "description": "När du hjälper en annan rollperson får han en extra modifikation +1 men bara om han följer dina instruktioner.",
+    "occupation": "generic"
+  },
+  {
+    "id": "sla-940f-b2c9",
+    "name": "Slaktare",
+    "description": "När ni har dödat ett monster i Zonen kan du utvinna ett antal ransoner krubb ur kadavret lika med monstrets STY.",
+    "occupation": "generic"
+  },
+  {
+    "id": "sna-78c2-86a6",
+    "name": "Snabbdragare",
+    "description": "Du kan dra ditt vapen utan att det kostar dig en manöver.",
+    "occupation": "generic"
+  },
+  {
+    "id": "sna-b2d6-dce5",
+    "name": "Snabbt fotarbete",
+    "description": "Du får modifikation +2 när du parerar en attack i närstrid.",
+    "occupation": "generic"
+  },
+  {
+    "id": "spe-4bd5-2292",
+    "name": "Specialist",
+    "description": "Du är expert på att använda en viss sorts vapen – välj ur vapenlistorna eller en artefakt.",
+    "occupation": "generic"
+  },
+  {
+    "id": "str-1dc7-3eed",
+    "name": "Stridsvan",
+    "description": "Du får addera +2 till resultatet på ditt initiativslag.",
+    "occupation": "generic"
+  },
+  {
+    "id": "söm-c751-ecbd",
+    "name": "Sömnlös",
+    "description": "Du kan återhämta förlorad Skärpa på andra sätt än att sova.",
+    "occupation": "generic"
+  },
+  {
+    "id": "zon-a2c7-73be",
+    "name": "Zonkock",
+    "description": "Du kan laga rötsmittad mat så att Rötan försvinner och rena rötsmittat vatten.",
+    "occupation": "generic"
+  }
+]

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
     import { onMount } from 'svelte';
-    import { generateUniqueVariants } from '../../utils/styleUtils';
+    import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
     import { sheetState, characterActions, closeDialogueOption, isDialogueOpen } from '../../states/character_sheet.svelte';
     import talentsData from '../../data/talents.json';
     import generalTalentsData from '../../data/general_talents.json';
@@ -10,11 +10,6 @@
 
     // Props to determine which type of talents to show
     let { modalType = 'occupational' }: { modalType: 'occupational' | 'generic' } = $props();
-
-    // Carousel state
-    let carouselContainer: HTMLElement | null = $state(null);
-    let currentTalentIndex = $state(0);
-    let isScrolling = $state(false);
     
     // Determine which talents to show based on modal type
     const availableTalents = $derived(modalType === 'occupational' 
@@ -31,8 +26,9 @@
         return sheetState.talents.some(t => t.id === talentId);
     }
     
-    // Generate unique variants for talent cards
+    // Generate unique variants and rotations for talent cards
     const talentVariants = $derived(generateUniqueVariants(availableTalents.length));
+    const cardRotations = $derived(generateRandomRotations(filteredTalents.length));
 
     function addTalent(talent: Talent) {
         // Validate talent selection based on rules
@@ -66,62 +62,17 @@
         closeDialogueOption(modalType === 'occupational' ? 'occupational-talents' : 'generic-talents');
     }
 
-    // Navigate carousel
-    function nextTalent() {
-        if (currentTalentIndex < filteredTalents.length - 1) {
-            currentTalentIndex++;
-        }
-    }
-    
-    function prevTalent() {
-        if (currentTalentIndex > 0) {
-            currentTalentIndex--;
-        }
-    }
-    
-    // Handle scroll wheel navigation
-    function handleWheel(event: WheelEvent) {
-        event.preventDefault();
-        
-        if (isScrolling) return;
-        isScrolling = true;
-        
-        if (event.deltaY > 0) {
-            nextTalent();
-        } else {
-            prevTalent();
-        }
-        
-        setTimeout(() => {
-            isScrolling = false;
-        }, 300);
-    }
-
-    // Handle escape key
+    // Close modal on Escape key
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
             closeModal();
-        } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-            event.preventDefault();
-            nextTalent();
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            prevTalent();
         }
     }
 
-    // Prevent modal close when clicking inside carousel
-    function handleCarouselClick(event: MouseEvent) {
+    // Prevent modal close when clicking inside grid
+    function handleGridClick(event: MouseEvent) {
         event.stopPropagation();
     }
-
-    // Set up event listeners
-    onMount(() => {
-        document.addEventListener('keydown', handleKeydown);
-        return () => {
-            document.removeEventListener('keydown', handleKeydown);
-        };
-    });
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -149,107 +100,59 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-            class="carousel-container"
-            bind:this={carouselContainer}
-            onclick={handleCarouselClick}
-            onwheel={handleWheel}
+            class="grid-container"
+            onclick={handleGridClick}
         >
-            <div class="card-stack">
+            <div class="card-grid">
                 {#each filteredTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
-                    {@const isCurrent = index === currentTalentIndex}
-                    {@const isNext = index === currentTalentIndex + 1}
-                    {@const isPrev = index === currentTalentIndex - 1}
-                    {@const distance = Math.abs(index - currentTalentIndex)}
-                    {@const isVisible = distance <= 3}
+                    {@const rotation = cardRotations[index] || 0}
                     
-                    {#if isVisible}
-                        <div 
-                            class="card-wrapper {isCurrent ? 'current' : ''} {isNext ? 'next' : ''} {isPrev ? 'prev' : ''}"
-                            style="
-                                z-index: {100 - distance};
-                                transform: 
-                                    translateX({(index - currentTalentIndex) * 15}px)
-                                    translateY({distance * 15}px)
-                                    rotate({(index - currentTalentIndex) * 3}deg)
-                                    scale({1 - distance * 0.1});
-                                opacity: {1 - distance * 0.3};
-                            "
-                            transition:scale={{ duration: 400, delay: distance * 50 }}
-                            onclick={() => addTalent(talent)}
-                        >
-                            <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
-                                <div class="card-content">
-                                    <div class="card-header">
-                                        <h3 class="card-name">{talent.name}</h3>
-                                        <div class="card-meta">
-                                            <span class="talent-icon">⚔️</span>
-                                            <span class="card-id">{talent.id}</span>
+                    <div 
+                        class="card-wrapper"
+                        style="--random-rotation: {rotation}deg"
+                        onclick={() => addTalent(talent)}
+                    >
+                        <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                            <div class="card-content">
+                                <div class="card-header">
+                                    <h3 class="card-name">{talent.name}</h3>
+                                    <div class="card-meta">
+                                        <span class="talent-icon">⚔️</span>
+                                        <span class="card-id">{talent.id}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-description">
+                                    {@html talent.description}
+                                </div>
+                                
+                                <div class="card-occupation">
+                                    <h4 class="card-occupation-title">Kategori:</h4>
+                                    <div class="card-occupation-content">
+                                        {talent.occupation === 'generic' ? 'Generisk talang' : `Yrkestalang - ${talent.occupation}`}
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer">
+                                    {#if isSelected}
+                                        <div class="selected-indicator">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                <polyline points="20,6 9,17 4,12"></polyline>
+                                            </svg>
+                                            <span>Vald</span>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="card-description">
-                                        {@html talent.description}
-                                    </div>
-                                    
-                                    <div class="card-occupation">
-                                        <h4 class="card-occupation-title">Kategori:</h4>
-                                        <div class="card-occupation-content">
-                                            {talent.occupation === 'generic' ? 'Generisk talang' : `Yrkestalang - ${talent.occupation}`}
+                                    {:else}
+                                        <div class="select-hint">
+                                            Klicka för att välja
                                         </div>
-                                    </div>
-                                    
-                                    <div class="card-footer">
-                                        {#if isSelected}
-                                            <div class="selected-indicator">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                    <polyline points="20,6 9,17 4,12"></polyline>
-                                                </svg>
-                                                <span>Vald</span>
-                                            </div>
-                                        {:else}
-                                            <div class="select-hint">
-                                                Klicka för att välja
-                                            </div>
-                                        {/if}
-                                    </div>
+                                    {/if}
                                 </div>
                             </div>
                         </div>
-                    {/if}
+                    </div>
                 {/each}
-            </div>
-            
-            <!-- Navigation Controls -->
-            <div class="carousel-navigation">
-                <button 
-                    class="nav-button prev" 
-                    onclick={prevTalent}
-                    disabled={currentTalentIndex === 0}
-                    aria-label="Föregående talang"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15,18 9,12 15,6"></polyline>
-                    </svg>
-                </button>
-                
-                <div class="carousel-indicator">
-                    <span class="current-index">{currentTalentIndex + 1}</span>
-                    <span class="separator">/</span>
-                    <span class="total-count">{filteredTalents.length}</span>
-                </div>
-                
-                <button 
-                    class="nav-button next" 
-                    onclick={nextTalent}
-                    disabled={currentTalentIndex >= filteredTalents.length - 1}
-                    aria-label="Nästa talang"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9,18 15,12 9,6"></polyline>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
@@ -278,107 +181,59 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-            class="carousel-container"
-            bind:this={carouselContainer}
-            onclick={handleCarouselClick}
-            onwheel={handleWheel}
+            class="grid-container"
+            onclick={handleGridClick}
         >
-            <div class="card-stack">
+            <div class="card-grid">
                 {#each filteredTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
-                    {@const isCurrent = index === currentTalentIndex}
-                    {@const isNext = index === currentTalentIndex + 1}
-                    {@const isPrev = index === currentTalentIndex - 1}
-                    {@const distance = Math.abs(index - currentTalentIndex)}
-                    {@const isVisible = distance <= 3}
+                    {@const rotation = cardRotations[index] || 0}
                     
-                    {#if isVisible}
-                        <div 
-                            class="card-wrapper {isCurrent ? 'current' : ''} {isNext ? 'next' : ''} {isPrev ? 'prev' : ''}"
-                            style="
-                                z-index: {100 - distance};
-                                transform: 
-                                    translateX({(index - currentTalentIndex) * 15}px)
-                                    translateY({distance * 15}px)
-                                    rotate({(index - currentTalentIndex) * 3}deg)
-                                    scale({1 - distance * 0.1});
-                                opacity: {1 - distance * 0.3};
-                            "
-                            transition:scale={{ duration: 400, delay: distance * 50 }}
-                            onclick={() => addTalent(talent)}
-                        >
-                            <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
-                                <div class="card-content">
-                                    <div class="card-header">
-                                        <h3 class="card-name">{talent.name}</h3>
-                                        <div class="card-meta">
-                                            <span class="talent-icon">🎯</span>
-                                            <span class="card-id">{talent.id}</span>
+                    <div 
+                        class="card-wrapper"
+                        style="--random-rotation: {rotation}deg"
+                        onclick={() => addTalent(talent)}
+                    >
+                        <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                            <div class="card-content">
+                                <div class="card-header">
+                                    <h3 class="card-name">{talent.name}</h3>
+                                    <div class="card-meta">
+                                        <span class="talent-icon">🎯</span>
+                                        <span class="card-id">{talent.id}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-description">
+                                    {@html talent.description}
+                                </div>
+                                
+                                <div class="card-occupation">
+                                    <h4 class="card-occupation-title">Kategori:</h4>
+                                    <div class="card-occupation-content">
+                                        {talent.occupation === 'generic' ? 'Generisk talang' : `Yrkestalang - ${talent.occupation}`}
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer">
+                                    {#if isSelected}
+                                        <div class="selected-indicator">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                <polyline points="20,6 9,17 4,12"></polyline>
+                                            </svg>
+                                            <span>Vald</span>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="card-description">
-                                        {@html talent.description}
-                                    </div>
-                                    
-                                    <div class="card-occupation">
-                                        <h4 class="card-occupation-title">Kategori:</h4>
-                                        <div class="card-occupation-content">
-                                            {talent.occupation === 'generic' ? 'Generisk talang' : `Yrkestalang - ${talent.occupation}`}
+                                    {:else}
+                                        <div class="select-hint">
+                                            Klicka för att välja
                                         </div>
-                                    </div>
-                                    
-                                    <div class="card-footer">
-                                        {#if isSelected}
-                                            <div class="selected-indicator">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                    <polyline points="20,6 9,17 4,12"></polyline>
-                                                </svg>
-                                                <span>Vald</span>
-                                            </div>
-                                        {:else}
-                                            <div class="select-hint">
-                                                Klicka för att välja
-                                            </div>
-                                        {/if}
-                                    </div>
+                                    {/if}
                                 </div>
                             </div>
                         </div>
-                    {/if}
+                    </div>
                 {/each}
-            </div>
-            
-            <!-- Navigation Controls -->
-            <div class="carousel-navigation">
-                <button 
-                    class="nav-button prev" 
-                    onclick={prevTalent}
-                    disabled={currentTalentIndex === 0}
-                    aria-label="Föregående talang"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15,18 9,12 15,6"></polyline>
-                    </svg>
-                </button>
-                
-                <div class="carousel-indicator">
-                    <span class="current-index">{currentTalentIndex + 1}</span>
-                    <span class="separator">/</span>
-                    <span class="total-count">{filteredTalents.length}</span>
-                </div>
-                
-                <button 
-                    class="nav-button next" 
-                    onclick={nextTalent}
-                    disabled={currentTalentIndex >= filteredTalents.length - 1}
-                    aria-label="Nästa talang"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9,18 15,12 9,6"></polyline>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>

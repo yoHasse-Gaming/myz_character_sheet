@@ -5,6 +5,8 @@
     import CharacterTab from "./tabs/CharacterTab.svelte";
     import Mutations from "./tabs/Mutations.svelte";
     import TalentsTab from "./tabs/TalentsTab.svelte";
+    import EquipmentTab from "./tabs/EquipmentTab.svelte";
+    import RelationsNotesTab from "./tabs/RelationsNotesTab.svelte";
 
     let activeTab = $state(1);
 
@@ -13,11 +15,11 @@
         { id: 2, label: 'Egenskaper' },
         { id: 3, label: 'Mutationer' },
         { id: 4, label: 'Talanger' },
-        { id: 5, label: 'Övrigt' }
+        { id: 5, label: 'Utrustning' },
+        { id: 6, label: 'Relationer' }
     ];
 
-
-    const tabVariants = ['tab-variant-1', 'tab-variant-2', 'tab-variant-3', 'tab-variant-4'];
+    const tabVariants = ['tab-variant-1', 'tab-variant-2', 'tab-variant-3', 'tab-variant-4', 'tab-variant-5', 'tab-variant-6'];
 
 
     
@@ -55,53 +57,30 @@
         <AbilitiesTab />
     {/if}
 
-    <!-- Tab 3: Talanger & Mutationer -->
+    <!-- Tab 3: Mutationer -->
     {#if activeTab === 3}
         <div class="talents-mutations-tab">
-
             <FormSection header="🧬 MUTATIONER">
                 <Mutations />
             </FormSection>
-            
-
         </div>
     {/if}
 
+    <!-- Tab 4: Talanger -->
     {#if activeTab === 4}
         <FormSection header="⚡ TALANGER">
             <TalentsTab />
         </FormSection>
     {/if}
 
-
-    <!-- Tab 4: Övrigt -->
+    <!-- Tab 5: Utrustning -->
     {#if activeTab === 5}
-        <div class="other-tab space-y-6">
-            <FormSection header="🎒 UTRUSTNING">
-                <div class="text-center py-6 text-surface-400">
-                    <div class="text-3xl mb-2">📦</div>
-                    <p class="italic">Skrot och rost som håller dig vid liv...</p>
-                </div>
-            </FormSection>
-            <FormSection header="⚔️ VAPEN & RUSTNING">
-                <div class="text-center py-6 text-surface-400">
-                    <div class="text-3xl mb-2">🛡️</div>
-                    <p class="italic">Ditt skydd mot Zonens faror</p>
-                </div>
-            </FormSection>
-            <FormSection header="👥 RELATIONER">
-                <div class="text-center py-6 text-surface-400">
-                    <div class="text-3xl mb-2">🤝</div>
-                    <p class="italic">Vänner och fiender i ödemarken</p>
-                </div>
-            </FormSection>
-            <FormSection header="📝 ANTECKNINGAR">
-                <div class="text-center py-6 text-surface-400">
-                    <div class="text-3xl mb-2">📋</div>
-                    <p class="italic">Minnen från den gamla världen...</p>
-                </div>
-            </FormSection>
-        </div>
+        <EquipmentTab />
+    {/if}
+
+    <!-- Tab 6: Relationer och Anteckningar -->
+    {#if activeTab === 6}
+        <RelationsNotesTab />
     {/if}
 
 </div>

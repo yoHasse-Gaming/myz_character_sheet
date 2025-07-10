@@ -1,7 +1,7 @@
 // Global character sheet state using Svelte 5 runes
 // This provides reactive state management across all components
 
-import type { BaseAbilityType, OptionalSkill, Mutation, Talent } from '../types';
+import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent } from '../types';
 import { SvelteMap } from 'svelte/reactivity';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 
@@ -142,7 +142,23 @@ export const sheetState = $state({
     },
     
     // Critical injuries
-    criticalInjuries: ""
+    criticalInjuries: "",
+    
+    // Equipment and inventory
+    equipment: [] as Equipment[],
+    equipmentTable: [] as EquipmentTableItem[],
+    
+    // Weapons
+    weapons: [] as Weapon[],
+    
+    // Armor
+    armor: [] as Armor[],
+    
+    // Relations with other characters
+    relations: [] as RPRelation[],
+    
+    // Notes or miscellaneous information
+    notes: [] as string[]
 });
 
 // Helper functions for managing the state
@@ -293,6 +309,89 @@ export const characterActions = {
     
     setCriticalInjuries(injuries: string) {
         sheetState.criticalInjuries = injuries;
+    },
+    
+    // Equipment management
+    addEquipment(equipment: Equipment) {
+        // Check if equipment is already added
+        const existingIndex = sheetState.equipment.findIndex(e => e.id === equipment.id);
+        if (existingIndex === -1) {
+            sheetState.equipment.push(equipment);
+        }
+    },
+    
+    removeEquipment(equipmentId: string) {
+        const index = sheetState.equipment.findIndex(e => e.id === equipmentId);
+        if (index !== -1) {
+            sheetState.equipment.splice(index, 1);
+        }
+    },
+    
+    // Weapons management
+    addWeapon(weapon: Weapon) {
+        // Check if weapon is already added
+        const existingIndex = sheetState.weapons.findIndex(w => w.id === weapon.id);
+        if (existingIndex === -1) {
+            sheetState.weapons.push(weapon);
+        }
+    },
+    
+    removeWeapon(weaponId: string) {
+        const index = sheetState.weapons.findIndex(w => w.id === weaponId);
+        if (index !== -1) {
+            sheetState.weapons.splice(index, 1);
+        }
+    },
+    
+    // Armor management
+    addArmor(armor: Armor) {
+        // Check if armor is already added
+        const existingIndex = sheetState.armor.findIndex(a => a.id === armor.id);
+        if (existingIndex === -1) {
+            sheetState.armor.push(armor);
+        }
+    },
+    
+    removeArmor(armorId: string) {
+        const index = sheetState.armor.findIndex(a => a.id === armorId);
+        if (index !== -1) {
+            sheetState.armor.splice(index, 1);
+        }
+    },
+    
+    // Relations management
+    addRelation(relation: RPRelation) {
+        // Check if relation is already added
+        const existingIndex = sheetState.relations.findIndex(r => r.id === relation.id);
+        if (existingIndex === -1) {
+            sheetState.relations.push(relation);
+        }
+    },
+    
+    removeRelation(relationId: string) {
+        const index = sheetState.relations.findIndex(r => r.id === relationId);
+        if (index !== -1) {
+            sheetState.relations.splice(index, 1);
+        }
+    },
+    
+    // Notes management
+    addNote(note: string) {
+        if (note.trim()) {
+            sheetState.notes.push(note.trim());
+        }
+    },
+    
+    removeNote(index: number) {
+        if (index >= 0 && index < sheetState.notes.length) {
+            sheetState.notes.splice(index, 1);
+        }
+    },
+    
+    updateNote(index: number, note: string) {
+        if (index >= 0 && index < sheetState.notes.length) {
+            sheetState.notes[index] = note.trim();
+        }
     },
     
     // Utility functions

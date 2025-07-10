@@ -1,0 +1,11 @@
+[
+    { "name": "Riddjur", "kostnad": "5-10", "belastning": "", "krav": "Stall", "kommentar": "" },
+    { "name": "Hund", "kostnad": "1", "belastning": "", "krav": "", "kommentar": "" },
+    { "name": "Gris", "kostnad": "1", "belastning": "", "krav": "", "kommentar": "" },
+    { "name": "Slav", "kostnad": "2", "belastning": "", "krav": "", "kommentar": "" },
+    { "name": "Helare", "kostnad": "3-6", "belastning": "", "krav": "", "kommentar": "Har fv 3-5 i vårda, kns 5 och talangen Helare." },
+    { "name": "Skrotskalle", "kostnad": "10+", "belastning": "", "krav": "", "kommentar": "Har fv 3-5 i mecka." },
+    { "name": "Zonstrykare", "kostnad": "4-8 per dygn", "belastning": "", "krav": "", "kommentar": "" },
+    { "name": "Livvakt", "kostnad": "3-6 per dygn", "belastning": "", "krav": "", "kommentar": "Kan skydda en person." },
+    { "name": "Krönikör", "kostnad": "3-6", "belastning": "", "krav": "", "kommentar": "Har fv 3-5 i leda vägen. Står för krubb och vatten åt sig själv. Skriver ett beställningsverk enligt önskemål." }
+]

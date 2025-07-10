@@ -39,30 +39,43 @@ export type OptionalSkill = {
     occupation: string;
 }
 
+export type EquipmentTableItem = {
+    id: string;
+    name: string;
+    quantity: number;
+    weight: number;
+}
+
 export type Equipment = {
+    id: string;
     name: string;
     description: string;
-    total: number;
+    quantity: number;
     weight: number;
 }
 
 export type Armor = {
+    id: string;
     name: string;
     description: string;
     protection: number;
     weight: number;
+    equipped: boolean;
 }
 
 export type Weapon = {
+    id: string;
     name: string;
     description: string;
     bonus: number;
     damage: number;
     range: number;
     weight: number;
+    equipped: boolean;
 }
 
 export type RPRelation = {
+    id: string;
     name: string;
     description: string;
     isClose: boolean;
@@ -119,6 +132,7 @@ export type MyCharSheet = {
     talentPoints: number;
     mutationPoints: number;
     equipment: Equipment[];
+    equipmentTable: EquipmentTableItem[];
     zoneRot: number;
     shells: number;
     armor: Armor[];

@@ -177,7 +177,7 @@
                     <table class="equipment-table">
                     <thead>
                         <tr>
-                            <th class="name-header">Föremål</th>
+                            <th class="name-header">Föremål <i class="icon-bar-chart"></i></th>
                             <th class="quantity-header">Antal</th>
                             <th class="weight-header">Vikt (kg)</th>
                             <th class="total-header">Tot. vikt</th>
@@ -480,7 +480,7 @@
 
     .equipment-table {
         width: 100%;
-
+        border: none;
         font-family: var(--form-labels), serif;
         background: transparent;
         position: relative;
@@ -493,7 +493,7 @@
 
     .equipment-table th {
         /* background: rgba(217, 119, 6, 0.2); */
-        /* color: var(--color-surface-900); */
+        color: var(--color-surface-900);
         padding: 0.75rem;
         text-align: left;
         font-weight: bold;
@@ -668,8 +668,6 @@
 
     /* Total row */
     .total-row {
-        background: url('/img/card_bg.png');
-        background-size: cover;
 
         font-weight: bold;
         position: relative;
@@ -682,18 +680,11 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #654321;
         opacity: 0.8;
     }
 
-    :global(.dark) .total-row {
-        background: url('/img/card_bg_dark.png');
 
-    }
 
-    :global(.dark) .total-row::before {
-        background: #A0522D;
-    }
 
     .total-label {
         text-align: right;

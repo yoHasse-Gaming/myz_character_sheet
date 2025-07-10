@@ -171,7 +171,7 @@
     }
 
     /* Optional skills section */
-    .optional-skills-section {
+    /* .optional-skills-section {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -182,17 +182,15 @@
         background: rgba(217, 119, 6, 0.05);
         border-radius: 0.5rem;
         border: 1px dashed rgba(217, 119, 6, 0.3);
-    }
+    } */
 
     .add-optional-skills-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background: transparent;
-        border: 2px solid var(--color-primary-600);
+        background-color: transparent;
         color: var(--color-primary-600);
-        border-radius: 0.5rem;
         cursor: pointer;
         transition: all 0.2s ease;
         font-weight: 600;
@@ -201,12 +199,12 @@
         font-size: 0.9rem;
     }
 
-    .add-optional-skills-button:hover {
+    /* .add-optional-skills-button:hover {
         background: var(--color-primary-600);
         color: white;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-    }
+    } */
 
     .optional-skills-count {
         font-size: 0.9rem;
@@ -218,10 +216,10 @@
         color: var(--color-surface-300);
     }
 
-    :global(.dark) .optional-skills-section {
+    /* :global(.dark) .optional-skills-section {
         background: rgba(217, 119, 6, 0.1);
         border-color: rgba(217, 119, 6, 0.4);
-    }
+    } */
 
     /* Responsive breakpoints using container queries */
     @container (min-width: 500px) {

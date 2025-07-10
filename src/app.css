@@ -1,9 +1,12 @@
+@charset "UTF-8";
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Architects+Daughter');
+
 @import 'tailwindcss';
 
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton/themes/vintage';
-
+@import './torn-paper.css';
 
 
 /* Import torn paper input styles */
@@ -62,8 +65,8 @@ by Excellent Ritma Florendia
     --color-warning-500: #b91c1c;
     --color-warning-600: #991b1b;
 
-    --font-user: Kalam, sans-serif;
-    --form-labels: Kalam, sans-serif;
+    --font-user: Architects Daughter, sans-serif;
+    --form-labels: Architects Daughter, sans-serif;
 }
 
 /* Dark mode SVG filter overrides */
@@ -93,7 +96,8 @@ by Excellent Ritma Florendia
     filter: var(--svg-filter-warning-500);
 }
 
-@import './torn-paper.css';
+
+
 
 
 
@@ -737,3 +741,5 @@ label {
     border-color: #737373;
     color: #f5f5f5 !important;
 }
+
+@import './handdrawn.css';

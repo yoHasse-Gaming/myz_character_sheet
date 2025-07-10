@@ -16,6 +16,7 @@
         // Handle numbers
         const num = parseFloat(weightStr);
         return isNaN(num) ? 0 : num;
+        
     }
 
     // Create equipment items from items.json with parsed weights
@@ -242,7 +243,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="total-row">
-                            <td colspan="3" class="total-label">Total bärkapacitet:</td>
+                            <td colspan="2" class="total-label">Total bärkapacitet: </td>
                             <td class="grand-total">
                                 <span class="grand-total-weight">{totalWeight.toFixed(2)} kg</span>
                             </td>
@@ -472,34 +473,49 @@
     /* Equipment Table Styles */
     .equipment-table-container {
         overflow-x: auto;
-        border-radius: 0.5rem;
+
         position: relative;
+        z-index: 2;
     }
 
     .equipment-table {
         width: 100%;
-        border-collapse: collapse;
+
         font-family: var(--form-labels), serif;
         background: transparent;
+        position: relative;
+        z-index: 1;
+
+
     }
 
+    
+
     .equipment-table th {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-surface-900);
+        /* background: rgba(217, 119, 6, 0.2); */
+        /* color: var(--color-surface-900); */
         padding: 0.75rem;
         text-align: left;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        border-bottom: 2px solid rgba(217, 119, 6, 0.4);
-        border-right: 1px solid rgba(217, 119, 6, 0.3);
+
+
+        position: relative;
+        z-index: 10;
+    }
+
+    .equipment-table td {
+        outline: none;
+
+
     }
 
     :global(.dark) .equipment-table th {
-        background: rgba(217, 119, 6, 0.3);
+        /* background: rgba(217, 119, 6, 0.3); */
         color: var(--color-surface-100);
-        border-bottom-color: rgba(217, 119, 6, 0.5);
-        border-right-color: rgba(217, 119, 6, 0.4);
+
+
     }
 
     .name-header {
@@ -526,7 +542,7 @@
     }
 
     .equipment-row {
-        border-bottom: 1px solid rgba(217, 119, 6, 0.2);
+
         transition: all 0.2s ease;
     }
 
@@ -549,8 +565,8 @@
         min-height: 2.5rem;
         font-size: 1rem;
         padding: 0.5rem 1rem;
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        border-radius: 0.25rem;
+
+
         background: var(--color-surface-50);
         color: var(--color-surface-900);
         font-family: var(--form-labels), serif;
@@ -559,15 +575,15 @@
 
     .equipment-name-input:focus, .equipment-number-input:focus {
         outline: none;
-        border-color: var(--color-primary-500);
-        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+
+        /* box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2); */
     }
 
     :global(.dark) .equipment-name-input, 
     :global(.dark) .equipment-number-input {
         background: var(--color-surface-800);
         color: var(--color-surface-100);
-        border-color: rgba(217, 119, 6, 0.4);
+
     }
 
     .equipment-number-input {
@@ -581,16 +597,16 @@
     .total-weight {
         font-weight: 600;
         color: var(--color-primary-600);
-        background: rgba(217, 119, 6, 0.1);
+        /* background: rgba(217, 119, 6, 0.1); */
         padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
+
         display: inline-block;
         min-width: 60px;
     }
 
     :global(.dark) .total-weight {
         color: var(--color-primary-400);
-        background: rgba(217, 119, 6, 0.2);
+        /* background: rgba(217, 119, 6, 0.2); */
     }
 
     /* Suggestions dropdown */
@@ -600,9 +616,9 @@
         left: 0;
         right: 0;
         background: var(--color-surface-50);
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        border-top: none;
-        border-radius: 0 0 0.25rem 0.25rem;
+
+
+
         max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
@@ -611,13 +627,13 @@
 
     :global(.dark) .suggestions-dropdown {
         background: var(--color-surface-800);
-        border-color: rgba(217, 119, 6, 0.4);
+
     }
 
     .suggestion-item {
         width: 100%;
         padding: 0.5rem 0.75rem;
-        border: none;
+
         background: transparent;
         text-align: left;
         cursor: pointer;
@@ -654,7 +670,7 @@
     .total-row {
         background: url('/img/card_bg.png');
         background-size: cover;
-        border-top: 2px solid #8B4513;
+
         font-weight: bold;
         position: relative;
     }
@@ -672,7 +688,7 @@
 
     :global(.dark) .total-row {
         background: url('/img/card_bg_dark.png');
-        border-top-color: #D2691E;
+
     }
 
     :global(.dark) .total-row::before {
@@ -702,10 +718,10 @@
         color: #8B4513;
         background: rgba(255, 248, 240, 0.9);
         padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
+
         display: inline-block;
         min-width: 80px;
-        border: 2px solid #654321;
+
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         transform: rotate(-0.5deg);
         transition: all 0.2s ease;
@@ -719,7 +735,7 @@
     :global(.dark) .grand-total-weight {
         background: rgba(40, 35, 30, 0.9);
         color: #D2691E;
-        border-color: #A0522D;
+
     }
 
     /* Weapon and Armor sections (keeping existing styles) */
@@ -730,8 +746,8 @@
         margin-bottom: 2rem;
         padding: 1rem;
         background: rgba(217, 119, 6, 0.05);
-        border: 1px dashed rgba(217, 119, 6, 0.3);
-        border-radius: 0.5rem;
+
+
     }
 
     .form-row {
@@ -753,8 +769,8 @@
         padding: 0.75rem 1.5rem;
         background: var(--color-primary-600);
         color: white;
-        border: none;
-        border-radius: 0.5rem;
+
+
         cursor: pointer;
         transition: all 0.2s ease;
         font-weight: 600;
@@ -837,8 +853,8 @@
 
     .remove-button {
         padding: 0.25rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-error-500);
+
+
         background: transparent;
         color: var(--color-error-600);
         cursor: pointer;
@@ -877,7 +893,7 @@
         color: var(--color-surface-600);
         background: rgba(0, 0, 0, 0.1);
         padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
+
         font-weight: 500;
     }
 

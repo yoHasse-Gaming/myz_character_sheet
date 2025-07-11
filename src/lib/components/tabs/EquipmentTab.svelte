@@ -36,10 +36,19 @@
         }));
     }
 
-    // Autocomplete functionality
-    let activeSearchIndex = $state(-1);
-    let showSuggestions = $state(Array(10).fill(false));
-    let searchQuery = $state(Array(10).fill(''));
+    // Modal states
+    let showEquipmentModal = $state(false);
+    let showWeaponModal = $state(false);
+    let showArmorModal = $state(false);
+
+    // Equipment management
+    let newEquipmentName = $state('');
+    let newEquipmentQuantity = $state(1);
+    let newEquipmentWeight = $state(0);
+
+    // Autocomplete functionality for equipment
+    let showEquipmentSuggestions = $state(false);
+    let equipmentSearchQuery = $state('');
 
     function getFilteredItems(query: string) {
         if (!query || query.length < 2) return [];
@@ -48,58 +57,91 @@
         ).slice(0, 5); // Limit to 5 suggestions
     }
 
-    function selectItem(rowIndex: number, item: any) {
-        sheetState.equipmentTable[rowIndex].name = item.name;
-        sheetState.equipmentTable[rowIndex].weight = item.weight;
-        if (sheetState.equipmentTable[rowIndex].quantity === 0) {
-            sheetState.equipmentTable[rowIndex].quantity = 1;
-        }
-        
-        showSuggestions[rowIndex] = false;
-        searchQuery[rowIndex] = '';
+    function selectEquipmentItem(item: any) {
+        newEquipmentName = item.name;
+        newEquipmentWeight = item.weight;
+        showEquipmentSuggestions = false;
+        equipmentSearchQuery = '';
     }
 
-    function handleNameInput(rowIndex: number, event: Event) {
+    function handleEquipmentNameInput(event: Event) {
         const target = event.target as HTMLInputElement;
         const value = target.value;
         
-        sheetState.equipmentTable[rowIndex].name = value;
-        searchQuery[rowIndex] = value;
-        showSuggestions[rowIndex] = value.length >= 2;
+        newEquipmentName = value;
+        equipmentSearchQuery = value;
+        showEquipmentSuggestions = value.length >= 2;
         
         // If exact match found, auto-fill weight
         const exactMatch = availableItems.find(item => 
             item.name.toLowerCase() === value.toLowerCase()
         );
         if (exactMatch) {
-            sheetState.equipmentTable[rowIndex].weight = exactMatch.weight;
-            if (sheetState.equipmentTable[rowIndex].quantity === 0) {
-                sheetState.equipmentTable[rowIndex].quantity = 1;
-            }
+            newEquipmentWeight = exactMatch.weight;
         }
     }
 
-    function updateQuantity(rowIndex: number, quantity: number) {
-        sheetState.equipmentTable[rowIndex].quantity = Math.max(0, quantity);
-    }
-
-    function updateWeight(rowIndex: number, weight: number) {
-        sheetState.equipmentTable[rowIndex].weight = Math.max(0, weight);
-    }
-
-    function hideSuggestions(rowIndex: number) {
+    function hideEquipmentSuggestions() {
         // Small delay to allow click events on suggestions to fire
         setTimeout(() => {
-            showSuggestions[rowIndex] = false;
+            showEquipmentSuggestions = false;
         }, 150);
     }
 
-    // Calculate total weight
-    const totalWeight = $derived(
-        sheetState.equipmentTable.reduce((total, item) => 
-            total + (item.quantity * item.weight), 0
-        )
+    function addEquipment() {
+        if (newEquipmentName.trim()) {
+            // Check if item exists in equipmentTable, if not add new row
+            const emptyIndex = sheetState.equipmentTable.findIndex(item => !item.name);
+            if (emptyIndex !== -1) {
+                sheetState.equipmentTable[emptyIndex] = {
+                    id: `eq-${emptyIndex}`,
+                    name: newEquipmentName.trim(),
+                    quantity: newEquipmentQuantity,
+                    weight: newEquipmentWeight
+                };
+            } else {
+                // Add new item if no empty slots
+                sheetState.equipmentTable.push({
+                    id: `eq-${sheetState.equipmentTable.length}`,
+                    name: newEquipmentName.trim(),
+                    quantity: newEquipmentQuantity,
+                    weight: newEquipmentWeight
+                });
+            }
+            
+            // Reset form
+            newEquipmentName = '';
+            newEquipmentQuantity = 1;
+            newEquipmentWeight = 0;
+            equipmentSearchQuery = '';
+            showEquipmentSuggestions = false;
+            showEquipmentModal = false;
+            showEquipmentModal = false;
+        }
+    }
+
+    function removeEquipment(index: number) {
+        sheetState.equipmentTable[index] = {
+            id: `eq-${index}`,
+            name: '',
+            quantity: 0,
+            weight: 0
+        };
+    }
+
+    // Filter out empty equipment items for display
+    const equipmentItems = $derived(
+        sheetState.equipmentTable.filter(item => item.name && item.name.trim() !== '')
     );
+
+    // Calculate total weight from equipment items
+    const totalWeight = $derived(() => {
+        const total = equipmentItems.reduce((sum, item) => 
+            sum + (item.quantity * item.weight), 0
+        );
+        console.log('Total weight calculated:', total, 'from items:', equipmentItems);
+        return total;
+    });
 
     // Generate random IDs for new items (for weapons and armor)
     function generateId() {
@@ -134,6 +176,7 @@
             newWeaponDamage = 1;
             newWeaponRange = 1;
             newWeaponWeight = 0;
+            showWeaponModal = false;
         }
     }
 
@@ -159,309 +202,437 @@
             newArmorDescription = '';
             newArmorProtection = 1;
             newArmorWeight = 0;
+            showArmorModal = false;
         }
     }
 
     // Generate variants for visual variety
+    const equipmentVariants = $derived(generateUniqueVariants(equipmentItems.length + 1));
     const weaponVariants = $derived(generateUniqueVariants(sheetState.weapons.length + 1));
     const armorVariants = $derived(generateUniqueVariants(sheetState.armor.length + 1));
 </script>
 
-<div class="equipment-tab space-y-6">
-    <!-- Equipment Table Section -->
-    <FormSection header="🎒 UTRUSTNING">
+<div class="equipment-tab">
+    <!-- Equipment Grid -->
+    <div class="equipment-grid">
+        <!-- Equipment Section -->
         <div class="equipment-section">
-            <!-- Equipment Table -->
-            <div class="torn-input-wrapper variant-1">
-                <div class="equipment-table-container">
-                    <table class="equipment-table">
-                    <thead>
-                        <tr>
-                            <th class="name-header">Föremål <i class="icon-bar-chart"></i></th>
-                            <th class="quantity-header">Antal</th>
-                            <th class="weight-header">Vikt (kg)</th>
-                            <th class="total-header">Tot. vikt</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each sheetState.equipmentTable as item, index}
-                            <tr class="equipment-row">
-                                <td class="name-cell">
-                                    <div class="name-input-container">
-                                        <input 
-                                            type="text" 
-                                            class="equipment-name-input" 
-                                            placeholder="Föremålsnamn..." 
-                                            value={item.name}
-                                            oninput={(e) => handleNameInput(index, e)}
-                                            onblur={() => hideSuggestions(index)}
-                                        />
-                                        {#if showSuggestions[index] && searchQuery[index]}
-                                            <div class="suggestions-dropdown">
-                                                {#each getFilteredItems(searchQuery[index]) as suggestion}
-                                                    <button 
-                                                        class="suggestion-item"
-                                                        onmousedown={(e) => {
-                                                            e.preventDefault();
-                                                            selectItem(index, suggestion);
-                                                        }}
-                                                    >
-                                                        <span class="suggestion-name">{suggestion.name}</span>
-                                                        <span class="suggestion-weight">{suggestion.weight} kg</span>
-                                                    </button>
-                                                {/each}
-                                            </div>
-                                        {/if}
+            <FormSection header="🎒 UTRUSTNING">
+                <div class="section-content">
+                    <button class="add-section-button" onclick={() => showEquipmentModal = true}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Lägg till utrustning
+                    </button>
+
+                    <!-- Equipment list -->
+                    <div class="section-items-list">
+                        {#each equipmentItems as item, index}
+                            <div class="torn-input-wrapper {equipmentVariants[index]} section-item-card">
+                                <div class="section-item-content">
+                                    <div class="section-item-header">
+                                        <h4 class="section-item-name">{item.name}</h4>
+                                        <button 
+                                            class="section-remove-button" 
+                                            onclick={() => removeEquipment(sheetState.equipmentTable.findIndex(eq => eq.id === item.id))}
+                                            aria-label="Ta bort {item.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
                                     </div>
-                                </td>
-                                <td class="quantity-cell">
-                                    <input 
-                                        type="number" 
-                                        class="equipment-number-input" 
-                                        min="0"
-                                        value={item.quantity}
-                                        oninput={(e) => updateQuantity(index, parseInt((e.target as HTMLInputElement).value) || 0)}
-                                    />
-                                </td>
-                                <td class="weight-cell">
-                                    <input 
-                                        type="number" 
-                                        class="equipment-number-input" 
-                                        min="0"
-                                        step="0.25"
-                                        value={item.weight}
-                                        oninput={(e) => updateWeight(index, parseFloat((e.target as HTMLInputElement).value) || 0)}
-                                    />
-                                </td>
-                                <td class="total-cell">
-                                    <span class="total-weight">
-                                        {(item.quantity * item.weight).toFixed(2)}
-                                    </span>
-                                </td>
-                            </tr>
+                                    <div class="section-item-stats">
+                                        <span class="section-stat">Antal: {item.quantity}</span>
+                                        <span class="section-stat">Vikt: {item.weight} kg</span>
+                                        <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
+                                    </div>
+                                </div>
+                            </div>
                         {/each}
-                    </tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td colspan="2" class="total-label">Total bärkapacitet: </td>
-                            <td class="grand-total">
-                                <span class="grand-total-weight">{totalWeight.toFixed(2)} kg</span>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                </div>
-            </div>
-        </div>
-    </FormSection>
+                    </div>
 
-    <!-- Weapons Section -->
-    <FormSection header="⚔️ VAPEN">
+                    <!-- Total weight display -->
+                    <div class="section-total-weight">
+                        <span class="section-total-label">Total: {totalWeight().toFixed(2)} kg</span>
+                    </div>
+                </div>
+            </FormSection>
+        </div>
+
+        <!-- Weapons Section -->
         <div class="weapons-section">
-            <!-- Add new weapon form -->
-            <div class="add-item-form">
-                <div class="form-row">
-                    <div class="torn-input-wrapper variant-1">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Vapennamn..." 
-                            bind:value={newWeaponName}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-2">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Beskrivning..." 
-                            bind:value={newWeaponDescription}
-                        />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="torn-input-wrapper variant-3">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Bonus" 
-                            bind:value={newWeaponBonus}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-4">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Skada" 
-                            min="1"
-                            bind:value={newWeaponDamage}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-5">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Räckvidd" 
-                            min="1"
-                            bind:value={newWeaponRange}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-6">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Vikt" 
-                            min="0"
-                            step="0.1"
-                            bind:value={newWeaponWeight}
-                        />
-                    </div>
-                    <button class="add-button" onclick={addWeapon}>
+            <FormSection header="⚔️ VAPEN">
+                <div class="section-content">
+                    <button class="add-section-button" onclick={() => showWeaponModal = true}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Lägg till
+                        Lägg till vapen
                     </button>
-                </div>
-            </div>
 
-            <!-- Weapons list -->
-            <div class="items-list">
-                {#each sheetState.weapons as weapon, index}
-                    <div class="torn-input-wrapper {weaponVariants[index]} item-card">
-                        <div class="item-content">
-                            <div class="item-header">
-                                <h4 class="item-name">{weapon.name}</h4>
-                                <div class="item-actions">
-                                    <label class="equipped-checkbox">
-                                        <input 
-                                            type="checkbox" 
-                                            bind:checked={weapon.equipped}
-                                        />
-                                        <span class="checkbox-label">Utrustad</span>
-                                    </label>
-                                    <button 
-                                        class="remove-button" 
-                                        onclick={() => characterActions.removeWeapon(weapon.id)}
-                                        aria-label="Ta bort {weapon.name}"
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
+                    <!-- Weapons list -->
+                    <div class="section-items-list">
+                        {#each sheetState.weapons as weapon, index}
+                            <div class="torn-input-wrapper {weaponVariants[index]} section-item-card">
+                                <div class="section-item-content">
+                                    <div class="section-item-header">
+                                        <h4 class="section-item-name">{weapon.name}</h4>
+                                        <div class="section-item-actions">
+                                            <label class="section-equipped-checkbox">
+                                                <input 
+                                                    type="checkbox" 
+                                                    bind:checked={weapon.equipped}
+                                                />
+                                                <span class="section-checkbox-label">Utrustad</span>
+                                            </label>
+                                            <button 
+                                                class="section-remove-button" 
+                                                onclick={() => characterActions.removeWeapon(weapon.id)}
+                                                aria-label="Ta bort {weapon.name}"
+                                            >
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {#if weapon.description}
+                                        <p class="section-item-description">{weapon.description}</p>
+                                    {/if}
+                                    <div class="section-item-stats">
+                                        <span class="section-stat">Bonus: +{weapon.bonus}</span>
+                                        <span class="section-stat">Skada: {weapon.damage}</span>
+                                        <span class="section-stat">Räckvidd: {weapon.range}</span>
+                                        <span class="section-stat">Vikt: {weapon.weight} kg</span>
+                                    </div>
                                 </div>
                             </div>
-                            {#if weapon.description}
-                                <p class="item-description">{weapon.description}</p>
-                            {/if}
-                            <div class="item-stats">
-                                <span class="stat">Bonus: +{weapon.bonus}</span>
-                                <span class="stat">Skada: {weapon.damage}</span>
-                                <span class="stat">Räckvidd: {weapon.range}</span>
-                                <span class="stat">Vikt: {weapon.weight} kg</span>
-                            </div>
-                        </div>
+                        {/each}
                     </div>
-                {/each}
-            </div>
+                </div>
+            </FormSection>
         </div>
-    </FormSection>
 
-    <!-- Armor Section -->
-    <FormSection header="🛡️ RUSTNING">
+        <!-- Armor Section -->
         <div class="armor-section">
-            <!-- Add new armor form -->
-            <div class="add-item-form">
-                <div class="form-row">
-                    <div class="torn-input-wrapper variant-1">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Rustningsnamn..." 
-                            bind:value={newArmorName}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-2">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Beskrivning..." 
-                            bind:value={newArmorDescription}
-                        />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="torn-input-wrapper variant-3">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Skydd" 
-                            min="1"
-                            bind:value={newArmorProtection}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-4">
-                        <input 
-                            type="number" 
-                            class="torn-input font-user" 
-                            placeholder="Vikt" 
-                            min="0"
-                            step="0.1"
-                            bind:value={newArmorWeight}
-                        />
-                    </div>
-                    <button class="add-button" onclick={addArmor}>
+            <FormSection header="🛡️ RUSTNING">
+                <div class="section-content">
+                    <button class="add-section-button" onclick={() => showArmorModal = true}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
+                        Lägg till rustning
+                    </button>
+
+                    <!-- Armor list -->
+                    <div class="section-items-list">
+                        {#each sheetState.armor as armor, index}
+                            <div class="torn-input-wrapper {armorVariants[index]} section-item-card">
+                                <div class="section-item-content">
+                                    <div class="section-item-header">
+                                        <h4 class="section-item-name">{armor.name}</h4>
+                                        <div class="section-item-actions">
+                                            <label class="section-equipped-checkbox">
+                                                <input 
+                                                    type="checkbox" 
+                                                    bind:checked={armor.equipped}
+                                                />
+                                                <span class="section-checkbox-label">Utrustad</span>
+                                            </label>
+                                            <button 
+                                                class="section-remove-button" 
+                                                onclick={() => characterActions.removeArmor(armor.id)}
+                                                aria-label="Ta bort {armor.name}"
+                                            >
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {#if armor.description}
+                                        <p class="section-item-description">{armor.description}</p>
+                                    {/if}
+                                    <div class="section-item-stats">
+                                        <span class="section-stat">Skydd: {armor.protection}</span>
+                                        <span class="section-stat">Vikt: {armor.weight} kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </FormSection>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Modal -->
+{#if showEquipmentModal}
+    <div class="modal-overlay" 
+         role="dialog" 
+         aria-modal="true"
+         tabindex="-1"
+         onclick={() => showEquipmentModal = false}
+         onkeydown={(e) => e.key === 'Escape' && (showEquipmentModal = false)}>
+        <div class="modal-content" 
+             role="document"
+             onclick={(e) => e.stopPropagation()}
+             onkeydown={(e) => e.stopPropagation()}>
+            <div class="modal-header">
+                <h3>Lägg till utrustning</h3>
+                <button class="modal-close" 
+                        aria-label="Stäng modal"
+                        onclick={() => showEquipmentModal = false}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addEquipment(); }}>
+                <div class="form-group">
+                    <label for="equipment-name">Namn:</label>
+                    <div class="name-input-container">
+                        <input 
+                            id="equipment-name"
+                            type="text" 
+                            bind:value={newEquipmentName}
+                            oninput={(e) => handleEquipmentNameInput(e)}
+                            onfocus={() => showEquipmentSuggestions = true}
+                            onblur={hideEquipmentSuggestions}
+                            placeholder="Namn på utrustning"
+                        />
+                        {#if showEquipmentSuggestions && equipmentSearchQuery}
+                            <div class="suggestions-dropdown">
+                                {#each getFilteredItems(equipmentSearchQuery) as suggestion}
+                                    <button 
+                                        type="button"
+                                        class="suggestion-item"
+                                        onmousedown={(e) => {
+                                            e.preventDefault();
+                                            selectEquipmentItem(suggestion);
+                                        }}
+                                    >
+                                        <span class="suggestion-name">{suggestion.name}</span>
+                                        <span class="suggestion-weight">{suggestion.weight} kg</span>
+                                    </button>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="equipment-quantity">Antal:</label>
+                    <input 
+                        id="equipment-quantity"
+                        type="number" 
+                        bind:value={newEquipmentQuantity}
+                        min="1"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="equipment-weight">Vikt (kg):</label>
+                    <input 
+                        id="equipment-weight"
+                        type="number" 
+                        bind:value={newEquipmentWeight}
+                        min="0"
+                        step="0.1"
+                    />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick={() => showEquipmentModal = false}>
+                        Avbryt
+                    </button>
+                    <button type="submit" class="btn-primary">
                         Lägg till
                     </button>
                 </div>
-            </div>
-
-            <!-- Armor list -->
-            <div class="items-list">
-                {#each sheetState.armor as armor, index}
-                    <div class="torn-input-wrapper {armorVariants[index]} item-card">
-                        <div class="item-content">
-                            <div class="item-header">
-                                <h4 class="item-name">{armor.name}</h4>
-                                <div class="item-actions">
-                                    <label class="equipped-checkbox">
-                                        <input 
-                                            type="checkbox" 
-                                            bind:checked={armor.equipped}
-                                        />
-                                        <span class="checkbox-label">Utrustad</span>
-                                    </label>
-                                    <button 
-                                        class="remove-button" 
-                                        onclick={() => characterActions.removeArmor(armor.id)}
-                                        aria-label="Ta bort {armor.name}"
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            {#if armor.description}
-                                <p class="item-description">{armor.description}</p>
-                            {/if}
-                            <div class="item-stats">
-                                <span class="stat">Skydd: {armor.protection}</span>
-                                <span class="stat">Vikt: {armor.weight} kg</span>
-                            </div>
-                        </div>
-                    </div>
-                {/each}
-            </div>
+            </form>
         </div>
-    </FormSection>
-</div>
+    </div>
+{/if}
+
+<!-- Weapon Modal -->
+{#if showWeaponModal}
+    <div class="modal-overlay"
+         role="dialog" 
+         aria-modal="true"
+         tabindex="-1"
+         onclick={() => showWeaponModal = false}
+         onkeydown={(e) => e.key === 'Escape' && (showWeaponModal = false)}>
+        <div class="modal-content"
+             role="document"
+             onclick={(e) => e.stopPropagation()}
+             onkeydown={(e) => e.stopPropagation()}>
+            <div class="modal-header">
+                <h3>Lägg till vapen</h3>
+                <button class="modal-close"
+                        aria-label="Stäng modal" 
+                        onclick={() => showWeaponModal = false}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addWeapon(); }}>
+                <div class="form-group">
+                    <label for="weapon-name">Namn:</label>
+                    <input 
+                        id="weapon-name"
+                        type="text" 
+                        bind:value={newWeaponName}
+                        placeholder="Namn på vapen"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="weapon-description">Beskrivning:</label>
+                    <textarea 
+                        id="weapon-description"
+                        bind:value={newWeaponDescription}
+                        placeholder="Beskrivning (valfritt)"
+                        rows="2"
+                    ></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weapon-bonus">Bonus:</label>
+                        <input 
+                            id="weapon-bonus"
+                            type="number" 
+                            bind:value={newWeaponBonus}
+                            min="0"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="weapon-damage">Skada:</label>
+                        <input 
+                            id="weapon-damage"
+                            type="number" 
+                            bind:value={newWeaponDamage}
+                            min="1"
+                        />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weapon-range">Räckvidd:</label>
+                        <input 
+                            id="weapon-range"
+                            type="number" 
+                            bind:value={newWeaponRange}
+                            min="1"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="weapon-weight">Vikt (kg):</label>
+                        <input 
+                            id="weapon-weight"
+                            type="number" 
+                            bind:value={newWeaponWeight}
+                            min="0"
+                            step="0.1"
+                        />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick={() => showWeaponModal = false}>
+                        Avbryt
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Lägg till
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{/if}
+
+<!-- Armor Modal -->
+{#if showArmorModal}
+    <div class="modal-overlay"
+         role="dialog" 
+         aria-modal="true"
+         tabindex="-1"
+         onclick={() => showArmorModal = false}
+         onkeydown={(e) => e.key === 'Escape' && (showArmorModal = false)}>
+        <div class="modal-content"
+             role="document"
+             onclick={(e) => e.stopPropagation()}
+             onkeydown={(e) => e.stopPropagation()}>
+            <div class="modal-header">
+                <h3>Lägg till rustning</h3>
+                <button class="modal-close"
+                        aria-label="Stäng modal" 
+                        onclick={() => showArmorModal = false}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addArmor(); }}>
+                <div class="form-group">
+                    <label for="armor-name">Namn:</label>
+                    <input 
+                        id="armor-name"
+                        type="text" 
+                        bind:value={newArmorName}
+                        placeholder="Namn på rustning"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="armor-description">Beskrivning:</label>
+                    <textarea 
+                        id="armor-description"
+                        bind:value={newArmorDescription}
+                        placeholder="Beskrivning (valfritt)"
+                        rows="2"
+                    ></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="armor-protection">Skydd:</label>
+                        <input 
+                            id="armor-protection"
+                            type="number" 
+                            bind:value={newArmorProtection}
+                            min="1"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="armor-weight">Vikt (kg):</label>
+                        <input 
+                            id="armor-weight"
+                            type="number" 
+                            bind:value={newArmorWeight}
+                            min="0"
+                            step="0.1"
+                        />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick={() => showArmorModal = false}>
+                        Avbryt
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Lägg till
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{/if}
 
 <style>
     .equipment-tab {
@@ -470,143 +641,23 @@
         gap: 2rem;
     }
 
-    /* Equipment Table Styles */
-    .equipment-table-container {
-        overflow-x: auto;
-
-        position: relative;
-        z-index: 2;
+    /* Equipment Grid Layout */
+    .equipment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+        align-items: start;
     }
 
-    .equipment-table {
-        width: 100%;
-        border: none;
-        font-family: var(--form-labels), serif;
-        background: transparent;
-        position: relative;
-        z-index: 1;
-
-
+    @media (max-width: 768px) {
+        .equipment-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
-    
-
-    .equipment-table th {
-        /* background: rgba(217, 119, 6, 0.2); */
-        color: var(--color-surface-900);
-        padding: 0.75rem;
-        text-align: left;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-
-
-        position: relative;
-        z-index: 10;
-    }
-
-    .equipment-table td {
-        outline: none;
-
-
-    }
-
-    :global(.dark) .equipment-table th {
-        /* background: rgba(217, 119, 6, 0.3); */
-        color: var(--color-surface-100);
-
-
-    }
-
-    .name-header {
-        width: 40%;
-        min-width: 200px;
-    }
-
-    .quantity-header {
-        width: 15%;
-        min-width: 80px;
-        text-align: center;
-    }
-
-    .weight-header {
-        width: 20%;
-        min-width: 100px;
-        text-align: center;
-    }
-
-    .total-header {
-        width: 25%;
-        min-width: 100px;
-        text-align: center;
-    }
-
-    .equipment-row {
-
-        transition: all 0.2s ease;
-    }
-
-    .equipment-row:hover {
-        background: rgba(217, 119, 6, 0.08);
-    }
-
-    .equipment-table td {
-        padding: 0.5rem 0.75rem;
-        vertical-align: middle;
-    }
-
+    /* Equipment autocomplete styles */
     .name-input-container {
         position: relative;
-    }
-
-    /* Custom styling for equipment table inputs */
-    .equipment-name-input, .equipment-number-input {
-        width: 100%;
-        min-height: 2.5rem;
-        font-size: 1rem;
-        padding: 0.5rem 1rem;
-
-
-        background: var(--color-surface-50);
-        color: var(--color-surface-900);
-        font-family: var(--form-labels), serif;
-        transition: all 0.2s ease;
-    }
-
-    .equipment-name-input:focus, .equipment-number-input:focus {
-        outline: none;
-
-        /* box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2); */
-    }
-
-    :global(.dark) .equipment-name-input, 
-    :global(.dark) .equipment-number-input {
-        background: var(--color-surface-800);
-        color: var(--color-surface-100);
-
-    }
-
-    .equipment-number-input {
-        text-align: center;
-    }
-
-    .quantity-cell, .weight-cell, .total-cell {
-        text-align: center;
-    }
-
-    .total-weight {
-        font-weight: 600;
-        color: var(--color-primary-600);
-        /* background: rgba(217, 119, 6, 0.1); */
-        padding: 0.25rem 0.5rem;
-
-        display: inline-block;
-        min-width: 60px;
-    }
-
-    :global(.dark) .total-weight {
-        color: var(--color-primary-400);
-        /* background: rgba(217, 119, 6, 0.2); */
     }
 
     /* Suggestions dropdown */
@@ -616,9 +667,8 @@
         left: 0;
         right: 0;
         background: var(--color-surface-50);
-
-
-
+        border: 1px solid var(--color-surface-200);
+        border-radius: 0.25rem;
         max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
@@ -627,13 +677,13 @@
 
     :global(.dark) .suggestions-dropdown {
         background: var(--color-surface-800);
-
+        border-color: var(--color-surface-600);
     }
 
     .suggestion-item {
         width: 100%;
         padding: 0.5rem 0.75rem;
-
+        border: none;
         background: transparent;
         text-align: left;
         cursor: pointer;
@@ -666,28 +716,25 @@
         color: var(--color-surface-400);
     }
 
-    /* Total row */
-    .total-row {
-
-        font-weight: bold;
+    /* Total weight display */
+    .total-weight-display {
+        margin-top: 1rem;
         position: relative;
+        z-index: 1;
     }
 
-    .total-row::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        opacity: 0.8;
+    .total-weight-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.5rem;
+        position: relative;
+        z-index: 1;
     }
-
-
-
 
     .total-label {
-        text-align: right;
         font-weight: bold;
         color: var(--color-surface-900);
         text-transform: uppercase;
@@ -699,20 +746,13 @@
         color: var(--color-surface-100);
     }
 
-    .grand-total {
-        text-align: center;
-    }
-
     .grand-total-weight {
         font-size: 1.1rem;
         font-weight: bold;
         color: #8B4513;
         background: rgba(255, 248, 240, 0.9);
         padding: 0.5rem 1rem;
-
-        display: inline-block;
-        min-width: 80px;
-
+        border-radius: 0.25rem;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         transform: rotate(-0.5deg);
         transition: all 0.2s ease;
@@ -726,207 +766,366 @@
     :global(.dark) .grand-total-weight {
         background: rgba(40, 35, 30, 0.9);
         color: #D2691E;
-
     }
 
-    /* Weapon and Armor sections (keeping existing styles) */
-    .add-item-form {
+    /* Section Content Styles */
+    .section-content {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        margin-bottom: 2rem;
-        padding: 1rem;
-        background: rgba(217, 119, 6, 0.05);
-
-
     }
 
-    .form-row {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .form-row .torn-input-wrapper {
-        flex: 1;
-        min-width: 150px;
-    }
-
-    .add-button {
+    .add-section-button {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
         background: var(--color-primary-600);
         color: white;
-
-
+        border: none;
+        border-radius: 0.5rem;
         cursor: pointer;
         transition: all 0.2s ease;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        white-space: nowrap;
     }
 
-    .add-button:hover {
+    .add-section-button:hover {
         background: var(--color-primary-700);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
-    .items-list {
-        display: grid;
+    .section-items-list {
+        display: flex;
+        flex-direction: column;
         gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 
-    .item-card {
+    .section-item-card {
+        padding: 1rem;
+        margin: 0;
+        position: relative;
+        z-index: 1;
         transition: all 0.2s ease;
     }
 
-    .item-card:hover {
+    .section-item-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    }
-
-    .item-content {
-        padding: 1rem;
-        position: relative;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         z-index: 2;
     }
 
-    .item-header {
+    .section-item-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .section-item-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 0.5rem;
+        gap: 1rem;
     }
 
-    .item-name {
-        font-family: var(--form-labels), serif;
+    .section-item-name {
+        margin: 0;
         font-size: 1.1rem;
         font-weight: bold;
         color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0;
         flex: 1;
     }
 
-    :global(.dark) .item-name {
+    :global(.dark) .section-item-name {
         color: var(--color-surface-100);
     }
 
-    .item-actions {
+    .section-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .section-equipped-checkbox {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    .equipped-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        cursor: pointer;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         color: var(--color-surface-700);
+        cursor: pointer;
     }
 
-    :global(.dark) .equipped-checkbox {
+    :global(.dark) .section-equipped-checkbox {
         color: var(--color-surface-300);
     }
 
-    .equipped-checkbox input[type="checkbox"] {
-        margin: 0;
+    .section-checkbox-label {
+        white-space: nowrap;
     }
 
-    .remove-button {
-        padding: 0.25rem;
-
-
-        background: transparent;
-        color: var(--color-error-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
+    .section-remove-button {
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: var(--color-danger-500);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 0;
     }
 
-    .remove-button:hover {
-        background: var(--color-error-600);
-        color: white;
+    .section-remove-button:hover {
+        background: var(--color-danger-600);
         transform: scale(1.1);
     }
 
-    .item-description {
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        margin: 0.5rem 0;
+    .section-item-description {
+        margin: 0;
+        font-style: italic;
+        color: var(--color-surface-600);
         line-height: 1.4;
     }
 
-    :global(.dark) .item-description {
+    :global(.dark) .section-item-description {
+        color: var(--color-surface-400);
+    }
+
+    .section-item-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-stat {
+        font-size: 0.9rem;
+        color: var(--color-surface-700);
+        font-weight: 600;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+
+    :global(.dark) .section-stat {
+        color: var(--color-surface-300);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .section-total-weight {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(217, 119, 6, 0.1);
+        border-radius: 0.5rem;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+    }
+
+    .section-total-label {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    :global(.dark) .section-total-label {
+        color: var(--color-surface-100);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .modal-content {
+        background: var(--color-surface-50);
+        border-radius: 0.5rem;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    :global(.dark) .modal-content {
+        background: var(--color-surface-800);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--color-surface-200);
+    }
+
+    :global(.dark) .modal-header {
+        border-color: var(--color-surface-600);
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: var(--color-surface-900);
+    }
+
+    :global(.dark) .modal-header h3 {
+        color: var(--color-surface-100);
+    }
+
+    .modal-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: transparent;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--color-surface-500);
+    }
+
+    .modal-close:hover {
+        background: var(--color-surface-200);
+        color: var(--color-surface-700);
+    }
+
+    :global(.dark) .modal-close:hover {
+        background: var(--color-surface-600);
         color: var(--color-surface-300);
     }
 
-    .item-stats {
+    .modal-form {
+        padding: 1.5rem;
+    }
+
+    .form-group {
         display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--color-surface-700);
+        font-size: 0.9rem;
+    }
+
+    :global(.dark) .form-group label {
+        color: var(--color-surface-300);
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 0.75rem;
+        border: 1px solid var(--color-surface-300);
+        border-radius: 0.25rem;
+        background: var(--color-surface-100);
+        color: var(--color-surface-900);
+        font-size: 1rem;
+    }
+
+    :global(.dark) .form-group input,
+    :global(.dark) .form-group textarea {
+        background: var(--color-surface-700);
+        border-color: var(--color-surface-600);
+        color: var(--color-surface-100);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--color-primary-500);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 1rem;
-        flex-wrap: wrap;
-        margin-top: 0.5rem;
     }
 
-    .stat {
-        font-size: 0.8rem;
-        color: var(--color-surface-600);
-        background: rgba(0, 0, 0, 0.1);
-        padding: 0.25rem 0.5rem;
-
-        font-weight: 500;
-    }
-
-    :global(.dark) .stat {
-        color: var(--color-surface-400);
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .equipment-table-container {
-            overflow-x: auto;
-        }
-
-        .equipment-table {
-            min-width: 500px;
-        }
-
+    @media (max-width: 480px) {
         .form-row {
-            flex-direction: column;
-        }
-
-        .form-row .torn-input-wrapper {
-            min-width: unset;
-        }
-
-        .items-list {
             grid-template-columns: 1fr;
         }
+    }
 
-        .item-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-surface-200);
+    }
 
-        .item-stats {
-            gap: 0.5rem;
-        }
+    :global(.dark) .modal-actions {
+        border-color: var(--color-surface-600);
+    }
 
-        .stat {
-            font-size: 0.75rem;
-        }
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        background: var(--color-primary-600);
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--color-primary-700);
+    }
+
+    .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        color: var(--color-surface-600);
+        border: 1px solid var(--color-surface-300);
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+        background: var(--color-surface-100);
+        color: var(--color-surface-700);
+    }
+
+    :global(.dark) .btn-secondary {
+        color: var(--color-surface-400);
+        border-color: var(--color-surface-600);
+    }
+
+    :global(.dark) .btn-secondary:hover {
+        background: var(--color-surface-700);
+        color: var(--color-surface-200);
     }
 </style>

@@ -3,6 +3,7 @@
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import itemsData from '../../data/items.json';
+    import { fade, scale } from 'svelte/transition';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -40,6 +41,57 @@
     let showEquipmentModal = $state(false);
     let showWeaponModal = $state(false);
     let showArmorModal = $state(false);
+
+    // Drag and drop states
+    let isDragging = $state(false);
+    let dragOverSection = $state(''); // 'equipment', 'weapons', 'armor', or ''
+
+    // Drag and drop handlers
+    function handleDragStart(event: DragEvent) {
+        isDragging = true;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', 'add-item');
+        }
+    }
+
+    function handleDragEnd() {
+        isDragging = false;
+        dragOverSection = '';
+    }
+
+    function handleDragOver(event: DragEvent, section: string) {
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = 'copy';
+        }
+        dragOverSection = section;
+    }
+
+    function handleDragLeave() {
+        dragOverSection = '';
+    }
+
+    function handleDrop(event: DragEvent, section: string) {
+        event.preventDefault();
+        isDragging = false;
+        dragOverSection = '';
+        
+        const data = event.dataTransfer?.getData('text/plain');
+        if (data === 'add-item') {
+            switch (section) {
+                case 'equipment':
+                    showEquipmentModal = true;
+                    break;
+                case 'weapons':
+                    showWeaponModal = true;
+                    break;
+                case 'armor':
+                    showArmorModal = true;
+                    break;
+            }
+        }
+    }
 
     // Equipment management
     let newEquipmentName = $state('');
@@ -210,22 +262,53 @@
     const equipmentVariants = $derived(generateUniqueVariants(equipmentItems.length + 1));
     const weaponVariants = $derived(generateUniqueVariants(sheetState.weapons.length + 1));
     const armorVariants = $derived(generateUniqueVariants(sheetState.armor.length + 1));
+    
+    // Special variant for the draggable add item
+    const addItemVariant = 'variant-6'; // Using a vibrant variant for the add item
 </script>
 
 <div class="equipment-tab">
+    <!-- Draggable Add Item -->
+    <div class="draggable-add-container">
+        <div 
+            class="draggable-add-item torn-input-wrapper {addItemVariant}"
+            role="button"
+            tabindex="0"
+            aria-label="Dra för att lägga till föremål"
+            draggable="true"
+            ondragstart={handleDragStart}
+            ondragend={handleDragEnd}
+            class:dragging={isDragging}
+        >
+            <div class="add-item-content">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span class="add-item-text">Dra för att lägga till</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Equipment Grid -->
     <div class="equipment-grid">
         <!-- Equipment Section -->
         <div class="equipment-section">
             <FormSection header="🎒 UTRUSTNING">
-                <div class="section-content">
-                    <button class="add-section-button" onclick={() => showEquipmentModal = true}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Lägg till utrustning
-                    </button>
+                <div 
+                    class="section-content drop-zone"
+                    role="region"
+                    aria-label="Utrustning dropzone"
+                    class:drag-over={dragOverSection === 'equipment'}
+                    ondragover={(e) => handleDragOver(e, 'equipment')}
+                    ondragleave={handleDragLeave}
+                    ondrop={(e) => handleDrop(e, 'equipment')}
+                >
+                    <div class="drop-zone-hint">
+                        {#if dragOverSection === 'equipment'}
+                            <div class="drop-hint-text">Släpp för att lägga till utrustning</div>
+                        {/if}
+                    </div>
 
                     <!-- Equipment list -->
                     <div class="section-items-list">
@@ -266,14 +349,20 @@
         <!-- Weapons Section -->
         <div class="weapons-section">
             <FormSection header="⚔️ VAPEN">
-                <div class="section-content">
-                    <button class="add-section-button" onclick={() => showWeaponModal = true}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Lägg till vapen
-                    </button>
+                <div 
+                    class="section-content drop-zone"
+                    role="region"
+                    aria-label="Vapen dropzone"
+                    class:drag-over={dragOverSection === 'weapons'}
+                    ondragover={(e) => handleDragOver(e, 'weapons')}
+                    ondragleave={handleDragLeave}
+                    ondrop={(e) => handleDrop(e, 'weapons')}
+                >
+                    <div class="drop-zone-hint">
+                        {#if dragOverSection === 'weapons'}
+                            <div class="drop-hint-text">Släpp för att lägga till vapen</div>
+                        {/if}
+                    </div>
 
                     <!-- Weapons list -->
                     <div class="section-items-list">
@@ -322,14 +411,20 @@
         <!-- Armor Section -->
         <div class="armor-section">
             <FormSection header="🛡️ RUSTNING">
-                <div class="section-content">
-                    <button class="add-section-button" onclick={() => showArmorModal = true}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Lägg till rustning
-                    </button>
+                <div 
+                    class="section-content drop-zone"
+                    role="region"
+                    aria-label="Rustning dropzone"
+                    class:drag-over={dragOverSection === 'armor'}
+                    ondragover={(e) => handleDragOver(e, 'armor')}
+                    ondragleave={handleDragLeave}
+                    ondrop={(e) => handleDrop(e, 'armor')}
+                >
+                    <div class="drop-zone-hint">
+                        {#if dragOverSection === 'armor'}
+                            <div class="drop-hint-text">Släpp för att lägga till rustning</div>
+                        {/if}
+                    </div>
 
                     <!-- Armor list -->
                     <div class="section-items-list">
@@ -378,15 +473,17 @@
 <!-- Equipment Modal -->
 {#if showEquipmentModal}
     <div class="modal-overlay" 
+        transition:scale={{ duration: 400, start: 1.2 }}
          role="dialog" 
          aria-modal="true"
          tabindex="-1"
          onclick={() => showEquipmentModal = false}
          onkeydown={(e) => e.key === 'Escape' && (showEquipmentModal = false)}>
         <div class="modal-content" 
-             role="document"
-             onclick={(e) => e.stopPropagation()}
-             onkeydown={(e) => e.stopPropagation()}>
+            
+            
+
+            role="document">
             <div class="modal-header">
                 <h3>Lägg till utrustning</h3>
                 <button class="modal-close" 
@@ -468,12 +565,14 @@
          role="dialog" 
          aria-modal="true"
          tabindex="-1"
+        transition:scale={{ duration: 400, start: 1.2 }}
+
          onclick={() => showWeaponModal = false}
          onkeydown={(e) => e.key === 'Escape' && (showWeaponModal = false)}>
         <div class="modal-content"
-             role="document"
-             onclick={(e) => e.stopPropagation()}
-             onkeydown={(e) => e.stopPropagation()}>
+            transition:scale={{ duration: 400, start: 1.2 }}
+
+             role="document">
             <div class="modal-header">
                 <h3>Lägg till vapen</h3>
                 <button class="modal-close"
@@ -567,9 +666,9 @@
          onclick={() => showArmorModal = false}
          onkeydown={(e) => e.key === 'Escape' && (showArmorModal = false)}>
         <div class="modal-content"
-             role="document"
-             onclick={(e) => e.stopPropagation()}
-             onkeydown={(e) => e.stopPropagation()}>
+        transition:scale={{ duration: 400, start: 1.2 }}
+
+             role="document">
             <div class="modal-header">
                 <h3>Lägg till rustning</h3>
                 <button class="modal-close"
@@ -652,6 +751,151 @@
     @media (max-width: 768px) {
         .equipment-grid {
             grid-template-columns: 1fr;
+        }
+    }
+
+    /* Draggable Add Item */
+    .draggable-add-container {
+        position: fixed;
+        top: 120px;
+        right: -60px; /* Position mostly off-screen */
+        z-index: 100;
+        transition: right 0.3s ease;
+    }
+
+    .draggable-add-container:hover {
+        right: 20px; /* Slide fully into view on hover */
+    }
+
+    .draggable-add-item {
+        padding: 1rem;
+        cursor: grab;
+        user-select: none;
+        transition: all 0.3s ease;
+        transform: rotate(3deg);
+        animation: float 3s ease-in-out infinite;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .draggable-add-item:hover {
+        transform: rotate(0deg) scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .draggable-add-item.dragging {
+        cursor: grabbing;
+        transform: rotate(-5deg) scale(0.9);
+        opacity: 0.8;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .add-item-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary-600);
+        position: relative;
+        z-index: 1;
+    }
+
+    .add-item-content svg {
+        color: var(--color-primary-700);
+        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+        position: relative;
+        z-index: 2;
+        stroke: currentColor;
+    }
+
+    :global(.dark) .add-item-content svg {
+        color: var(--color-primary-400);
+    }
+
+    .add-item-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        color: var(--color-primary-700);
+        position: relative;
+        z-index: 2;
+    }
+
+    :global(.dark) .add-item-text {
+        color: var(--color-primary-300);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: rotate(3deg) translateY(0px); }
+        50% { transform: rotate(3deg) translateY(-8px); }
+    }
+
+    /* Drop Zones */
+    .drop-zone {
+        position: relative;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+    }
+
+    .drop-zone.drag-over {
+        background: rgba(217, 119, 6, 0.1);
+        border: 2px dashed var(--color-primary-500);
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(217, 119, 6, 0.2);
+    }
+
+    .drop-zone-hint {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    .drop-hint-text {
+        background: var(--color-primary-600);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        animation: pulse 1s ease-in-out infinite alternate;
+        z-index: 10000;
+        position: relative;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.05); }
+    }
+
+    /* Responsive adjustments for draggable item */
+    @media (max-width: 768px) {
+        .draggable-add-container {
+            position: static;
+            right: auto;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .draggable-add-container:hover {
+            right: auto;
+        }
+        
+        .draggable-add-item {
+            animation: none;
+            transform: rotate(0deg);
         }
     }
 
@@ -773,29 +1017,10 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-    }
-
-    .add-section-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background: var(--color-primary-600);
-        color: white;
-        border: none;
+        position: relative;
+        min-height: 200px;
+        padding: 1rem;
         border-radius: 0.5rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .add-section-button:hover {
-        background: var(--color-primary-700);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
     .section-items-list {

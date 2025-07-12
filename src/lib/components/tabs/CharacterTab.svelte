@@ -18,6 +18,31 @@
     // Generate random variants for each input to make them unique
     const [nameVariant, jobVariant, faceVariant, bodyVariant, clothesVariant] = generateUniqueVariants(5);
 
+    // Throttle function to reduce state update frequency
+    function throttle(func: Function, delay: number) {
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        let lastExecTime = 0;
+        return (...args: any[]) => {
+            const currentTime = Date.now();
+            
+            if (currentTime - lastExecTime > delay) {
+                func(...args);
+                lastExecTime = currentTime;
+            } else {
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func(...args);
+                    lastExecTime = Date.now();
+                }, delay);
+            }
+        };
+    }
+
+    // Throttled save function for better performance
+    const throttledSaveLayout = throttle((tabName: string, paperId: string, layout: any) => {
+        characterActions.savePaperLayout(tabName as 'characterTab' | 'skillsTab', paperId, layout);
+    }, 100); // Save at most every 100ms
+
     onMount(() => {
         // Initialize InteractJS for draggable and resizable character papers
         console.log('Initializing InteractJS for character tab...');
@@ -46,7 +71,7 @@
         
         interact('.character-paper')
             .draggable({
-                allowFrom: '.paper-header', // Only allow dragging from the header
+                allowFrom: '.character-header', // Only allow dragging from the header
                 listeners: {
                     start: (event) => {
                         console.log('Drag started on:', event.target);
@@ -61,9 +86,21 @@
                         target.setAttribute('data-x', x.toString());
                         target.setAttribute('data-y', y.toString());
                         
-                        // Save position to state
+                        // Use throttled save for better performance
                         const paperId = target.getAttribute('data-paper-id');
                         if (paperId) {
+                            throttledSaveLayout('characterTab', paperId, { x, y });
+                        }
+                    },
+                    end: (event) => {
+                        event.target.style.zIndex = '';
+                        
+                        // Final save when drag ends
+                        const target = event.target;
+                        const paperId = target.getAttribute('data-paper-id');
+                        if (paperId) {
+                            const x = parseFloat(target.getAttribute('data-x')) || 0;
+                            const y = parseFloat(target.getAttribute('data-y')) || 0;
                             const currentLayout = characterActions.getPaperLayout('characterTab', paperId) || {};
                             characterActions.savePaperLayout('characterTab', paperId, {
                                 ...currentLayout,
@@ -71,9 +108,6 @@
                                 y
                             });
                         }
-                    },
-                    end: (event) => {
-                        event.target.style.zIndex = '';
                     }
                 }
             })
@@ -101,10 +135,10 @@
                         target.setAttribute('data-x', x.toString());
                         target.setAttribute('data-y', y.toString());
                         
-                        // Save layout to state
+                        // Use throttled save for better performance
                         const paperId = target.getAttribute('data-paper-id');
                         if (paperId) {
-                            characterActions.savePaperLayout('characterTab', paperId, {
+                            throttledSaveLayout('characterTab', paperId, {
                                 x,
                                 y,
                                 width: event.rect.width,
@@ -114,6 +148,22 @@
                     },
                     end: (event) => {
                         event.target.style.zIndex = '';
+                        
+                        // Final save when resize ends
+                        const target = event.target;
+                        const paperId = target.getAttribute('data-paper-id');
+                        if (paperId) {
+                            const x = parseFloat(target.getAttribute('data-x')) || 0;
+                            const y = parseFloat(target.getAttribute('data-y')) || 0;
+                            const width = parseFloat(target.style.width) || 0;
+                            const height = parseFloat(target.style.height) || 0;
+                            characterActions.savePaperLayout('characterTab', paperId, {
+                                x,
+                                y,
+                                width,
+                                height
+                            });
+                        }
                     }
                 },
                 modifiers: [

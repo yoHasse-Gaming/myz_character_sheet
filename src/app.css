@@ -753,6 +753,9 @@ label {
     position: relative;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     will-change: transform;
+    /* Add hardware acceleration for better performance */
+    transform: translateZ(0);
+    backface-visibility: hidden;
     /* Add a subtle border that becomes visible on hover to indicate resize areas */
     border: 3px solid transparent;
     border-radius: 4px;
@@ -783,6 +786,9 @@ label {
     border-radius: 4px 4px 0 0;
     transition: background-color 0.2s ease;
     flex-shrink: 0; /* Don't shrink the header */
+    /* Improve drag performance */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 

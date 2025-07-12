@@ -7,6 +7,31 @@
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
 
+    // Throttle function to reduce state update frequency
+    function throttle(func: Function, delay: number) {
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        let lastExecTime = 0;
+        return (...args: any[]) => {
+            const currentTime = Date.now();
+            
+            if (currentTime - lastExecTime > delay) {
+                func(...args);
+                lastExecTime = currentTime;
+            } else {
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func(...args);
+                    lastExecTime = Date.now();
+                }, delay);
+            }
+        };
+    }
+
+    // Throttled save function for better performance
+    const throttledSaveLayout = throttle((tabName: string, paperId: string, layout: any) => {
+        characterActions.savePaperLayout(tabName as 'characterTab' | 'skillsTab', paperId, layout);
+    }, 100); // Save at most every 100ms
+
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
         const cols = 3;
@@ -67,23 +92,28 @@
                         target.setAttribute('data-x', x.toString());
                         target.setAttribute('data-y', y.toString());
                         
-                        // Save position to state
+                        // Use throttled save for better performance
                         const paperId = target.getAttribute('data-paper-id');
                         if (paperId) {
-                            try {
-                                const currentLayout = characterActions.getPaperLayout('skillsTab', paperId) || {};
-                                characterActions.savePaperLayout('skillsTab', paperId, {
-                                    ...currentLayout,
-                                    x,
-                                    y
-                                });
-                            } catch (error) {
-                                console.error('Error saving paper layout:', error);
-                            }
+                            throttledSaveLayout('skillsTab', paperId, { x, y });
                         }
                     },
                     end: (event) => {
                         event.target.style.zIndex = '';
+                        
+                        // Final save when drag ends
+                        const target = event.target;
+                        const paperId = target.getAttribute('data-paper-id');
+                        if (paperId) {
+                            const x = parseFloat(target.getAttribute('data-x')) || 0;
+                            const y = parseFloat(target.getAttribute('data-y')) || 0;
+                            const currentLayout = characterActions.getPaperLayout('skillsTab', paperId) || {};
+                            characterActions.savePaperLayout('skillsTab', paperId, {
+                                ...currentLayout,
+                                x,
+                                y
+                            });
+                        }
                     }
                 }
             })
@@ -111,23 +141,35 @@
                         target.setAttribute('data-x', x.toString());
                         target.setAttribute('data-y', y.toString());
                         
-                        // Save layout to state
+                        // Use throttled save for better performance
                         const paperId = target.getAttribute('data-paper-id');
                         if (paperId) {
-                            try {
-                                characterActions.savePaperLayout('skillsTab', paperId, {
-                                    x,
-                                    y,
-                                    width: event.rect.width,
-                                    height: event.rect.height
-                                });
-                            } catch (error) {
-                                console.error('Error saving paper layout during resize:', error);
-                            }
+                            throttledSaveLayout('skillsTab', paperId, {
+                                x,
+                                y,
+                                width: event.rect.width,
+                                height: event.rect.height
+                            });
                         }
                     },
                     end: (event) => {
                         event.target.style.zIndex = '';
+                        
+                        // Final save when resize ends
+                        const target = event.target;
+                        const paperId = target.getAttribute('data-paper-id');
+                        if (paperId) {
+                            const x = parseFloat(target.getAttribute('data-x')) || 0;
+                            const y = parseFloat(target.getAttribute('data-y')) || 0;
+                            const width = parseFloat(target.style.width) || 0;
+                            const height = parseFloat(target.style.height) || 0;
+                            characterActions.savePaperLayout('skillsTab', paperId, {
+                                x,
+                                y,
+                                width,
+                                height
+                            });
+                        }
                     }
                 },
                 modifiers: [

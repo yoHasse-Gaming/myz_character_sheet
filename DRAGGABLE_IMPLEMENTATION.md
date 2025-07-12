@@ -1,7 +1,9 @@
 # Draggable & Resizable Papers Implementation
 
+# Draggable & Resizable Papers Implementation
+
 ## Overview
-Implemented InteractJS to make papers both draggable and resizable within tabs. This allows users to create completely custom layouts by moving and sizing papers to their preference.
+Implemented InteractJS to make papers both draggable and resizable within tabs. This allows users to create completely custom layouts by moving and sizing papers to their preference. The implementation includes performance optimizations and header-only dragging for better UX.
 
 ## Changes Made
 
@@ -9,44 +11,65 @@ Implemented InteractJS to make papers both draggable and resizable within tabs. 
 - Installed `interactjs` package for drag and drop functionality
 - InteractJS includes its own TypeScript definitions
 
-### 2. Skills.svelte Component Updates
+### 2. Performance Optimizations
+- **Throttled State Updates**: Implemented throttling to reduce state saves during drag/resize to max every 100ms
+- **Hardware Acceleration**: Added CSS `transform: translateZ(0)` and `backface-visibility: hidden` for GPU acceleration
+- **Final Save on End**: Ensure final position/size is saved when drag/resize operations complete
+- **Reduced Console Logging**: Minimized debug output for better performance
+
+### 3. Skills.svelte Component Updates
 
 #### Script Changes
 - Added `import interact from 'interactjs'`
 - Added `onMount()` lifecycle hook to initialize InteractJS
+- Added throttling function to optimize state update frequency
 - Configured draggable and resizable behavior with:
   - Move listeners to update element position
   - Resize listeners to update element size
   - Data attributes to track position (data-x, data-y)
   - Minimum size constraints to prevent papers from becoming too small
-  - Debug logging to troubleshoot initialization
+  - Header-only dragging using `allowFrom: '.paper-header'`
+  - Throttled save during movement, final save on end
 
-### 3. CharacterTab.svelte Component Updates
+### 4. CharacterTab.svelte Component Updates
 
 #### Script Changes
 - Added `import interact from 'interactjs'` and `onMount` from 'svelte'
+- Added throttling function for performance optimization
 - Added InteractJS initialization for both draggable and resizable character papers
 - Configured resize behavior with all edges enabled (top, bottom, left, right)
 - Set minimum size constraints (250x120px for character papers)
-- Debug logging for troubleshooting
+- Header-only dragging implementation
+- Performance-optimized state management
 
-#### HTML Structure Changes
+### 5. CSS Refactoring & Shared Styles
+
+#### Shared Classes in app.css
+- **`.draggable-paper`**: Base styling for all draggable papers with hardware acceleration
+- **`.paper-header`**: Consistent header styling with drag cursor and performance optimizations
+- **`.paper-label`**: Unified label styling across all papers
+- **`.paper-content`**: Flexible content area that adapts to paper size
+- **`.paper-input`** & **`.paper-textarea`**: Consistent input styling that fills available space
+- **`.paper-drag-handle`**: Optional visual drag indicators
+
+#### Performance Enhancements
+- Hardware acceleration via CSS transforms
+- Reduced transition complexity
+- Optimized z-index management during drag operations
+- Throttled state updates to prevent lag
+
+### 6. HTML Structure Changes
+
+#### CharacterTab.svelte
 - Completely restructured layout to move all labels inside torn paper wrappers
 - Added drag handles with grip dots icon to each field
 - Added `character-paper` class to torn-input-wrapper elements
 - Added `data-x="0" data-y="0"` attributes for position tracking
 - Changed from grid/card layout to flexible paper container
 - Fields now include: Name, Job/Syssla, Face/Ansikte, Body/Kropp, Clothes/Kläder
+- Uses shared CSS classes for consistency
 
-#### CSS Changes
-- Added comprehensive styling for draggable and resizable character papers
-- Added visible borders on hover to indicate resize areas
-- Enhanced shadow effects on hover/active/resize states
-- Responsive design for mobile devices
-- Styled headers with labels and drag handles
-- Made inputs and textareas adapt to container size
-
-#### HTML Structure Changes
+#### Skills.svelte
 - Moved skill names inside the torn paper wrapper (in header section)
 - Added drag handle with grip dots icon
 - Added `skill-paper` class to torn-input-wrapper elements

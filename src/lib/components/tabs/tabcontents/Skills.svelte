@@ -2,7 +2,9 @@
     import { onMount } from 'svelte';
     import interact from 'interactjs';
     import { generateUniqueVariants } from '../../../utils/styleUtils';
-    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../../states/character_sheet.svelte'
+    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../../states/character_sheet.svelte';
+    import DraggableAddItem from '../../DraggableAddItem.svelte';
+    import DropZone from '../../DropZone.svelte';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
@@ -275,42 +277,50 @@
 </script>
 
 <div class="skills-tab">
-    <!-- Control Buttons Section -->
-    <div class="skills-controls-section">
-        <!-- Add Optional Skills Button -->
-        <div class="optional-skills-section">
-            <button 
-                class="add-optional-skills-button"
-                onclick={() => openDialogueOption('optionalSkills')}
-            >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Lägg till valfria färdigheter
-            </button>
-            {#if sheetState.optionalSkills.length > 0}
-                <span class="optional-skills-count">
-                    {sheetState.optionalSkills.length} valfria färdigheter
-                </span>
-            {/if}
-        </div>
+    <!-- Draggable Add Item -->
+    <DraggableAddItem 
+        text="Dra för färdigheter"
+        ariaLabel="Dra för att lägga till valfria färdigheter"
+        variant="variant-5"
+    />
 
-        <!-- Reset Layout Button -->
-        <div class="reset-layout-container">
-            <button 
-                class="reset-layout-button"
-                onclick={resetSkillsLayout}
-                title="Återställ alla färdighetspapper till standardpositioner"
-            >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                    <path d="M3 3v5h5"></path>
-                </svg>
-                Återställ layout
-            </button>
-        </div>
-    </div>
+    <!-- Skills Drop Zone Container -->
+    <DropZone 
+        dragOverText="Släpp för att lägga till valfria färdigheter"
+        onDrop={() => openDialogueOption('optionalSkills')}
+    >
+        {#snippet children()}
+            <!-- Control Buttons Section -->
+            <div class="skills-controls-section">
+                <!-- Optional Skills Info -->
+                <div class="optional-skills-info">
+                    {#if sheetState.optionalSkills.length > 0}
+                        <p class="optional-skills-description">
+                            Du har {sheetState.optionalSkills.length} valfria färdigheter. 
+                            Dra papperet för att lägga till fler.
+                        </p>
+                    {:else}
+                        <p class="optional-skills-description">
+                            Inga valfria färdigheter valda. Dra papperet hit för att lägga till färdigheter.
+                        </p>
+                    {/if}
+                </div>
+
+                <!-- Reset Layout Button -->
+                <div class="reset-layout-container">
+                    <button 
+                        class="reset-layout-button"
+                        onclick={resetSkillsLayout}
+                        title="Återställ alla färdighetspapper till standardpositioner"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        Återställ layout
+                    </button>
+                </div>
+            </div>
 
     <!-- Core Skills -->
     {#each sheetState.skills as skill, index}
@@ -404,8 +414,8 @@
             </div>
         </div>
     {/each}
-
-
+        {/snippet}
+    </DropZone>
 </div>
 
 <!-- Optional Skills Modal -->
@@ -450,58 +460,39 @@
         gap: 0.5rem;
     }
 
-    /* Optional skills section */
-    .optional-skills-section {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
+    /* Skills controls section */
+    .skills-controls-section {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 1rem;
         padding: 1rem;
         background: rgba(217, 119, 6, 0.05);
         border-radius: 0.5rem;
         border: 1px dashed rgba(217, 119, 6, 0.3);
         backdrop-filter: blur(8px);
-        z-index: 100;
+        z-index: 10;
+        margin-bottom: 2rem;
     }
 
-    :global(.dark) .optional-skills-section {
+    :global(.dark) .skills-controls-section {
         background: rgba(217, 119, 6, 0.1);
         border-color: rgba(217, 119, 6, 0.4);
     }
 
-    .add-optional-skills-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background-color: transparent;
-        color: var(--color-primary-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 0.9rem;
-        border: none;
-        border-radius: 0.25rem;
+    .optional-skills-info {
+        flex: 1;
     }
 
-    .add-optional-skills-button:hover {
-        background: var(--color-primary-600);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-    }
-
-    .optional-skills-count {
+    .optional-skills-description {
+        margin: 0;
         font-size: 0.9rem;
         color: var(--color-surface-700);
-        font-weight: 600;
+        font-weight: 500;
+        font-style: italic;
     }
 
-    :global(.dark) .optional-skills-count {
+    :global(.dark) .optional-skills-description {
         color: var(--color-surface-300);
     }
 

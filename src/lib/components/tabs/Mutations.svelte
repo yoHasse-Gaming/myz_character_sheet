@@ -3,6 +3,8 @@
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
+    import DraggableAddItem from '../DraggableAddItem.svelte';
+    import DropZone from '../DropZone.svelte';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
@@ -34,72 +36,70 @@
 </script>
 
 <div class="mutations-tab">
-    <!-- Add Mutations Button -->
-    <div class="add-mutations-section">
-        <button 
-            class="add-mutation-btn"
-            onclick={() => openDialogueOption('mutations')}
-            aria-label="Lägg till mutation"
-            title="Välj mutation från Zonens gåvor"
-        >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="16"></line>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-            <span>Lägg till mutation</span>
-        </button>
-    </div>
+    <!-- Draggable Add Item -->
+    <DraggableAddItem 
+        text="Dra för mutation"
+        ariaLabel="Dra för att lägga till mutation"
+        variant="variant-3"
+    />
 
-    <!-- Selected Mutations -->
-    {#each sheetState.mutations as mutation, index}
-        <div class="mutation-item-wrapper">
-            <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]}">
-                <div class="mutation-item-content">
-                    <div class="mutation-header">
-                        <span class="mutation-name">{mutation.name}</span>
-                        <div class="mutation-controls-right">
-                            <button 
-                                class="info-icon-button"
-                                onclick={() => showMutationInfo(mutation)}
-                                aria-label="Information om {mutation.name}"
-                                title="Visa information om {mutation.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9,9h6v6H9z"></path>
-                                    <path d="M9,9h6"></path>
-                                </svg>
-                            </button>
-                            <button
-                                class="remove-mutation-button"
-                                onclick={() => removeMutation(mutation.id)}
-                                aria-label="Ta bort {mutation.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
+    <!-- Mutations Drop Zone -->
+    <DropZone 
+        dragOverText="Släpp för att lägga till mutation"
+        onDrop={() => openDialogueOption('mutations')}
+    >
+        {#snippet children()}
+            <!-- Selected Mutations -->
+            <div class="mutations-list">
+                {#each sheetState.mutations as mutation, index}
+                    <div class="mutation-item-wrapper">
+                        <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]}">
+                            <div class="mutation-item-content">
+                                <div class="mutation-header">
+                                    <span class="mutation-name">{mutation.name}</span>
+                                    <div class="mutation-controls-right">
+                                        <button 
+                                            class="info-icon-button"
+                                            onclick={() => showMutationInfo(mutation)}
+                                            aria-label="Information om {mutation.name}"
+                                            title="Visa information om {mutation.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9,9h6v6H9z"></path>
+                                                <path d="M9,9h6"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="remove-mutation-button"
+                                            onclick={() => removeMutation(mutation.id)}
+                                            aria-label="Ta bort {mutation.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mutation-meta">
+                                    <span class="mutation-id-display">🧬 {mutation.id}</span>
+                                    <span class="mutation-trigger">Utlöses: {mutation.trigger_when}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mutation-meta">
-                        <span class="mutation-id-display">🧬 {mutation.id}</span>
-                        <span class="mutation-trigger">Utlöses: {mutation.trigger_when}</span>
+                {/each}
+                
+                {#if sheetState.mutations.length === 0}
+                    <div class="no-mutations-message">
+                        <p>Inga mutationer valda. Dra papperet hit för att lägga till mutationer.</p>
                     </div>
-                </div>
+                {/if}
             </div>
-        </div>
-    {/each}
-
-    {#if sheetState.mutations.length === 0}
-        <div class="no-mutations-message">
-            <div class="no-mutations-icon">🧬</div>
-            <p class="no-mutations-text">Inga mutationer valda</p>
-            <p class="no-mutations-subtext">Zonens gåvor väntar på att upptäckas...</p>
-        </div>
-    {/if}
+        {/snippet}
+    </DropZone>
 </div>
 
             <!-- Mutation Points Section -->

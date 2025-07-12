@@ -158,7 +158,13 @@ export const sheetState = $state({
     relations: [] as RPRelation[],
     
     // Notes or miscellaneous information
-    notes: [] as string[]
+    notes: [] as string[],
+    
+    // Paper layout data for preserving positions and sizes across tab switches
+    paperLayouts: {
+        characterTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
+        skillsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
+    }
 });
 
 // Helper functions for managing the state
@@ -454,6 +460,24 @@ export const characterActions = {
         }));
         
         owlbearSync.syncNow();
+    },
+    
+    // Paper layout management
+    savePaperLayout(tabName: 'characterTab' | 'skillsTab', paperId: string, layout: { x: number; y: number; width?: number; height?: number }) {
+        sheetState.paperLayouts[tabName][paperId] = layout;
+    },
+    
+    getPaperLayout(tabName: 'characterTab' | 'skillsTab', paperId: string) {
+        return sheetState.paperLayouts[tabName][paperId] || null;
+    },
+    
+    clearPaperLayouts(tabName?: 'characterTab' | 'skillsTab') {
+        if (tabName) {
+            sheetState.paperLayouts[tabName] = {};
+        } else {
+            sheetState.paperLayouts.characterTab = {};
+            sheetState.paperLayouts.skillsTab = {};
+        }
     }
 };
 

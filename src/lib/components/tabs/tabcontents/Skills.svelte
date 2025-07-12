@@ -52,7 +52,7 @@
         
         interact('.skill-paper')
             .draggable({
-                allowFrom: '.skill-header', // Only allow dragging from the header
+                allowFrom: '.paper-header', // Only allow dragging from the header
                 listeners: {
                     start: (event) => {
                         console.log('Drag started on:', event.target);
@@ -241,20 +241,10 @@
     {#each sheetState.skills as skill, index}
         {@const position = getInitialPosition(index)}
         <div class="skill-item-wrapper" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
-                <div class="skill-item-content">
-                    <div class="skill-header">
-                        <span class="skill-name">{skill.name}</span>
-                        <div class="skill-drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {skillVariants[index]} skill-paper draggable-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
+                <div class="skill-item-content paper-content">
+                    <div class="skill-header paper-header">
+                        <span class="skill-name paper-label">{skill.name}</span>
                     </div>
                     <div class="skill-controls">
                         <div class="skill-controls-right">
@@ -293,20 +283,10 @@
         {@const skillIndex = sheetState.skills.length + index}
         {@const position = getInitialPosition(skillIndex)}
         <div class="skill-item-wrapper optional-skill" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
-                <div class="skill-item-content">
-                    <div class="skill-header">
-                        <span class="skill-name">{skill.name}</span>
-                        <div class="skill-drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper draggable-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
+                <div class="skill-item-content paper-content">
+                    <div class="skill-header paper-header">
+                        <span class="skill-name paper-label">{skill.name}</span>
                     </div>
                     <div class="skill-controls">
                         <div class="skill-controls-right">
@@ -377,43 +357,23 @@
         position: absolute; /* Changed to absolute for free positioning */
     }
 
-    /* Make skill papers draggable and resizable */
+    /* Skill-specific paper styling */
     .skill-paper {
-        cursor: default; /* Default cursor since only header is draggable */
-        user-select: none;
-        position: relative;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-        will-change: transform;
         min-width: 200px;
         min-height: 100px;
-        /* Add a subtle border that becomes visible on hover to indicate resize areas */
-        border: 3px solid transparent;
-        border-radius: 4px;
     }
 
     .skill-paper:hover {
         border-color: rgba(217, 119, 6, 0.4);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 10;
     }
 
     .skill-paper:active,
     .skill-paper.dragging,
     .skill-paper.resizing {
-        z-index: 20;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
         border-color: rgba(217, 119, 6, 0.8);
     }
 
-    /* Ensure content doesn't interfere with resizing */
-    .skill-item-content {
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-        pointer-events: auto;
-        height: 100%;
-        box-sizing: border-box;
-    }
+    /* Remove duplicate styles - now using shared .paper-content classes */
 
     /* Make input resize with the container */
     .skill-input {
@@ -427,52 +387,9 @@
         box-sizing: border-box;
     }
 
-    /* Content inside torn paper wrapper */
-    .skill-item-content {
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-        transition: all 0.2s ease;
-    }
+    /* Content inside torn paper wrapper - now using shared .paper-content */
 
-    /* New skill header with name and drag handle */
-    .skill-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        cursor: move; /* Make it clear this is the draggable area */
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0; /* Don't shrink the header */
-    }
-
-    .skill-header:hover {
-        background: rgba(217, 119, 6, 0.05);
-    }
-
-    :global(.dark) .skill-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.02);
-    }
-
-    :global(.dark) .skill-header:hover {
-        background: rgba(217, 119, 6, 0.1);
-    }
-
-    .skill-drag-handle {
-        color: var(--color-surface-500);
-        opacity: 0.7;
-        transition: all 0.2s ease;
-    }
-
-    .skill-paper:hover .skill-drag-handle {
-        opacity: 1;
-        color: var(--color-primary-600);
-    }
+    /* Remove duplicate styles - now using shared .paper-header, .paper-label, .paper-drag-handle classes */
 
     /* Skill controls - now just the input and info button */
     .skill-controls {
@@ -575,19 +492,7 @@
         color: var(--color-primary-400);
     }
 
-    .skill-name {
-        font-family: var(--font-user), serif;
-        font-weight: bold;
-        font-size: 1.1rem;
-        letter-spacing: 0.05em;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        flex-grow: 1;
-    }
-
-    :global(.dark) .skill-name {
-        color: var(--color-surface-100);
-    }
+    /* Remove duplicate styles - now using shared .paper-label classes */
 
     /* Skill input styling */
     .skill-input {

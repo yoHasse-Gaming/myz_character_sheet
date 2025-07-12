@@ -175,3 +175,12 @@ This implementation serves as a proof of concept. If the draggable behavior is w
 - CSS transforms are used for visual positioning
 - Existing torn paper effects are maintained
 - Responsive design considerations included
+- **Shared CSS Classes**: Common draggable functionality uses shared classes:
+  - `.draggable-paper`: Base paper styling for all draggable elements
+  - `.paper-header`: Shared header styling for draggable areas
+  - `.paper-label`: Shared label styling for paper titles
+  - `.paper-drag-handle`: Shared drag handle styling
+  - `.paper-content`: Shared content container styling
+  - `.paper-input` / `.paper-textarea`: Shared input/textarea styling
+- **Component-specific classes**: Only minimum required styling remains in components
+- **Code reduction**: Eliminated ~150 lines of duplicate CSS between CharacterTab and Skills

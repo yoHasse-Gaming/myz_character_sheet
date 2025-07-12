@@ -46,7 +46,7 @@
         
         interact('.character-paper')
             .draggable({
-                allowFrom: '.character-header', // Only allow dragging from the header
+                allowFrom: '.paper-header', // Only allow dragging from the header
                 listeners: {
                     start: (event) => {
                         console.log('Drag started on:', event.target);
@@ -169,23 +169,13 @@
     <div class="character-papers-container">
         <!-- Name Field -->
         <div class="character-item-wrapper" style="top: 20px; left: 20px;">
-            <div class="torn-input-wrapper {nameVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-name">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="name" class="character-label">Namn</label>
-                        <div class="drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {nameVariant} character-paper draggable-paper" data-x="0" data-y="0" data-paper-id="character-name">
+                <div class="character-item-content paper-content">
+                    <div class="character-header paper-header">
+                        <label for="name" class="character-label paper-label">Namn</label>
                     </div>
                     <input type="text" 
-                        class="torn-input font-user character-input" 
+                        class="torn-input font-user character-input paper-input" 
                         data-tooltip="Vad kallar dig de andra överlevarna?" 
                         id="name" 
                         data-placement="bottom" 
@@ -197,23 +187,13 @@
 
         <!-- Job Field -->
         <div class="character-item-wrapper" style="top: 20px; left: 350px;">
-            <div class="torn-input-wrapper {jobVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-job">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="job" class="character-label">Syssla</label>
-                        <div class="drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {jobVariant} character-paper draggable-paper" data-x="0" data-y="0" data-paper-id="character-job">
+                <div class="character-item-content paper-content">
+                    <div class="character-header paper-header">
+                        <label for="job" class="character-label paper-label">Syssla</label>
                     </div>
                     <input type="text" 
-                        class="torn-input font-user character-input" 
+                        class="torn-input font-user character-input paper-input" 
                         id="job" 
                         placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
                         bind:value={formData.job} />
@@ -223,24 +203,14 @@
 
         <!-- Face Field -->
         <div class="character-item-wrapper" style="top: 200px; left: 50px;">
-            <div class="torn-input-wrapper {faceVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-face">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="face" class="character-label">Ansikte</label>
-                        <div class="drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {faceVariant} character-paper draggable-paper" data-x="0" data-y="0" data-paper-id="character-face">
+                <div class="character-item-content paper-content">
+                    <div class="character-header paper-header">
+                        <label for="face" class="character-label paper-label">Ansikte</label>
+
                     </div>
                     <textarea 
-                        class="torn-input font-user character-textarea" 
-                        
+                        class="torn-input font-user character-textarea paper-textarea" 
                         placeholder="Ärrat, väderbitit, maskerat..." 
                         bind:value={formData.appearance.face}></textarea>
                 </div>
@@ -249,23 +219,13 @@
 
         <!-- Body Field -->
         <div class="character-item-wrapper" style="top: 200px; left: 400px;">
-            <div class="torn-input-wrapper {bodyVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-body">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="body" class="character-label">Kropp</label>
-                        <div class="drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {bodyVariant} character-paper draggable-paper" data-x="0" data-y="0" data-paper-id="character-body">
+                <div class="character-item-content paper-content">
+                    <div class="character-header paper-header">
+                        <label for="body" class="character-label paper-label">Kropp</label>
                     </div>
                     <textarea 
-                        class="torn-input font-user character-textarea" 
+                        class="torn-input font-user character-textarea paper-textarea" 
                         placeholder="Mager, muskulös, deformerad..." 
                         bind:value={formData.appearance.body}></textarea>
                 </div>
@@ -274,23 +234,14 @@
 
         <!-- Clothes Field -->
         <div class="character-item-wrapper" style="top: 380px; left: 120px;">
-            <div class="torn-input-wrapper {clothesVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-clothes">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="clothes" class="character-label">Kläder</label>
-                        <div class="drag-handle">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="12" r="1"></circle>
-                                <circle cx="9" cy="5" r="1"></circle>
-                                <circle cx="9" cy="19" r="1"></circle>
-                                <circle cx="15" cy="12" r="1"></circle>
-                                <circle cx="15" cy="5" r="1"></circle>
-                                <circle cx="15" cy="19" r="1"></circle>
-                            </svg>
-                        </div>
+            <div class="torn-input-wrapper {clothesVariant} character-paper draggable-paper" data-x="0" data-y="0" data-paper-id="character-clothes">
+                <div class="character-item-content paper-content">
+                    <div class="character-header paper-header">
+                        <label for="clothes" class="character-label paper-label">Kläder</label>
+
                     </div>
                     <textarea 
-                        class="torn-input font-user character-textarea" 
+                        class="torn-input font-user character-textarea paper-textarea" 
                         placeholder="Lappade trasor, läder, folie..." 
                         bind:value={formData.appearance.clothes}></textarea>
                 </div>
@@ -371,124 +322,15 @@
         position: absolute; /* Changed to absolute for free positioning */
     }
 
-    /* Make character papers draggable and resizable */
+    /* Character-specific paper styling */
     .character-paper {
-        cursor: default; /* Default cursor since only header is draggable */
-        user-select: none;
-        position: relative;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-        will-change: transform;
         min-width: 250px;
         min-height: 120px;
-        /* Add a subtle border that becomes visible on hover to indicate resize areas */
-        border: 3px solid transparent;
-        border-radius: 4px;
     }
 
-    .character-paper:hover {
-        /* border-color: rgba(217, 119, 6, 0.4); */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 10;
-    }
+    /* Remove duplicate styles - now using shared .paper-content, .paper-input, .paper-textarea classes */
 
-    .character-paper:active,
-    .character-paper.dragging,
-    .character-paper.resizing {
-        z-index: 20;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-        /* border-color: rgba(217, 119, 6, 0.8); */
-    }
-
-    /* Change cursor when over resize areas */
-    .character-paper:not(:hover) {
-        /* InteractJS will handle the cursor changes automatically when hovering over edges */
-        cursor: move;
-    }
-
-    /* Ensure content doesn't interfere with resizing */
-    .character-item-content {
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-        pointer-events: auto;
-        height: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Make textareas and inputs resize with the container */
-    .character-textarea {
-        width: 100%;
-        border: none;
-        background: transparent;
-        font-size: 1rem;
-        padding: 0.5rem 0;
-        resize: none; /* Disable default resize since we're using InteractJS */
-        box-sizing: border-box;
-        flex: 1; /* Take up remaining space after header */
-        min-height: 3rem;
-    }
-
-    .character-input {
-        width: 100%;
-        border: none;
-        background: transparent;
-        font-size: 1rem;
-        padding: 0.5rem 0;
-        box-sizing: border-box;
-    }
-
-
-
-    /* Character header with label and drag handle */
-    .character-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        cursor: move; /* Make it clear this is the draggable area */
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0; /* Don't shrink the header */
-    }
-
-
-    :global(.dark) .character-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-        
-    }
-
-    .character-label {
-        pointer-events: none;
-        font-family: var(--font-user), serif;
-        font-weight: bold;
-        font-size: 1.1rem;
-        letter-spacing: 0.05em;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        flex-grow: 1;
-    }
-
-    :global(.dark) .character-label {
-        color: var(--color-surface-100);
-    }
-
-    .drag-handle {
-        color: var(--color-surface-200);
-        opacity: 0.7;
-        transition: all 0.2s ease;
-    }
-
-    .character-paper:hover .drag-handle {
-        opacity: 1;
-        color: var(--color-primary-600);
-    }
-
-    /* Input and textarea styling */
+    /* Remove duplicate styles - now using shared .paper-header, .paper-label, .paper-drag-handle classes */
 
     /* Responsive adjustments */
     @media (max-width: 768px) {

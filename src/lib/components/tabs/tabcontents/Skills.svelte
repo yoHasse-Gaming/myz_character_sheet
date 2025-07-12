@@ -32,6 +32,26 @@
         characterActions.savePaperLayout(tabName as 'characterTab' | 'skillsTab', paperId, layout);
     }, 100); // Save at most every 100ms
 
+    // Function to calculate minimum height based on content
+    function getMinHeightForContent(element: HTMLElement): number {
+        // For skills, we mainly need to ensure all controls are visible
+        const header = element.querySelector('.skill-header');
+        const content = element.querySelector('.skill-item-content');
+        
+        if (!content) return 100; // Fallback minimum
+        
+        // Calculate the natural height of the content
+        const headerHeight = header ? (header as HTMLElement).offsetHeight : 35;
+        const controls = content.querySelector('.skill-controls');
+        const controlsHeight = controls ? (controls as HTMLElement).offsetHeight : 60; // Typical height for skill controls
+        
+        // Add padding and margins
+        const contentPadding = 32; // 1rem top + 1rem bottom  
+        const minHeight = headerHeight + controlsHeight + contentPadding + 15; // +15 for margin
+        
+        return Math.max(100, minHeight); // Never smaller than default minimum
+    }
+
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
         const cols = 3;
@@ -77,7 +97,7 @@
         
         interact('.skill-paper')
             .draggable({
-                allowFrom: '.paper-header', // Only allow dragging from the header
+                allowFrom: '.skill-header', // Only allow dragging from the header
                 listeners: {
                     start: (event) => {
                         console.log('Drag started on:', event.target);
@@ -115,7 +135,14 @@
                             });
                         }
                     }
-                }
+                },
+                modifiers: [
+                    // Restrict dragging to within the tab-content container
+                    interact.modifiers.restrictRect({
+                        restriction: '.tab-content',
+                        endOnly: true
+                    })
+                ]
             })
             .resizable({
                 edges: { left: true, right: true, bottom: true, top: true },
@@ -129,9 +156,15 @@
                         let x = (parseFloat(target.getAttribute('data-x')) || 0);
                         let y = (parseFloat(target.getAttribute('data-y')) || 0);
 
+                        // Calculate minimum height based on content
+                        const minHeight = getMinHeightForContent(target);
+                        
+                        // Ensure height doesn't go below minimum
+                        const newHeight = Math.max(event.rect.height, minHeight);
+
                         // Update the element's style
                         target.style.width = event.rect.width + 'px';
-                        target.style.height = event.rect.height + 'px';
+                        target.style.height = newHeight + 'px';
 
                         // Translate when resizing from top or left edges
                         x += event.deltaRect.left;
@@ -148,7 +181,7 @@
                                 x,
                                 y,
                                 width: event.rect.width,
-                                height: event.rect.height
+                                height: newHeight
                             });
                         }
                     },
@@ -173,7 +206,7 @@
                     }
                 },
                 modifiers: [
-                    // Minimum size
+                    // Static minimum size constraints
                     interact.modifiers.restrictSize({
                         min: { width: 200, height: 100 }
                     })
@@ -283,10 +316,10 @@
     {#each sheetState.skills as skill, index}
         {@const position = getInitialPosition(index)}
         <div class="skill-item-wrapper" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[index]} skill-paper draggable-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
-                <div class="skill-item-content paper-content">
-                    <div class="skill-header paper-header">
-                        <span class="skill-name paper-label">{skill.name}</span>
+            <div class="torn-input-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
+                <div class="skill-item-content">
+                    <div class="skill-header">
+                        <span class="skill-name">{skill.name}</span>
                     </div>
                     <div class="skill-controls">
                         <div class="skill-controls-right">
@@ -325,10 +358,10 @@
         {@const skillIndex = sheetState.skills.length + index}
         {@const position = getInitialPosition(skillIndex)}
         <div class="skill-item-wrapper optional-skill" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper draggable-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
-                <div class="skill-item-content paper-content">
-                    <div class="skill-header paper-header">
-                        <span class="skill-name paper-label">{skill.name}</span>
+            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
+                <div class="skill-item-content">
+                    <div class="skill-header">
+                        <span class="skill-name">{skill.name}</span>
                     </div>
                     <div class="skill-controls">
                         <div class="skill-controls-right">
@@ -399,37 +432,6 @@
         position: absolute; /* Changed to absolute for free positioning */
     }
 
-    /* Skill-specific paper styling */
-    .skill-paper {
-        min-width: 200px;
-        min-height: 100px;
-    }
-
-    .skill-paper:hover {
-        border-color: rgba(217, 119, 6, 0.4);
-    }
-
-    .skill-paper:active,
-    .skill-paper.dragging,
-    .skill-paper.resizing {
-        border-color: rgba(217, 119, 6, 0.8);
-    }
-
-    /* Remove duplicate styles - now using shared .paper-content classes */
-
-    /* Make input resize with the container */
-    .skill-input {
-        width: 4rem;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-        padding-left: unset;
-        max-height: 2rem;
-        box-sizing: border-box;
-    }
-
-    /* Content inside torn paper wrapper - now using shared .paper-content */
 
     /* Remove duplicate styles - now using shared .paper-header, .paper-label, .paper-drag-handle classes */
 
@@ -689,6 +691,84 @@
         flex-shrink: 0;
     }
 
+    /* Skills-specific paper styling */
+    .skill-paper {
+        cursor: default; /* Default cursor since only header is draggable */
+        user-select: none;
+        position: relative;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        will-change: transform;
+        /* Add hardware acceleration for better performance */
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        min-width: 200px;
+        min-height: 125px;
+        /* Add a subtle border that becomes visible on hover to indicate resize areas */
+        border: 3px solid transparent;
+        border-radius: 4px;
+    }
+
+    .skill-paper:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+
+    .skill-paper:active,
+    .skill-paper.dragging,
+    .skill-paper.resizing {
+        z-index: 20;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Skills content styling */
+    .skill-item-content {
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+        pointer-events: auto;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Skills header styling */
+    .skill-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: move; /* Make it clear this is the draggable area */
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 4px 4px 0 0;
+        transition: background-color 0.2s ease;
+        flex-shrink: 0; /* Don't shrink the header */
+        /* Improve drag performance */
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    :global(.dark) .skill-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .skill-name {
+        pointer-events: none;
+        font-family: var(--font-user), serif;
+        font-weight: bold;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        flex-grow: 1;
+    }
+
+    :global(.dark) .skill-name {
+        color: var(--color-surface-100);
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .skills-controls-section {
@@ -698,6 +778,10 @@
         
         .reset-layout-container {
             order: -1; /* Show reset button first on mobile */
+        }
+
+        .skill-paper {
+            min-width: 180px;
         }
     }
 

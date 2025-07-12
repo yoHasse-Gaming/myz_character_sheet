@@ -238,6 +238,7 @@
 
 textarea.torn-input {
     padding-top: 1rem;
+    overflow-y: hidden;
 }
 
 /* Remove focus outline while keeping accessibility and override all focus styles */

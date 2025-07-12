@@ -16,6 +16,7 @@ Implemented InteractJS to make papers both draggable and resizable within tabs. 
 - **Hardware Acceleration**: Added CSS `transform: translateZ(0)` and `backface-visibility: hidden` for GPU acceleration
 - **Final Save on End**: Ensure final position/size is saved when drag/resize operations complete
 - **Reduced Console Logging**: Minimized debug output for better performance
+- **Content-Aware Resizing**: Dynamic minimum height calculation prevents text from being clipped when resizing
 
 ### 3. Skills.svelte Component Updates
 
@@ -207,3 +208,136 @@ This implementation serves as a proof of concept. If the draggable behavior is w
   - `.paper-input` / `.paper-textarea`: Shared input/textarea styling
 - **Component-specific classes**: Only minimum required styling remains in components
 - **Code reduction**: Eliminated ~150 lines of duplicate CSS between CharacterTab and Skills
+
+## Content-Aware Resizing Feature
+
+### Overview
+Implemented dynamic minimum height calculation to prevent content from being clipped when resizing papers.
+
+### How It Works
+
+#### Character Tab Papers
+- **Textarea Content Detection**: For papers containing textareas (face, body, clothes), the system calculates the actual text height
+- **Dynamic Height Calculation**: Creates a temporary invisible div with the same styling to measure text height
+- **Minimum Height Enforcement**: Sets minimum resize height to: header height + content padding + text height + margins
+- **Prevents Text Clipping**: Users cannot resize papers smaller than the space needed to display all text content
+
+#### Skills Tab Papers  
+- **Control Layout Detection**: Calculates height needed for skill headers and control elements
+- **Natural Content Height**: Measures the actual height of skill controls (input fields, buttons)
+- **Minimum Content Visibility**: Ensures all skill controls remain visible when resizing
+
+### Implementation Details
+
+#### Content Height Calculation Functions
+```javascript
+// CharacterTab.svelte - for textarea content
+function getMinHeightForContent(element) {
+    // Creates temporary div to measure text height
+    // Accounts for font, line-height, padding
+    // Returns header + content + text height + margins
+}
+
+// Skills.svelte - for control elements  
+function getMinHeightForContent(element) {
+    // Measures header and control heights
+    // Returns header + controls + padding + margins
+}
+```
+
+#### InteractJS Integration
+- **Dynamic Modifiers**: Uses InteractJS `restrictSize` modifier with callback function
+- **Real-time Calculation**: Minimum height is calculated during resize operation
+- **Per-Element Basis**: Each paper can have different minimum heights based on its content
+
+### Benefits
+- **Prevents Content Loss**: Text and controls never get clipped or hidden
+- **Better UX**: Users get visual feedback when they've reached minimum size
+- **Responsive Design**: Minimum size adapts to actual content, not arbitrary fixed values
+- **Accessibility**: Ensures all content remains readable and interactive
+
+## Auto-Resize When Typing Feature
+
+### Overview
+Added automatic paper expansion when users type in textareas. Papers now grow automatically to accommodate new content, preventing text from being clipped or hidden.
+
+### How It Works
+
+#### Real-time Text Monitoring
+- **Input Event Listeners**: Each textarea in character papers has an `oninput` event listener
+- **Debounced Processing**: Auto-resize function is debounced (150ms) to avoid excessive calculations during rapid typing
+- **Content-Aware Expansion**: Papers only grow when content needs more space, never shrink automatically
+
+#### Implementation Details
+```javascript
+// Debounced auto-resize function
+const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement) => {
+    autoResizePaper(textarea);
+}, 150); // Wait 150ms after user stops typing
+
+// Applied to each textarea
+<textarea 
+    oninput={(e) => debouncedAutoResize(e.target as HTMLTextAreaElement)}
+    ...
+/>
+```
+
+#### Character Tab Integration
+- **Face Field**: Auto-expands when users add more descriptive text
+- **Body Field**: Grows to accommodate longer character descriptions  
+- **Clothes Field**: Expands for detailed clothing descriptions
+- **Layout Persistence**: Auto-expanded sizes are saved and restored when switching tabs
+
+### Benefits
+- **Seamless UX**: Text never gets cut off or hidden when typing
+- **Dynamic Layout**: Papers adapt to content length automatically
+- **Performance Optimized**: Debounced to prevent lag during typing
+- **Non-Destructive**: Manual resizing still works, auto-resize only grows papers
+- **Persistent**: Auto-expanded sizes are saved with other layout data
+
+### Technical Implementation
+- **Minimum Height Calculation**: Uses existing `getMinHeightForContent()` function
+- **Layout Integration**: Auto-resize updates saved paper layouts automatically
+- **TypeScript Support**: Proper type safety for textarea elements
+- **Event Optimization**: Debounced to balance responsiveness with performance
+
+## Drag Containment Feature
+
+### Overview
+Added boundary restrictions to prevent papers from being dragged outside the visible tab area. Papers are now constrained to stay within the `.tab-content` container.
+
+### How It Works
+
+#### InteractJS Restriction Modifiers
+- **Containment Boundary**: Papers cannot be dragged outside the `.tab-content` div
+- **End-Only Validation**: Restriction is applied when drag ends, allowing smooth movement during drag
+- **Universal Application**: Both Character tab and Skills tab papers are contained
+
+#### Implementation Details
+```javascript
+modifiers: [
+    // Restrict dragging to within the tab-content container
+    interact.modifiers.restrictRect({
+        restriction: '.tab-content',
+        endOnly: true
+    })
+]
+```
+
+#### Containment Behavior
+- **Visual Feedback**: Papers can be dragged to the edge but snap back if released outside bounds
+- **Smooth Dragging**: No jerky movement during drag operations
+- **Consistent Boundaries**: Same containment rules apply to all draggable papers
+- **Layout Preservation**: Containment works with saved layouts and auto-resize features
+
+### Benefits
+- **Prevents Lost Papers**: Users cannot accidentally drag papers outside the visible area
+- **Better UX**: Clear boundaries help users understand the draggable area
+- **Maintains Layout Integrity**: Papers stay within the designed interface space
+- **Mobile Friendly**: Especially helpful on smaller screens where papers could easily go off-screen
+
+### Technical Implementation
+- **Character Tab**: All character field papers (Name, Job, Face, Body, Clothes) are contained within `.tab-content`
+- **Skills Tab**: All skill papers are contained within `.tab-content`
+- **Compatible Features**: Works seamlessly with existing drag/resize, auto-resize, and layout persistence
+- **Performance Optimized**: Uses `endOnly: true` to avoid constant boundary checking during movement

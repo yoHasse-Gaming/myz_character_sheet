@@ -4,7 +4,6 @@
     import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import DropZone from '../DropZone.svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -48,134 +47,120 @@
         variant="variant-4"
     />
 
-    <!-- Occupational Talents Drop Zone -->
-    <div class="talents-section">
+    <!-- Occupational Talents Section -->
+    <div class="talents-section" data-drop-zone="occupational-talents">
         <FormSection header="⚔️ YRKESTALANGER">
-            <DropZone 
-                dragOverText="Släpp för att lägga till yrkestalang"
-                onDrop={() => (canAddOccupational || canAddSecondOccupational) ? openDialogueOption('occupational-talents') : null}
-            >
-                {#snippet children()}
-                    <div class="talent-info">
-                        <p class="talent-description">Yrkestalanger ({occupationalTalents.length}/2) - Specialiserade färdigheter från ditt yrke</p>
-                        {#if !canAddSecondOccupational && occupationalTalents.length === 1}
-                            <p class="talent-requirement">Kräver 3 generiska talanger för att låsa upp den andra yrkestalangen</p>
-                        {/if}
-                    </div>
-                    
-                    <div class="talents-list">
-                        {#each occupationalTalents as talent, index}
-                            <div class="talent-item-wrapper">
-                                <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card">
-                                    <div class="talent-item-content">
-                                        <div class="talent-header">
-                                            <span class="talent-name">{talent.name}</span>
-                                            <div class="talent-controls-right">
-                                                <button 
-                                                    class="info-icon-button"
-                                                    onclick={() => showTalentInfo(talent)}
-                                                    aria-label="Information om {talent.name}"
-                                                    title="Visa information om {talent.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="10"></circle>
-                                                        <path d="M9,9h6v6H9z"></path>
-                                                        <path d="M9,9h6"></path>
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    class="remove-talent-button"
-                                                    onclick={() => removeTalent(talent.id)}
-                                                    aria-label="Ta bort {talent.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="talent-meta">
-                                            <span class="talent-id-display">⚔️ {talent.id}</span>
-                                            <span class="talent-occupation">Yrke: {talent.occupation}</span>
-                                        </div>
+            <div class="talent-info">
+                <p class="talent-description">Yrkestalanger ({occupationalTalents.length}/2) - Specialiserade färdigheter från ditt yrke</p>
+                {#if !canAddSecondOccupational && occupationalTalents.length === 1}
+                    <p class="talent-requirement">Kräver 3 generiska talanger för att låsa upp den andra yrkestalangen</p>
+                {/if}
+            </div>
+            
+            <div class="talents-list">
+                {#each occupationalTalents as talent, index}
+                    <div class="talent-item-wrapper">
+                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card">
+                            <div class="talent-item-content">
+                                <div class="talent-header">
+                                    <span class="talent-name">{talent.name}</span>
+                                    <div class="talent-controls-right">
+                                        <button 
+                                            class="info-icon-button"
+                                            onclick={() => showTalentInfo(talent)}
+                                            aria-label="Information om {talent.name}"
+                                            title="Visa information om {talent.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9,9h6v6H9z"></path>
+                                                <path d="M9,9h6"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="remove-talent-button"
+                                            onclick={() => removeTalent(talent.id)}
+                                            aria-label="Ta bort {talent.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
+                                <div class="talent-meta">
+                                    <span class="talent-id-display">⚔️ {talent.id}</span>
+                                    <span class="talent-occupation">Yrke: {talent.occupation}</span>
+                                </div>
                             </div>
-                        {/each}
-                        
-                        {#if occupationalTalents.length === 0}
-                            <div class="no-talents-message">
-                                <p>Inga yrkestalanger valda. Dra papperet hit för att lägga till yrkestalanger.</p>
-                            </div>
-                        {/if}
+                        </div>
                     </div>
-                {/snippet}
-            </DropZone>
+                {/each}
+                
+                {#if occupationalTalents.length === 0}
+                    <div class="no-talents-message">
+                        <p>Inga yrkestalanger valda. Dra papperet hit för att lägga till yrkestalanger.</p>
+                    </div>
+                {/if}
+            </div>
         </FormSection>
     </div>
 
-    <!-- Generic Talents Drop Zone -->
-    <div class="talents-section">
+    <!-- Generic Talents Section -->
+    <div class="talents-section" data-drop-zone="generic-talents">
         <FormSection header="🎯 GENERISKA TALANGER">
-            <DropZone 
-                dragOverText="Släpp för att lägga till generisk talang"
-                onDrop={() => canAddGeneric ? openDialogueOption('generic-talents') : null}
-            >
-                {#snippet children()}
-                    <div class="talent-info">
-                        <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
-                    </div>
-                    
-                    <div class="talents-list">
-                        {#each genericTalents as talent, index}
-                            <div class="talent-item-wrapper">
-                                <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card">
-                                    <div class="talent-item-content">
-                                        <div class="talent-header">
-                                            <span class="talent-name">{talent.name}</span>
-                                            <div class="talent-controls-right">
-                                                <button 
-                                                    class="info-icon-button"
-                                                    onclick={() => showTalentInfo(talent)}
-                                                    aria-label="Information om {talent.name}"
-                                                    title="Visa information om {talent.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="10"></circle>
-                                                        <path d="M9,9h6v6H9z"></path>
-                                                        <path d="M9,9h6"></path>
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    class="remove-talent-button"
-                                                    onclick={() => removeTalent(talent.id)}
-                                                    aria-label="Ta bort {talent.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="talent-meta">
-                                            <span class="talent-id-display">🎯 {talent.id}</span>
-                                            <span class="talent-occupation">Typ: Generisk</span>
-                                        </div>
+            <div class="talent-info">
+                <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
+            </div>
+            
+            <div class="talents-list">
+                {#each genericTalents as talent, index}
+                    <div class="talent-item-wrapper">
+                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card">
+                            <div class="talent-item-content">
+                                <div class="talent-header">
+                                    <span class="talent-name">{talent.name}</span>
+                                    <div class="talent-controls-right">
+                                        <button 
+                                            class="info-icon-button"
+                                            onclick={() => showTalentInfo(talent)}
+                                            aria-label="Information om {talent.name}"
+                                            title="Visa information om {talent.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9,9h6v6H9z"></path>
+                                                <path d="M9,9h6"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="remove-talent-button"
+                                            onclick={() => removeTalent(talent.id)}
+                                            aria-label="Ta bort {talent.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
+                                <div class="talent-meta">
+                                    <span class="talent-id-display">🎯 {talent.id}</span>
+                                    <span class="talent-occupation">Typ: Generisk</span>
+                                </div>
                             </div>
-                        {/each}
-                        
-                        {#if genericTalents.length === 0}
-                            <div class="no-talents-message">
-                                <p>Inga generiska talanger valda. Dra papperet hit för att lägga till generiska talanger.</p>
-                            </div>
-                        {/if}
+                        </div>
                     </div>
-                {/snippet}
-            </DropZone>
+                {/each}
+                
+                {#if genericTalents.length === 0}
+                    <div class="no-talents-message">
+                        <p>Inga generiska talanger valda. Dra papperet hit för att lägga till generiska talanger.</p>
+                    </div>
+                {/if}
+            </div>
         </FormSection>
     </div>
 </div>

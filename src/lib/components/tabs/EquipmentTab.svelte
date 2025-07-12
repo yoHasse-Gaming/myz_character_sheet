@@ -1,7 +1,6 @@
 <script lang="ts">
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import DropZone from '../DropZone.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import itemsData from '../../data/items.json';
@@ -243,151 +242,130 @@
     <!-- Equipment Grid -->
     <div class="equipment-grid">
         <!-- Equipment Section -->
-        <div class="equipment-section">
+        <div class="equipment-section" data-drop-zone="equipment">
             <FormSection header="🎒 UTRUSTNING">
-                <DropZone 
-                    dragOverText="Släpp för att lägga till utrustning"
-                    onDrop={() => showEquipmentModal = true}
-                >
-                    {#snippet children()}
-                        <!-- Equipment list -->
-                        <div class="section-items-list">
-                            {#each equipmentItems as item, index}
-                                <div class="torn-input-wrapper {equipmentVariants[index]} section-item-card">
-                                    <div class="section-item-content">
-                                        <div class="section-item-header">
-                                            <h4 class="section-item-name">{item.name}</h4>
-                                            <button 
-                                                class="section-remove-button" 
-                                                onclick={() => removeEquipment(sheetState.equipmentTable.findIndex(eq => eq.id === item.id))}
-                                                aria-label="Ta bort {item.name}"
-                                            >
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div class="section-item-stats">
-                                            <span class="section-stat">Antal: {item.quantity}</span>
-                                            <span class="section-stat">Vikt: {item.weight} kg</span>
-                                            <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
-                                        </div>
-                                    </div>
+                <!-- Equipment list -->
+                <div class="section-items-list">
+                    {#each equipmentItems as item, index}
+                        <div class="torn-input-wrapper {equipmentVariants[index]} section-item-card">
+                            <div class="section-item-content">
+                                <div class="section-item-header">
+                                    <h4 class="section-item-name">{item.name}</h4>
+                                    <button 
+                                        class="section-remove-button" 
+                                        onclick={() => removeEquipment(sheetState.equipmentTable.findIndex(eq => eq.id === item.id))}
+                                        aria-label="Ta bort {item.name}"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
                                 </div>
-                            {/each}
+                                <div class="section-item-stats">
+                                    <span class="section-stat">Antal: {item.quantity}</span>
+                                    <span class="section-stat">Vikt: {item.weight} kg</span>
+                                    <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
+                                </div>
+                            </div>
                         </div>
+                    {/each}
+                </div>
 
-                        <!-- Total weight display -->
-                        <div class="section-total-weight">
-                            <span class="section-total-label">Total: {totalWeight().toFixed(2)} kg</span>
-                        </div>
-                    {/snippet}
-                </DropZone>
+                <!-- Total weight display -->
+                <div class="section-total-weight">
+                    <span class="section-total-label">Total: {totalWeight().toFixed(2)} kg</span>
+                </div>
             </FormSection>
         </div>
 
         <!-- Weapons Section -->
-        <div class="weapons-section">
+        <div class="weapons-section" data-drop-zone="weapons">
             <FormSection header="⚔️ VAPEN">
-                <DropZone 
-                    dragOverText="Släpp för att lägga till vapen"
-                    onDrop={() => showWeaponModal = true}
-                >
-                    {#snippet children()}
-                        <!-- Weapons list -->
-                        <div class="section-items-list">
-                            {#each sheetState.weapons as weapon, index}
-                                <div class="torn-input-wrapper {weaponVariants[index]} section-item-card">
-                                    <div class="section-item-content">
-                                        <div class="section-item-header">
-                                            <h4 class="section-item-name">{weapon.name}</h4>
-                                            <div class="section-item-actions">
-                                                <label class="section-equipped-checkbox">
-                                                    <input 
-                                                        type="checkbox" 
-                                                        bind:checked={weapon.equipped}
-                                                    />
-                                                    <span class="section-checkbox-label">Utrustad</span>
-                                                </label>
-                                                <button 
-                                                    class="section-remove-button" 
-                                                    onclick={() => characterActions.removeWeapon(weapon.id)}
-                                                    aria-label="Ta bort {weapon.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {#if weapon.description}
-                                            <p class="section-item-description">{weapon.description}</p>
-                                        {/if}
-                                        <div class="section-item-stats">
-                                            <span class="section-stat">Bonus: +{weapon.bonus}</span>
-                                            <span class="section-stat">Skada: {weapon.damage}</span>
-                                            <span class="section-stat">Räckvidd: {weapon.range}</span>
-                                            <span class="section-stat">Vikt: {weapon.weight} kg</span>
-                                        </div>
+                <!-- Weapons list -->
+                <div class="section-items-list">
+                    {#each sheetState.weapons as weapon, index}
+                        <div class="torn-input-wrapper {weaponVariants[index]} section-item-card">
+                            <div class="section-item-content">
+                                <div class="section-item-header">
+                                    <h4 class="section-item-name">{weapon.name}</h4>
+                                    <div class="section-item-actions">
+                                        <label class="section-equipped-checkbox">
+                                            <input 
+                                                type="checkbox" 
+                                                bind:checked={weapon.equipped}
+                                            />
+                                            <span class="section-checkbox-label">Utrustad</span>
+                                        </label>
+                                        <button 
+                                            class="section-remove-button" 
+                                            onclick={() => characterActions.removeWeapon(weapon.id)}
+                                            aria-label="Ta bort {weapon.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                            {/each}
+                                {#if weapon.description}
+                                    <p class="section-item-description">{weapon.description}</p>
+                                {/if}
+                                <div class="section-item-stats">
+                                    <span class="section-stat">Bonus: +{weapon.bonus}</span>
+                                    <span class="section-stat">Skada: {weapon.damage}</span>
+                                    <span class="section-stat">Räckvidd: {weapon.range}</span>
+                                    <span class="section-stat">Vikt: {weapon.weight} kg</span>
+                                </div>
+                            </div>
                         </div>
-                    {/snippet}
-                </DropZone>
+                    {/each}
+                </div>
             </FormSection>
         </div>
 
         <!-- Armor Section -->
-        <div class="armor-section">
+        <div class="armor-section" data-drop-zone="armor">
             <FormSection header="🛡️ RUSTNING">
-                <DropZone 
-                    dragOverText="Släpp för att lägga till rustning"
-                    onDrop={() => showArmorModal = true}
-                >
-                    {#snippet children()}
-                        <!-- Armor list -->
-                        <div class="section-items-list">
-                            {#each sheetState.armor as armor, index}
-                                <div class="torn-input-wrapper {armorVariants[index]} section-item-card">
-                                    <div class="section-item-content">
-                                        <div class="section-item-header">
-                                            <h4 class="section-item-name">{armor.name}</h4>
-                                            <div class="section-item-actions">
-                                                <label class="section-equipped-checkbox">
-                                                    <input 
-                                                        type="checkbox" 
-                                                        bind:checked={armor.equipped}
-                                                    />
-                                                    <span class="section-checkbox-label">Utrustad</span>
-                                                </label>
-                                                <button 
-                                                    class="section-remove-button" 
-                                                    onclick={() => characterActions.removeArmor(armor.id)}
-                                                    aria-label="Ta bort {armor.name}"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {#if armor.description}
-                                            <p class="section-item-description">{armor.description}</p>
-                                        {/if}
-                                        <div class="section-item-stats">
-                                            <span class="section-stat">Skydd: {armor.protection}</span>
-                                            <span class="section-stat">Vikt: {armor.weight} kg</span>
-                                        </div>
+                <!-- Armor list -->
+                <div class="section-items-list">
+                    {#each sheetState.armor as armor, index}
+                        <div class="torn-input-wrapper {armorVariants[index]} section-item-card">
+                            <div class="section-item-content">
+                                <div class="section-item-header">
+                                    <h4 class="section-item-name">{armor.name}</h4>
+                                    <div class="section-item-actions">
+                                        <label class="section-equipped-checkbox">
+                                            <input 
+                                                type="checkbox" 
+                                                bind:checked={armor.equipped}
+                                            />
+                                            <span class="section-checkbox-label">Utrustad</span>
+                                        </label>
+                                        <button 
+                                            class="section-remove-button" 
+                                            onclick={() => characterActions.removeArmor(armor.id)}
+                                            aria-label="Ta bort {armor.name}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                            {/each}
+                                {#if armor.description}
+                                    <p class="section-item-description">{armor.description}</p>
+                                {/if}
+                                <div class="section-item-stats">
+                                    <span class="section-stat">Skydd: {armor.protection}</span>
+                                    <span class="section-stat">Vikt: {armor.weight} kg</span>
+                                </div>
+                            </div>
                         </div>
-                    {/snippet}
-                </DropZone>
+                    {/each}
+                </div>
             </FormSection>
         </div>
     </div>

@@ -482,7 +482,7 @@ export const characterActions = {
 };
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents';
+export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes';
 
 // Info modal state to hold content
 export const infoModalState = $state({

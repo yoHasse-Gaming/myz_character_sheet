@@ -3,6 +3,7 @@
     import MutationsModal from './lib/components/Modals/MutationsModal.svelte';
     import TalentsModal from './lib/components/Modals/TalentsModal.svelte';
     import InfoModal from './lib/components/Modals/InfoModal.svelte';
+    import DragOverlay from './lib/components/DragOverlay.svelte';
     import { onMount } from 'svelte';
     import Tabs from './lib/components/Tabs.svelte';
     import SvgContent from './lib/components/contents/SvgContent.svelte';
@@ -30,6 +31,9 @@
 <MutationsModal />
 <TalentsModal modalType="occupational" />
 <TalentsModal modalType="generic" />
+
+<!-- Drag and Drop Overlay -->
+<DragOverlay />
 
 <!-- Global Utility Buttons -->
 <ThemeSelector />

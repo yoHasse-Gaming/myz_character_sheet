@@ -4,7 +4,6 @@
     import { generateUniqueVariants } from '../../../utils/styleUtils';
     import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../../states/character_sheet.svelte';
     import DraggableAddItem from '../../DraggableAddItem.svelte';
-    import DropZone from '../../DropZone.svelte';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
@@ -284,14 +283,10 @@
         variant="variant-5"
     />
 
-    <!-- Skills Drop Zone Container -->
-    <DropZone 
-        dragOverText="Släpp för att lägga till valfria färdigheter"
-        onDrop={() => openDialogueOption('optionalSkills')}
-    >
-        {#snippet children()}
-            <!-- Control Buttons Section -->
-            <div class="skills-controls-section">
+    <!-- Skills Container -->
+    <div data-drop-zone="skills">
+        <!-- Control Buttons Section -->
+        <div class="skills-controls-section">
                 <!-- Optional Skills Info -->
                 <div class="optional-skills-info">
                     {#if sheetState.optionalSkills.length > 0}
@@ -414,8 +409,7 @@
             </div>
         </div>
     {/each}
-        {/snippet}
-    </DropZone>
+    </div>
 </div>
 
 <!-- Optional Skills Modal -->

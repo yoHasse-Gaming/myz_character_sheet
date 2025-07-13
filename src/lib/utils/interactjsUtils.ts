@@ -1,7 +1,7 @@
 import interact from "interactjs";
 import { characterActions } from "../states/character_sheet.svelte";
 
-export type TabName = 'characterTab' | 'equipmentTab' | 'mutationsTab' | 'talentsTab' | 'relationsNotesTab';
+export type TabName = 'characterTab' | 'skillsTab' | 'equipmentTab' | 'mutationsTab' | 'talentsTab' | 'relationsNotesTab';
 
 export function initInteractForElement(
     element: HTMLElement | string, 

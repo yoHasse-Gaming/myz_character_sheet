@@ -5,6 +5,7 @@
     import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import DraggableAddItem from '../../DraggableAddItem.svelte';
     import { openInfoModal } from '../../../states/modals.svelte';
+    import { initInteractForElement } from '../../../utils/interactjsUtils';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
@@ -77,6 +78,7 @@
         skillElements.forEach((element, index) => {
             const paperId = element.getAttribute('data-paper-id');
             if (paperId) {
+                
                 try {
                     const savedLayout = characterActions.getPaperLayout('skillsTab', paperId);
                     if (savedLayout) {
@@ -94,126 +96,127 @@
                 } catch (error) {
                     console.error('Error restoring layout for', paperId, error);
                 }
+                initInteractForElement(element as HTMLElement, 'skillsTab', '.skill-header', '.skill-header');
             }
         });
         
-        interact('.skill-paper')
-            .draggable({
-                allowFrom: '.skill-header', // Only allow dragging from the header
-                listeners: {
-                    start: (event) => {
-                        console.log('Drag started on:', event.target);
-                        event.target.style.zIndex = '1000';
-                    },
-                    move: (event) => {
-                        const target = event.target;
-                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        // interact('.skill-paper')
+        //     .draggable({
+        //         allowFrom: '.skill-header', // Only allow dragging from the header
+        //         listeners: {
+        //             start: (event) => {
+        //                 console.log('Drag started on:', event.target);
+        //                 event.target.style.zIndex = '1000';
+        //             },
+        //             move: (event) => {
+        //                 const target = event.target;
+        //                 const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        //                 const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-                        target.setAttribute('data-x', x.toString());
-                        target.setAttribute('data-y', y.toString());
+        //                 target.style.transform = `translate(${x}px, ${y}px)`;
+        //                 target.setAttribute('data-x', x.toString());
+        //                 target.setAttribute('data-y', y.toString());
                         
-                        // Use throttled save for better performance
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            throttledSaveLayout('skillsTab', paperId, { x, y });
-                        }
-                    },
-                    end: (event) => {
-                        event.target.style.zIndex = '';
+        //                 // Use throttled save for better performance
+        //                 const paperId = target.getAttribute('data-paper-id');
+        //                 if (paperId) {
+        //                     throttledSaveLayout('skillsTab', paperId, { x, y });
+        //                 }
+        //             },
+        //             end: (event) => {
+        //                 event.target.style.zIndex = '';
                         
-                        // Final save when drag ends
-                        const target = event.target;
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            const x = parseFloat(target.getAttribute('data-x')) || 0;
-                            const y = parseFloat(target.getAttribute('data-y')) || 0;
-                            const currentLayout = characterActions.getPaperLayout('skillsTab', paperId) || {};
-                            characterActions.savePaperLayout('skillsTab', paperId, {
-                                ...currentLayout,
-                                x,
-                                y
-                            });
-                        }
-                    }
-                },
-                modifiers: [
-                    // Restrict dragging to within the tab-content container
-                    interact.modifiers.restrictRect({
-                        restriction: '.tab-content',
-                        endOnly: true
-                    })
-                ]
-            })
-            .resizable({
-                edges: { left: true, right: true, bottom: true, top: true },
-                listeners: {
-                    start: (event) => {
-                        console.log('Resize started on:', event.target);
-                        event.target.style.zIndex = '1000';
-                    },
-                    move: (event) => {
-                        const target = event.target;
-                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
-                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
+        //                 // Final save when drag ends
+        //                 const target = event.target;
+        //                 const paperId = target.getAttribute('data-paper-id');
+        //                 if (paperId) {
+        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
+        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
+        //                     const currentLayout = characterActions.getPaperLayout('skillsTab', paperId) || {};
+        //                     characterActions.savePaperLayout('skillsTab', paperId, {
+        //                         ...currentLayout,
+        //                         x,
+        //                         y
+        //                     });
+        //                 }
+        //             }
+        //         },
+        //         modifiers: [
+        //             // Restrict dragging to within the tab-content container
+        //             interact.modifiers.restrictRect({
+        //                 restriction: '.tab-content',
+        //                 endOnly: true
+        //             })
+        //         ]
+        //     })
+        //     .resizable({
+        //         edges: { left: true, right: true, bottom: true, top: true },
+        //         listeners: {
+        //             start: (event) => {
+        //                 console.log('Resize started on:', event.target);
+        //                 event.target.style.zIndex = '1000';
+        //             },
+        //             move: (event) => {
+        //                 const target = event.target;
+        //                 let x = (parseFloat(target.getAttribute('data-x')) || 0);
+        //                 let y = (parseFloat(target.getAttribute('data-y')) || 0);
 
-                        // Calculate minimum height based on content
-                        const minHeight = getMinHeightForContent(target);
+        //                 // Calculate minimum height based on content
+        //                 const minHeight = getMinHeightForContent(target);
                         
-                        // Ensure height doesn't go below minimum
-                        const newHeight = Math.max(event.rect.height, minHeight);
+        //                 // Ensure height doesn't go below minimum
+        //                 const newHeight = Math.max(event.rect.height, minHeight);
 
-                        // Update the element's style
-                        target.style.width = event.rect.width + 'px';
-                        target.style.height = newHeight + 'px';
+        //                 // Update the element's style
+        //                 target.style.width = event.rect.width + 'px';
+        //                 target.style.height = newHeight + 'px';
 
-                        // Translate when resizing from top or left edges
-                        x += event.deltaRect.left;
-                        y += event.deltaRect.top;
+        //                 // Translate when resizing from top or left edges
+        //                 x += event.deltaRect.left;
+        //                 y += event.deltaRect.top;
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-                        target.setAttribute('data-x', x.toString());
-                        target.setAttribute('data-y', y.toString());
+        //                 target.style.transform = `translate(${x}px, ${y}px)`;
+        //                 target.setAttribute('data-x', x.toString());
+        //                 target.setAttribute('data-y', y.toString());
                         
-                        // Use throttled save for better performance
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            throttledSaveLayout('skillsTab', paperId, {
-                                x,
-                                y,
-                                width: event.rect.width,
-                                height: newHeight
-                            });
-                        }
-                    },
-                    end: (event) => {
-                        event.target.style.zIndex = '';
+        //                 // Use throttled save for better performance
+        //                 const paperId = target.getAttribute('data-paper-id');
+        //                 if (paperId) {
+        //                     throttledSaveLayout('skillsTab', paperId, {
+        //                         x,
+        //                         y,
+        //                         width: event.rect.width,
+        //                         height: newHeight
+        //                     });
+        //                 }
+        //             },
+        //             end: (event) => {
+        //                 event.target.style.zIndex = '';
                         
-                        // Final save when resize ends
-                        const target = event.target;
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            const x = parseFloat(target.getAttribute('data-x')) || 0;
-                            const y = parseFloat(target.getAttribute('data-y')) || 0;
-                            const width = parseFloat(target.style.width) || 0;
-                            const height = parseFloat(target.style.height) || 0;
-                            characterActions.savePaperLayout('skillsTab', paperId, {
-                                x,
-                                y,
-                                width,
-                                height
-                            });
-                        }
-                    }
-                },
-                modifiers: [
-                    // Static minimum size constraints
-                    interact.modifiers.restrictSize({
-                        min: { width: 200, height: 100 }
-                    })
-                ]
-            });
+        //                 // Final save when resize ends
+        //                 const target = event.target;
+        //                 const paperId = target.getAttribute('data-paper-id');
+        //                 if (paperId) {
+        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
+        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
+        //                     const width = parseFloat(target.style.width) || 0;
+        //                     const height = parseFloat(target.style.height) || 0;
+        //                     characterActions.savePaperLayout('skillsTab', paperId, {
+        //                         x,
+        //                         y,
+        //                         width,
+        //                         height
+        //                     });
+        //                 }
+        //             }
+        //         },
+        //         modifiers: [
+        //             // Static minimum size constraints
+        //             interact.modifiers.restrictSize({
+        //                 min: { width: 200, height: 100 }
+        //             })
+        //         ]
+        //     });
     });
 
     function resetSkillsLayout() {

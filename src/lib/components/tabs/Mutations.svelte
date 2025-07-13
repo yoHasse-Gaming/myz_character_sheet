@@ -6,7 +6,7 @@
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Microscope } from '@lucide/svelte';
+    import { Dna, Microscope } from '@lucide/svelte';
     import { initInteractForElement, type TabName } from '../../utils/interactjsUtils';
 
     // Generate unique variants for mutation items to make them look different
@@ -15,13 +15,6 @@
     function showMutationInfo(mutation: any) {
         const content = `
             <div class="mutation-section">
-                <h4 class="section-title">ID:</h4>
-                <div class="section-content">
-                    <span class="mutation-id-tooltip">🧬 ${mutation.id}</span>
-                </div>
-            </div>
-            <div class="mutation-section">
-                <h4 class="section-title">Beskrivning:</h4>
                 <div class="section-content">${mutation.description}</div>
             </div>
             <div class="mutation-section">
@@ -81,6 +74,14 @@
                 }
             }
         }
+
+        // select all mutation items and initialize them
+        const mutationItems = document.querySelectorAll('.mutation-item-wrapper');
+        mutationItems.forEach((item, index) => {
+            const variant = mutationVariants[index % mutationVariants.length];
+            item.classList.add(variant);
+            initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
+        });
     });
 
 </script>
@@ -116,10 +117,10 @@
         <div class="mutations-list">
             {#each sheetState.mutations as mutation, index}
                 <div class="mutation-item-wrapper">
-                    <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]}">
+                    <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]}" data-x="0" data-y="0" data-paper-id="mutation-{index}">
                         <div class="mutation-item-content">
                             <div class="mutation-header">
-                                <span class="mutation-name">{mutation.name}</span>
+                                <span class="mutation-name"><Dna />  {mutation.name}</span>
                                 <div class="mutation-controls-right">
                                     <button 
                                         class="info-icon-button"
@@ -147,7 +148,6 @@
                             </div>
                             
                             <div class="mutation-meta">
-                                <span class="mutation-id-display">🧬 {mutation.id}</span>
                                 <span class="mutation-trigger">Utlöses: {mutation.trigger_when}</span>
                             </div>
                         </div>
@@ -301,7 +301,7 @@
     }
 
     .mutation-item-wrapper {
-        width: 100%;
+       width: 400px;
         margin-bottom: 0.5rem;
     }
 
@@ -327,6 +327,10 @@
         color: var(--color-surface-900);
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         flex: 1;
+    }
+
+    .lucide {
+        display: inline-block;
     }
 
     :global(.dark) .mutation-name {

@@ -59,18 +59,55 @@
 
     // Listen for global drag events
     function handleGlobalDragStart(event: DragEvent) {
+        // Only activate overlay for our specific drag operations
+        // Check if this is a valid HTML5 drag event with our data
+        if (!event.dataTransfer || !isValidDragSource(event)) {
+            return;
+        }
+        
         setTimeout(() => {
             isDragActive = true;
         }, 1);
     }
 
     function handleGlobalDragEnd(event: DragEvent) {
+        // Only deactivate if this was our drag operation
+        if (!event.dataTransfer || !isValidDragSource(event)) {
+            return;
+        }
+        
         isDragActive = false;
         dragOverZone = null;
     }
 
+    function isValidDragSource(event: DragEvent): boolean {
+        // Check if the drag source is our add-item draggable
+        const target = event.target as HTMLElement;
+        
+        // Check for our specific data type
+        const hasAddItemData = event.dataTransfer?.types.includes('text/plain') ?? false;
+        
+        // Check if the dragged element or its parent has our specific classes/attributes
+        const isAddItemDraggable = target?.closest('[draggable="true"]')?.getAttribute('data-drag-type') === 'add-item' ||
+                                  target?.closest('.draggable-add-item') ||
+                                  target?.getAttribute('data-drag-type') === 'add-item';
+        
+        // Check if this is NOT an interact.js drag (interact.js usually doesn't use HTML5 dragstart events)
+        const isInteractJsDrag = target?.closest('.interact-draggable') ||
+                                target?.hasAttribute('data-interact') ||
+                                (event.target as HTMLElement)?.classList?.contains('interact-draggable');
+        
+        return hasAddItemData && isAddItemDraggable && !isInteractJsDrag;
+    }
+
     function handleOverlayDragOver(event: DragEvent) {
         event.preventDefault();
+        
+        // Only handle if this is our drag operation
+        if (!isValidDragOperation(event)) {
+            return;
+        }
+        
         if (event.dataTransfer) {
             event.dataTransfer.dropEffect = 'copy';
         }
@@ -85,11 +122,22 @@
     }
 
     function handleOverlayDragLeave(event: DragEvent) {
+        // Only handle if this is our drag operation
+        if (!isValidDragOperation(event)) {
+            return;
+        }
+        
         dragOverZone = null;
     }
 
     function handleOverlayDrop(event: DragEvent) {
         event.preventDefault();
+        
+        // Only handle if this is our drag operation
+        if (!isValidDragOperation(event)) {
+            return;
+        }
+        
         const data = event.dataTransfer?.getData('text/plain');
         
         if (data === 'add-item' && dragOverZone) {
@@ -101,6 +149,12 @@
         
         isDragActive = false;
         dragOverZone = null;
+    }
+
+    function isValidDragOperation(event: DragEvent): boolean {
+        // Check if we have the expected data type and content
+        const data = event.dataTransfer?.getData('text/plain') || '';
+        return data === 'add-item' || (event.dataTransfer?.types.includes('text/plain') ?? false);
     }
 
     function findZoneAtPosition(x: number, y: number): string | null {

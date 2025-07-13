@@ -100,7 +100,6 @@
             }
         });
         
-        // interact('.skill-paper')
         //     .draggable({
         //         allowFrom: '.skill-header', // Only allow dragging from the header
         //         listeners: {

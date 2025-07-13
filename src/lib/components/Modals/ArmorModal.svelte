@@ -65,10 +65,15 @@
   {/snippet}
   
   {#snippet content()}
-    <div class="armor-modal-content">
+    <div class="armor-modal-content torn-input-wrapper variant-2 modal-content-wrapper">
         <div class="modal-header">
-            <h3>Lägg till rustning</h3>
-            <button class="modal-close"
+            <div class="modal-title-container">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <h3 class="modal-title">Lägg till rustning</h3>
+            </div>
+            <button class="modal-close-button"
                     aria-label="Stäng modal" 
                         onclick={closeModal}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -80,52 +85,66 @@
             <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addArmor(); }}>
                 <div class="form-group">
                     <label for="armor-name">Namn:</label>
-                    <input 
-                        id="armor-name"
-                        type="text" 
-                        bind:value={newArmorName}
-                        placeholder="Namn på rustning"
-                        required
-                    />
+                    <div class="torn-input-wrapper variant-3">
+                        <input 
+                            id="armor-name"
+                            type="text" 
+                            class="torn-input"
+                            bind:value={newArmorName}
+                            placeholder="Namn på rustning"
+                            required
+                        />
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="armor-description">Beskrivning:</label>
-                    <textarea 
-                        id="armor-description"
-                        bind:value={newArmorDescription}
-                        placeholder="Beskrivning (valfritt)"
-                        rows="2"
-                    ></textarea>
+                    <div class="torn-input-wrapper variant-4">
+                        <textarea 
+                            id="armor-description"
+                            class="torn-input"
+                            bind:value={newArmorDescription}
+                            placeholder="Beskrivning (valfritt)"
+                            rows="2"
+                        ></textarea>
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="armor-protection">Skydd:</label>
-                        <input 
-                            id="armor-protection"
-                            type="number" 
-                            bind:value={newArmorProtection}
-                            min="1"
-                            required
-                        />
+                        <div class="torn-input-wrapper variant-5">
+                            <input 
+                                id="armor-protection"
+                                type="number" 
+                                class="torn-input"
+                                bind:value={newArmorProtection}
+                                min="1"
+                                required
+                            />
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="armor-weight">Vikt (kg):</label>
-                        <input 
-                            id="armor-weight"
-                            type="number" 
-                            bind:value={newArmorWeight}
-                            min="0"
-                            step="0.1"
-                        />
+                        <div class="torn-input-wrapper variant-6">
+                            <input 
+                                id="armor-weight"
+                                type="number" 
+                                class="torn-input"
+                                bind:value={newArmorWeight}
+                                min="0"
+                                step="0.1"
+                            />
+                        </div>
                     </div>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick={closeModal}>
                         Avbryt
                     </button>
-                    <button type="submit" class="btn-primary">
-                        Lägg till
-                    </button>
+                    <div class="torn-input-wrapper variant-7 btn-wrapper">
+                        <button type="submit" class="btn-primary">
+                            Lägg till
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -133,23 +152,13 @@
 </Modal>
 
 <style>
-    /* Ensure modal appears on top and is properly styled */
-    :global(.skeleton-modal-backdrop) {
-        z-index: 100 !important;
-    }
+    @import '../../styles/common-modal.css';
     
-    :global(.skeleton-modal-positioner) {
-        z-index: 100 !important;
-    }
-    
-    :global(.skeleton-modal-content) {
-        z-index: 101 !important;
-    }
-    
-    /* Armor-specific styles that override common styles if needed */
+    /* Armor Modal Specific Styles */
     .armor-modal-content {
-        position: relative;
-        z-index: 102;
+        /* Armor-specific adjustments if needed */
+        min-height: 350px; /* Standard height for armor */
     }
 
+    /* All other styles now in torn-paper.css for reusability */
 </style>

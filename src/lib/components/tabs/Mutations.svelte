@@ -1,16 +1,20 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Dna, Microscope } from '@lucide/svelte';
+    import { Dna, DnaOff, Microscope, X } from '@lucide/svelte';
     import { initInteractForElement, type TabName } from '../../utils/interactjsUtils';
+    import { Rating } from '@skeletonlabs/skeleton-svelte';
+    import type { Mutation } from '../../types';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
+
+    const initializedMutations: string[] = $state([]);
 
     function showMutationInfo(mutation: any) {
         const content = `
@@ -48,6 +52,22 @@
         console.log('Mutation layout reset to defaults');
     }
 
+    async function onMutationSelected(mutation: Mutation, selected: boolean) {
+        // need to find the mutation and init interact for it
+        // wait for dom to be ready
+        await tick();
+        // check if items has been initialized
+        const mutationItems = document.querySelectorAll('.mutation-paper');
+        mutationItems.forEach((item, index) => {
+            if (!initializedMutations.includes(item.getAttribute('data-paper-id') || '')) {
+                initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
+                initializedMutations.push(item.getAttribute('data-paper-id') || '');
+            }
+        });
+
+    }
+
+
     onMount(() => {
         // Initialize InteractJS for the mutation points component
         const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
@@ -76,17 +96,18 @@
         }
 
         // select all mutation items and initialize them
-        const mutationItems = document.querySelectorAll('.mutation-item-wrapper');
+        const mutationItems = document.querySelectorAll('.mutation-paper');
         mutationItems.forEach((item, index) => {
             const variant = mutationVariants[index % mutationVariants.length];
             item.classList.add(variant);
+            initializedMutations.push(item.getAttribute('data-paper-id') || `mutation-${index}`);
             initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
         });
     });
 
 </script>
 
-<MutationsModal />
+<MutationsModal onMutationSelected={onMutationSelected} />
 
 <div class="mutations-tab">
     <!-- Reset Layout Button -->
@@ -114,10 +135,9 @@
     <!-- Mutations Section -->
     <div data-drop-zone="mutations">
         <!-- Selected Mutations -->
-        <div class="mutations-list">
             {#each sheetState.mutations as mutation, index}
                 <div class="mutation-item-wrapper">
-                    <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]}" data-x="0" data-y="0" data-paper-id="mutation-{index}">
+                    <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]} mutation-paper" data-x="0" data-y="0" data-paper-id="mutation-{index}">
                         <div class="mutation-item-content">
                             <div class="mutation-header">
                                 <span class="mutation-name"><Dna />  {mutation.name}</span>
@@ -160,7 +180,6 @@
                     <p>Inga mutationer valda. Dra papperet hit för att lägga till mutationer.</p>
                 </div>
             {/if}
-        </div>
     </div>
 
         <div class="mutation-points-floating-container">
@@ -174,23 +193,19 @@
                 <div class="mutation-points-display">
                     <div class="mutation-points-controls">
                         <div class="mutation-points-indicators">
-                            {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                            <!-- {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
                                 <button 
                                     class="mutation-point-indicator"
                                     onclick={() => {
                                         if (sheetState.mutationPoints > idx) {
-                                            // If this indicator is filled, reduce points to this level
                                             characterActions.setTotalMutationPoints(idx);
                                         } else {
-                                            // If this indicator is not filled, increase points to include this level
                                             characterActions.setTotalMutationPoints(idx + 1);
                                         }
                                     }}
                                     aria-label="Toggle mutation point {idx + 1}"
                                 >
-                                    <!-- Always show the circle as base layer -->
                                     <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" />
-                                    <!-- Show X on top if point is spent -->
                                     {#if sheetState.mutationPoints > idx}
                                         <img 
                                             src='/img/strokes/x.svg' 
@@ -199,7 +214,33 @@
                                         />
                                     {/if}
                                 </button>
-                            {/each}
+                            {/each} -->
+                            <!-- add icon here which will clear the last mutationpoint -->
+                            
+                            <button 
+                            title="Ta bort sista mutationpoängen"
+                            disabled={sheetState.mutationPoints === 0}
+                                onclick={() => {
+                                    if (sheetState.mutationPoints > 0) {
+                                        characterActions.setTotalMutationPoints(sheetState.mutationPoints - 1);
+                                    }
+                                }}
+                            >
+                                <DnaOff size={24} />
+                            </button>
+                            
+                            <Rating 
+                                value={sheetState.mutationPoints} 
+                                count={10}
+                                onValueChange={(value) => characterActions.setTotalMutationPoints(value.value)}
+                            >
+                                {#snippet iconEmpty()}
+                                    <Dna size={24} />
+                                {/snippet}
+                                {#snippet iconFull()}
+                                    <Dna size={24} color="red" />
+                                {/snippet}
+                            </Rating>
                         </div>
                     </div>
                 </div>
@@ -300,9 +341,24 @@
         transform: translateY(0);
     }
 
-    .mutation-item-wrapper {
-       width: 400px;
-        margin-bottom: 0.5rem;
+    .mutation-paper {
+        width: 350px;
+        max-width: 100%;
+        height: auto;
+        min-height: 120px;
+        max-height: 200px;
+        cursor: default;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        border: 2px solid transparent;
+        border-radius: 4px;
+    }
+
+    .mutation-paper:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        z-index: 10;
     }
 
     .mutation-item-content {
@@ -312,6 +368,8 @@
         flex-direction: column;
         gap: 0.75rem;
         z-index: 1;
+        height: 100%;
+        overflow: hidden;
     }
 
     .mutation-header {
@@ -482,6 +540,18 @@
 
         .mutation-controls-right {
             align-self: flex-end;
+        }
+
+        .mutation-paper {
+            width: 300px;
+            min-height: 100px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .mutation-paper {
+            width: 280px;
+            min-height: 90px;
         }
     }
 

@@ -6,6 +6,7 @@
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import TalentsModal from '../Modals/TalentsModal.svelte';
+    import { initInteractForElement } from '../../utils/interactjsUtils';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -13,13 +14,6 @@
     function showTalentInfo(talent: any) {
         const content = 
             '<div class="talent-section">' +
-                '<h4 class="section-title">ID:</h4>' +
-                '<div class="section-content">' +
-                    '<span class="talent-id-tooltip">⚔️ ' + talent.id + '</span>' +
-                '</div>' +
-            '</div>' +
-            '<div class="talent-section">' +
-                '<h4 class="section-title">Beskrivning:</h4>' +
                 '<div class="section-content">' + talent.description + '</div>' +
             '</div>' +
             '<div class="talent-section">' +
@@ -39,6 +33,17 @@
     const canAddOccupational = $derived(characterActions.canAddOccupationalTalent());
     const canAddSecondOccupational = $derived(characterActions.canAddSecondOccupationalTalent());
     const canAddGeneric = $derived(characterActions.canAddGenericTalent());
+
+    onMount(() => {
+        // Initialize any necessary state or fetch data here
+        const talents = document.querySelectorAll('.talent-item-wrapper');
+        if(talents) {
+            talents.forEach((talent, index) => {
+                initInteractForElement(talent as HTMLElement, 'talentsTab', '.talent-header', '.talent-header');
+            });
+        }
+        
+    });
 </script>
 
 <TalentsModal modalType="occupational" />
@@ -54,21 +59,20 @@
 
     <!-- Occupational Talents Section -->
     <div class="talents-section" data-drop-zone="occupational-talents">
-        <FormSection header="⚔️ YRKESTALANGER">
-            <div class="talent-info">
+            <!-- <div class="talent-info">
                 <p class="talent-description">Yrkestalanger ({occupationalTalents.length}/2) - Specialiserade färdigheter från ditt yrke</p>
                 {#if !canAddSecondOccupational && occupationalTalents.length === 1}
                     <p class="talent-requirement">Kräver 3 generiska talanger för att låsa upp den andra yrkestalangen</p>
                 {/if}
-            </div>
+            </div> -->
             
             <div class="talents-list">
                 {#each occupationalTalents as talent, index}
                     <div class="talent-item-wrapper">
-                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card">
+                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  data-x="0" data-y="0" data-paper-id="occuptalent-{index}">
                             <div class="talent-item-content">
                                 <div class="talent-header">
-                                    <span class="talent-name">{talent.name}</span>
+                                    <span class="talent-name">Yrke: {talent.name}</span>
                                     <div class="talent-controls-right">
                                         <button 
                                             class="info-icon-button"
@@ -95,7 +99,6 @@
                                     </div>
                                 </div>
                                 <div class="talent-meta">
-                                    <span class="talent-id-display">⚔️ {talent.id}</span>
                                     <span class="talent-occupation">Yrke: {talent.occupation}</span>
                                 </div>
                             </div>
@@ -103,29 +106,27 @@
                     </div>
                 {/each}
                 
-                {#if occupationalTalents.length === 0}
+                <!-- {#if occupationalTalents.length === 0}
                     <div class="no-talents-message">
                         <p>Inga yrkestalanger valda. Dra papperet hit för att lägga till yrkestalanger.</p>
                     </div>
-                {/if}
+                {/if} -->
             </div>
-        </FormSection>
     </div>
 
     <!-- Generic Talents Section -->
     <div class="talents-section" data-drop-zone="generic-talents">
-        <FormSection header="🎯 GENERISKA TALANGER">
-            <div class="talent-info">
+            <!-- <div class="talent-info">
                 <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
-            </div>
+            </div> -->
             
             <div class="talents-list">
                 {#each genericTalents as talent, index}
                     <div class="talent-item-wrapper">
-                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card">
+                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" data-x="0" data-y="0" data-paper-id="generictalent-{index}">
                             <div class="talent-item-content">
                                 <div class="talent-header">
-                                    <span class="talent-name">{talent.name}</span>
+                                    <span class="talent-name">Generisk: {talent.name}</span>
                                     <div class="talent-controls-right">
                                         <button 
                                             class="info-icon-button"
@@ -166,7 +167,6 @@
                     </div>
                 {/if}
             </div>
-        </FormSection>
     </div>
 </div>
 
@@ -176,6 +176,8 @@
         flex-direction: column;
         gap: 1.5rem;
         width: 100%;
+        min-height: 100vh;
+
     }
 
     .talents-section {

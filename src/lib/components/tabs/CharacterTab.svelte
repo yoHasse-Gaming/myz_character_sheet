@@ -47,9 +47,6 @@
             }
         });
 
-
-        
-        // interact('.character-paper')
         //     .draggable({
         //         allowFrom: '.character-header', // Use component-specific selector
         //         listeners: {

@@ -7,6 +7,10 @@
     import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
     import { Modal } from "@skeletonlabs/skeleton-svelte";
 
+    const { onMutationSelected }: {
+        onMutationSelected: (mutation: Mutation, selected: boolean) => Promise<void>;
+    } = $props();
+
     // Get available mutations
     const availableMutations: Mutation[] = mutations;
     
@@ -17,18 +21,21 @@
     function isMutationSelected(mutationId: string): boolean {
         return sheetState.mutations.some(m => m.id === mutationId);
     }
+
     
     // Generate unique variants and random rotations for mutation cards
     const mutationVariants = generateUniqueVariants(availableMutations.length);
     const randomRotations = generateRandomRotations(availableMutations.length);
     
-    function selectMutation(mutation: Mutation) {
+    async function selectMutation(mutation: Mutation) {
         if (isMutationSelected(mutation.id)) {
             characterActions.removeMutation(mutation.id);
+            await onMutationSelected(mutation, false);
         } else {
             const selectedMutation: Mutation = mutation;
             characterActions.addMutation(selectedMutation);
             // Automatically close the modal after selection
+            await onMutationSelected(selectedMutation, true);
             setTimeout(() => closeModal(), 500);
         }
     }

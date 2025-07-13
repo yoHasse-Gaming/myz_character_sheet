@@ -786,6 +786,11 @@ label {
     color: #f5f5f5 !important;
 }
 
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
 /* @import './handdrawn.css'; */
 
 /* Shared Draggable Paper Styles */

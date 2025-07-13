@@ -13,14 +13,9 @@
     let isDragging = $state(false);
     let dragOverNotes = $state(false);
 
-    // Modal and add functions
+    // Modal functions
     function openRelationModal() {
         openDialogueOption('relations');
-    }
-
-    function addNoteDirectly() {
-        // Add a blank note that user can edit
-        characterActions.addNote('');
     }
 
 
@@ -104,28 +99,6 @@
                 Andra överlevare du träffat i Zonen samt viktiga anteckningar och minnen från dina äventyr.
             </p>
             
-            <!-- Add Items Controls -->
-            <div class="add-controls">
-                <!-- Draggable Add Item for Relations -->
-                <DraggableAddItem 
-                    text="Dra för att lägga till relation"
-                    ariaLabel="Dra för att skapa en ny relation"
-                    variant="variant-3"
-                />
-                
-                <!-- Direct Add Button for Notes -->
-                <button class="add-note-direct-button" onclick={addNoteDirectly}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14,2 14,8 20,8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10,9 9,9 8,9"></polyline>
-                    </svg>
-                    Lägg till anteckning
-                </button>
-            </div>
-
             <!-- Combined Items Grid -->
             <div class="items-grid">
                 <!-- Relations -->
@@ -207,6 +180,22 @@
 
 <DragOverlay />
 
+<!-- Floating Draggable Add Items -->
+<DraggableAddItem 
+    text="Dra för att lägga till relation"
+    ariaLabel="Dra för att skapa en ny relation"
+    variant="variant-3"
+    dragType="add-relation"
+    position={{ top: 120, right: -60 }}
+/>
+
+<DraggableAddItem 
+    text="Dra för att lägga till anteckning"
+    ariaLabel="Dra för att skapa en ny anteckning"
+    variant="variant-4"
+    dragType="add-note"
+    position={{ top: 220, right: -60 }}
+/>
 
 <!-- Modals -->
 <RelationModal />
@@ -229,38 +218,6 @@
 
     :global(.dark) .section-description {
         color: var(--color-surface-400);
-    }
-
-    /* Add controls */
-    .add-controls {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .add-note-direct-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background: var(--color-secondary-600);
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 0.9rem;
-    }
-
-    .add-note-direct-button:hover {
-        background: var(--color-secondary-700);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     /* Combined items grid */

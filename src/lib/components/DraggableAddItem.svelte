@@ -3,6 +3,8 @@
         text = "Dra för att lägga till",
         ariaLabel = "Dra för att lägga till föremål", 
         variant = "variant-6",
+        dragType = "add-item",
+        position = { top: 120, right: -60 },
         onDragStart = () => {},
         onDragEnd = () => {}
     } = $props();
@@ -13,7 +15,7 @@
         isDragging = true;
         if (event.dataTransfer) {
             event.dataTransfer.effectAllowed = 'copy';
-            event.dataTransfer.setData('text/plain', 'add-item');
+            event.dataTransfer.setData('text/plain', dragType);
         }
         onDragStart();
     }
@@ -24,13 +26,14 @@
     }
 </script>
 
-<div class="draggable-add-container">
+<div class="draggable-add-container" style="top: {position.top}px; right: {position.right}px;">
     <div 
         class="draggable-add-item torn-input-wrapper {variant}"
         role="button"
         tabindex="0"
         aria-label={ariaLabel}
         draggable="true"
+        data-drag-type="{dragType}"
         ondragstart={handleDragStart}
         ondragend={handleDragEnd}
         class:dragging={isDragging}
@@ -49,14 +52,12 @@
     /* Draggable Add Item */
     .draggable-add-container {
         position: fixed;
-        top: 120px;
-        right: -60px; /* Position mostly off-screen */
         z-index: 100;
         transition: right 0.3s ease;
     }
 
     .draggable-add-container:hover {
-        right: 20px; /* Slide fully into view on hover */
+        right: 20px !important; /* Slide fully into view on hover */
     }
 
     .draggable-add-item {

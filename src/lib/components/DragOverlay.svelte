@@ -5,6 +5,7 @@
 
     let isDragActive = $state(false);
     let dragOverZone = $state<string | null>(null);
+    let currentDragType = $state<string | null>(null);
 
     // Define drop zones with their positions and actions
     const dropZones = [
@@ -56,16 +57,17 @@
             }
         },
         {
-            id: 'relations',
-            text: 'Lägg till relation',
-            selector: '.relations-list, [data-drop-zone="relations"]',
-            action: () => openDialogueOption('relations')
-        },
-        {
-            id: 'notes',
-            text: 'Lägg till anteckning',
-            selector: '.notes-list, [data-drop-zone="notes"]',
-            action: () => openDialogueOption('notes')
+            id: 'relations-notes',
+            text: 'Lägg till här',
+            selector: '.relations-notes-section, .items-grid',
+            action: () => {
+                // Action depends on the drag type
+                if (currentDragType === 'add-relation') {
+                    openDialogueOption('relations');
+                } else if (currentDragType === 'add-note') {
+                    characterActions.addNote('');
+                }
+            }
         }
     ];
 
@@ -76,6 +78,10 @@
         if (!event.dataTransfer || !isValidDragSource(event)) {
             return;
         }
+        
+        // Get the drag type
+        const target = event.target as HTMLElement;
+        currentDragType = target?.closest('[draggable="true"]')?.getAttribute('data-drag-type') || 'add-item';
         
         setTimeout(() => {
             isDragActive = true;
@@ -90,6 +96,7 @@
         
         isDragActive = false;
         dragOverZone = null;
+        currentDragType = null;
     }
 
     function isValidDragSource(event: DragEvent): boolean {
@@ -100,16 +107,19 @@
         const hasAddItemData = event.dataTransfer?.types.includes('text/plain') ?? false;
         
         // Check if the dragged element or its parent has our specific classes/attributes
-        const isAddItemDraggable = target?.closest('[draggable="true"]')?.getAttribute('data-drag-type') === 'add-item' ||
-                                  target?.closest('.draggable-add-item') ||
-                                  target?.getAttribute('data-drag-type') === 'add-item';
+        const dragTypeAttribute = target?.closest('[draggable="true"]')?.getAttribute('data-drag-type');
+        const isAddItemDraggable = dragTypeAttribute && (
+            dragTypeAttribute === 'add-item' || 
+            dragTypeAttribute === 'add-relation' || 
+            dragTypeAttribute === 'add-note'
+        );
         
         // Check if this is NOT an interact.js drag (interact.js usually doesn't use HTML5 dragstart events)
         const isInteractJsDrag = target?.closest('.interact-draggable') ||
                                 target?.hasAttribute('data-interact') ||
                                 (event.target as HTMLElement)?.classList?.contains('interact-draggable');
         
-        return hasAddItemData && isAddItemDraggable && !isInteractJsDrag;
+        return hasAddItemData && !!isAddItemDraggable && !isInteractJsDrag;
     }
 
     function handleOverlayDragOver(event: DragEvent) {
@@ -152,25 +162,47 @@
         
         const data = event.dataTransfer?.getData('text/plain');
         
-        if (data === 'add-item' && dragOverZone) {
+        if (dragOverZone) {
             const zone = dropZones.find(z => z.id === dragOverZone);
             if (zone) {
-                zone.action();
+                // For the unified relations-notes zone, the action already handles the currentDragType
+                if (zone.id === 'relations-notes') {
+                    zone.action();
+                } else if (data === 'add-item') {
+                    // Legacy behavior for other zones
+                    zone.action();
+                }
             }
         }
         
         isDragActive = false;
         dragOverZone = null;
+        currentDragType = null;
     }
 
     function isValidDragOperation(event: DragEvent): boolean {
         // Check if we have the expected data type and content
         const data = event.dataTransfer?.getData('text/plain') || '';
-        return data === 'add-item' || (event.dataTransfer?.types.includes('text/plain') ?? false);
+        return (
+            data === 'add-item' || 
+            data === 'add-relation' || 
+            data === 'add-note' || 
+            (event.dataTransfer?.types.includes('text/plain') ?? false)
+        );
     }
 
-    function findZoneAtPosition(x: number, y: number): string | null {
+    function findZoneAtPosition(x: number, y: number): string | null {        
         for (const zone of dropZones) {
+            // Skip zones that don't match the current drag type
+            if (zone.id === 'relations-notes' && currentDragType !== 'add-relation' && currentDragType !== 'add-note') {
+                continue;
+            }
+            
+            // For legacy drag types, allow all zones except relations-notes
+            if (currentDragType === 'add-item' && zone.id === 'relations-notes') {
+                continue;
+            }
+            
             // Try the original selector first
             let element = document.querySelector(zone.selector);
             
@@ -204,14 +236,9 @@
                 } else if (zone.id === 'skills') {
                     element = document.querySelector('[data-drop-zone="skills"]') ||
                              document.querySelector('.skills-tab') as HTMLElement;
-                } else if (zone.id === 'relations') {
-                    element = document.querySelector('.relations-list') ||
-                             document.querySelector('[data-drop-zone="relations"]') ||
-                             document.querySelector('.relations-section') as HTMLElement;
-                } else if (zone.id === 'notes') {
-                    element = document.querySelector('.notes-list') ||
-                             document.querySelector('[data-drop-zone="notes"]') ||
-                             document.querySelector('.notes-section') as HTMLElement;
+                } else if (zone.id === 'relations-notes') {
+                    element = document.querySelector('.relations-notes-section') ||
+                             document.querySelector('.items-grid') as HTMLElement;
                 }
             }
             
@@ -265,16 +292,10 @@
                 // Try different skills selectors
                 element = document.querySelector('[data-drop-zone="skills"]') ||
                          document.querySelector('.skills-tab') as HTMLElement;
-            } else if (zone.id === 'relations') {
-                // Try different relations selectors
-                element = document.querySelector('.relations-list') ||
-                         document.querySelector('[data-drop-zone="relations"]') ||
-                         document.querySelector('.relations-section') as HTMLElement;
-            } else if (zone.id === 'notes') {
-                // Try different notes selectors
-                element = document.querySelector('.notes-list') ||
-                         document.querySelector('[data-drop-zone="notes"]') ||
-                         document.querySelector('.notes-section') as HTMLElement;
+            } else if (zone.id === 'relations-notes') {
+                // Try different relations-notes selectors
+                element = document.querySelector('.relations-notes-section') ||
+                         document.querySelector('.items-grid') as HTMLElement;
             }
         }
         
@@ -314,18 +335,30 @@
         ondrop={handleOverlayDrop}
     >
         {#each dropZones as zone}
-            {@const pos = getZonePosition(zone)}
-            {#if pos.visible}
-                <div 
-                    class="flashlight-zone"
-                    class:active={dragOverZone === zone.id}
-                    style="
-                        left: {pos.left}px;
-                        top: {pos.top}px;
-                    "
-                >
-                    <div class="flashlight-text">{zone.text}</div>
-                </div>
+            {@const shouldShow = (
+                (zone.id === 'relations-notes' && (currentDragType === 'add-relation' || currentDragType === 'add-note')) ||
+                (currentDragType === 'add-item' && zone.id !== 'relations-notes')
+            )}
+            {#if shouldShow}
+                {@const pos = getZonePosition(zone)}
+                {#if pos.visible}
+                    <div 
+                        class="flashlight-zone"
+                        class:active={dragOverZone === zone.id}
+                        style="
+                            left: {pos.left}px;
+                            top: {pos.top}px;
+                        "
+                    >
+                        <div class="flashlight-text">
+                            {#if zone.id === 'relations-notes'}
+                                {currentDragType === 'add-relation' ? 'Lägg till relation' : 'Lägg till anteckning'}
+                            {:else}
+                                {zone.text}
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
             {/if}
         {/each}
     </div>

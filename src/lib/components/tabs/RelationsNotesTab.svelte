@@ -1,43 +1,29 @@
 <script lang="ts">
+    import { onMount, onDestroy } from 'svelte';
     import FormSection from '../FormSection.svelte';
+    import DraggableAddItem from '../DraggableAddItem.svelte';
+    import DragOverlay from '../DragOverlay.svelte';
+    import RelationModal from '../Modals/RelationModal.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import { openDialogueOption } from '../../states/modals.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
+    import { initInteractForElement } from '../../utils/interactjsUtils';
 
-    // Generate random IDs for new items
-    function generateId() {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Draggable state
+    let isDragging = $state(false);
+    let dragOverNotes = $state(false);
+
+    // Modal and add functions
+    function openRelationModal() {
+        openDialogueOption('relations');
     }
 
-    // Relations management
-    let newRelationName = $state('');
-    let newRelationDescription = $state('');
-    let newRelationIsClose = $state(false);
-
-    function addRelation() {
-        if (newRelationName.trim()) {
-            characterActions.addRelation({
-                id: generateId(),
-                name: newRelationName.trim(),
-                description: newRelationDescription.trim(),
-                isClose: newRelationIsClose
-            });
-            
-            // Reset form
-            newRelationName = '';
-            newRelationDescription = '';
-            newRelationIsClose = false;
-        }
+    function addNoteDirectly() {
+        // Add a blank note that user can edit
+        characterActions.addNote('');
     }
 
-    // Notes management
-    let newNoteText = $state('');
 
-    function addNote() {
-        if (newNoteText.trim()) {
-            characterActions.addNote(newNoteText.trim());
-            newNoteText = '';
-        }
-    }
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
@@ -47,61 +33,110 @@
     // Generate variants for visual variety
     const relationVariants = $derived(generateUniqueVariants(sheetState.relations.length + 1));
     const noteVariants = $derived(generateUniqueVariants(sheetState.notes.length + 1));
+
+    // InteractJS setup
+    onMount(() => {
+        // Use a slight delay to ensure DOM is fully rendered
+        setTimeout(() => {
+            // Setup draggable for relation items
+            const relationCards = document.querySelectorAll('.relation-card');
+            relationCards.forEach(card => {
+                if (card instanceof HTMLElement) {
+                    initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+                        enableDraggable: true,
+                        enableResizable: false
+                    });
+                }
+            });
+
+            // Setup draggable for note items
+            const noteCards = document.querySelectorAll('.note-card');
+            noteCards.forEach(card => {
+                if (card instanceof HTMLElement) {
+                    initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+                        enableDraggable: true,
+                        enableResizable: true
+                    });
+                }
+            });
+        }, 100);
+    });
+
+    // Re-initialize InteractJS when items are added/removed
+    $effect(() => {
+        // Watch for changes in relations/notes length
+        const relationCount = sheetState.relations.length;
+        const noteCount = sheetState.notes.length;
+        
+        // Re-setup draggable functionality when items change
+        setTimeout(() => {
+            const relationCards = document.querySelectorAll('.relation-card');
+            relationCards.forEach(card => {
+                if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+                    initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+                        enableDraggable: true,
+                        enableResizable: false
+                    });
+                    card.setAttribute('data-interact-initialized', 'true');
+                }
+            });
+
+            const noteCards = document.querySelectorAll('.note-card');
+            noteCards.forEach(card => {
+                if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+                    initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+                        enableDraggable: true,
+                        enableResizable: true
+                    });
+                    card.setAttribute('data-interact-initialized', 'true');
+                }
+            });
+        }, 50);
+    });
+
 </script>
 
 <div class="relations-notes-tab space-y-6">
-    <!-- Relations Section -->
-    <FormSection header="👥 RELATIONER">
-        <div class="relations-section">
+    <!-- Relations and Notes Section -->
+    <FormSection header="👥 RELATIONER & ANTECKNINGAR">
+        <div class="relations-notes-section">
             <p class="section-description">
-                Andra överlevare du träffat i Zonen - vänner, fiender, eller något däremellan.
+                Andra överlevare du träffat i Zonen samt viktiga anteckningar och minnen från dina äventyr.
             </p>
             
-            <!-- Add new relation form -->
-            <div class="add-item-form">
-                <div class="form-row">
-                    <div class="torn-input-wrapper variant-1">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Namn på person..." 
-                            bind:value={newRelationName}
-                        />
-                    </div>
-                    <div class="torn-input-wrapper variant-2">
-                        <input 
-                            type="text" 
-                            class="torn-input font-user" 
-                            placeholder="Relation/beskrivning..." 
-                            bind:value={newRelationDescription}
-                        />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label class="close-relation-checkbox">
-                        <input 
-                            type="checkbox" 
-                            bind:checked={newRelationIsClose}
-                        />
-                        <span class="checkbox-label">Nära relation</span>
-                        <span class="checkbox-hint">(Vän, familj, eller särskilt viktigt)</span>
-                    </label>
-                    <button class="add-button" onclick={addRelation}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Lägg till
-                    </button>
-                </div>
+            <!-- Add Items Controls -->
+            <div class="add-controls">
+                <!-- Draggable Add Item for Relations -->
+                <DraggableAddItem 
+                    text="Dra för att lägga till relation"
+                    ariaLabel="Dra för att skapa en ny relation"
+                    variant="variant-3"
+                />
+                
+                <!-- Direct Add Button for Notes -->
+                <button class="add-note-direct-button" onclick={addNoteDirectly}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    Lägg till anteckning
+                </button>
             </div>
 
-            <!-- Relations list -->
-            <div class="relations-list">
+            <!-- Combined Items Grid -->
+            <div class="items-grid">
+                <!-- Relations -->
                 {#each sheetState.relations as relation, index}
-                    <div class="torn-input-wrapper {relationVariants[index]} relation-card {relation.isClose ? 'close-relation' : ''}">
+                    <div class="torn-input-wrapper {relationVariants[index]} relation-card {relation.isClose ? 'close-relation' : ''}" 
+                         data-x="0" 
+                         data-y="0"
+                         data-paper-id="relation-{relation.id}">
                         <div class="relation-content">
                             <div class="relation-header">
+                                <div class="item-type-badge relation-badge">👥</div>
                                 <h4 class="relation-name">
                                     {relation.name}
                                     {#if relation.isClose}
@@ -125,50 +160,17 @@
                         </div>
                     </div>
                 {/each}
-                
-                {#if sheetState.relations.length === 0}
-                    <div class="empty-state">
-                        <div class="empty-icon">🤝</div>
-                        <p>Inga relationer registrerade än. Vilka andra överlevare har du träffat i Zonen?</p>
-                    </div>
-                {/if}
-            </div>
-        </div>
-    </FormSection>
 
-    <!-- Notes Section -->
-    <FormSection header="📝 ANTECKNINGAR">
-        <div class="notes-section">
-            <p class="section-description">
-                Minnen, viktiga platser, ledtrådar och andra saker du vill komma ihåg från dina äventyr i Zonen.
-            </p>
-            
-            <!-- Add new note form -->
-            <div class="add-note-form">
-                <div class="torn-input-wrapper variant-1">
-                    <textarea 
-                        class="torn-input font-user note-input" 
-                        placeholder="Skriv en ny anteckning..."
-                        rows="3"
-                        bind:value={newNoteText}
-                    ></textarea>
-                </div>
-                <button class="add-button" onclick={addNote}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Lägg till anteckning
-                </button>
-            </div>
-
-            <!-- Notes list -->
-            <div class="notes-list">
+                <!-- Notes -->
                 {#each sheetState.notes as note, index}
-                    <div class="torn-input-wrapper {noteVariants[index]} note-card">
+                    <div class="torn-input-wrapper {noteVariants[index]} note-card" 
+                         data-x="0" 
+                         data-y="0"
+                         data-paper-id="note-{index}">
                         <div class="note-content">
                             <div class="note-header">
-                                <span class="note-number">#{index + 1}</span>
+                                <div class="item-type-badge note-badge">📝</div>
+                                <span class="note-number">Anteckning #{index + 1}</span>
                                 <button 
                                     class="remove-button" 
                                     onclick={() => characterActions.removeNote(index)}
@@ -182,18 +184,19 @@
                             </div>
                             <textarea 
                                 class="note-text font-user"
-                                rows="3"
+                                rows="4"
                                 value={note}
+                                placeholder="Skriv din anteckning här..."
                                 oninput={(e) => updateNote(index, e)}
                             ></textarea>
                         </div>
                     </div>
                 {/each}
                 
-                {#if sheetState.notes.length === 0}
+                {#if sheetState.relations.length === 0 && sheetState.notes.length === 0}
                     <div class="empty-state">
                         <div class="empty-icon">📋</div>
-                        <p>Inga anteckningar än. Dokumentera dina upptäckter och minnen från Zonen!</p>
+                        <p>Inga relationer eller anteckningar än. Dokumentera dina äventyr och kontakter i Zonen!</p>
                     </div>
                 {/if}
             </div>
@@ -201,11 +204,19 @@
     </FormSection>
 </div>
 
+
+<DragOverlay />
+
+
+<!-- Modals -->
+<RelationModal />
+
 <style>
     .relations-notes-tab {
         display: flex;
         flex-direction: column;
         gap: 2rem;
+        height: 100vh;
     }
 
     .section-description {
@@ -220,57 +231,21 @@
         color: var(--color-surface-400);
     }
 
-    /* Add item forms */
-    .add-item-form,
-    .add-note-form {
+    /* Add controls */
+    .add-controls {
         display: flex;
-        flex-direction: column;
         gap: 1rem;
         margin-bottom: 2rem;
-        padding: 1rem;
-        background: rgba(217, 119, 6, 0.05);
-        border: 1px dashed rgba(217, 119, 6, 0.3);
-        border-radius: 0.5rem;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
         flex-wrap: wrap;
-    }
-
-    .form-row .torn-input-wrapper {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .close-relation-checkbox {
-        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        flex-shrink: 0;
     }
 
-    :global(.dark) .close-relation-checkbox {
-        color: var(--color-surface-300);
-    }
-
-    .checkbox-hint {
-        font-size: 0.8rem;
-        color: var(--color-surface-500);
-        font-style: italic;
-    }
-
-    .add-button {
+    .add-note-direct-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background: var(--color-primary-600);
+        background: var(--color-secondary-600);
         color: white;
         border: none;
         border-radius: 0.5rem;
@@ -279,30 +254,75 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        white-space: nowrap;
-        flex-shrink: 0;
+        font-size: 0.9rem;
     }
 
-    .add-button:hover {
-        background: var(--color-primary-700);
+    .add-note-direct-button:hover {
+        background: var(--color-secondary-700);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
-    /* Relations list */
-    .relations-list {
+    /* Combined items grid */
+    .items-grid {
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        position: relative;
+        min-height: 100px;
     }
 
-    .relation-card {
+    /* Item type badges */
+    .item-type-badge {
+        font-size: 1.2rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .relation-badge {
+        background: rgba(34, 197, 94, 0.2);
+        color: var(--color-success-700);
+    }
+
+    .note-badge {
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--color-info-700);
+    }
+
+    /* Shared card styles */
+    .relation-card,
+    .note-card {
         transition: all 0.2s ease;
+        cursor: move;
+        position: relative;
+        touch-action: none;
+        user-select: none;
+        will-change: transform;
+        transform: translateZ(0); /* Force hardware acceleration */
     }
 
-    .relation-card:hover {
-        transform: translateY(-2px);
+    .relation-card:hover,
+    .note-card:hover {
+        transform: translateY(-2px) translateZ(0);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        z-index: 10;
+    }
+
+    .relation-card:active,
+    .note-card:active {
+        opacity: 0.8;
+        z-index: 20;
+        transition: none; /* Disable transition during drag */
+    }
+
+    .relation-content,
+    .note-content {
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+        height: 100%;
     }
 
     .relation-card.close-relation {
@@ -310,17 +330,12 @@
         box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
     }
 
-    .relation-content {
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-    }
-
     .relation-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 0.5rem;
+        gap: 0.5rem;
     }
 
     .relation-name {
@@ -362,65 +377,41 @@
         color: var(--color-surface-300);
     }
 
-    /* Notes list */
-    .notes-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .note-card {
-        transition: all 0.2s ease;
-    }
-
-    .note-card:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .note-content {
-        padding: 1rem;
-        position: relative;
-        z-index: 2;
-    }
-
+    /* Notes list - now part of items grid */
     .note-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.5rem;
+        gap: 0.5rem;
     }
 
     .note-number {
         font-family: var(--form-labels), serif;
         font-size: 0.9rem;
         font-weight: bold;
-        color: var(--color-primary-600);
-        background: rgba(217, 119, 6, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
+        color: var(--color-info-700);
+        flex: 1;
     }
 
-    .note-text,
-    .note-input {
+    .note-text {
         width: 100%;
         background: transparent;
         border: none;
         resize: vertical;
-        min-height: 60px;
+        height: 100%;
         font-size: 0.9rem;
         color: var(--color-surface-900);
         line-height: 1.4;
         font-family: var(--font-user), sans-serif;
+        resize: none;
     }
 
-    :global(.dark) .note-text,
-    :global(.dark) .note-input {
+    :global(.dark) .note-text {
         color: var(--color-surface-100);
     }
 
-    .note-text:focus,
-    .note-input:focus {
+    .note-text:focus {
         outline: none;
         background: rgba(217, 119, 6, 0.05);
         border-radius: 0.25rem;
@@ -446,6 +437,14 @@
         transform: scale(1.1);
     }
 
+    /* Drag states */
+    .items-grid.drag-over {
+        background: rgba(217, 119, 6, 0.1);
+        border: 2px dashed rgba(217, 119, 6, 0.5);
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
     /* Empty states */
     .empty-state {
         text-align: center;
@@ -462,14 +461,6 @@
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .form-row {
-            flex-direction: column;
-        }
-
-        .form-row .torn-input-wrapper {
-            min-width: unset;
-        }
-
         .relations-list {
             grid-template-columns: 1fr;
         }
@@ -478,12 +469,6 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 0.5rem;
-        }
-
-        .close-relation-checkbox {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.25rem;
         }
     }
 </style>

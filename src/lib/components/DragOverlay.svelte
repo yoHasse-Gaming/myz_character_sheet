@@ -54,6 +54,18 @@
             action: () => {
                 if (characterActions.canAddGenericTalent()) openDialogueOption('generic-talents');
             }
+        },
+        {
+            id: 'relations',
+            text: 'Lägg till relation',
+            selector: '.relations-list, [data-drop-zone="relations"]',
+            action: () => openDialogueOption('relations')
+        },
+        {
+            id: 'notes',
+            text: 'Lägg till anteckning',
+            selector: '.notes-list, [data-drop-zone="notes"]',
+            action: () => openDialogueOption('notes')
         }
     ];
 
@@ -192,6 +204,14 @@
                 } else if (zone.id === 'skills') {
                     element = document.querySelector('[data-drop-zone="skills"]') ||
                              document.querySelector('.skills-tab') as HTMLElement;
+                } else if (zone.id === 'relations') {
+                    element = document.querySelector('.relations-list') ||
+                             document.querySelector('[data-drop-zone="relations"]') ||
+                             document.querySelector('.relations-section') as HTMLElement;
+                } else if (zone.id === 'notes') {
+                    element = document.querySelector('.notes-list') ||
+                             document.querySelector('[data-drop-zone="notes"]') ||
+                             document.querySelector('.notes-section') as HTMLElement;
                 }
             }
             
@@ -245,6 +265,16 @@
                 // Try different skills selectors
                 element = document.querySelector('[data-drop-zone="skills"]') ||
                          document.querySelector('.skills-tab') as HTMLElement;
+            } else if (zone.id === 'relations') {
+                // Try different relations selectors
+                element = document.querySelector('.relations-list') ||
+                         document.querySelector('[data-drop-zone="relations"]') ||
+                         document.querySelector('.relations-section') as HTMLElement;
+            } else if (zone.id === 'notes') {
+                // Try different notes selectors
+                element = document.querySelector('.notes-list') ||
+                         document.querySelector('[data-drop-zone="notes"]') ||
+                         document.querySelector('.notes-section') as HTMLElement;
             }
         }
         

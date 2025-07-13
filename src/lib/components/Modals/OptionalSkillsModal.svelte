@@ -1,11 +1,13 @@
 <script lang="ts">
+    import { Modal } from '@skeletonlabs/skeleton-svelte';
     import { onMount } from 'svelte';
     import { fade, scale } from "svelte/transition";
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
-    import { sheetState, characterActions, closeDialogueOption, isDialogueOpen } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions} from '../../states/character_sheet.svelte';
     import type { OptionalSkill, SkillsData } from '../../types';
     import skills from '../../data/skills.json';
     import '../../styles/common-modal.css';
+    import { closeDialogueOption, isDialogueOpen, toggleDialogueOption } from '../../states/modals.svelte';
 
     // Get available optional skills
     const optionalSkills: OptionalSkill[] = skills.optionalSkills;
@@ -52,15 +54,31 @@
     function handleCardClick(event: MouseEvent) {
         event.stopPropagation();
     }
+    
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
-{#if isDialogueOpen('optionalSkills')}
+awdsawds
+
+<!-- TODO: Convert to using the Modal component from Skeleton -->
+<Modal
+  open={isDialogueOpen('optionalSkills')}
+  onOpenChange={(e) => toggleDialogueOption('optionalSkills', e.open)}
+  triggerBase="btn preset-tonal"
+  contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
+  backdropClasses="backdrop-blur-sm"
+>
+
+{#snippet content()}
+test content
+{/snippet}
+</Modal>
+
+{#if false}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
+    <dialog 
         onclick={closeModal}
         transition:fade={{ duration: 200 }}
     >
@@ -134,7 +152,7 @@
                 {/each}
             </div>
         </div>
-    </div>
+    </dialog>
 {/if}
 
 <style>

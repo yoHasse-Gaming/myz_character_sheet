@@ -2,8 +2,9 @@
     import { onMount } from 'svelte';
     import interact from 'interactjs';
     import { generateUniqueVariants } from '../../../utils/styleUtils';
-    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../../states/character_sheet.svelte';
+    import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import DraggableAddItem from '../../DraggableAddItem.svelte';
+    import { openInfoModal } from '../../../states/modals.svelte';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);

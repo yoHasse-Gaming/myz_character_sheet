@@ -1,10 +1,14 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
-    import { sheetState, characterActions, closeDialogueOption, isDialogueOpen } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions} from '../../states/character_sheet.svelte';
     import type { Mutation } from '../../types';
     import mutations from '../../data/mutations.json';
     import '../../styles/common-modal.css';
+    import { onMount } from "svelte";
+    import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
+
+    let mutationsDialog: HTMLDialogElement;
 
     // Get available mutations
     const availableMutations: Mutation[] = mutations;
@@ -43,20 +47,14 @@
         }
     }
     
-    // Prevent modal close when clicking inside cards
-    function handleCardClick(event: MouseEvent) {
-        event.stopPropagation();
-    }
+
+
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
 {#if isDialogueOpen('mutations')}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
-        onclick={closeModal}
+    <dialog 
         transition:fade={{ duration: 200 }}
     >
         <button class="modal-close-button" onclick={closeModal} aria-label="Stäng">
@@ -66,7 +64,7 @@
             </svg>
         </button>
         
-        <div class="grid-container" onclick={handleCardClick}>
+        <div class="grid-container" >
             <div class="card-grid">
                 {#each filteredMutations() as mutation, index}
                     {@const variantIndex = availableMutations.findIndex(m => m.id === mutation.id)}
@@ -116,7 +114,7 @@
                 {/each}
             </div>
         </div>
-    </div>
+    </dialog>
 {/if}
 
 <style>

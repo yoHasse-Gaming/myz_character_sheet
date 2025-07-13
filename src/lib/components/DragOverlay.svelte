@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
-    import { openDialogueOption } from '../states/character_sheet.svelte';
     import { characterActions } from '../states/character_sheet.svelte';
+    import { openDialogueOption } from '../states/modals.svelte';
 
     let isDragActive = $state(false);
     let dragOverZone = $state<string | null>(null);
@@ -11,25 +11,25 @@
         {
             id: 'equipment-general',
             text: 'Lägg till utrustning',
-            selector: '.equipment-tab .equipment-section:first-child',
+            selector: '[data-drop-zone="equipment"], .equipment-section',
             action: () => openDialogueOption('equipment')
         },
         {
             id: 'weapons',
             text: 'Lägg till vapen', 
-            selector: '.equipment-tab .equipment-section:nth-child(2)',
+            selector: '[data-drop-zone="weapons"], .weapons-section',
             action: () => openDialogueOption('weapons')
         },
         {
             id: 'armor',
             text: 'Lägg till skydd',
-            selector: '.equipment-tab .equipment-section:nth-child(3)',
+            selector: '[data-drop-zone="armor"], .armor-section',
             action: () => openDialogueOption('armor')
         },
         {
             id: 'mutations',
             text: 'Lägg till mutation',
-            selector: '.mutations-tab',
+            selector: '.mutations-list, [data-drop-zone="mutations"]',
             action: () => openDialogueOption('mutations')
         },
         {
@@ -41,7 +41,7 @@
         {
             id: 'occupational-talents',
             text: 'Lägg till yrkestalang',
-            selector: '.talents-tab .talents-section:first-of-type',
+            selector: '[data-drop-zone="occupational-talents"]',
             action: () => {
                 const canAdd = characterActions.canAddOccupationalTalent() || characterActions.canAddSecondOccupationalTalent();
                 if (canAdd) openDialogueOption('occupational-talents');
@@ -50,7 +50,7 @@
         {
             id: 'generic-talents',
             text: 'Lägg till generisk talang',
-            selector: '.talents-tab .talents-section:last-of-type',
+            selector: '[data-drop-zone="generic-talents"]',
             action: () => {
                 if (characterActions.canAddGenericTalent()) openDialogueOption('generic-talents');
             }
@@ -111,24 +111,30 @@
             // Use the same fallback logic as getZonePosition
             if (!element) {
                 if (zone.id.includes('talents')) {
-                    const talentSections = document.querySelectorAll('.talents-section');
-                    if (zone.id === 'occupational-talents' && talentSections[0]) {
-                        element = talentSections[0] as HTMLElement;
-                    } else if (zone.id === 'generic-talents' && talentSections[1]) {
-                        element = talentSections[1] as HTMLElement;
+                    // Try to find the specific talents section by data attribute
+                    if (zone.id === 'occupational-talents') {
+                        element = document.querySelector('[data-drop-zone="occupational-talents"]') ||
+                                 document.querySelector('.talents-section:first-of-type') as HTMLElement;
+                    } else if (zone.id === 'generic-talents') {
+                        element = document.querySelector('[data-drop-zone="generic-talents"]') ||
+                                 document.querySelector('.talents-section:last-of-type') as HTMLElement;
                     }
-                } else if (zone.id.includes('equipment')) {
-                    const equipmentSections = document.querySelectorAll('.equipment-section');
-                    if (zone.id === 'equipment-general' && equipmentSections[0]) {
-                        element = equipmentSections[0] as HTMLElement;
-                    } else if (zone.id === 'weapons' && equipmentSections[1]) {
-                        element = equipmentSections[1] as HTMLElement;
-                    } else if (zone.id === 'armor' && equipmentSections[2]) {
-                        element = equipmentSections[2] as HTMLElement;
+                } else if (zone.id.includes('equipment') || zone.id === 'weapons' || zone.id === 'armor') {
+                    // Try to find equipment sections by data attribute or class
+                    if (zone.id === 'equipment-general') {
+                        element = document.querySelector('[data-drop-zone="equipment"]') ||
+                                 document.querySelector('.equipment-section') as HTMLElement;
+                    } else if (zone.id === 'weapons') {
+                        element = document.querySelector('[data-drop-zone="weapons"]') ||
+                                 document.querySelector('.weapons-section') as HTMLElement;
+                    } else if (zone.id === 'armor') {
+                        element = document.querySelector('[data-drop-zone="armor"]') ||
+                                 document.querySelector('.armor-section') as HTMLElement;
                     }
                 } else if (zone.id === 'mutations') {
-                    element = document.querySelector('.mutations-tab') || 
-                             document.querySelector('[class*="mutations"]') as HTMLElement;
+                    element = document.querySelector('.mutations-list') ||
+                             document.querySelector('[data-drop-zone="mutations"]') ||
+                             document.querySelector('.mutations-tab') as HTMLElement;
                 } else if (zone.id === 'skills') {
                     element = document.querySelector('[data-drop-zone="skills"]') ||
                              document.querySelector('.skills-tab') as HTMLElement;
@@ -152,31 +158,35 @@
         // If not found, try alternative selectors based on the zone type
         if (!element) {
             if (zone.id.includes('talents')) {
-                // Try to find any talents section
-                const talentSections = document.querySelectorAll('.talents-section');
-                console.log(`Found ${talentSections.length} .talents-section elements`);
+                // Try to find the specific talents section by data attribute
+                console.log(`Looking for talents zone: ${zone.id}`);
                 
-                if (zone.id === 'occupational-talents' && talentSections[0]) {
-                    element = talentSections[0] as HTMLElement;
-                } else if (zone.id === 'generic-talents' && talentSections[1]) {
-                    element = talentSections[1] as HTMLElement;
+                if (zone.id === 'occupational-talents') {
+                    element = document.querySelector('[data-drop-zone="occupational-talents"]') ||
+                             document.querySelector('.talents-section:first-of-type') as HTMLElement;
+                } else if (zone.id === 'generic-talents') {
+                    element = document.querySelector('[data-drop-zone="generic-talents"]') ||
+                             document.querySelector('.talents-section:last-of-type') as HTMLElement;
                 }
-            } else if (zone.id.includes('equipment')) {
-                // Try to find any equipment section
-                const equipmentSections = document.querySelectorAll('.equipment-section');
-                console.log(`Found ${equipmentSections.length} .equipment-section elements`);
+            } else if (zone.id.includes('equipment') || zone.id === 'weapons' || zone.id === 'armor') {
+                // Try to find equipment sections by data attribute or class
+                console.log(`Looking for equipment zone: ${zone.id}`);
                 
-                if (zone.id === 'equipment-general' && equipmentSections[0]) {
-                    element = equipmentSections[0] as HTMLElement;
-                } else if (zone.id === 'weapons' && equipmentSections[1]) {
-                    element = equipmentSections[1] as HTMLElement;
-                } else if (zone.id === 'armor' && equipmentSections[2]) {
-                    element = equipmentSections[2] as HTMLElement;
+                if (zone.id === 'equipment-general') {
+                    element = document.querySelector('[data-drop-zone="equipment"]') ||
+                             document.querySelector('.equipment-section') as HTMLElement;
+                } else if (zone.id === 'weapons') {
+                    element = document.querySelector('[data-drop-zone="weapons"]') ||
+                             document.querySelector('.weapons-section') as HTMLElement;
+                } else if (zone.id === 'armor') {
+                    element = document.querySelector('[data-drop-zone="armor"]') ||
+                             document.querySelector('.armor-section') as HTMLElement;
                 }
             } else if (zone.id === 'mutations') {
-                // Try different mutations selectors
-                element = document.querySelector('.mutations-tab') || 
-                         document.querySelector('[class*="mutations"]') as HTMLElement;
+                // Try different mutations selectors - prioritize content area
+                element = document.querySelector('.mutations-list') ||
+                         document.querySelector('[data-drop-zone="mutations"]') ||
+                         document.querySelector('.mutations-tab') as HTMLElement;
             } else if (zone.id === 'skills') {
                 // Try different skills selectors
                 element = document.querySelector('[data-drop-zone="skills"]') ||

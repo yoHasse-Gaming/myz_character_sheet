@@ -2,7 +2,6 @@
 // This provides reactive state management across all components
 
 import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent } from '../types';
-import { SvelteMap } from 'svelte/reactivity';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 
 // Define the character sheet state structure
@@ -480,70 +479,6 @@ export const characterActions = {
         }
     }
 };
-
-// Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes';
-
-// Info modal state to hold content
-export const infoModalState = $state({
-    title: '',
-    content: '',
-    type: '' as 'skill' | 'trauma' | 'mutation' | 'talent' | ''
-});
-
-// Create a reactive map for dialogue states
-const openDialogue = new SvelteMap<DialogueOption, boolean>([
-    ['optionalSkills', false],
-    ['mutations', false],
-    ['info', false],
-    ['occupational-talents', false],
-    ['generic-talents', false]
-]);
-
-// Convert to reactive state
-
-// Dialogue management functions
-export function isDialogueOpen(dialogue: DialogueOption | undefined = undefined) {
-    if (!dialogue) {
-        return Array.from(openDialogue.values()).some((value) => value === true);
-    }
-    return openDialogue.get(dialogue) ?? false;
-}
-
-export function toggleDialogueOption(dialogue: DialogueOption) {
-    const currentValue = openDialogue.get(dialogue) ?? false;
-    openDialogue.set(dialogue, !currentValue);
-}
-
-export function openDialogueOption(dialogue: DialogueOption) {
-    // Close all other dialogues first
-    console.log(`Opening dialogue: ${dialogue}`);
-    openDialogue.forEach((value, key) => {
-        if (key !== dialogue) {
-            openDialogue.set(key, false);
-        }
-    });
-    openDialogue.set(dialogue, true);
-}
-
-export function closeDialogueOption(dialogue: DialogueOption | undefined = undefined) {
-    if (!dialogue) {
-        // Close all dialogues
-        openDialogue.forEach((value, key) => {
-            openDialogue.set(key, false);
-        });
-        return;
-    }
-    openDialogue.set(dialogue, false);
-}
-
-// Function to open info modal with specific content
-export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' | 'talent' = 'skill') {
-    infoModalState.title = title;
-    infoModalState.content = content;
-    infoModalState.type = type;
-    openDialogueOption('info');
-}
 
 // Export types for TypeScript support
 export type CharacterSheet = typeof sheetState;

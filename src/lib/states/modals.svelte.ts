@@ -11,52 +11,58 @@ export const infoModalState = $state({
 });
 
 // Create a reactive map for dialogue states
-export const dialogues = new SvelteMap<DialogueOption, HTMLDialogElement>();
+const openDialogue = new SvelteMap<DialogueOption, boolean>([
+    ['optionalSkills', false],
+    ['mutations', false],
+    ['info', false],
+    ['occupational-talents', false],
+    ['generic-talents', false],
+    ['equipment', false],
+    ['weapons', false],
+    ['armor', false],
+    ['relations', false],
+    ['notes', false]
+]);
 
 // Convert to reactive state
 
 // Dialogue management functions
 export function isDialogueOpen(dialogue: DialogueOption | undefined = undefined) {
     if (!dialogue) {
-        return Array.from(dialogues.values()).some((value) => value.open);
+        return Array.from(openDialogue.values()).some((value) => value === true);
     }
-    return dialogues.get(dialogue) ?? false;
+    return openDialogue.get(dialogue) ?? false;
 }
 
-export function toggleDialogueOption(dialogue: DialogueOption) {
-    const currentValue = dialogues.get(dialogue)?.open ?? false;
-    if (currentValue) {
-        dialogues.get(dialogue)?.close();
-    } else {
-        openDialogueOption(dialogue);
+export function toggleDialogueOption(dialogue: DialogueOption, open: boolean | undefined = undefined) {
+    if (open !== undefined) {
+        openDialogue.set(dialogue, open);
+        return;
     }
+    const currentValue = openDialogue.get(dialogue) ?? false;
+    openDialogue.set(dialogue, !currentValue);
 }
 
 export function openDialogueOption(dialogue: DialogueOption) {
     // Close all other dialogues first
     console.log(`Opening dialogue: ${dialogue}`);
-    // close all open dialogues except the one being opened
-    dialogues.forEach((value, key) => {
+    openDialogue.forEach((value, key) => {
         if (key !== dialogue) {
-            value.close();
+            openDialogue.set(key, false);
         }
     });
-    if (!dialogues.has(dialogue)) {
-        console.warn(`Dialogue ${dialogue} not found in dialogues map.`);
-        return;
-    }
-    dialogues.get(dialogue)?.showModal();
+    openDialogue.set(dialogue, true);
 }
 
 export function closeDialogueOption(dialogue: DialogueOption | undefined = undefined) {
     if (!dialogue) {
         // Close all dialogues
-        dialogues.forEach((value, key) => {
-            value.close();
+        openDialogue.forEach((value, key) => {
+            openDialogue.set(key, false);
         });
         return;
     }
-    dialogues.get(dialogue)?.close();
+    openDialogue.set(dialogue, false);
 }
 
 // Function to open info modal with specific content

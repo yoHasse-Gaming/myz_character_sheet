@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { sheetState, characterActions, openInfoModal } from '../../../states/character_sheet.svelte';
+    import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import { fade, scale } from 'svelte/transition';
+    import { openInfoModal } from '../../../states/modals.svelte';
     
 
     let { 
@@ -58,6 +59,9 @@
         }
     }
 </script>
+
+<!-- TODO: Use this instead for dmg fields?
+<Rating value={starValue} onValueChange={(e) => (starValue = e.value)} /> -->
 
 
 <div class="torn-input-wrapper variant-{(abilityIndex % 6) + 1}">

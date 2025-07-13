@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { sheetState, characterActions, openDialogueOption, openInfoModal } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
+    import { openInfoModal } from '../../states/modals.svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants

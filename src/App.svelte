@@ -12,6 +12,10 @@
     import OBR from '@owlbear-rodeo/sdk';
     import DiceRollerTest from './lib/components/DiceRollerTest.svelte';
     import { diceStates } from './lib/states/dice.svelte';
+    import EquipmentModal from './lib/components/Modals/EquipmentModal.svelte';
+    import WeaponModal from './lib/components/Modals/WeaponModal.svelte';
+    import ArmorModal from './lib/components/Modals/ArmorModal.svelte';
+    import { isDialogueOpen } from './lib/states/modals.svelte';
 
 
 
@@ -25,6 +29,8 @@
 
 </script>
 
+
+
 <!-- Global Modals -->
 <InfoModal />
 <OptionalSkillsModal />
@@ -32,10 +38,27 @@
 <TalentsModal modalType="occupational" />
 <TalentsModal modalType="generic" />
 
+<!-- Modal Components -->
+<EquipmentModal />
+
+<WeaponModal />
+
+<ArmorModal />
+
+<!-- {#if isDialogueOpen()}
+<div class="modal-backdrop">
+</div>
+{/if} -->
+
 <!-- Drag and Drop Overlay -->
 <DragOverlay />
 
 <!-- Global Utility Buttons -->
+
+<!-- 
+TODO: Use this instead of the AppBar component
+<AppBar></AppBar> 
+-->
 <ThemeSelector />
 <SizeSelector />
 

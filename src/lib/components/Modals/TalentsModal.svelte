@@ -2,11 +2,12 @@
     import { fade, scale } from "svelte/transition";
     import { onMount } from 'svelte';
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
-    import { sheetState, characterActions, closeDialogueOption, isDialogueOpen } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import talentsData from '../../data/talents.json';
     import generalTalentsData from '../../data/general_talents.json';
     import type { Talent } from '../../types';
     import '../../styles/common-modal.css';
+    import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
 
     // Props to determine which type of talents to show
     let { modalType = 'occupational' }: { modalType: 'occupational' | 'generic' } = $props();
@@ -81,9 +82,7 @@
 {#if isDialogueOpen('occupational-talents') && modalType === 'occupational'}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
-        onclick={closeModal}
+    <dialog 
         transition:fade={{ duration: 200 }}
     >
         <button 
@@ -151,16 +150,14 @@
                 {/each}
             </div>
         </div>
-    </div>
+    </dialog>
 {/if}
 
 <!-- Generic Talents Modal -->
 {#if isDialogueOpen('generic-talents') && modalType === 'generic'}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
-        onclick={closeModal}
+    <dialog 
         transition:fade={{ duration: 200 }}
     >
         <button 
@@ -232,7 +229,7 @@
                 {/each}
             </div>
         </div>
-    </div>
+    </dialog>
 {/if}
 
 <style>

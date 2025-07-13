@@ -1,10 +1,10 @@
 <script lang="ts">
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
+    import DragOverlay from '../DragOverlay.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import itemsData from '../../data/items.json';
-    import { fade, scale } from 'svelte/transition';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -38,11 +38,8 @@
         }));
     }
 
-    // Modal states
-    let showEquipmentModal = $state(false);
-    let showWeaponModal = $state(false);
-    let showArmorModal = $state(false);
-
+    // Modal states are now managed globally through isDialogueOpen
+    
     // Drag and drop states
     let dragOverSection = $state(''); // 'equipment', 'weapons', 'armor', or ''
 
@@ -56,81 +53,27 @@
     }
 
     // Equipment management
-    let newEquipmentName = $state('');
-    let newEquipmentQuantity = $state(1);
-    let newEquipmentWeight = $state(0);
-
-    // Autocomplete functionality for equipment
-    let showEquipmentSuggestions = $state(false);
-    let equipmentSearchQuery = $state('');
-
-    function getFilteredItems(query: string) {
-        if (!query || query.length < 2) return [];
-        return availableItems.filter(item => 
-            item.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5); // Limit to 5 suggestions
-    }
-
-    function selectEquipmentItem(item: any) {
-        newEquipmentName = item.name;
-        newEquipmentWeight = item.weight;
-        showEquipmentSuggestions = false;
-        equipmentSearchQuery = '';
-    }
-
-    function handleEquipmentNameInput(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = target.value;
+    // Equipment management - now handled by modal
+    function handleEquipmentAdd(event: CustomEvent) {
+        const equipment = event.detail;
         
-        newEquipmentName = value;
-        equipmentSearchQuery = value;
-        showEquipmentSuggestions = value.length >= 2;
-        
-        // If exact match found, auto-fill weight
-        const exactMatch = availableItems.find(item => 
-            item.name.toLowerCase() === value.toLowerCase()
-        );
-        if (exactMatch) {
-            newEquipmentWeight = exactMatch.weight;
-        }
-    }
-
-    function hideEquipmentSuggestions() {
-        // Small delay to allow click events on suggestions to fire
-        setTimeout(() => {
-            showEquipmentSuggestions = false;
-        }, 150);
-    }
-
-    function addEquipment() {
-        if (newEquipmentName.trim()) {
-            // Check if item exists in equipmentTable, if not add new row
-            const emptyIndex = sheetState.equipmentTable.findIndex(item => !item.name);
-            if (emptyIndex !== -1) {
-                sheetState.equipmentTable[emptyIndex] = {
-                    id: `eq-${emptyIndex}`,
-                    name: newEquipmentName.trim(),
-                    quantity: newEquipmentQuantity,
-                    weight: newEquipmentWeight
-                };
-            } else {
-                // Add new item if no empty slots
-                sheetState.equipmentTable.push({
-                    id: `eq-${sheetState.equipmentTable.length}`,
-                    name: newEquipmentName.trim(),
-                    quantity: newEquipmentQuantity,
-                    weight: newEquipmentWeight
-                });
-            }
-            
-            // Reset form
-            newEquipmentName = '';
-            newEquipmentQuantity = 1;
-            newEquipmentWeight = 0;
-            equipmentSearchQuery = '';
-            showEquipmentSuggestions = false;
-            showEquipmentModal = false;
-            showEquipmentModal = false;
+        // Check if item exists in equipmentTable, if not add new row
+        const emptyIndex = sheetState.equipmentTable.findIndex(item => !item.name);
+        if (emptyIndex !== -1) {
+            sheetState.equipmentTable[emptyIndex] = {
+                id: `eq-${emptyIndex}`,
+                name: equipment.name,
+                quantity: equipment.quantity,
+                weight: equipment.weight
+            };
+        } else {
+            // Add new item if no empty slots
+            sheetState.equipmentTable.push({
+                id: `eq-${sheetState.equipmentTable.length}`,
+                name: equipment.name,
+                quantity: equipment.quantity,
+                weight: equipment.weight
+            });
         }
     }
 
@@ -157,67 +100,9 @@
         return total;
     });
 
-    // Generate random IDs for new items (for weapons and armor)
+    // Generate random IDs for new items
     function generateId() {
         return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
-
-    // Weapon management
-    let newWeaponName = $state('');
-    let newWeaponDescription = $state('');
-    let newWeaponBonus = $state(0);
-    let newWeaponDamage = $state(1);
-    let newWeaponRange = $state(1);
-    let newWeaponWeight = $state(0);
-
-    function addWeapon() {
-        if (newWeaponName.trim()) {
-            characterActions.addWeapon({
-                id: generateId(),
-                name: newWeaponName.trim(),
-                description: newWeaponDescription.trim(),
-                bonus: newWeaponBonus,
-                damage: newWeaponDamage,
-                range: newWeaponRange,
-                weight: newWeaponWeight,
-                equipped: false
-            });
-            
-            // Reset form
-            newWeaponName = '';
-            newWeaponDescription = '';
-            newWeaponBonus = 0;
-            newWeaponDamage = 1;
-            newWeaponRange = 1;
-            newWeaponWeight = 0;
-            showWeaponModal = false;
-        }
-    }
-
-    // Armor management
-    let newArmorName = $state('');
-    let newArmorDescription = $state('');
-    let newArmorProtection = $state(1);
-    let newArmorWeight = $state(0);
-
-    function addArmor() {
-        if (newArmorName.trim()) {
-            characterActions.addArmor({
-                id: generateId(),
-                name: newArmorName.trim(),
-                description: newArmorDescription.trim(),
-                protection: newArmorProtection,
-                weight: newArmorWeight,
-                equipped: false
-            });
-            
-            // Reset form
-            newArmorName = '';
-            newArmorDescription = '';
-            newArmorProtection = 1;
-            newArmorWeight = 0;
-            showArmorModal = false;
-        }
     }
 
     // Generate variants for visual variety
@@ -371,268 +256,10 @@
     </div>
 </div>
 
-<!-- Equipment Modal -->
-{#if showEquipmentModal}
-    <div class="modal-overlay" 
-        transition:scale={{ duration: 400, start: 1.2 }}
-         role="dialog" 
-         aria-modal="true"
-         tabindex="-1"
-         onclick={() => showEquipmentModal = false}
-         onkeydown={(e) => e.key === 'Escape' && (showEquipmentModal = false)}>
-        <div class="modal-content" 
-            
-            
+<!-- Drag Overlay -->
+<DragOverlay />
 
-            role="document">
-            <div class="modal-header">
-                <h3>Lägg till utrustning</h3>
-                <button class="modal-close" 
-                        aria-label="Stäng modal"
-                        onclick={() => showEquipmentModal = false}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addEquipment(); }}>
-                <div class="form-group">
-                    <label for="equipment-name">Namn:</label>
-                    <div class="name-input-container">
-                        <input 
-                            id="equipment-name"
-                            type="text" 
-                            bind:value={newEquipmentName}
-                            oninput={(e) => handleEquipmentNameInput(e)}
-                            onfocus={() => showEquipmentSuggestions = true}
-                            onblur={hideEquipmentSuggestions}
-                            placeholder="Namn på utrustning"
-                        />
-                        {#if showEquipmentSuggestions && equipmentSearchQuery}
-                            <div class="suggestions-dropdown">
-                                {#each getFilteredItems(equipmentSearchQuery) as suggestion}
-                                    <button 
-                                        type="button"
-                                        class="suggestion-item"
-                                        onmousedown={(e) => {
-                                            e.preventDefault();
-                                            selectEquipmentItem(suggestion);
-                                        }}
-                                    >
-                                        <span class="suggestion-name">{suggestion.name}</span>
-                                        <span class="suggestion-weight">{suggestion.weight} kg</span>
-                                    </button>
-                                {/each}
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="equipment-quantity">Antal:</label>
-                    <input 
-                        id="equipment-quantity"
-                        type="number" 
-                        bind:value={newEquipmentQuantity}
-                        min="1"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="equipment-weight">Vikt (kg):</label>
-                    <input 
-                        id="equipment-weight"
-                        type="number" 
-                        bind:value={newEquipmentWeight}
-                        min="0"
-                        step="0.1"
-                    />
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick={() => showEquipmentModal = false}>
-                        Avbryt
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        Lägg till
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-{/if}
 
-<!-- Weapon Modal -->
-{#if showWeaponModal}
-    <div class="modal-overlay"
-         role="dialog" 
-         aria-modal="true"
-         tabindex="-1"
-        transition:scale={{ duration: 400, start: 1.2 }}
-
-         onclick={() => showWeaponModal = false}
-         onkeydown={(e) => e.key === 'Escape' && (showWeaponModal = false)}>
-        <div class="modal-content"
-            transition:scale={{ duration: 400, start: 1.2 }}
-
-             role="document">
-            <div class="modal-header">
-                <h3>Lägg till vapen</h3>
-                <button class="modal-close"
-                        aria-label="Stäng modal" 
-                        onclick={() => showWeaponModal = false}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addWeapon(); }}>
-                <div class="form-group">
-                    <label for="weapon-name">Namn:</label>
-                    <input 
-                        id="weapon-name"
-                        type="text" 
-                        bind:value={newWeaponName}
-                        placeholder="Namn på vapen"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="weapon-description">Beskrivning:</label>
-                    <textarea 
-                        id="weapon-description"
-                        bind:value={newWeaponDescription}
-                        placeholder="Beskrivning (valfritt)"
-                        rows="2"
-                    ></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="weapon-bonus">Bonus:</label>
-                        <input 
-                            id="weapon-bonus"
-                            type="number" 
-                            bind:value={newWeaponBonus}
-                            min="0"
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="weapon-damage">Skada:</label>
-                        <input 
-                            id="weapon-damage"
-                            type="number" 
-                            bind:value={newWeaponDamage}
-                            min="1"
-                        />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="weapon-range">Räckvidd:</label>
-                        <input 
-                            id="weapon-range"
-                            type="number" 
-                            bind:value={newWeaponRange}
-                            min="1"
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="weapon-weight">Vikt (kg):</label>
-                        <input 
-                            id="weapon-weight"
-                            type="number" 
-                            bind:value={newWeaponWeight}
-                            min="0"
-                            step="0.1"
-                        />
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick={() => showWeaponModal = false}>
-                        Avbryt
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        Lägg till
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-{/if}
-
-<!-- Armor Modal -->
-{#if showArmorModal}
-    <div class="modal-overlay"
-         role="dialog" 
-         aria-modal="true"
-         tabindex="-1"
-         onclick={() => showArmorModal = false}
-         onkeydown={(e) => e.key === 'Escape' && (showArmorModal = false)}>
-        <div class="modal-content"
-        transition:scale={{ duration: 400, start: 1.2 }}
-
-             role="document">
-            <div class="modal-header">
-                <h3>Lägg till rustning</h3>
-                <button class="modal-close"
-                        aria-label="Stäng modal" 
-                        onclick={() => showArmorModal = false}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addArmor(); }}>
-                <div class="form-group">
-                    <label for="armor-name">Namn:</label>
-                    <input 
-                        id="armor-name"
-                        type="text" 
-                        bind:value={newArmorName}
-                        placeholder="Namn på rustning"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="armor-description">Beskrivning:</label>
-                    <textarea 
-                        id="armor-description"
-                        bind:value={newArmorDescription}
-                        placeholder="Beskrivning (valfritt)"
-                        rows="2"
-                    ></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="armor-protection">Skydd:</label>
-                        <input 
-                            id="armor-protection"
-                            type="number" 
-                            bind:value={newArmorProtection}
-                            min="1"
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="armor-weight">Vikt (kg):</label>
-                        <input 
-                            id="armor-weight"
-                            type="number" 
-                            bind:value={newArmorWeight}
-                            min="0"
-                            step="0.1"
-                        />
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick={() => showArmorModal = false}>
-                        Avbryt
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        Lägg till
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-{/if}
 
 <style>
     .equipment-tab {
@@ -653,119 +280,6 @@
         .equipment-grid {
             grid-template-columns: 1fr;
         }
-    }
-
-    /* Equipment autocomplete styles */
-    .name-input-container {
-        position: relative;
-    }
-
-    /* Suggestions dropdown */
-    .suggestions-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--color-surface-50);
-        border: 1px solid var(--color-surface-200);
-        border-radius: 0.25rem;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    :global(.dark) .suggestions-dropdown {
-        background: var(--color-surface-800);
-        border-color: var(--color-surface-600);
-    }
-
-    .suggestion-item {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: none;
-        background: transparent;
-        text-align: left;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .suggestion-item:hover {
-        background: rgba(217, 119, 6, 0.1);
-    }
-
-    .suggestion-name {
-        font-weight: 500;
-        color: var(--color-surface-900);
-    }
-
-    :global(.dark) .suggestion-name {
-        color: var(--color-surface-100);
-    }
-
-    .suggestion-weight {
-        font-size: 0.85rem;
-        color: var(--color-surface-600);
-        font-weight: 600;
-    }
-
-    :global(.dark) .suggestion-weight {
-        color: var(--color-surface-400);
-    }
-
-    /* Total weight display */
-    .total-weight-display {
-        margin-top: 1rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .total-weight-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: rgba(217, 119, 6, 0.05);
-        border-radius: 0.5rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .total-label {
-        font-weight: bold;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    :global(.dark) .total-label {
-        color: var(--color-surface-100);
-    }
-
-    .grand-total-weight {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #8B4513;
-        background: rgba(255, 248, 240, 0.9);
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        transform: rotate(-0.5deg);
-        transition: all 0.2s ease;
-    }
-
-    .grand-total-weight:hover {
-        transform: rotate(0deg) scale(1.05);
-        box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-    }
-
-    :global(.dark) .grand-total-weight {
-        background: rgba(40, 35, 30, 0.9);
-        color: #D2691E;
     }
 
     /* Section Content Styles */
@@ -921,192 +435,5 @@
 
     :global(.dark) .section-total-label {
         color: var(--color-surface-100);
-    }
-
-    /* Modal Styles */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        padding: 1rem;
-    }
-
-    .modal-content {
-        background: var(--color-surface-50);
-        border-radius: 0.5rem;
-        max-width: 500px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    }
-
-    :global(.dark) .modal-content {
-        background: var(--color-surface-800);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem;
-        border-bottom: 1px solid var(--color-surface-200);
-    }
-
-    :global(.dark) .modal-header {
-        border-color: var(--color-surface-600);
-    }
-
-    .modal-header h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-    }
-
-    :global(.dark) .modal-header h3 {
-        color: var(--color-surface-100);
-    }
-
-    .modal-close {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: transparent;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        color: var(--color-surface-500);
-    }
-
-    .modal-close:hover {
-        background: var(--color-surface-200);
-        color: var(--color-surface-700);
-    }
-
-    :global(.dark) .modal-close:hover {
-        background: var(--color-surface-600);
-        color: var(--color-surface-300);
-    }
-
-    .modal-form {
-        padding: 1.5rem;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .form-group label {
-        font-weight: 600;
-        color: var(--color-surface-700);
-        font-size: 0.9rem;
-    }
-
-    :global(.dark) .form-group label {
-        color: var(--color-surface-300);
-    }
-
-    .form-group input,
-    .form-group textarea {
-        padding: 0.75rem;
-        border: 1px solid var(--color-surface-300);
-        border-radius: 0.25rem;
-        background: var(--color-surface-100);
-        color: var(--color-surface-900);
-        font-size: 1rem;
-    }
-
-    :global(.dark) .form-group input,
-    :global(.dark) .form-group textarea {
-        background: var(--color-surface-700);
-        border-color: var(--color-surface-600);
-        color: var(--color-surface-100);
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--color-primary-500);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    @media (max-width: 480px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--color-surface-200);
-    }
-
-    :global(.dark) .modal-actions {
-        border-color: var(--color-surface-600);
-    }
-
-    .btn-primary {
-        padding: 0.75rem 1.5rem;
-        background: var(--color-primary-600);
-        color: white;
-        border: none;
-        border-radius: 0.25rem;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary:hover {
-        background: var(--color-primary-700);
-    }
-
-    .btn-secondary {
-        padding: 0.75rem 1.5rem;
-        background: transparent;
-        color: var(--color-surface-600);
-        border: 1px solid var(--color-surface-300);
-        border-radius: 0.25rem;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    .btn-secondary:hover {
-        background: var(--color-surface-100);
-        color: var(--color-surface-700);
-    }
-
-    :global(.dark) .btn-secondary {
-        color: var(--color-surface-400);
-        border-color: var(--color-surface-600);
-    }
-
-    :global(.dark) .btn-secondary:hover {
-        background: var(--color-surface-700);
-        color: var(--color-surface-200);
     }
 </style>

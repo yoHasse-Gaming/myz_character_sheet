@@ -1,5 +1,6 @@
 <script lang="ts">
     import { characterActions, sheetState } from "../states/character_sheet.svelte";
+    import Dna from "@lucide/svelte/icons/dna";
     import FormSection from "./FormSection.svelte";
     import AbilitiesTab from "./tabs/AbilitiesTab.svelte";
     import CharacterTab from "./tabs/CharacterTab.svelte";
@@ -24,6 +25,22 @@
 
     
 </script>
+
+
+<!-- 
+TODO: Use this from skeletonUI instead of custom tabs
+<Tabs value={group} onValueChange={(e) => (group = e.value)}>
+  {#snippet list()}
+    <Tabs.Control value="plane">Plane</Tabs.Control>
+    <Tabs.Control value="boat">Boat</Tabs.Control>
+    <Tabs.Control value="car">Car</Tabs.Control>
+  {/snippet}
+  {#snippet content()}
+    <Tabs.Panel value="plane">Plane Panel - {lorem}</Tabs.Panel>
+    <Tabs.Panel value="boat">Boat Panel - {lorem}</Tabs.Panel>
+    <Tabs.Panel value="car">Car Panel - {lorem}</Tabs.Panel>
+  {/snippet}
+</Tabs> -->
 
 <div class="tab-nav">
     {#each tabs as tab, index}
@@ -60,7 +77,8 @@
     <!-- Tab 3: Mutationer -->
     {#if activeTab === 3}
         <div class="talents-mutations-tab">
-            <FormSection header="🧬 MUTATIONER">
+            <Dna />
+            <FormSection header="MUTATIONER">
                 <Mutations />
             </FormSection>
         </div>

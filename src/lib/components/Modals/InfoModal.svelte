@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
-    import { isDialogueOpen, closeDialogueOption, infoModalState } from '../../states/character_sheet.svelte';
+    import { closeDialogueOption, infoModalState, isDialogueOpen } from "../../states/modals.svelte";
+
 
     function closeModal() {
         closeDialogueOption('info');
@@ -13,10 +14,6 @@
         }
     }
 
-    // Prevent modal close when clicking inside content
-    function handleContentClick(event: MouseEvent) {
-        event.stopPropagation();
-    }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -24,17 +21,13 @@
 {#if isDialogueOpen('info')}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
-        onclick={closeModal}
-        transition:fade={{ duration: 200 }}
-    >
-        <div 
+
+        <dialog 
             class="info-modal-container"
-            onclick={handleContentClick}
             transition:scale={{ duration: 300, start: 0.8 }}
+            open
         >
-                    <button 
+            <button 
                 class="modal-close-button" 
                 onclick={closeModal} 
                 aria-label="Stäng talangfönster"
@@ -66,26 +59,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+    </dialog>
 {/if}
 
 <style>
-    .modal-backdrop {
-        position: fixed;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.75);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        transform: none;
-    }
     
     .info-modal-container {
         max-width: min(90vw, 600px);

@@ -5,8 +5,17 @@
     * [x] Full overlay system with flashlight circles highlighting all drop zones simultaneously.
 * [ ] - Fix so the design or style is the same for all tabs.
     * Paper-style for every section.
+    * [ ] - Mutations should be like skills with dragable mutations.
+    * [ ] - Base-skills should be like skills with dragable base-skills.
+    * [ ] - Conditions should have paper-background style and be draggable.
+    * [ ] - Severe conditions should have paper-background style and be draggable.
 
 
 * [ ] - Finish all tabs so they are usable.
 * [ ] - Make sure character data is saved and loaded correctly.
 * [ ] - 
+
+
+
+## Bugs:
+* [ ] - Drop zones are as wide as the container, should have a max-width which is the same as the height.

@@ -4,6 +4,7 @@
     import { onMount } from 'svelte';
     import Skills from './tabcontents/Skills.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import OptionalSkillsModal from '../Modals/OptionalSkillsModal.svelte';
 
     type Condition = {
         name: keyof typeof sheetState.conditions;
@@ -19,6 +20,8 @@
 
 
 </script> 
+
+<OptionalSkillsModal />
 
 {#snippet conditionItem(condition: Condition)}
 <div class="condition-item">

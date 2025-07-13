@@ -2,6 +2,8 @@
     import { characterActions } from '../../states/character_sheet.svelte';
     import { scale } from 'svelte/transition';
     import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
+
 
     // Form state
     let newArmorName = $state('');
@@ -38,26 +40,37 @@
         newArmorWeight = 0;
     }
 
-    function handleClose() {
+    function closeModal() {
         resetForm();
         closeDialogueOption('armor');
-
     }
-
-
-
 
 </script>
 
-{#if isDialogueOpen('armor')}
-
-<dialog transition:scale={{ duration: 400, start: 1.2 }}>
-    <div class="modal-content">
+<Modal
+  open={isDialogueOpen('armor')}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="armor-modal-content">
         <div class="modal-header">
             <h3>Lägg till rustning</h3>
             <button class="modal-close"
                     aria-label="Stäng modal" 
-                        onclick={handleClose}>
+                        onclick={closeModal}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -107,7 +120,7 @@
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick={handleClose}>
+                    <button type="button" class="btn-secondary" onclick={closeModal}>
                         Avbryt
                     </button>
                     <button type="submit" class="btn-primary">
@@ -116,6 +129,27 @@
                 </div>
             </form>
         </div>
-</dialog>
-{/if}
+  {/snippet}
+</Modal>
 
+<style>
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Armor-specific styles that override common styles if needed */
+    .armor-modal-content {
+        position: relative;
+        z-index: 102;
+    }
+
+</style>

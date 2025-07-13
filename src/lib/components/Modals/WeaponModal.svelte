@@ -2,6 +2,8 @@
     import { characterActions} from '../../states/character_sheet.svelte';
     import { scale } from 'svelte/transition';
     import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
+
 
     // Form state
     let newWeaponName = $state('');
@@ -43,18 +45,38 @@
         newWeaponWeight = 0;
     }
 
+    function closeModal() {
+        closeDialogueOption('weapons');
+    }
+
     function handleClose() {
         resetForm();
-        closeDialogueOption('weapons');
+        closeModal();
     }
 
 
 
 </script>
 
-{#if isDialogueOpen('weapons')}
-<dialog transition:scale={{ duration: 400, start: 1.2 }} open>
-    <div class="modal-content">
+<Modal
+  open={isDialogueOpen('weapons')}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="weapon-modal-content">
         <div class="modal-header">
             <h3>Lägg till vapen</h3>
             <button class="modal-close"
@@ -139,11 +161,28 @@
                 </div>
             </form>
         </div>
-</dialog>
-{/if}
+  {/snippet}
+</Modal>
 
 <style>
-
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Weapon-specific styles that override common styles if needed */
+    .weapon-modal-content {
+        position: relative;
+        z-index: 102;
+    }
 
     .modal-content {
         background: var(--color-surface-50);

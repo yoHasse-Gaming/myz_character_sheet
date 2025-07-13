@@ -285,38 +285,9 @@
     />
 
     <!-- Skills Container -->
-    <div data-drop-zone="skills">
+    <div >
         <!-- Control Buttons Section -->
-        <div class="skills-controls-section">
-                <!-- Optional Skills Info -->
-                <div class="optional-skills-info">
-                    {#if sheetState.optionalSkills.length > 0}
-                        <p class="optional-skills-description">
-                            Du har {sheetState.optionalSkills.length} valfria färdigheter. 
-                            Dra papperet för att lägga till fler.
-                        </p>
-                    {:else}
-                        <p class="optional-skills-description">
-                            Inga valfria färdigheter valda. Dra papperet hit för att lägga till färdigheter.
-                        </p>
-                    {/if}
-                </div>
 
-                <!-- Reset Layout Button -->
-                <div class="reset-layout-container">
-                    <button 
-                        class="reset-layout-button"
-                        onclick={resetSkillsLayout}
-                        title="Återställ alla färdighetspapper till standardpositioner"
-                    >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                            <path d="M3 3v5h5"></path>
-                        </svg>
-                        Återställ layout
-                    </button>
-                </div>
-            </div>
 
     <!-- Core Skills -->
     {#each sheetState.skills as skill, index}

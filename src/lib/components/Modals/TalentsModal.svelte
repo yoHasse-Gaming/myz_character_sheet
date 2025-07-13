@@ -1,13 +1,12 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
-    import { onMount } from 'svelte';
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import talentsData from '../../data/talents.json';
     import generalTalentsData from '../../data/general_talents.json';
     import type { Talent } from '../../types';
-    import '../../styles/common-modal.css';
     import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
 
     // Props to determine which type of talents to show
     let { modalType = 'occupational' }: { modalType: 'occupational' | 'generic' } = $props();
@@ -63,28 +62,35 @@
         closeDialogueOption(modalType === 'occupational' ? 'occupational-talents' : 'generic-talents');
     }
 
-    // Close modal on Escape key
+    // Close modal on Escape key (handled by Modal component now)
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
             closeModal();
         }
     }
 
-    // Prevent modal close when clicking inside grid
-    function handleGridClick(event: MouseEvent) {
-        event.stopPropagation();
-    }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
 <!-- Occupational Talents Modal -->
-{#if isDialogueOpen('occupational-talents') && modalType === 'occupational'}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <dialog 
-        transition:fade={{ duration: 200 }}
-    >
+<Modal
+  open={isDialogueOpen('occupational-talents') && modalType === 'occupational'}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="talents-modal-content">
         <button 
             class="modal-close-button" 
             onclick={closeModal} 
@@ -96,13 +102,7 @@
             </svg>
         </button>
         
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-            class="grid-container"
-            onclick={handleGridClick}
-        >
-            <div class="card-grid">
+        <div class="card-grid">
                 {#each filteredTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
@@ -150,16 +150,29 @@
                 {/each}
             </div>
         </div>
-    </dialog>
-{/if}
+  {/snippet}
+</Modal>
 
 <!-- Generic Talents Modal -->
-{#if isDialogueOpen('generic-talents') && modalType === 'generic'}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <dialog 
-        transition:fade={{ duration: 200 }}
-    >
+<Modal
+  open={isDialogueOpen('generic-talents') && modalType === 'generic'}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="talents-modal-content">
         <button 
             class="modal-close-button" 
             onclick={closeModal} 
@@ -171,13 +184,7 @@
             </svg>
         </button>
         
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-            class="grid-container"
-            onclick={handleGridClick}
-        >
-            <div class="card-grid">
+        <div class="card-grid">
                 {#each filteredTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
@@ -229,12 +236,79 @@
                 {/each}
             </div>
         </div>
-    </dialog>
-{/if}
+  {/snippet}
+</Modal>
 
 <style>
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Talents-specific styles that override common styles if needed */
+    .talents-modal-content {
+        position: relative;
+        z-index: 102;
+    }
+    
+    .modal-close-button {
+        z-index: 103 !important;
+    }
+
     /* Talent-specific styles */
     .talent-icon {
         font-size: 1.2rem;
+    }
+
+    /* Make button cards behave like divs but with proper accessibility */
+    .card-wrapper {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        text-align: left;
+        transition: all 0.2s ease;
+        transform: rotate(var(--random-rotation));
+        transform-origin: center;
+        perspective: 1000px;
+        max-width: 350px;
+        min-height: 400px;
+        position: relative;
+    }
+
+    .card-wrapper:hover {
+        transform: translateY(-4px) rotate(var(--random-rotation));
+        filter: brightness(1.05);
+        z-index: 2;
+    }
+
+    .card-wrapper:focus {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+        z-index: 3;
+    }
+
+    .card-wrapper:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+        z-index: 3;
+    }
+
+    /* Ensure the torn input wrapper takes full height and width of the button */
+    .card-wrapper .torn-input-wrapper {
+        width: 100%;
+        height: 100%;
+        min-height: inherit;
     }
 </style>

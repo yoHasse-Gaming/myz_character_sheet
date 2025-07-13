@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { Modal } from '@skeletonlabs/skeleton-svelte';
     import { onMount } from 'svelte';
     import { fade, scale } from "svelte/transition";
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
     import { sheetState, characterActions} from '../../states/character_sheet.svelte';
     import type { OptionalSkill, SkillsData } from '../../types';
     import skills from '../../data/skills.json';
-    import '../../styles/common-modal.css';
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
     import { closeDialogueOption, isDialogueOpen, toggleDialogueOption } from '../../states/modals.svelte';
 
     // Get available optional skills
@@ -43,45 +42,27 @@
         closeDialogueOption('optionalSkills');
     }
     
-    // Close modal on Escape key or grid click
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    }
-    
-    // Prevent modal close when clicking inside cards
-    function handleCardClick(event: MouseEvent) {
-        event.stopPropagation();
-    }
-    
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
-awdsawds
-
-<!-- TODO: Convert to using the Modal component from Skeleton -->
 <Modal
   open={isDialogueOpen('optionalSkills')}
-  onOpenChange={(e) => toggleDialogueOption('optionalSkills', e.open)}
-  triggerBase="btn preset-tonal"
-  contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
-  backdropClasses="backdrop-blur-sm"
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
 >
-
-{#snippet content()}
-test content
-{/snippet}
-</Modal>
-
-{#if false}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <dialog 
-        onclick={closeModal}
-        transition:fade={{ duration: 200 }}
-    >
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="optional-skills-modal-content">
         <button class="modal-close-button" onclick={closeModal} aria-label="Stäng">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -89,18 +70,20 @@ test content
             </svg>
         </button>
         
-        <div class="grid-container" onclick={handleCardClick}>
+        <div >
             <div class="card-grid">
                 {#each filteredSkills() as skill, index}
                     {@const variantIndex = optionalSkills.findIndex(s => s.id === skill.id)}
                     {@const isSelected = isSkillSelected(skill.id)}
                     {@const rotation = randomRotations[index % randomRotations.length]}
                     
-                    <div 
+                    <button 
                         class="card-wrapper"
                         style="--random-rotation: {rotation}deg"
                         transition:scale={{ duration: 400, delay: index * 50 }}
                         onclick={() => selectSkill(skill)}
+                        type="button"
+                        aria-label="Välj färdighet: {skill.name}"
                     >
                         <div class="torn-input-wrapper {skillVariants[variantIndex]} {isSelected ? 'selected' : ''}">
                             <div class="card-content">
@@ -148,13 +131,79 @@ test content
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 {/each}
             </div>
         </div>
-    </dialog>
-{/if}
+    </div>
+  {/snippet}
+</Modal>
 
 <style>
-    /* Optional Skills specific styles that override common styles if needed */
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Optional Skills-specific styles that override common styles if needed */
+    .optional-skills-modal-content {
+        position: relative;
+        z-index: 102;
+    }
+    
+    .modal-close-button {
+        z-index: 103 !important;
+    }
+
+    /* Make button cards behave like divs but with proper accessibility */
+    .card-wrapper {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        text-align: left;
+        transition: all 0.2s ease;
+        transform: rotate(var(--random-rotation));
+        transform-origin: center;
+        perspective: 1000px;
+        max-width: 350px;
+        min-height: 400px;
+        position: relative;
+    }
+
+    .card-wrapper:hover {
+        transform: translateY(-4px) rotate(var(--random-rotation));
+        filter: brightness(1.05);
+        z-index: 2;
+    }
+
+    .card-wrapper:focus {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+        z-index: 3;
+    }
+
+    .card-wrapper:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+        z-index: 3;
+    }
+
+    /* Ensure the torn input wrapper takes full height and width of the button */
+    .card-wrapper .torn-input-wrapper {
+        width: 100%;
+        height: 100%;
+        min-height: inherit;
+    }
 </style>

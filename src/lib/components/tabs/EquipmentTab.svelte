@@ -5,6 +5,9 @@
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import itemsData from '../../data/items.json';
+    import EquipmentModal from '../Modals/EquipmentModal.svelte';
+    import WeaponModal from '../Modals/WeaponModal.svelte';
+    import ArmorModal from '../Modals/ArmorModal.svelte';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -113,6 +116,12 @@
     // Special variant for the draggable add item
     const addItemVariant = 'variant-6'; // Using a vibrant variant for the add item
 </script>
+
+<EquipmentModal />
+
+<WeaponModal />
+
+<ArmorModal />
 
 <div class="equipment-tab">
     <!-- Draggable Add Item -->

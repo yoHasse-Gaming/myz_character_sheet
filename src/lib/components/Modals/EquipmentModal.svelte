@@ -3,6 +3,8 @@
     import itemsData from '../../data/items.json';
     import { scale } from 'svelte/transition';
     import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
+
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -114,17 +116,37 @@
         showSuggestions = false;
     }
 
+    function closeModal() {
+        closeDialogueOption('equipment');
+    }
+
     function handleClose() {
         resetForm();
-        closeDialogueOption('equipment');
-
+        closeModal();
     }
 
 
 </script>
-{#if isDialogueOpen('equipment')}
-<dialog transition:scale={{ duration: 400, start: 1.2 }} open>
-    <div class="modal-content">
+
+<Modal
+  open={isDialogueOpen('equipment')}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="equipment-modal-content">
         <div class="modal-header">
             <h3>Lägg till utrustning</h3>
             <button class="modal-close" 
@@ -200,11 +222,28 @@
                 </div>
             </form>
         </div>
-    
-</dialog>
-{/if}
+  {/snippet}
+</Modal>
 
 <style>
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Equipment-specific styles that override common styles if needed */
+    .equipment-modal-content {
+        position: relative;
+        z-index: 102;
+    }
 
     .modal-content {
         background: var(--color-surface-50);

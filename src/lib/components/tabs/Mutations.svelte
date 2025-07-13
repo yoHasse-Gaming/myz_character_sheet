@@ -5,6 +5,7 @@
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
+    import MutationsModal from '../Modals/MutationsModal.svelte';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
@@ -34,6 +35,8 @@
     }
 
 </script>
+
+<MutationsModal />
 
 <div class="mutations-tab">
     <!-- Draggable Add Item -->

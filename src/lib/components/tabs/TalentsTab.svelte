@@ -5,6 +5,7 @@
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
+    import TalentsModal from '../Modals/TalentsModal.svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -39,6 +40,9 @@
     const canAddSecondOccupational = $derived(characterActions.canAddSecondOccupationalTalent());
     const canAddGeneric = $derived(characterActions.canAddGenericTalent());
 </script>
+
+<TalentsModal modalType="occupational" />
+<TalentsModal modalType="generic" />
 
 <div class="talents-tab">
     <!-- Draggable Add Item -->

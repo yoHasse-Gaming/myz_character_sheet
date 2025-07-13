@@ -1,13 +1,14 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
     import { closeDialogueOption, infoModalState, isDialogueOpen } from "../../states/modals.svelte";
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
 
 
     function closeModal() {
         closeDialogueOption('info');
     }
 
-    // Close modal on Escape key
+    // Close modal on Escape key (handled by Modal component now)
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
             closeModal();
@@ -16,17 +17,25 @@
 
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
-{#if isDialogueOpen('info')}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-
-        <dialog 
-            class="info-modal-container"
-            transition:scale={{ duration: 300, start: 0.8 }}
-            open
-        >
+<Modal
+  open={isDialogueOpen('info')}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+  contentBase="!z-[101] card bg-surface-100-900 p-0 shadow-xl max-w-2xl max-h-[90vh] overflow-hidden"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="info-modal-content">
             <button 
                 class="modal-close-button" 
                 onclick={closeModal} 
@@ -59,10 +68,32 @@
                     </div>
                 </div>
             </div>
-    </dialog>
-{/if}
+    </div>
+  {/snippet}
+</Modal>
 
 <style>
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Info-specific styles that override common styles if needed */
+    .info-modal-content {
+        position: relative;
+        z-index: 102;
+        max-width: min(90vw, 600px);
+        max-height: min(90vh, 700px);
+        width: 100%;
+    }
     
     .info-modal-container {
         max-width: min(90vw, 600px);

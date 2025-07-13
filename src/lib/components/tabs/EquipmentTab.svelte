@@ -8,6 +8,7 @@
     import EquipmentModal from '../Modals/EquipmentModal.svelte';
     import WeaponModal from '../Modals/WeaponModal.svelte';
     import ArmorModal from '../Modals/ArmorModal.svelte';
+    import { Backpack, BowArrow, ShieldHalf } from '@lucide/svelte';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -137,7 +138,7 @@
     <div class="equipment-grid">
         <!-- Equipment Section -->
         <div class="equipment-section" data-drop-zone="equipment">
-            <FormSection header="🎒 UTRUSTNING">
+            <FormSection header="UTRUSTNING" headerIcon={Backpack}>
                 <!-- Equipment list -->
                 <div class="section-items-list">
                     {#each equipmentItems as item, index}
@@ -175,7 +176,7 @@
 
         <!-- Weapons Section -->
         <div class="weapons-section" data-drop-zone="weapons">
-            <FormSection header="⚔️ VAPEN">
+            <FormSection header="VAPEN" headerIcon={BowArrow}>
                 <!-- Weapons list -->
                 <div class="section-items-list">
                     {#each sheetState.weapons as weapon, index}
@@ -221,7 +222,7 @@
 
         <!-- Armor Section -->
         <div class="armor-section" data-drop-zone="armor">
-            <FormSection header="🛡️ RUSTNING">
+            <FormSection header="RUSTNING" headerIcon={ShieldHalf}>
                 <!-- Armor list -->
                 <div class="section-items-list">
                     {#each sheetState.armor as armor, index}

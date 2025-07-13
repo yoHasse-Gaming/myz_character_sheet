@@ -2,6 +2,7 @@
 // This provides reactive state management across all components
 
 import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent } from '../types';
+import type { LayoutType, TabName } from '../utils/interactjsUtils';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 
 // Define the character sheet state structure
@@ -462,17 +463,18 @@ export const characterActions = {
     },
     
     // Paper layout management
-    savePaperLayout(tabName: 'characterTab' | 'skillsTab', paperId: string, layout: { x: number; y: number; width?: number; height?: number }) {
-        sheetState.paperLayouts[tabName][paperId] = layout;
+    savePaperLayout(tabName: TabName, paperId: string, layout: LayoutType) {
+        sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts][paperId] = layout;
     },
     
-    getPaperLayout(tabName: 'characterTab' | 'skillsTab', paperId: string) {
-        return sheetState.paperLayouts[tabName][paperId] || null;
+    getPaperLayout(tabName: TabName, paperId: string) {
+        const layouts = sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts];
+        return layouts ? layouts[paperId] || null : null;
     },
     
-    clearPaperLayouts(tabName?: 'characterTab' | 'skillsTab') {
+    clearPaperLayouts(tabName?: TabName) {
         if (tabName) {
-            sheetState.paperLayouts[tabName] = {};
+            sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts] = {};
         } else {
             sheetState.paperLayouts.characterTab = {};
             sheetState.paperLayouts.skillsTab = {};

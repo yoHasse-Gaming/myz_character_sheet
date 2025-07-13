@@ -82,11 +82,13 @@
           {@const isSelected = isMutationSelected(mutation.id)}
           {@const rotation = randomRotations[index % randomRotations.length]}
           
-          <div 
+          <button 
             class="card-wrapper"
             style="--random-rotation: {rotation}deg"
             transition:scale={{ duration: 400, delay: index * 50 }}
             onclick={() => selectMutation(mutation)}
+            type="button"
+            aria-label="Välj mutation: {mutation.name}"
           >
             <div class="torn-input-wrapper {mutationVariants[variantIndex]} {isSelected ? 'selected' : ''}">
               <div class="card-content">
@@ -121,7 +123,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         {/each}
       </div>
     </div>
@@ -151,4 +153,7 @@
     .modal-close-button {
         z-index: 103 !important;
     }
+
+    /* Make button cards behave like divs but with proper accessibility */
+   
 </style>

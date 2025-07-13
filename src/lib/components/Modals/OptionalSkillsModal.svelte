@@ -164,46 +164,5 @@
     }
 
     /* Make button cards behave like divs but with proper accessibility */
-    .card-wrapper {
-        background: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        cursor: pointer;
-        display: block;
-        width: 100%;
-        text-align: left;
-        transition: all 0.2s ease;
-        transform: rotate(var(--random-rotation));
-        transform-origin: center;
-        perspective: 1000px;
-        max-width: 350px;
-        min-height: 400px;
-        position: relative;
-    }
 
-    .card-wrapper:hover {
-        transform: translateY(-4px) rotate(var(--random-rotation));
-        filter: brightness(1.05);
-        z-index: 2;
-    }
-
-    .card-wrapper:focus {
-        outline: 2px solid var(--color-primary-500);
-        outline-offset: 2px;
-        z-index: 3;
-    }
-
-    .card-wrapper:focus-visible {
-        outline: 2px solid var(--color-primary-500);
-        outline-offset: 2px;
-        z-index: 3;
-    }
-
-    /* Ensure the torn input wrapper takes full height and width of the button */
-    .card-wrapper .torn-input-wrapper {
-        width: 100%;
-        height: 100%;
-        min-height: inherit;
-    }
 </style>

@@ -19,7 +19,9 @@ by Excellent Ritma Florendia
 
 
 
-
+h4>.lucide {
+    display: inline-block;
+}
 
 /* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
 :root {

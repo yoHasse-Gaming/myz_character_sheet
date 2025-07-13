@@ -17,9 +17,9 @@
         : generalTalentsData as Talent[]);
     
     // Filter out already selected talents
-    const filteredTalents = $derived(availableTalents.filter(talent => 
-        !sheetState.talents.some(selected => selected.id === talent.id)
-    ));
+    // const filteredTalents = $derived(availableTalents.filter(talent => 
+    //     !sheetState.talents.some(selected => selected.id === talent.id)
+    // ));
     
     // Check if a talent is already selected
     function isTalentSelected(talentId: string): boolean {
@@ -28,7 +28,7 @@
     
     // Generate unique variants and rotations for talent cards
     const talentVariants = $derived(generateUniqueVariants(availableTalents.length));
-    const cardRotations = $derived(generateRandomRotations(filteredTalents.length));
+    const cardRotations = $derived(generateRandomRotations(availableTalents.length));
 
     function addTalent(talent: Talent) {
         // Validate talent selection based on rules
@@ -62,12 +62,6 @@
         closeDialogueOption(modalType === 'occupational' ? 'occupational-talents' : 'generic-talents');
     }
 
-    // Close modal on Escape key (handled by Modal component now)
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    }
 
 </script>
 
@@ -103,12 +97,12 @@
         </button>
         
         <div class="card-grid">
-                {#each filteredTalents as talent, index}
+                {#each availableTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
                     {@const rotation = cardRotations[index] || 0}
                     
-                    <div 
+                    <button 
                         class="card-wrapper"
                         style="--random-rotation: {rotation}deg"
                         onclick={() => addTalent(talent)}
@@ -146,7 +140,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 {/each}
             </div>
         </div>
@@ -185,12 +179,12 @@
         </button>
         
         <div class="card-grid">
-                {#each filteredTalents as talent, index}
+                {#each availableTalents as talent, index}
                     {@const variantIndex = availableTalents.findIndex(t => t.id === talent.id)}
                     {@const isSelected = isTalentSelected(talent.id)}
                     {@const rotation = cardRotations[index] || 0}
                     
-                    <div 
+                    <button 
                         class="card-wrapper"
                         style="--random-rotation: {rotation}deg"
                         onclick={() => addTalent(talent)}
@@ -232,7 +226,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 {/each}
             </div>
         </div>
@@ -268,47 +262,5 @@
         font-size: 1.2rem;
     }
 
-    /* Make button cards behave like divs but with proper accessibility */
-    .card-wrapper {
-        background: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        cursor: pointer;
-        display: block;
-        width: 100%;
-        text-align: left;
-        transition: all 0.2s ease;
-        transform: rotate(var(--random-rotation));
-        transform-origin: center;
-        perspective: 1000px;
-        max-width: 350px;
-        min-height: 400px;
-        position: relative;
-    }
 
-    .card-wrapper:hover {
-        transform: translateY(-4px) rotate(var(--random-rotation));
-        filter: brightness(1.05);
-        z-index: 2;
-    }
-
-    .card-wrapper:focus {
-        outline: 2px solid var(--color-primary-500);
-        outline-offset: 2px;
-        z-index: 3;
-    }
-
-    .card-wrapper:focus-visible {
-        outline: 2px solid var(--color-primary-500);
-        outline-offset: 2px;
-        z-index: 3;
-    }
-
-    /* Ensure the torn input wrapper takes full height and width of the button */
-    .card-wrapper .torn-input-wrapper {
-        width: 100%;
-        height: 100%;
-        min-height: inherit;
-    }
 </style>

@@ -8,6 +8,7 @@
     import TalentsTab from "./tabs/TalentsTab.svelte";
     import EquipmentTab from "./tabs/EquipmentTab.svelte";
     import RelationsNotesTab from "./tabs/RelationsNotesTab.svelte";
+    import { GraduationCap } from "@lucide/svelte";
 
     let activeTab = $state(1);
 
@@ -77,8 +78,7 @@ TODO: Use this from skeletonUI instead of custom tabs
     <!-- Tab 3: Mutationer -->
     {#if activeTab === 3}
         <div class="talents-mutations-tab">
-            <Dna />
-            <FormSection header="MUTATIONER">
+            <FormSection header="MUTATIONER" headerIcon={Dna}>
                 <Mutations />
             </FormSection>
         </div>
@@ -86,7 +86,7 @@ TODO: Use this from skeletonUI instead of custom tabs
 
     <!-- Tab 4: Talanger -->
     {#if activeTab === 4}
-        <FormSection header="⚡ TALANGER">
+        <FormSection header="TALANGER" headerIcon={GraduationCap}>
             <TalentsTab />
         </FormSection>
     {/if}

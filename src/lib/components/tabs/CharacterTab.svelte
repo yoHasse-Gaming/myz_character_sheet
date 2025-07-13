@@ -28,6 +28,8 @@
         // Restore saved positions and sizes
         characterElements.forEach((element, index) => {
             const paperId = element.getAttribute('data-paper-id');
+            initInteractForElement((element as HTMLElement), 'characterTab', '.character-header');
+
             if (paperId) {
                 const savedLayout = characterActions.getPaperLayout('characterTab', paperId);
                 if (savedLayout) {
@@ -45,7 +47,6 @@
             }
         });
 
-        initInteractForElement('.character-paper', 'characterTab', '.character-header');
 
         
         // interact('.character-paper')
@@ -257,7 +258,7 @@
                         class="torn-input font-user character-textarea" 
                         placeholder="Ärrat, väderbitit, maskerat..." 
                         bind:value={formData.appearance.face}
-                        oninput={(e) => debouncedAutoResize(e.target as HTMLTextAreaElement)}></textarea>
+                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement, '.character-header', 'characterTab')}></textarea>
                 </div>
             </div>
         </div>
@@ -273,7 +274,7 @@
                         class="torn-input font-user character-textarea" 
                         placeholder="Mager, muskulös, deformerad..." 
                         bind:value={formData.appearance.body}
-                        oninput={(e) => debouncedAutoResize(e.target as HTMLTextAreaElement)}></textarea>
+                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement,'.character-header', 'characterTab')}></textarea>
                 </div>
             </div>
         </div>
@@ -289,7 +290,7 @@
                         class="torn-input font-user character-textarea" 
                         placeholder="Lappade trasor, läder, folie..." 
                         bind:value={formData.appearance.clothes}
-                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement, 'characterTab')}></textarea>
+                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement,'.character-header', 'characterTab')}></textarea>
                 </div>
             </div>
         </div>

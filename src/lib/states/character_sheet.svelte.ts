@@ -163,7 +163,8 @@ export const sheetState = $state({
     // Paper layout data for preserving positions and sizes across tab switches
     paperLayouts: {
         characterTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        skillsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
+        skillsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
+        mutationsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
     }
 });
 

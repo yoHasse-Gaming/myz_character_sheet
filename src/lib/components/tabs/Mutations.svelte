@@ -7,6 +7,7 @@
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
     import { Microscope } from '@lucide/svelte';
+    import { initInteractForElement, type TabName } from '../../utils/interactjsUtils';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
@@ -35,11 +36,73 @@
         characterActions.removeMutation(mutationId);
     }
 
+    function resetMutationLayout() {
+        // Clear saved layout
+        characterActions.clearPaperLayouts('mutationsTab');
+        
+        // Reset mutation points element to default position and size
+        const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
+        if (mutationPointsElement) {
+            // Reset transform
+            mutationPointsElement.style.transform = '';
+            mutationPointsElement.setAttribute('data-x', '0');
+            mutationPointsElement.setAttribute('data-y', '0');
+            // Reset size
+            mutationPointsElement.style.width = '';
+            mutationPointsElement.style.height = '';
+        }
+        
+        console.log('Mutation layout reset to defaults');
+    }
+
+    onMount(() => {
+        // Initialize InteractJS for the mutation points component
+        const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
+        if (mutationPointsElement) {
+            // Initialize InteractJS for this specific element
+            initInteractForElement('.mutation-points-wrapper', 'mutationsTab', '.mutation-points-header', undefined, {
+                enableResizable: false,
+                enableDraggable: true
+            });
+            
+            // Apply saved layout if it exists
+            const savedLayout = characterActions.getPaperLayout('mutationsTab', 'mutation-points');
+            if (savedLayout) {
+                if (savedLayout.x !== undefined && savedLayout.y !== undefined) {
+                    mutationPointsElement.style.transform = `translate(${savedLayout.x}px, ${savedLayout.y}px)`;
+                    mutationPointsElement.setAttribute('data-x', savedLayout.x.toString());
+                    mutationPointsElement.setAttribute('data-y', savedLayout.y.toString());
+                }
+                if (savedLayout.width) {
+                    mutationPointsElement.style.width = `${savedLayout.width}px`;
+                }
+                if (savedLayout.height) {
+                    mutationPointsElement.style.height = `${savedLayout.height}px`;
+                }
+            }
+        }
+    });
+
 </script>
 
 <MutationsModal />
 
 <div class="mutations-tab">
+    <!-- Reset Layout Button -->
+    <div class="reset-layout-container">
+        <button 
+            class="reset-layout-button"
+            onclick={resetMutationLayout}
+            title="Återställ mutation layout till standardposition"
+        >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+            </svg>
+            Återställ layout
+        </button>
+    </div>
+
     <!-- Draggable Add Item -->
     <DraggableAddItem 
         text="Dra för mutation"
@@ -99,11 +162,9 @@
             {/if}
         </div>
     </div>
-</div>
 
-            <!-- Mutation Points Section -->
-    <div class="mutation-points-floating-container">
-        <div class="torn-input-wrapper variant-2 mutation-points-wrapper">
+        <div class="mutation-points-floating-container">
+        <div class="torn-input-wrapper variant-2 mutation-points-wrapper" data-x="0" data-y="0" data-paper-id="mutation-points">
             <div class="mutation-points-content">
                 <div class="mutation-points-header">
                     <Microscope size={20} class="mutation-points-icon" />
@@ -143,22 +204,67 @@
                     </div>
                 </div>
                 
-                <div class="mutation-points-info">
-                    <p class="mutation-points-explanation">
-                        Mutationspoäng representerar din potentiella kraft från Zonen. 
-                        Klicka på cirklarna för att ställa in dina tillgängliga poäng.
-                    </p>
-                </div>
+
             </div>
         </div>
     </div>
+</div>
+
+            <!-- Mutation Points Section -->
+
 
 <style>
     .mutations-tab {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        width: 100%;
+        padding: 1rem;
+        position: relative;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    /* Reset layout button */
+    .reset-layout-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1001;
+    }
+
+    .reset-layout-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-family: var(--font-user), sans-serif;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .reset-layout-button:hover {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .reset-layout-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .reset-layout-button svg {
+        flex-shrink: 0;
     }
 
     .add-mutations-section {
@@ -393,9 +499,30 @@
 
     .mutation-points-wrapper {
         padding: 1.5rem;
-        min-width: 350px;
+        width: 450px;
         position: relative;
         z-index: 1;
+        cursor: default;
+        user-select: none;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        height: 150px;
+        border: 3px solid transparent;
+        border-radius: 4px;
+    }
+
+    .mutation-points-wrapper:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+
+    .mutation-points-wrapper:active,
+    .mutation-points-wrapper.dragging,
+    .mutation-points-wrapper.resizing {
+        z-index: 20;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     }
 
     .mutation-points-content {
@@ -412,6 +539,19 @@
         gap: 0.75rem;
         justify-content: center;
         margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: move;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 4px 4px 0 0;
+        transition: background-color 0.2s ease;
+        flex-shrink: 0;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    :global(.dark) .mutation-points-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
     }
 
     .mutation-points-title {
@@ -502,6 +642,7 @@
     }
 
     .mutation-points-info {
+        margin: auto;
         text-align: center;
         max-width: 300px;
     }

@@ -6,127 +6,139 @@ export type TabName = 'characterTab' | 'equipmentTab' | 'mutationsTab' | 'talent
 export function initInteractForElement(
     element: HTMLElement | string, 
     tabName: TabName,
-    allowFrom: HTMLElement | string |undefined = undefined,
-
+    headerElem: HTMLElement | string | undefined = undefined,
+    allowFrom: HTMLElement | string | undefined = undefined,
+    options: {
+        enableDraggable?: boolean;
+        enableResizable?: boolean;
+    } = { enableDraggable: true, enableResizable: true }
 ) {
     // Initialize Interact.js for the given element
-    interact(element)
-            .draggable({
-                allowFrom: allowFrom, // Use component-specific selector
-                listeners: {
-                    start: (event) => {
-                        console.log('Drag started on:', event.target);
-                        event.target.style.zIndex = '1000';
-                    },
-                    move: (event) => {
-                        const target = event.target;
-                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+    const interactElement = interact(element);
+    
+    // Apply draggable functionality if enabled
+    if (options.enableDraggable) {
+        interactElement.draggable({
+            allowFrom: allowFrom, // Use component-specific selector
+            listeners: {
+                start: (event) => {
+                    console.log('Drag started on:', event.target);
+                    event.target.style.zIndex = '1000';
+                },
+                move: (event) => {
+                    const target = event.target;
+                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-                        target.setAttribute('data-x', x.toString());
-                        target.setAttribute('data-y', y.toString());
-                        
-                        // Use throttled save for better performance
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            throttledSaveLayout(tabName, paperId, { x, y });
-                        }
-                    },
-                    end: (event) => {
-                        event.target.style.zIndex = '';
-                        
-                        // Final save when drag ends
-                        const target = event.target;
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            const x = parseFloat(target.getAttribute('data-x')) || 0;
-                            const y = parseFloat(target.getAttribute('data-y')) || 0;
-                            const currentLayout = characterActions.getPaperLayout(tabName, paperId) || {};
-                            characterActions.savePaperLayout(tabName, paperId, {
-                                ...currentLayout,
-                                x,
-                                y
-                            });
-                        }
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x.toString());
+                    target.setAttribute('data-y', y.toString());
+                    
+                    // Use throttled save for better performance
+                    const paperId = target.getAttribute('data-paper-id');
+                    if (paperId) {
+                        throttledSaveLayout(tabName, paperId, { x, y });
                     }
                 },
-                modifiers: [
-                    // Restrict dragging to within the tab-content container
-                    interact.modifiers.restrictRect({
-                        restriction: '.tab-content',
-                        endOnly: true
-                    })
-                ]
-            })
-            .resizable({
-                edges: { left: true, right: true, bottom: true, top: true },
-                listeners: {
-                    start: (event) => {
-                        console.log('Resize started on:', event.target);
-                        event.target.style.zIndex = '1000';
-                    },
-                    move: (event) => {
-                        const target = event.target;
-                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
-                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
+                end: (event) => {
+                    event.target.style.zIndex = '';
+                    
+                    // Final save when drag ends
+                    const target = event.target;
+                    const paperId = target.getAttribute('data-paper-id');
+                    if (paperId) {
+                        const x = parseFloat(target.getAttribute('data-x')) || 0;
+                        const y = parseFloat(target.getAttribute('data-y')) || 0;
+                        const currentLayout = characterActions.getPaperLayout(tabName, paperId) || {};
+                        characterActions.savePaperLayout(tabName, paperId, {
+                            ...currentLayout,
+                            x,
+                            y
+                        });
+                    }
+                }
+            },
+            modifiers: [
+                // Restrict dragging to within the tab-content container
+                interact.modifiers.restrictRect({
+                    restriction: '.tab-content',
+                    endOnly: true
+                })
+            ]
+        });
+    }
+    
+    // Apply resizable functionality if enabled
+    if (options.enableResizable) {
+        interactElement.resizable({
+            edges: { left: true, right: true, bottom: true, top: true },
+            listeners: {
+                start: (event) => {
+                    console.log('Resize started on:', event.target);
+                    event.target.style.zIndex = '1000';
+                },
+                move: (event) => {
+                    const target = event.target;
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0);
 
-                        // Calculate minimum height based on content
-                        const minHeight = getMinHeightForContent(target);
-                        
-                        // Ensure height doesn't go below minimum
-                        const newHeight = Math.max(event.rect.height, minHeight);
+                    // Calculate minimum height based on content
+                    const minHeight = headerElem ? getMinHeightForContent(target, headerElem) : 120; // Default minimum height if no headerElem provided
+                    
+                    // Ensure height doesn't go below minimum
+                    const newHeight = Math.max(event.rect.height, minHeight);
 
-                        // Update the element's style
-                        target.style.width = event.rect.width + 'px';
-                        target.style.height = newHeight + 'px';
+                    // Update the element's style
+                    target.style.width = event.rect.width + 'px';
+                    target.style.height = newHeight + 'px';
 
-                        // Translate when resizing from top or left edges
-                        x += event.deltaRect.left;
-                        y += event.deltaRect.top;
+                    // Translate when resizing from top or left edges
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-                        target.setAttribute('data-x', x.toString());
-                        target.setAttribute('data-y', y.toString());
-                        
-                        // Use throttled save for better performance
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            throttledSaveLayout(tabName, paperId, {
-                                x,
-                                y,
-                                width: event.rect.width,
-                                height: newHeight
-                            });
-                        }
-                    },
-                    end: (event) => {
-                        event.target.style.zIndex = '';
-                        
-                        // Final save when resize ends
-                        const target = event.target;
-                        const paperId = target.getAttribute('data-paper-id');
-                        if (paperId) {
-                            const x = parseFloat(target.getAttribute('data-x')) || 0;
-                            const y = parseFloat(target.getAttribute('data-y')) || 0;
-                            const width = parseFloat(target.style.width) || 0;
-                            const height = parseFloat(target.style.height) || 0;
-                            characterActions.savePaperLayout(tabName, paperId, {
-                                x,
-                                y,
-                                width,
-                                height
-                            });
-                        }
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x.toString());
+                    target.setAttribute('data-y', y.toString());
+                    
+                    // Use throttled save for better performance
+                    const paperId = target.getAttribute('data-paper-id');
+                    if (paperId) {
+                        throttledSaveLayout(tabName, paperId, {
+                            x,
+                            y,
+                            width: event.rect.width,
+                            height: newHeight
+                        });
                     }
                 },
-                modifiers: [
-                    // Static minimum size constraints
-                    interact.modifiers.restrictSize({
-                        min: { width: 250, height: 120 }
-                    })
-                ]
-            });
+                end: (event) => {
+                    event.target.style.zIndex = '';
+                    
+                    // Final save when resize ends
+                    const target = event.target;
+                    const paperId = target.getAttribute('data-paper-id');
+                    if (paperId) {
+                        const x = parseFloat(target.getAttribute('data-x')) || 0;
+                        const y = parseFloat(target.getAttribute('data-y')) || 0;
+                        const width = parseFloat(target.style.width) || 0;
+                        const height = parseFloat(target.style.height) || 0;
+                        characterActions.savePaperLayout(tabName, paperId, {
+                            x,
+                            y,
+                            width,
+                            height
+                        });
+                    }
+                }
+            },
+            modifiers: [
+                // Static minimum size constraints
+                interact.modifiers.restrictSize({
+                    min: { width: 250, height: 120 }
+                })
+            ]
+        });
+    }
 }
 
     // Throttle function to reduce state update frequency
@@ -160,7 +172,7 @@ export function initInteractForElement(
         characterActions.savePaperLayout(tabName, paperId, layout);
     }, 100); // Save at most every 100ms
 
-    export function getMinHeightForContent(element: HTMLElement, allowFrom: HTMLElement | undefined = undefined): number {
+    export function getMinHeightForContent(element: HTMLElement, headerElem: HTMLElement | string): number {
         const textarea = element.querySelector('textarea');
         if (!textarea) return 120; // Default minimum for input fields
         
@@ -192,7 +204,8 @@ export function initInteractForElement(
         document.body.removeChild(tempDiv);
         
         // Get header height
-        const header = allowFrom ? allowFrom : element;
+        // Get element either by string or HTMLElement
+        const header = typeof headerElem === 'string' ? element.querySelector(headerElem) : headerElem;
         const headerHeight = header ? (header as HTMLElement).offsetHeight : 40;
         
         // Calculate total minimum height: header + content padding + text height + some margin
@@ -202,36 +215,49 @@ export function initInteractForElement(
         return Math.max(120, minHeight); // Never smaller than default minimum
     }
 
-    export function autoResizePaper(textarea: HTMLTextAreaElement, tabName: TabName) {
-        const paper = textarea.closest('.character-paper') as HTMLElement; TODO: FIX ME!
+    export function autoResizePaper(textarea: HTMLTextAreaElement, paperHeader: HTMLElement | string, tabName: TabName) {
+        const paper = textarea.closest('.torn-input-wrapper') as HTMLElement;
         if (!paper) return;
         
-        const currentHeight = parseFloat(paper.style.height) || paper.offsetHeight;
-        const minHeight = getMinHeightForContent(paper);
+        // Prevent infinite resize loops and conflicts with manual resize
+        if (paper.hasAttribute('data-auto-resizing') || paper.hasAttribute('data-manual-resizing')) return;
+        paper.setAttribute('data-auto-resizing', 'true');
         
-        // Only grow the paper if content needs more space
-        if (minHeight > currentHeight) {
-            paper.style.height = minHeight + 'px';
+        try {
+            const currentHeight = parseFloat(paper.style.height) || paper.offsetHeight;
+            const minHeight =  getMinHeightForContent(paper, paperHeader);
             
-            // Save the new layout
-            const paperId = paper.getAttribute('data-paper-id');
-            if (paperId) {
-                const x = parseFloat(paper.getAttribute('data-x') || '0') || 0;
-                const y = parseFloat(paper.getAttribute('data-y') || '0') || 0;
-                const width = parseFloat(paper.style.width) || paper.offsetWidth;
+            // Only grow the paper if content needs more space, and add a small buffer to prevent constant resizing
+            const buffer = 10; // Small buffer to prevent continuous resizing
+            if (minHeight > currentHeight + buffer) {
+                paper.style.height = minHeight + 'px';
                 
-                characterActions.savePaperLayout(tabName, paperId, {
-                    x,
-                    y,
-                    width,
-                    height: minHeight
-                });
+                // Save the new layout
+                const paperId = paper.getAttribute('data-paper-id');
+                if (paperId) {
+                    const x = parseFloat(paper.getAttribute('data-x') || '0') || 0;
+                    const y = parseFloat(paper.getAttribute('data-y') || '0') || 0;
+                    const width = parseFloat(paper.style.width) || paper.offsetWidth;
+                    
+                    characterActions.savePaperLayout(tabName, paperId, {
+                        x,
+                        y,
+                        width,
+                        height: minHeight
+                    });
+                }
             }
+        } finally {
+            // Always remove the flag after processing
+            setTimeout(() => {
+                paper.removeAttribute('data-auto-resizing');
+            }, 50);
         }
     }
 
         // Debounced auto-resize function to avoid excessive calls during typing
-    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement, tabName: TabName) => {
-        autoResizePaper(textarea, tabName);
+    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement, header: HTMLElement | string, tabName: TabName) => {
+        console.log('Debounced auto-resize triggered for:', textarea);
+        autoResizePaper(textarea, header, tabName);
     }, 150); // Wait 150ms after user stops typing
 

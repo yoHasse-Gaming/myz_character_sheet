@@ -3,18 +3,27 @@
     import { fade, scale } from 'svelte/transition';
     import { openInfoModal } from '../../../states/modals.svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
-    import { Ban, Bone, Circle, CircleX, Skull } from '@lucide/svelte';
+    import { Ban, BicepsFlexed, Bone, Circle, type Icon as IconType } from '@lucide/svelte';
+
     import { onMount } from 'svelte';
+    import { getIconForAbility } from '../../../utils/iconUtils';
+    import type { AbilityType, BaseAbilityType } from '../../../types';
     
 
     let { 
-        baseAbilityLabel,
-        baseAbilityDmgLabel,
-        abilityIndex
+        baseAbility,
+        abilityIndex,
+        
+    }: {
+        baseAbility: BaseAbilityType;
+        abilityIndex: number;
+        
     } = $props();
 
     // Get the ability from global state
     const ability = $derived(sheetState.baseAbilities[abilityIndex]);
+
+    const AbilityIcon = getIconForAbility(baseAbility.type);
 
     function toggleDamage(damageIndex: number) {
         const currentDamage = ability?.damage || 0;
@@ -54,7 +63,7 @@
         }
     };
 
-    const currentTrauma = traumaDescriptions[baseAbilityDmgLabel];
+    const currentTrauma = traumaDescriptions[baseAbility.damageLabel];
 
     function showTraumaInfo() {
         if (currentTrauma) {
@@ -70,26 +79,19 @@
     });
 </script>
 
-<!-- TODO: Use this instead for dmg fields? 
-<Rating value={2}>
-  {#snippet iconEmpty()}
-    <Bone size={24} />
-  {/snippet}
-  {#snippet iconFull()}
-    <Skull size={24} />
-  {/snippet}
-</Rating> -->
 
 <div class="torn-input-wrapper variant-{(abilityIndex % 6) + 1}">
     <div class="base-ability-container">
         <div class="ability-row">
             <div class="ability-section">
-                <label for={baseAbilityLabel} class="ability-label">{baseAbilityLabel}</label>
+                <label for={baseAbility.label} class="ability-label">
+                    <AbilityIcon />
+                    {baseAbility.label}</label>
                 <input type="number" 
                     max="10" 
                     min="1" 
                     class="ability-input font-user" 
-                    name={baseAbilityLabel} 
+                    name={baseAbility.label} 
                     value={ability?.value || 1}
                     oninput={handleValueChange} />
             </div>
@@ -97,12 +99,12 @@
 
             <div class="damage-section">
                 <div class="damage-header">
-                    <span class="damage-label">{baseAbilityDmgLabel}</span>
+                    <span class="damage-label">{baseAbility.damageLabel}</span>
                     <button 
                         class="info-icon-button"
                         onclick={showTraumaInfo}
-                        aria-label="Information om {baseAbilityDmgLabel}"
-                        title="Visa information om {baseAbilityDmgLabel}"
+                        aria-label="Information om {baseAbility.damageLabel}"
+                        title="Visa information om {baseAbility.damageLabel}"
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -113,46 +115,21 @@
                 </div>
                 <div class="damage-controls">
                     <div class="damage-indicators">
-                        <!-- {#each [0, 1, 2, 3, 4] as idx}
+                        {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}
                             <button 
                                 class="damage-indicator"
                                 onclick={() => toggleDamage(idx)}
                                 aria-label="Toggle damage for indicator {idx + 1}"
                             >
                                 
-                                <img src='/img/strokes/o.svg' alt="No damage" class="stroke-image circle-layer" />
                                 
                                 {#if (ability?.damage || 0) > idx}
-                                    <img 
-                                        src='/img/strokes/x.svg' 
-                                        alt="Damage" 
-                                        class="stroke-image x-layer" 
-                                        in:scale={{ duration: 200, start: 0.8 }}
-                                        out:fade={{ duration: 150 }}
-                                    />
+                                    <Circle size={24} fill="red"  />
+                                {:else}
+                                    <Circle size={24} />
                                 {/if}
                             </button>
-                        {/each} -->
-                        <!-- <button 
-                            title="Ta bort sista mutationpoängen"
-                            disabled={ability?.damage === 0}
-                                onclick={() => {
-                                    if (ability?.damage > 0) {
-                                        characterActions.setAbilityDamage(abilityIndex, ability?.damage-1);
-                                    }
-                                }}
-                            ><CircleX size={24} />
-                        </button> -->
-                        <Rating value={ability?.damage} count={ability.value}
-                            onValueChange={(value) => characterActions.setAbilityDamage(abilityIndex, value.value)}
-                        >
-                        {#snippet iconEmpty()}
-                            <Circle size={24}  />
-                        {/snippet}
-                        {#snippet iconFull()}
-                            <Circle size={24} fill="red"  />
-                        {/snippet}
-                        </Rating>
+                        {/each}
                     </div>
                 </div>
             </div>

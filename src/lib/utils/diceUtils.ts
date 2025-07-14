@@ -33,6 +33,8 @@ export async function checkDicePluginAvailability(): Promise<void> {
             return;
         }
 
+        console.log("🎲 MYZ Dice plugin metadata check passed");
+
         diceStates.isDicePluginAvailable = true;
 
         if(metadataCheck.available && !diceStates.broadCastAvailabilityCheck) {

@@ -1,3 +1,4 @@
+import type { Icon as IconType } from '@lucide/svelte';
 // Character-related types
 export type Talent = {
     id: string;
@@ -27,12 +28,22 @@ export type SkillsData = {
     mutations: Mutation[];
 }
 
+export type SkillType = {
+    id: string;
+    name: string;
+    baseAbility: AbilityType;
+    value: number;
+    description: string;
+    bonusEffects: string;
+    examples?: string;
+}
+
 // New optional skill types
 export type OptionalSkill = {
     id: string;
     name: string;
     value: number;
-    baseAbility: string;
+    baseAbility: AbilityType;
     description: string;
     bonusEffects: string;
     examples?: string;
@@ -86,11 +97,15 @@ export type KeyValuePair = {
     value: string;
 }
 
+export type AbilityType = "STRENGTH" | "AGILITY" | "WITS" | "EMPATHY";
+
+
 export type BaseAbilityType = {
     label: string;
     damageLabel: string;
     value: number;
     damage: number;
+    type: AbilityType;
 }
 
 export type MyCharSheet = {

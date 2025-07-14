@@ -46,9 +46,9 @@
                         <div class="space-y-4 ">
                             {#each sheetState.baseAbilities as ability, index}
                                 <BaseAbility
-                                    baseAbilityLabel={ability.label}
-                                    baseAbilityDmgLabel={ability.damageLabel}
+                                    baseAbility={ability}
                                     abilityIndex={index}
+                                    
                                 />
                             {/each}
                         </div>

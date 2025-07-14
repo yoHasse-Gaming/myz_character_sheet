@@ -6,10 +6,15 @@
     import DraggableAddItem from '../../DraggableAddItem.svelte';
     import { openInfoModal } from '../../../states/modals.svelte';
     import { initInteractForElement } from '../../../utils/interactjsUtils';
+    import { getIconForAbility } from '../../../utils/iconUtils';
+    import { Tooltip } from '@skeletonlabs/skeleton-svelte';
+    import { diceStates } from '../../../states/dice.svelte';
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
-
+    
+    // Track tooltip state for each skill individually
+    let tooltipStates: Record<string, boolean> = $state({});
 
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
@@ -31,7 +36,7 @@
             if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
                 initInteractForElement(card as HTMLElement, 'skillsTab', undefined, undefined, {
                     enableDraggable: true,
-                    enableResizable: true
+                    enableResizable: false
                 });
             }
 
@@ -148,11 +153,29 @@
 
     <!-- Core Skills -->
     {#each sheetState.skills as skill, index}
+        {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
         {@const position = getInitialPosition(index)}
         <div class="skill-item-wrapper" style="top: {position.y}px; left: {position.x}px;">
             <div class="torn-input-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
                 <div class="skill-item-content">
                     <div class="skill-header">
+                            <Tooltip
+                                open={tooltipStates[`optional-skill-${skill.id}`] || false}
+                                onOpenChange={(e) => (tooltipStates[`optional-skill-${skill.id}`] = e.open)}
+                                positioning={{ placement: 'top' }}
+                                triggerBase="underline"
+                                contentBase="card preset-filled p-4 z-1000"
+                                openDelay={200}
+                                arrow
+                            >
+                                {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
+                                {#snippet content()}
+                                    <div class="tooltip-content">
+                                        <strong>{skill.baseAbility}</strong>
+                                        <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                                    </div>
+                                {/snippet}
+                            </Tooltip>
                         <span class="skill-name">{skill.name}</span>
                         <div class="skill-controls-right">
                             <button 
@@ -167,6 +190,8 @@
                                     <path d="M9,9h6"></path>
                                 </svg>
                             </button>
+                            {#if diceStates.isDicePluginAvailable}
+
                             <button 
                                 class="dice-roll-button"
                                 onclick={() => {/* TODO: Add dice roll logic */}}
@@ -179,6 +204,7 @@
                                     <circle cx="15" cy="15" r="1"></circle>
                                 </svg>
                             </button>
+                            {/if}
                             <input
                                 id="skill-{index}"
                                 name={skill.name}
@@ -190,6 +216,7 @@
                                 oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
                                 placeholder="0"
                             />
+
                         </div>
                     </div>
                 </div>
@@ -199,12 +226,30 @@
 
     <!-- Optional Skills -->
     {#each sheetState.optionalSkills as skill, index}
+        {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility)}
         {@const skillIndex = sheetState.skills.length + index}
         {@const position = getInitialPosition(skillIndex)}
         <div class="skill-item-wrapper optional-skill" style="top: {position.y}px; left: {position.x}px;">
             <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
                 <div class="skill-item-content">
                     <div class="skill-header">
+                            <Tooltip
+                                open={tooltipStates[`optional-skill-${skill.id}`] || false}
+                                onOpenChange={(e) => (tooltipStates[`optional-skill-${skill.id}`] = e.open)}
+                                positioning={{ placement: 'top' }}
+                                triggerBase="underline"
+                                contentBase="card preset-filled p-4 z-1000"
+                                openDelay={200}
+                                arrow
+                            >
+                                {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
+                                {#snippet content()}
+                                    <div class="tooltip-content">
+                                        <strong>{skill.baseAbility}</strong>
+                                        <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                                    </div>
+                                {/snippet}
+                            </Tooltip>
                         <span class="skill-name">{skill.name}</span>
                         <div class="skill-controls-right">
                             <button 
@@ -219,6 +264,7 @@
                                     <path d="M9,9h6"></path>
                                 </svg>
                             </button>
+                            {#if diceStates.isDicePluginAvailable}
                             <button 
                                 class="dice-roll-button"
                                 onclick={() => {/* TODO: Add dice roll logic */}}
@@ -231,6 +277,7 @@
                                     <circle cx="15" cy="15" r="1"></circle>
                                 </svg>
                             </button>
+                            {/if}
                             <input
                                 id="optional-skill-{skill.id}"
                                 name={skill.name}
@@ -242,6 +289,9 @@
                                 oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
                                 placeholder="0"
                             />
+                            
+
+                            
                             <button
                                 class="remove-skill-button"
                                 onclick={() => removeOptionalSkill(skill.id)}
@@ -267,6 +317,10 @@
 
 <style>
     /* Skills container - responsive grid */
+
+    .z-1000 {
+        z-index: 1000; /* Ensure skills tab is above other content */
+    }
     .skills-tab {
         display: block;
         width: 100%;
@@ -509,6 +563,46 @@
         color: var(--color-primary-400);
     }
 
+    /* Tooltip content styling */
+    .tooltip-content {
+        text-align: center;
+        font-family: var(--font-user), sans-serif;
+        background: var(--color-surface-50);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--color-surface-200);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 120px;
+    }
+
+    .tooltip-content strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: bold;
+        color: var(--color-primary-600);
+        margin-bottom: 0.25rem;
+    }
+
+    .tooltip-description {
+        font-size: 0.8rem;
+        color: var(--color-surface-700);
+        font-style: italic;
+    }
+
+    :global(.dark) .tooltip-content {
+        background: var(--color-surface-800);
+        border-color: var(--color-surface-600);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    :global(.dark) .tooltip-content strong {
+        color: var(--color-primary-400);
+    }
+
+    :global(.dark) .tooltip-description {
+        color: var(--color-surface-300);
+    }
+
     /* Skills controls section */
     .skills-controls-section {
         display: flex;
@@ -621,6 +715,8 @@
     }
 
     .skill-name {
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
         pointer-events: none;
         font-family: var(--font-user), serif;
         font-weight: bold;

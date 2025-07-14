@@ -8,7 +8,7 @@
     import { Modal } from "@skeletonlabs/skeleton-svelte";
 
     const { onMutationSelected }: {
-        onMutationSelected: (mutation: Mutation, selected: boolean) => Promise<void>;
+        onMutationSelected?: (mutation: Mutation, selected: boolean) => Promise<void> | undefined ;
     } = $props();
 
     // Get available mutations
@@ -30,12 +30,12 @@
     async function selectMutation(mutation: Mutation) {
         if (isMutationSelected(mutation.id)) {
             characterActions.removeMutation(mutation.id);
-            await onMutationSelected(mutation, false);
+            await onMutationSelected?.(mutation, false);
         } else {
             const selectedMutation: Mutation = mutation;
             characterActions.addMutation(selectedMutation);
             // Automatically close the modal after selection
-            await onMutationSelected(selectedMutation, true);
+            await onMutationSelected?.(selectedMutation, true);
             setTimeout(() => closeModal(), 500);
         }
     }

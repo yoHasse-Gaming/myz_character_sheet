@@ -57,17 +57,16 @@
             }
         },
         {
-            id: 'relations-notes',
-            text: 'Lägg till här',
-            selector: '.relations-notes-section, .items-grid',
-            action: () => {
-                // Action depends on the drag type
-                if (currentDragType === 'add-relation') {
-                    openDialogueOption('relations');
-                } else if (currentDragType === 'add-note') {
-                    characterActions.addNote('');
-                }
-            }
+            id: 'relations',
+            text: 'Lägg till relation',
+            selector: '[data-drop-zone="relations"], .relations-section',
+            action: () => openDialogueOption('relations')
+        },
+        {
+            id: 'notes',
+            text: 'Lägg till anteckning',
+            selector: '[data-drop-zone="notes"], .notes-section',
+            action: () => characterActions.addNote('NewNote')
         }
     ];
 
@@ -164,14 +163,8 @@
         
         if (dragOverZone) {
             const zone = dropZones.find(z => z.id === dragOverZone);
-            if (zone) {
-                // For the unified relations-notes zone, the action already handles the currentDragType
-                if (zone.id === 'relations-notes') {
-                    zone.action();
-                } else if (data === 'add-item') {
-                    // Legacy behavior for other zones
-                    zone.action();
-                }
+            if (zone && data === 'add-item') {
+                zone.action();
             }
         }
         
@@ -193,14 +186,13 @@
 
     function findZoneAtPosition(x: number, y: number): string | null {        
         for (const zone of dropZones) {
-            // Skip zones that don't match the current drag type
-            if (zone.id === 'relations-notes' && currentDragType !== 'add-relation' && currentDragType !== 'add-note') {
-                continue;
-            }
-            
-            // For legacy drag types, allow all zones except relations-notes
-            if (currentDragType === 'add-item' && zone.id === 'relations-notes') {
-                continue;
+            // For add-item drag type, show all zones
+            // For specific drag types, only show matching zones
+            if (currentDragType !== 'add-item') {
+                if ((zone.id === 'relations' && currentDragType !== 'add-relation') ||
+                    (zone.id === 'notes' && currentDragType !== 'add-note')) {
+                    continue;
+                }
             }
             
             // Try the original selector first
@@ -231,14 +223,16 @@
                     }
                 } else if (zone.id === 'mutations') {
                     element = document.querySelector('.mutations-list') ||
-                             document.querySelector('[data-drop-zone="mutations"]') ||
-                             document.querySelector('.mutations-tab') as HTMLElement;
+                            document.querySelector('[data-drop-zone="mutations"]') ||
+                            document.querySelector('.mutations-tab') as HTMLElement;
                 } else if (zone.id === 'skills') {
                     element = document.querySelector('[data-drop-zone="skills"]') ||
-                             document.querySelector('.skills-tab') as HTMLElement;
-                } else if (zone.id === 'relations-notes') {
-                    element = document.querySelector('.relations-notes-section') ||
-                             document.querySelector('.items-grid') as HTMLElement;
+                            document.querySelector('.skills-tab') as HTMLElement;                } else if (zone.id === 'relations') {
+                    element = document.querySelector('[data-drop-zone="relations"]') ||
+                             document.querySelector('.relations-section') as HTMLElement;
+                } else if (zone.id === 'notes') {
+                    element = document.querySelector('[data-drop-zone="notes"]') ||
+                             document.querySelector('.notes-section') as HTMLElement;
                 }
             }
             
@@ -292,10 +286,14 @@
                 // Try different skills selectors
                 element = document.querySelector('[data-drop-zone="skills"]') ||
                          document.querySelector('.skills-tab') as HTMLElement;
-            } else if (zone.id === 'relations-notes') {
-                // Try different relations-notes selectors
-                element = document.querySelector('.relations-notes-section') ||
-                         document.querySelector('.items-grid') as HTMLElement;
+            } else if (zone.id === 'relations') {
+                // Try different relations selectors
+                element = document.querySelector('[data-drop-zone="relations"]') ||
+                         document.querySelector('.relations-section') as HTMLElement;
+            } else if (zone.id === 'notes') {
+                // Try different notes selectors
+                element = document.querySelector('[data-drop-zone="notes"]') ||
+                         document.querySelector('.notes-section') as HTMLElement;
             }
         }
         
@@ -336,8 +334,9 @@
     >
         {#each dropZones as zone}
             {@const shouldShow = (
-                (zone.id === 'relations-notes' && (currentDragType === 'add-relation' || currentDragType === 'add-note')) ||
-                (currentDragType === 'add-item' && zone.id !== 'relations-notes')
+                currentDragType === 'add-item' || 
+                (zone.id === 'relations' && currentDragType === 'add-relation') ||
+                (zone.id === 'notes' && currentDragType === 'add-note')
             )}
             {#if shouldShow}
                 {@const pos = getZonePosition(zone)}
@@ -350,13 +349,7 @@
                             top: {pos.top}px;
                         "
                     >
-                        <div class="flashlight-text">
-                            {#if zone.id === 'relations-notes'}
-                                {currentDragType === 'add-relation' ? 'Lägg till relation' : 'Lägg till anteckning'}
-                            {:else}
-                                {zone.text}
-                            {/if}
-                        </div>
+                        <div class="flashlight-text">{zone.text}</div>
                     </div>
                 {/if}
             {/if}

@@ -164,6 +164,7 @@ export const sheetState = $state({
     paperLayouts: {
         characterTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
         skillsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
+        talentsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
         mutationsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
         relationsNotesTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
     }
@@ -480,6 +481,7 @@ export const characterActions = {
         } else {
             sheetState.paperLayouts.characterTab = {};
             sheetState.paperLayouts.skillsTab = {};
+            sheetState.paperLayouts.talentsTab = {};
             sheetState.paperLayouts.mutationsTab = {};
             sheetState.paperLayouts.relationsNotesTab = {};
         }

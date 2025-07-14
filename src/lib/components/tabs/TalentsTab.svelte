@@ -30,19 +30,29 @@
     // Get talent statistics
     const occupationalTalents = $derived(sheetState.talents.filter(t => t.occupation !== 'generic'));
     const genericTalents = $derived(sheetState.talents.filter(t => t.occupation === 'generic'));
-    const canAddOccupational = $derived(characterActions.canAddOccupationalTalent());
-    const canAddSecondOccupational = $derived(characterActions.canAddSecondOccupationalTalent());
-    const canAddGeneric = $derived(characterActions.canAddGenericTalent());
+
+    $effect(() => {
+        // Watch for changes in talents length
+        sheetState.talents.length;
+        
+    // Use timeout to ensure DOM is ready
+        const talentCards = document.querySelectorAll('.talent-item-card');
+        talentCards.forEach((card, index) => {
+            $inspect('Running');
+            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+                card.setAttribute('data-interact-initialized', 'true');
+
+                initInteractForElement(card, 'talentsTab', undefined, undefined, {
+                    enableDraggable: true,
+                    enableResizable: true
+                });
+            }
+        });
+    });
 
     onMount(() => {
-        // Initialize any necessary state or fetch data here
-        const talents = document.querySelectorAll('.talent-item-wrapper');
-        if(talents) {
-            talents.forEach((talent, index) => {
-                initInteractForElement(talent as HTMLElement, 'talentsTab', '.talent-header', '.talent-header');
-            });
-        }
-        
+        // Initial setup - ensure DOM is ready before first initialization
+
     });
 </script>
 
@@ -59,17 +69,12 @@
 
     <!-- Occupational Talents Section -->
     <div class="talents-section" data-drop-zone="occupational-talents">
-            <!-- <div class="talent-info">
-                <p class="talent-description">Yrkestalanger ({occupationalTalents.length}/2) - Specialiserade färdigheter från ditt yrke</p>
-                {#if !canAddSecondOccupational && occupationalTalents.length === 1}
-                    <p class="talent-requirement">Kräver 3 generiska talanger för att låsa upp den andra yrkestalangen</p>
-                {/if}
-            </div> -->
-            
             <div class="talents-list">
                 {#each occupationalTalents as talent, index}
-                    <div class="talent-item-wrapper">
-                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  data-x="0" data-y="0" data-paper-id="occuptalent-{index}">
+                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  
+                            data-x="0" 
+                            data-y="0" 
+                            data-paper-id="occuptalent-{talent.id}">
                             <div class="talent-item-content">
                                 <div class="talent-header">
                                     <span class="talent-name">Yrke: {talent.name}</span>
@@ -103,14 +108,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                 {/each}
                 
-                <!-- {#if occupationalTalents.length === 0}
-                    <div class="no-talents-message">
-                        <p>Inga yrkestalanger valda. Dra papperet hit för att lägga till yrkestalanger.</p>
-                    </div>
-                {/if} -->
             </div>
     </div>
 
@@ -122,8 +121,10 @@
             
             <div class="talents-list">
                 {#each genericTalents as talent, index}
-                    <div class="talent-item-wrapper">
-                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" data-x="0" data-y="0" data-paper-id="generictalent-{index}">
+                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" 
+                        data-x="0" 
+                        data-y="0" 
+                        data-paper-id="generictalent-{talent.id}">
                             <div class="talent-item-content">
                                 <div class="talent-header">
                                     <span class="talent-name">Generisk: {talent.name}</span>
@@ -158,14 +159,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                 {/each}
                 
-                {#if genericTalents.length === 0}
-                    <div class="no-talents-message">
-                        <p>Inga generiska talanger valda. Dra papperet hit för att lägga till generiska talanger.</p>
-                    </div>
-                {/if}
             </div>
     </div>
 </div>
@@ -182,6 +177,7 @@
 
     .talents-section {
         width: 100%;
+        min-height: 200px;
     }
 
     .talent-info {
@@ -228,12 +224,23 @@
         position: relative;
         z-index: 1;
         transition: all 0.2s ease;
+        cursor: move;
+        touch-action: none;
+        user-select: none;
+        will-change: transform;
+        transform: translateZ(0); /* Force hardware acceleration */
     }
 
     .talent-item-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-2px) translateZ(0);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         z-index: 2;
+    }
+
+    .talent-item-card:active {
+        opacity: 0.8;
+        z-index: 20;
+        transition: none; /* Disable transition during drag */
     }
 
     .talent-item-content {

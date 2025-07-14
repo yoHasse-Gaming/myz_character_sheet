@@ -52,20 +52,38 @@
         console.log('Mutation layout reset to defaults');
     }
 
-    async function onMutationSelected(mutation: Mutation, selected: boolean) {
-        // need to find the mutation and init interact for it
-        // wait for dom to be ready
-        await tick();
-        // check if items has been initialized
+    // async function onMutationSelected(mutation: Mutation, selected: boolean) {
+    //     // need to find the mutation and init interact for it
+    //     // wait for dom to be ready
+    //     await tick();
+    //     // check if items has been initialized
+    //     const mutationItems = document.querySelectorAll('.mutation-paper');
+    //     mutationItems.forEach((item, index) => {
+    //         if (!initializedMutations.includes(item.getAttribute('data-paper-id') || '')) {
+    //             initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
+    //             initializedMutations.push(item.getAttribute('data-paper-id') || '');
+    //         }
+    //     });
+
+    // }
+
+    $effect(() => {
+        // Watch for changes in relations/notes length
+        sheetState.mutations.length;
+        
+        // Re-setup draggable functionality when items change
         const mutationItems = document.querySelectorAll('.mutation-paper');
-        mutationItems.forEach((item, index) => {
-            if (!initializedMutations.includes(item.getAttribute('data-paper-id') || '')) {
-                initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
-                initializedMutations.push(item.getAttribute('data-paper-id') || '');
+        mutationItems.forEach(card => {
+            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+                initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+                    enableDraggable: true,
+                    enableResizable: true
+                });
+                card.setAttribute('data-interact-initialized', 'true');
             }
         });
-
-    }
+        
+    });
 
 
     onMount(() => {
@@ -95,19 +113,11 @@
             }
         }
 
-        // select all mutation items and initialize them
-        const mutationItems = document.querySelectorAll('.mutation-paper');
-        mutationItems.forEach((item, index) => {
-            const variant = mutationVariants[index % mutationVariants.length];
-            item.classList.add(variant);
-            initializedMutations.push(item.getAttribute('data-paper-id') || `mutation-${index}`);
-            initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
-        });
     });
 
 </script>
 
-<MutationsModal onMutationSelected={onMutationSelected} />
+<MutationsModal />
 
 <div class="mutations-tab">
     <!-- Reset Layout Button -->

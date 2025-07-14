@@ -10,60 +10,33 @@
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
 
-    // Throttle function to reduce state update frequency
-    function throttle(func: Function, delay: number) {
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        let lastExecTime = 0;
-        return (...args: any[]) => {
-            const currentTime = Date.now();
-            
-            if (currentTime - lastExecTime > delay) {
-                func(...args);
-                lastExecTime = currentTime;
-            } else {
-                if (timeoutId) clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    func(...args);
-                    lastExecTime = Date.now();
-                }, delay);
-            }
-        };
-    }
-
-    // Throttled save function for better performance
-    const throttledSaveLayout = throttle((tabName: string, paperId: string, layout: any) => {
-        characterActions.savePaperLayout(tabName as 'characterTab' | 'skillsTab', paperId, layout);
-    }, 100); // Save at most every 100ms
-
-    // Function to calculate minimum height based on content
-    function getMinHeightForContent(element: HTMLElement): number {
-        // For skills, we mainly need to ensure all controls are visible
-        const header = element.querySelector('.skill-header');
-        const content = element.querySelector('.skill-item-content');
-        
-        if (!content) return 100; // Fallback minimum
-        
-        // Calculate the natural height of the content
-        const headerHeight = header ? (header as HTMLElement).offsetHeight : 35;
-        const controls = content.querySelector('.skill-controls');
-        const controlsHeight = controls ? (controls as HTMLElement).offsetHeight : 60; // Typical height for skill controls
-        
-        // Add padding and margins
-        const contentPadding = 32; // 1rem top + 1rem bottom  
-        const minHeight = headerHeight + controlsHeight + contentPadding + 15; // +15 for margin
-        
-        return Math.max(100, minHeight); // Never smaller than default minimum
-    }
 
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
-        const cols = 3;
+        const cols = 2;
         const row = Math.floor(index / cols);
         const col = index % cols;
         const x = col * 280 + 20;
-        const y = row * 180 + 80;
+        const y = row * 70 + 20;
         return { x, y };
     }
+
+    $effect(() => {
+        // Debug: Check if characterActions is available
+        sheetState.optionalSkills.length;
+        
+        // Initialize interact for all skill papers
+        const skillElements = document.querySelectorAll('.skill-paper');
+        skillElements.forEach((card, index) => {
+            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+                initInteractForElement(card as HTMLElement, 'skillsTab', undefined, undefined, {
+                    enableDraggable: true,
+                    enableResizable: true
+                });
+            }
+
+        });
+    });
 
     onMount(() => {
         // Debug: Check if characterActions is available
@@ -96,126 +69,8 @@
                 } catch (error) {
                     console.error('Error restoring layout for', paperId, error);
                 }
-                initInteractForElement(element as HTMLElement, 'skillsTab', '.skill-header', '.skill-header');
             }
         });
-        
-        //     .draggable({
-        //         allowFrom: '.skill-header', // Only allow dragging from the header
-        //         listeners: {
-        //             start: (event) => {
-        //                 console.log('Drag started on:', event.target);
-        //                 event.target.style.zIndex = '1000';
-        //             },
-        //             move: (event) => {
-        //                 const target = event.target;
-        //                 const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        //                 const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        //                 target.style.transform = `translate(${x}px, ${y}px)`;
-        //                 target.setAttribute('data-x', x.toString());
-        //                 target.setAttribute('data-y', y.toString());
-                        
-        //                 // Use throttled save for better performance
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     throttledSaveLayout('skillsTab', paperId, { x, y });
-        //                 }
-        //             },
-        //             end: (event) => {
-        //                 event.target.style.zIndex = '';
-                        
-        //                 // Final save when drag ends
-        //                 const target = event.target;
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
-        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
-        //                     const currentLayout = characterActions.getPaperLayout('skillsTab', paperId) || {};
-        //                     characterActions.savePaperLayout('skillsTab', paperId, {
-        //                         ...currentLayout,
-        //                         x,
-        //                         y
-        //                     });
-        //                 }
-        //             }
-        //         },
-        //         modifiers: [
-        //             // Restrict dragging to within the tab-content container
-        //             interact.modifiers.restrictRect({
-        //                 restriction: '.tab-content',
-        //                 endOnly: true
-        //             })
-        //         ]
-        //     })
-        //     .resizable({
-        //         edges: { left: true, right: true, bottom: true, top: true },
-        //         listeners: {
-        //             start: (event) => {
-        //                 console.log('Resize started on:', event.target);
-        //                 event.target.style.zIndex = '1000';
-        //             },
-        //             move: (event) => {
-        //                 const target = event.target;
-        //                 let x = (parseFloat(target.getAttribute('data-x')) || 0);
-        //                 let y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-        //                 // Calculate minimum height based on content
-        //                 const minHeight = getMinHeightForContent(target);
-                        
-        //                 // Ensure height doesn't go below minimum
-        //                 const newHeight = Math.max(event.rect.height, minHeight);
-
-        //                 // Update the element's style
-        //                 target.style.width = event.rect.width + 'px';
-        //                 target.style.height = newHeight + 'px';
-
-        //                 // Translate when resizing from top or left edges
-        //                 x += event.deltaRect.left;
-        //                 y += event.deltaRect.top;
-
-        //                 target.style.transform = `translate(${x}px, ${y}px)`;
-        //                 target.setAttribute('data-x', x.toString());
-        //                 target.setAttribute('data-y', y.toString());
-                        
-        //                 // Use throttled save for better performance
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     throttledSaveLayout('skillsTab', paperId, {
-        //                         x,
-        //                         y,
-        //                         width: event.rect.width,
-        //                         height: newHeight
-        //                     });
-        //                 }
-        //             },
-        //             end: (event) => {
-        //                 event.target.style.zIndex = '';
-                        
-        //                 // Final save when resize ends
-        //                 const target = event.target;
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
-        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
-        //                     const width = parseFloat(target.style.width) || 0;
-        //                     const height = parseFloat(target.style.height) || 0;
-        //                     characterActions.savePaperLayout('skillsTab', paperId, {
-        //                         x,
-        //                         y,
-        //                         width,
-        //                         height
-        //                     });
-        //                 }
-        //             }
-        //         },
-        //         modifiers: [
-        //             // Static minimum size constraints
-        //             interact.modifiers.restrictSize({
-        //                 min: { width: 200, height: 100 }
-        //             })
-        //         ]
-        //     });
     });
 
     function resetSkillsLayout() {
@@ -299,8 +154,6 @@
                 <div class="skill-item-content">
                     <div class="skill-header">
                         <span class="skill-name">{skill.name}</span>
-                    </div>
-                    <div class="skill-controls">
                         <div class="skill-controls-right">
                             <button 
                                 class="info-icon-button"
@@ -312,6 +165,18 @@
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <path d="M9,9h6v6H9z"></path>
                                     <path d="M9,9h6"></path>
+                                </svg>
+                            </button>
+                            <button 
+                                class="dice-roll-button"
+                                onclick={() => {/* TODO: Add dice roll logic */}}
+                                aria-label="Slå tärning för {skill.name}"
+                                title="Slå tärning för {skill.name}"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="9" cy="9" r="1"></circle>
+                                    <circle cx="15" cy="15" r="1"></circle>
                                 </svg>
                             </button>
                             <input
@@ -341,8 +206,6 @@
                 <div class="skill-item-content">
                     <div class="skill-header">
                         <span class="skill-name">{skill.name}</span>
-                    </div>
-                    <div class="skill-controls">
                         <div class="skill-controls-right">
                             <button 
                                 class="info-icon-button"
@@ -354,6 +217,18 @@
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <path d="M9,9h6v6H9z"></path>
                                     <path d="M9,9h6"></path>
+                                </svg>
+                            </button>
+                            <button 
+                                class="dice-roll-button"
+                                onclick={() => {/* TODO: Add dice roll logic */}}
+                                aria-label="Slå tärning för {skill.name}"
+                                title="Slå tärning för {skill.name}"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="9" cy="9" r="1"></circle>
+                                    <circle cx="15" cy="15" r="1"></circle>
                                 </svg>
                             </button>
                             <input
@@ -495,6 +370,37 @@
         color: var(--color-primary-400);
     }
 
+    .dice-roll-button {
+        background: none;
+        border: none;
+        color: var(--color-surface-600);
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+    }
+
+    .dice-roll-button:hover {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--color-success-600);
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    :global(.dark) .dice-roll-button {
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .dice-roll-button:hover {
+        background: rgba(34, 197, 94, 0.2);
+        color: var(--color-success-400);
+    }
+
     /* Remove duplicate styles - now using shared .paper-label classes */
 
     /* Skill input styling */
@@ -506,6 +412,7 @@
         flex-shrink: 0;
         padding-left: unset;
         max-height: 2rem;
+        min-height: 1rem;
     }
 
     /* Dark mode adjustments */
@@ -661,7 +568,7 @@
         transform: translateZ(0);
         backface-visibility: hidden;
         min-width: 200px;
-        min-height: 125px;
+        min-height: 40px;
         /* Add a subtle border that becomes visible on hover to indicate resize areas */
         border: 3px solid transparent;
         border-radius: 4px;
@@ -681,7 +588,7 @@
 
     /* Skills content styling */
     .skill-item-content {
-        padding: 1rem;
+        padding: 0.5rem;
         position: relative;
         z-index: 2;
         pointer-events: auto;
@@ -696,9 +603,9 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.75rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 0;
+        padding: 0.3rem 0.5rem;
+        /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
         cursor: move; /* Make it clear this is the draggable area */
         background: rgba(0, 0, 0, 0.02);
         border-radius: 4px 4px 0 0;
@@ -717,7 +624,7 @@
         pointer-events: none;
         font-family: var(--font-user), serif;
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         letter-spacing: 0.05em;
         color: var(--color-surface-900);
         text-transform: uppercase;

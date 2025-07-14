@@ -23,8 +23,8 @@
     // Create equipment items from items.json with parsed weights
     const availableItems = itemsData.map(item => ({
         name: item.name,
-        weight: parseWeight(item.belastning),
-        comment: item.kommentar || ''
+        weight: parseWeight(item.weight),
+        comment: item.comment || ''
     }));
 
     // Form state

@@ -28,8 +28,8 @@
     // Create equipment items from items.json with parsed weights
     const availableItems = itemsData.map(item => ({
         name: item.name,
-        weight: parseWeight(item.belastning),
-        comment: item.kommentar || ''
+        weight: parseWeight(item.weight),
+        comment: item.comment || ''
     }));
 
     // Initialize equipment table with 10 empty rows if not already set

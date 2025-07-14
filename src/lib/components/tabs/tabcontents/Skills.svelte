@@ -136,6 +136,42 @@
         characterActions.removeOptionalSkill(skillId);
     }
 
+    // Function to roll dice for a regular skill
+    function rollForSkill(skillIndex: number) {
+        const skill = sheetState.skills[skillIndex];
+        if (!skill) return;
+
+        // Find the corresponding base ability
+        const baseAbility = sheetState.baseAbilities.find(ability => ability.type === skill.baseAbility);
+        if (!baseAbility) return;
+
+        characterActions.openSkillRollModal(
+            skill.name,
+            skill.value,
+            baseAbility.label,
+            baseAbility.value,
+            baseAbility.damage
+        );
+    }
+
+    // Function to roll dice for an optional skill
+    function rollForOptionalSkill(skillId: string) {
+        const skill = sheetState.optionalSkills.find(s => s.id === skillId);
+        if (!skill) return;
+
+        // Find the corresponding base ability
+        const baseAbility = sheetState.baseAbilities.find(ability => ability.type === skill.baseAbility);
+        if (!baseAbility) return;
+
+        characterActions.openSkillRollModal(
+            skill.name,
+            skill.value,
+            baseAbility.label,
+            baseAbility.value,
+            baseAbility.damage
+        );
+    }
+
 </script>
 
 <div class="skills-tab">
@@ -194,7 +230,7 @@
 
                             <button 
                                 class="dice-roll-button"
-                                onclick={() => {/* TODO: Add dice roll logic */}}
+                                onclick={() => rollForSkill(index)}
                                 aria-label="Slå tärning för {skill.name}"
                                 title="Slå tärning för {skill.name}"
                             >
@@ -267,7 +303,7 @@
                             {#if diceStates.isDicePluginAvailable}
                             <button 
                                 class="dice-roll-button"
-                                onclick={() => {/* TODO: Add dice roll logic */}}
+                                onclick={() => rollForOptionalSkill(skill.id)}
                                 aria-label="Slå tärning för {skill.name}"
                                 title="Slå tärning för {skill.name}"
                             >

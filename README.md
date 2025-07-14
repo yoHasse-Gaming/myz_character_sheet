@@ -10,14 +10,21 @@
     * [ ] - Base-skills should be like skills with dragable base-skills.
     * [ ] - Conditions should have paper-background style and be draggable.
     * [ ] - Severe conditions should have paper-background style and be draggable.
+* [ ] - When rolling dice, have a result callback so a toast icon can be shown with the result.
 
 
 * [ ] - Finish all tabs so they are usable.
 * [ ] - Make sure character data is saved and loaded correctly.
-* [ ] - 
+* [ ] - Add grouping for all paper-items. Like beeing able to group papers together and have them move together.
 
+# TODO next:
+* Add weapon from weapon.json
+    * Allow user to either add a predefined weapon or create a custom one.
+* Allow for modification of existing weapons and equipment and armor.
+* Add selection for dice roll for skills I want the equipment dice to be a dropdown to select equipment with a bonus or a weapon that is connected to that skill.
 
-
+For example.
+Weapons.json contains 
 
 
 ## Bugs:

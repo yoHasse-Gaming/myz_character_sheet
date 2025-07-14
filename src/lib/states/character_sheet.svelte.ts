@@ -391,7 +391,40 @@ export const characterActions = {
             sheetState.paperLayouts.mutationsTab = {};
             sheetState.paperLayouts.relationsNotesTab = {};
         }
-    }
+    },
+
+    // Dice rolling functions
+    openSkillRollModal(skillName: string, skillValue: number, baseAbilityLabel: string, baseAbilityValue: number, baseAbilityDamage: number) {
+        // Import the function dynamically to avoid circular dependencies
+        import('../states/modals.svelte').then(({ openDiceRollModal }) => {
+            const effectiveAbilityValue = Math.max(0, baseAbilityValue - baseAbilityDamage);
+            
+            openDiceRollModal({
+                rollName: `${skillName}`,
+                baseDice: effectiveAbilityValue,
+                skillDice: skillValue,
+                gearDice: 0,
+                skillName: skillName,
+                abilityName: baseAbilityLabel
+            });
+        });
+    },
+
+    openAbilityRollModal(abilityLabel: string, abilityValue: number, abilityDamage: number) {
+        // Import the function dynamically to avoid circular dependencies
+        import('../states/modals.svelte').then(({ openDiceRollModal }) => {
+            const effectiveAbilityValue = Math.max(0, abilityValue - abilityDamage);
+            
+            openDiceRollModal({
+                rollName: `${abilityLabel}`,
+                baseDice: effectiveAbilityValue,
+                skillDice: 0,
+                gearDice: 0,
+                abilityName: abilityLabel
+            });
+        });
+    },
+
 };
 
 // Export types for TypeScript support

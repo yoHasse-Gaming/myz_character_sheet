@@ -2,6 +2,7 @@
     import './lib/styles/common-modal.css';
 
     import InfoModal from './lib/components/Modals/InfoModal.svelte';
+    import DiceRollModal from './lib/components/Modals/DiceRollModal.svelte';
     import DragOverlay from './lib/components/DragOverlay.svelte';
     import { onMount } from 'svelte';
     import Tabs from './lib/components/Tabs.svelte';
@@ -10,6 +11,7 @@
     import SizeSelector from './lib/components/SizeSelector.svelte';
     import OBR from '@owlbear-rodeo/sdk';
     import DiceRollerTest from './lib/components/DiceRollerTest.svelte';
+    import DiceRollTest from './lib/components/DiceRollTest.svelte';
     import { diceStates } from './lib/states/dice.svelte';
 
 
@@ -30,6 +32,7 @@
 
 <!-- Global Modals -->
 <InfoModal />
+<DiceRollModal />
 
 
 
@@ -53,6 +56,9 @@ TODO: Use this instead of the AppBar component
 {#if diceStates.isDicePluginAvailable && diceStates.broadCastAvailabilityCheck}
     <DiceRollerTest />
 {/if}
+
+<!-- Add test component for the new dice roll modal -->
+<!-- <DiceRollTest /> -->
 
 <!-- Main Content -->
 <main class="sheet-container">

@@ -57,12 +57,18 @@ export type EquipmentTableItem = {
     weight: number;
 }
 
+export type WeaponDistance = "MELEE" | "CLOSE" | "SHORT" | "LONG";
+
 export type Equipment = {
     id: string;
     name: string;
     description: string;
     quantity: number;
     weight: number;
+    bonuses: {
+        id: string;
+        value: number;
+    }[]; 
 }
 
 export type Armor = {

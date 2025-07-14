@@ -1,13 +1,32 @@
 import { SvelteMap } from 'svelte/reactivity';
+import type { DiceRollConfig } from './dice.svelte';
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes';
+export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes' | 'diceRoll';
 
 // Info modal state to hold content
 export const infoModalState = $state({
     title: '',
     content: '',
     type: '' as 'skill' | 'trauma' | 'mutation' | 'talent' | ''
+});
+
+// Dice roll modal state
+export const diceRollModalState = $state({
+    rollName: '',
+    baseRoll: {
+        baseDice: 0,
+        skillDice: 0,
+        gearDice: 0
+    },
+    modifiers: {
+        extraBaseDice: 0,
+        extraSkillDice: 0,
+        extraGearDice: 0
+    },
+    selectedEquipment: [] as string[], // IDs of selected equipment/weapons/armor
+    skillName: '',
+    abilityName: ''
 });
 
 // Create a reactive map for dialogue states
@@ -21,7 +40,8 @@ const openDialogue = new SvelteMap<DialogueOption, boolean>([
     ['weapons', false],
     ['armor', false],
     ['relations', false],
-    ['notes', false]
+    ['notes', false],
+    ['diceRoll', false]
 ]);
 
 // Convert to reactive state
@@ -71,5 +91,30 @@ export function openInfoModal(title: string, content: string, type: 'skill' | 't
     infoModalState.content = content;
     infoModalState.type = type;
     openDialogueOption('info');
+}
+
+// Function to open dice roll modal with initial configuration
+export function openDiceRollModal(config: {
+    rollName: string;
+    baseDice: number;
+    skillDice: number;
+    gearDice?: number;
+    skillName?: string;
+    abilityName?: string;
+}) {
+    diceRollModalState.rollName = config.rollName;
+    diceRollModalState.baseRoll.baseDice = config.baseDice;
+    diceRollModalState.baseRoll.skillDice = config.skillDice;
+    diceRollModalState.baseRoll.gearDice = config.gearDice || 0;
+    diceRollModalState.skillName = config.skillName || '';
+    diceRollModalState.abilityName = config.abilityName || '';
+    
+    // Reset modifiers and selections
+    diceRollModalState.modifiers.extraBaseDice = 0;
+    diceRollModalState.modifiers.extraSkillDice = 0;
+    diceRollModalState.modifiers.extraGearDice = 0;
+    diceRollModalState.selectedEquipment = [];
+    
+    openDialogueOption('diceRoll');
 }
 

@@ -4,7 +4,7 @@
     import FormSection from '../FormSection.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { characterActions } from '../../states/character_sheet.svelte';
-    import { autoResizePaper, debouncedAutoResize, getMinHeightForContent, initInteractForElement, throttledSaveLayout } from '../../utils/interactjsUtils';
+    import { autoResizePaper, getMinHeightForContent, initInteractForElement, throttledSaveLayout } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
 
     let formData = {
@@ -177,7 +177,7 @@
 
         <PaperCard 
             paperId="character-clothes"
-        
+            autoResize={true}
             tabName="characterTab"
             >
             {#snippet header()}
@@ -188,7 +188,8 @@
             <div class="torn-paper-wrapper {clothesVariant}">
                 <textarea 
                     placeholder="Lappade trasor, läder, folie..." 
-                    bind:value={formData.appearance.clothes}></textarea>
+                    bind:value={formData.appearance.clothes}
+                    ></textarea>
             </div>
             {/snippet}
         </PaperCard>

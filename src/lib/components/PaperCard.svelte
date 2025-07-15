@@ -15,7 +15,7 @@
         dragHandle = '.paper-header',
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
-        minSize = { width: 250, height: 120 },
+        minSize = { width: 250, height: 80 },
         header = undefined,
         HeaderIcon = undefined,
         content,
@@ -50,7 +50,14 @@
         if (paperElement) {
             // Initialize InteractJS for draggable and resizable functionality
             if (draggable || resizable) {
-                initInteractForElement(paperElement, tabName, dragHandle);
+                initInteractForElement(paperElement, tabName, dragHandle, undefined, {
+                    enableDraggable: draggable,
+                    enableResizable: resizable,
+                });
+            }
+
+            if(!additionalClasses.includes('p-')){
+                additionalClasses += ' p-4';
             }
 
             // Restore saved layout
@@ -84,21 +91,23 @@
 
     // Handle auto-resize for textareas
     function handleTextareaInput(event: Event) {
+        console.log('Textarea input event:', event);
         if (autoResize && event.target instanceof HTMLTextAreaElement) {
-            autoResizePaper(event.target, dragHandle, tabName);
+            console.log('Auto-resizing textarea:', event.target);
+            autoResizePaper(event.target, tabName);
         }
     }
 </script>
 
 <div 
     bind:this={paperElement}
-    class="torn-paper-wrapper {cardVariant} paper-card {additionalClasses}"
+    class="torn-paper-wrapper {cardVariant} paper-card "
     data-x="0" 
     data-y="0" 
     data-paper-id={paperId}
     style="--min-width: {minSize.width}px; --min-height: {minSize.height}px;"
 >
-    <div class="paper-content" bind:this={contentElement}>
+    <div class="paper-content {additionalClasses}" bind:this={contentElement}>
         {#if header}
             <div class="paper-header">
                 <div class="paper-label">
@@ -145,7 +154,6 @@
 
     /* Paper content container */
     .paper-content {
-        padding: 1rem;
         position: relative;
         z-index: 2;
         pointer-events: auto;

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import interact from 'interactjs';
     import { generateUniqueVariants } from '../../../utils/styleUtils';
     import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import DraggableAddItem from '../../DraggableAddItem.svelte';
@@ -174,7 +173,6 @@
 
 </script>
 
-<div class="skills-tab">
     <!-- Draggable Add Item -->
     <DraggableAddItem 
         text="Dra för färdigheter"
@@ -260,7 +258,7 @@
         </div>
     {/each}
 
-    <!-- Optional Skills -->
+    
     {#each sheetState.optionalSkills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility)}
         {@const skillIndex = sheetState.skills.length + index}
@@ -345,7 +343,6 @@
         </div>
     {/each}
     </div>
-</div>
 
 <!-- Optional Skills Modal -->
 <!-- Remove the modal from here since it's now in the layout -->

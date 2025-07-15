@@ -49,46 +49,44 @@
             />
         {/each}
         
-            <PaperCard 
-                paperId="conditions"
-                tabName={'skillsTab'}> 
-                {#snippet header()}
-                <div class="conditions-header">
-                    <h3 class="conditions-title">Tillstånd</h3>
-                </div>
-                {/snippet}
-                
-                {#snippet content()}
-                                    <div class="conditions-container">
-                {#each conditionAndToggle as condition, index}
-                    {#if index % 2 === 0}
-                        <div class="condition-row">
-                            {@render conditionItem(condition)}
-                            {#if conditionAndToggle[index + 1]}
-                                {@render conditionItem(conditionAndToggle[index + 1])}
-                            {/if}
-                        </div>
-                    {/if}
-                {/each}
-
-                <div class="condition-row critical-injuries">
-                    <div class="condition-item critical-item">
-                        <span class="condition-label critical-label">Kritiska skador:</span>
-                        <input 
-                            type="text" 
-                            class="critical-input font-user" 
-                            placeholder="Beskrivning av allvarliga skador..." 
-                            bind:value={sheetState.criticalInjuries} 
-                        />
-                    </div>
-                </div>
+        <PaperCard 
+            paperId="conditions"
+            tabName={'skillsTab'}
+            resizable={false}
+            > 
+            {#snippet header()}
+            <div class="conditions-header">
+                <h3 class="conditions-title">Tillstånd</h3>
             </div>
             {/snippet}
-
-            </PaperCard>
-
-            <Skills />
+            
+            {#snippet content()}
+            <div class="conditions-container">
+            {#each conditionAndToggle as condition, index}
+                {#if index % 2 === 0}
+                    <div class="condition-row">
+                        {@render conditionItem(condition)}
+                        {#if conditionAndToggle[index + 1]}
+                            {@render conditionItem(conditionAndToggle[index + 1])}
+                        {/if}
+                    </div>
+                {/if}
+            {/each}
+            <span class="">Kritiska skador:</span>
+            <div class="torn-paper-wrapper">
+                <textarea 
+                    class="critical-input font-user" 
+                    placeholder="Beskrivning av allvarliga skador..." 
+                    bind:value={sheetState.criticalInjuries} 
+                ></textarea>
+            </div>
         </div>
+        {/snippet}
+
+        </PaperCard>
+
+        <Skills />
+    </div>
 
         <style>
             .conditions-container {

@@ -215,8 +215,8 @@ export function initInteractForElement(
         return Math.max(120, minHeight); // Never smaller than default minimum
     }
 
-    export function autoResizePaper(textarea: HTMLTextAreaElement, paperHeader: HTMLElement | string, tabName: TabName) {
-        const paper = textarea.closest('.torn-paper-wrapper') as HTMLElement;
+    export function autoResizePaper(textarea: HTMLTextAreaElement, tabName: TabName) {
+        const paper = textarea.closest('.paper-card') as HTMLElement;
         if (!paper) return;
         
         // Prevent infinite resize loops and conflicts with manual resize
@@ -225,7 +225,9 @@ export function initInteractForElement(
         
         try {
             const currentHeight = parseFloat(paper.style.height) || paper.offsetHeight;
-            const minHeight =  getMinHeightForContent(paper, paperHeader);
+            console.log('Current paper height:', currentHeight);
+            const minHeight =  getMinHeightForContent(paper, '.paper-header');
+            console.log('Calculated minimum height for content:', minHeight);
             
             // Only grow the paper if content needs more space, and add a small buffer to prevent constant resizing
             const buffer = 10; // Small buffer to prevent continuous resizing
@@ -256,8 +258,8 @@ export function initInteractForElement(
     }
 
         // Debounced auto-resize function to avoid excessive calls during typing
-    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement, header: HTMLElement | string, tabName: TabName) => {
+    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement, tabName: TabName) => {
         console.log('Debounced auto-resize triggered for:', textarea);
-        autoResizePaper(textarea, header, tabName);
+        autoResizePaper(textarea, tabName);
     }, 150); // Wait 150ms after user stops typing
 

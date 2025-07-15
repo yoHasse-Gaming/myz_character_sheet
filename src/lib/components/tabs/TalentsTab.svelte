@@ -7,6 +7,7 @@
     import { openInfoModal } from '../../states/modals.svelte';
     import TalentsModal from '../Modals/TalentsModal.svelte';
     import { initInteractForElement } from '../../utils/interactjsUtils';
+    import PaperCard from '../PaperCard.svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -71,43 +72,80 @@
     <div class="talents-section" data-drop-zone="occupational-talents">
             <div class="talents-list">
                 {#each occupationalTalents as talent, index}
-                        <div class="torn-paper-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  
-                            data-x="0" 
-                            data-y="0" 
-                            data-paper-id="occuptalent-{talent.id}">
-                            <div class="talent-item-content">
-                                <div class="talent-header">
-                                    <span class="talent-name">Yrke: {talent.name}</span>
-                                    <div class="talent-controls-right">
-                                        <button 
-                                            class="info-icon-button"
-                                            onclick={() => showTalentInfo(talent)}
-                                            aria-label="Information om {talent.name}"
-                                            title="Visa information om {talent.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <path d="M9,9h6v6H9z"></path>
-                                                <path d="M9,9h6"></path>
-                                            </svg>
-                                        </button>
-                                        <button
-                                            class="remove-talent-button"
-                                            onclick={() => removeTalent(talent.id)}
-                                            aria-label="Ta bort {talent.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="talent-meta">
-                                    <span class="talent-occupation">Yrke: {talent.occupation}</span>
-                                </div>
+                <PaperCard
+                    paperId={`occupational-talent-${talent.id}`}
+                    tabName="talentsTab"
+                    draggable={true}
+                    resizable={false}
+                    >
+                {#snippet header()}
+                    <span class="talent-name">Yrke: {talent.name}</span>
+                    <div class="talent-controls-right">
+                    <button 
+                        class="info-icon-button"
+                        onclick={() => showTalentInfo(talent)}
+                        aria-label="Information om {talent.name}"
+                        title="Visa information om {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9,9h6v6H9z"></path>
+                            <path d="M9,9h6"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="remove-talent-button"
+                        onclick={() => removeTalent(talent.id)}
+                        aria-label="Ta bort {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                {/snippet}
+                
+                {#snippet content()}
+
+                <div class="talent-meta">
+                    <span class="talent-occupation">Yrke: {talent.occupation}</span>
+                </div>
+                {/snippet}
+                
+                </PaperCard>
+                    <div class="talent-item-content">
+                        <div class="talent-header">
+                            <span class="talent-name">Yrke: {talent.name}</span>
+                            <div class="talent-controls-right">
+                                <button 
+                                    class="info-icon-button"
+                                    onclick={() => showTalentInfo(talent)}
+                                    aria-label="Information om {talent.name}"
+                                    title="Visa information om {talent.name}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9,9h6v6H9z"></path>
+                                        <path d="M9,9h6"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="remove-talent-button"
+                                    onclick={() => removeTalent(talent.id)}
+                                    aria-label="Ta bort {talent.name}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
+                        <div class="talent-meta">
+                            <span class="talent-occupation">Yrke: {talent.occupation}</span>
+                        </div>
+                    </div>
                 {/each}
                 
             </div>

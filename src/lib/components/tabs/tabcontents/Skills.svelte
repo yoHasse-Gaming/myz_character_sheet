@@ -8,6 +8,11 @@
     import { getIconForAbility } from '../../../utils/iconUtils';
     import { Tooltip } from '@skeletonlabs/skeleton-svelte';
     import { diceStates } from '../../../states/dice.svelte';
+    import PaperCard from '../../PaperCard.svelte';
+
+    const { startPosition }: {
+        startPosition: { x: number, y: number }
+    } = $props();
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
@@ -17,12 +22,25 @@
 
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
+        const startX = startPosition?.x || 350; // Default to 600 if not provided
+        const startY = startPosition?.y || 20; // Default to 20 if not provided
+        const startPos = { x: startX, y: startY + index * 70 }; // 70px spacing between skills
+
         const cols = 2;
         const row = Math.floor(index / cols);
         const col = index % cols;
-        const x = col * 280 + 20;
-        const y = row * 70 + 20;
+        // Position skills in a grid layout
+        const x = col * 280 + startX;
+        const y = row * 70 + startY;
         return { x, y };
+
+        // const cols = 2;
+        // const row = Math.floor(index / cols);
+        // const col = index % cols;
+        // // Position skills to the right of abilities (starting at x: 600)
+        // const x = col * 280 + 600;
+        // const y = row * 70 + 20;
+        // return { x, y };
     }
 
     $effect(() => {
@@ -181,7 +199,6 @@
     />
 
     <!-- Skills Container -->
-    <div >
         <!-- Control Buttons Section -->
 
 
@@ -189,241 +206,206 @@
     {#each sheetState.skills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
         {@const position = getInitialPosition(index)}
-        <div class="skill-item-wrapper" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-paper-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
-                <div class="skill-item-content">
-                    <div class="skill-header">
-                            <Tooltip
-                                open={tooltipStates[`optional-skill-${skill.id}`] || false}
-                                onOpenChange={(e) => (tooltipStates[`optional-skill-${skill.id}`] = e.open)}
-                                positioning={{ placement: 'top' }}
-                                triggerBase="underline"
-                                contentBase="card preset-filled p-4 z-1000"
-                                openDelay={200}
-                                arrow
-                            >
-                                {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
-                                {#snippet content()}
-                                    <div class="tooltip-content">
-                                        <strong>{skill.baseAbility}</strong>
-                                        <div class="tooltip-description">Grundegenskap för {skill.name}</div>
-                                    </div>
-                                {/snippet}
-                            </Tooltip>
-                        <span class="skill-name">{skill.name}</span>
-                        <div class="skill-controls-right">
-                            <button 
-                                class="info-icon-button"
-                                onclick={() => showSkillInfo(skill)}
-                                aria-label="Information om {skill.name}"
-                                title="Visa information om {skill.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9,9h6v6H9z"></path>
-                                    <path d="M9,9h6"></path>
-                                </svg>
-                            </button>
-                            {#if diceStates.isDicePluginAvailable}
-
-                            <button 
-                                class="dice-roll-button"
-                                onclick={() => rollForSkill(index)}
-                                aria-label="Slå tärning för {skill.name}"
-                                title="Slå tärning för {skill.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="9" cy="9" r="1"></circle>
-                                    <circle cx="15" cy="15" r="1"></circle>
-                                </svg>
-                            </button>
-                            {/if}
-                            <input
-                                id="skill-{index}"
-                                name={skill.name}
-                                type="number"
-                                min="0"
-                                max="5"
-                                class="torn-input skill-input font-user"
-                                value={skill.value}
-                                oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                                placeholder="0"
-                            />
-
-                        </div>
+        <PaperCard
+            paperId="skill-{index}"
+            tabName="skillsTab"
+            draggable={true}
+            resizable={false}
+            initialPosition={position}
+            minSize={{ width: 250, height: 60 }}
+            variant={skillVariants[index]}
+            class="p-2 pt-4"
+        >
+            {#snippet content()}
+                <div class="skill-content">
+                    <Tooltip
+                        open={tooltipStates[`skill-${index}`] || false}
+                        onOpenChange={(e) => (tooltipStates[`skill-${index}`] = e.open)}
+                        positioning={{ placement: 'top' }}
+                        triggerBase="underline"
+                        contentBase="card preset-filled p-4 z-1000"
+                        openDelay={200}
+                        arrow
+                    >
+                        {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
+                        {#snippet content()}
+                            <div class="tooltip-content">
+                                <strong>{skill.baseAbility}</strong>
+                                <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                            </div>
+                        {/snippet}
+                    </Tooltip>
+                    <span class="skill-name">{skill.name}</span>
+                    <div class="skill-controls-right">
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showSkillInfo(skill)}
+                            aria-label="Information om {skill.name}"
+                            title="Visa information om {skill.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9,9h6v6H9z"></path>
+                                <path d="M9,9h6"></path>
+                            </svg>
+                        </button>
+                        {#if diceStates.isDicePluginAvailable}
+                        <button 
+                            class="dice-roll-button"
+                            onclick={() => rollForSkill(index)}
+                            aria-label="Slå tärning för {skill.name}"
+                            title="Slå tärning för {skill.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="9" cy="9" r="1"></circle>
+                                <circle cx="15" cy="15" r="1"></circle>
+                            </svg>
+                        </button>
+                        {/if}
+                        <input
+                            id="skill-{index}"
+                            name={skill.name}
+                            type="number"
+                            min="0"
+                            max="5"
+                            class="skill-input font-user"
+                            value={skill.value}
+                            oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                            placeholder="0"
+                        />
                     </div>
                 </div>
-            </div>
-        </div>
+            {/snippet}
+        </PaperCard>
     {/each}
 
-    
+    <!-- Optional Skills -->
     {#each sheetState.optionalSkills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility)}
         {@const skillIndex = sheetState.skills.length + index}
         {@const position = getInitialPosition(skillIndex)}
-        <div class="skill-item-wrapper optional-skill" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-paper-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
-                <div class="skill-item-content">
-                    <div class="skill-header">
-                            <Tooltip
-                                open={tooltipStates[`optional-skill-${skill.id}`] || false}
-                                onOpenChange={(e) => (tooltipStates[`optional-skill-${skill.id}`] = e.open)}
-                                positioning={{ placement: 'top' }}
-                                triggerBase="underline"
-                                contentBase="card preset-filled p-4 z-1000"
-                                openDelay={200}
-                                arrow
-                            >
-                                {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
-                                {#snippet content()}
-                                    <div class="tooltip-content">
-                                        <strong>{skill.baseAbility}</strong>
-                                        <div class="tooltip-description">Grundegenskap för {skill.name}</div>
-                                    </div>
-                                {/snippet}
-                            </Tooltip>
-                        <span class="skill-name">{skill.name}</span>
-                        <div class="skill-controls-right">
-                            <button 
-                                class="info-icon-button"
-                                onclick={() => showSkillInfo(skill)}
-                                aria-label="Information om {skill.name}"
-                                title="Visa information om {skill.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9,9h6v6H9z"></path>
-                                    <path d="M9,9h6"></path>
-                                </svg>
-                            </button>
-                            {#if diceStates.isDicePluginAvailable}
-                            <button 
-                                class="dice-roll-button"
-                                onclick={() => rollForOptionalSkill(skill.id)}
-                                aria-label="Slå tärning för {skill.name}"
-                                title="Slå tärning för {skill.name}"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="9" cy="9" r="1"></circle>
-                                    <circle cx="15" cy="15" r="1"></circle>
-                                </svg>
-                            </button>
-                            {/if}
-                            <input
-                                id="optional-skill-{skill.id}"
-                                name={skill.name}
-                                type="number"
-                                min="0"
-                                max="5"
-                                class="torn-input skill-input font-user"
-                                value={skill.value}
-                                oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                                placeholder="0"
-                            />
-                            
-
-                            
-                            <button
-                                class="remove-skill-button"
-                                onclick={() => removeOptionalSkill(skill.id)}
-                                aria-label="Ta bort {skill.name}"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
+        <PaperCard
+            paperId="optional-skill-{skill.id}"
+            tabName="skillsTab"
+            draggable={true}
+            resizable={false}
+            initialPosition={position}
+            minSize={{ width: 250, height: 60 }}
+            variant={skillVariants[skillIndex]}
+        >
+            {#snippet content()}
+                <div class="skill-content optional-skill">
+                    <Tooltip
+                        open={tooltipStates[`optional-skill-${skill.id}`] || false}
+                        onOpenChange={(e) => (tooltipStates[`optional-skill-${skill.id}`] = e.open)}
+                        positioning={{ placement: 'top' }}
+                        triggerBase="underline"
+                        contentBase="card preset-filled p-4 z-1000"
+                        openDelay={200}
+                        arrow
+                    >
+                        {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
+                        {#snippet content()}
+                            <div class="tooltip-content">
+                                <strong>{skill.baseAbility}</strong>
+                                <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                            </div>
+                        {/snippet}
+                    </Tooltip>
+                    <span class="skill-name">{skill.name}</span>
+                    <div class="skill-controls-right">
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showSkillInfo(skill)}
+                            aria-label="Information om {skill.name}"
+                            title="Visa information om {skill.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9,9h6v6H9z"></path>
+                                <path d="M9,9h6"></path>
+                            </svg>
+                        </button>
+                        {#if diceStates.isDicePluginAvailable}
+                        <button 
+                            class="dice-roll-button"
+                            onclick={() => rollForOptionalSkill(skill.id)}
+                            aria-label="Slå tärning för {skill.name}"
+                            title="Slå tärning för {skill.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="9" cy="9" r="1"></circle>
+                                <circle cx="15" cy="15" r="1"></circle>
+                            </svg>
+                        </button>
+                        {/if}
+                        <input
+                            id="optional-skill-{skill.id}"
+                            name={skill.name}
+                            type="number"
+                            min="0"
+                            max="5"
+                            class="skill-input font-user"
+                            value={skill.value}
+                            oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
+                            placeholder="0"
+                        />
+                        <button
+                            class="remove-skill-button"
+                            onclick={() => removeOptionalSkill(skill.id)}
+                            aria-label="Ta bort {skill.name}"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </div>
+            {/snippet}
+        </PaperCard>
     {/each}
-    </div>
 
 <!-- Optional Skills Modal -->
 <!-- Remove the modal from here since it's now in the layout -->
 <!-- <OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} /> -->
 
 <style>
-    /* Skills container - responsive grid */
-
     .z-1000 {
-        z-index: 1000; /* Ensure skills tab is above other content */
-    }
-    .skills-tab {
-        display: block;
-        width: 100%;
-        min-height: 100vh;
-        position: relative;
-        padding: 1rem;
-        overflow: visible; /* Allow papers to move freely */
+        z-index: 1000;
     }
 
-    /* Individual skill item wrapper */
-    .skill-item-wrapper {
-        margin-bottom: 0.5rem;
-        width: fit-content;
-        min-width: 250px;
-        max-width: 400px;
-        position: absolute; /* Changed to absolute for free positioning */
-    }
-
-
-    /* Remove duplicate styles - now using shared .paper-header, .paper-label, .paper-drag-handle classes */
-
-    /* Skill controls - now just the input and info button */
-    .skill-controls {
+    .skill-content {
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        width: 100%;
         gap: 0.5rem;
+        padding: 0.25rem;
+        min-height: 2rem;
     }
 
     .skill-controls-right {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        margin-left: auto;
     }
 
-    /* Skills controls section */
-    .skills-controls-section {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 1rem;
-        background: rgba(217, 119, 6, 0.05);
-        border-radius: 0.5rem;
-        border: 1px dashed rgba(217, 119, 6, 0.3);
-        backdrop-filter: blur(8px);
-        z-index: 10;
-        margin-bottom: 2rem;
-    }
-
-    :global(.dark) .skills-controls-section {
-        background: rgba(217, 119, 6, 0.1);
-        border-color: rgba(217, 119, 6, 0.4);
-    }
-
-    .optional-skills-info {
-        flex: 1;
-    }
-
-    .optional-skills-description {
-        margin: 0;
+    .skill-name {
+        font-family: var(--font-user), serif;
+        font-weight: bold;
         font-size: 0.9rem;
-        color: var(--color-surface-700);
-        font-weight: 500;
-        font-style: italic;
+        letter-spacing: 0.05em;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        flex-grow: 1;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
     }
 
-    :global(.dark) .optional-skills-description {
-        color: var(--color-surface-300);
+    :global(.dark) .skill-name {
+        color: var(--color-surface-100);
     }
 
     .info-icon-button {
@@ -488,74 +470,28 @@
         color: var(--color-success-400);
     }
 
-    /* Remove duplicate styles - now using shared .paper-label classes */
-
-    /* Skill input styling */
     .skill-input {
-        width: 4rem;
+        width: 3rem;
+        height: 1rem;
         text-align: center;
         font-weight: bold;
-        font-size: 1.2rem;
+        font-size: 1rem;
         flex-shrink: 0;
-        padding-left: unset;
-        max-height: 2rem;
-        min-height: 1rem;
-    }
-
-    /* Dark mode adjustments */
-
-
-    /* Modal content styling */
-    .skill-section {
-        margin-bottom: 1rem;
-    }
-
-    .skill-section:last-child {
-        margin-bottom: 0;
-    }
-
-    .section-title {
-        font-weight: bold;
-        font-size: 0.9rem;
-        color: var(--color-surface-800);
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    :global(.dark) .section-title {
-        color: var(--color-surface-200);
-    }
-
-    .section-content {
-        font-size: 0.9rem;
+        border: 2px solid var(--color-surface-600);
+        border-radius: 4px;
+        background: transparent;
         color: var(--color-surface-900);
-        font-family: var(--font-user), sans-serif;
     }
 
-    :global(.dark) .section-content {
+    :global(.dark) .skill-input {
         color: var(--color-surface-100);
+        border-color: var(--color-surface-400);
     }
 
-    /* HTML content styling */
-    .section-content :global(strong) {
-        font-weight: 600;
-        color: var(--color-primary-600);
-    }
-
-    .section-content :global(ul) {
-        margin: 0.5rem 0;
-        padding-left: 1.5rem;
-    }
-
-    .section-content :global(li) {
-        margin: 0.25rem 0;
-        color: inherit;
-    }
-
-    .section-content :global(p) {
-        margin: 0.5rem 0;
-        color: inherit;
+    .skill-input:focus {
+        outline: none;
+        border-color: var(--color-primary-600);
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
     }
 
     .remove-skill-button {
@@ -578,22 +514,6 @@
         background: var(--color-error-600);
         color: white;
         transform: scale(1.1);
-    }
-
-    /* Skill ability tooltip styling */
-    .skill-ability-tooltip {
-        font-weight: bold;
-        color: var(--color-primary-600);
-        background: rgba(217, 119, 6, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.9rem;
-        display: inline-block;
-    }
-
-    :global(.dark) .skill-ability-tooltip {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-primary-400);
     }
 
     /* Tooltip content styling */
@@ -636,149 +556,70 @@
         color: var(--color-surface-300);
     }
 
-    /* Skills controls section */
-    .skills-controls-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 1rem;
+    /* Modal content styling */
+    .skill-section {
         margin-bottom: 1rem;
-        position: relative;
-        z-index: 100;
     }
 
-    /* Reset layout button for skills */
-    .reset-layout-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        background: linear-gradient(135deg, #dc2626, #991b1b);
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        font-family: var(--font-user), sans-serif;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        transition: all 0.2s ease;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .reset-layout-button:hover {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    .reset-layout-button:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .reset-layout-button svg {
-        flex-shrink: 0;
-    }
-
-    /* Skills-specific paper styling */
-    .skill-paper {
-        cursor: default; /* Default cursor since only header is draggable */
-        user-select: none;
-        position: relative;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-        will-change: transform;
-        /* Add hardware acceleration for better performance */
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        min-width: 200px;
-        min-height: 40px;
-        /* Add a subtle border that becomes visible on hover to indicate resize areas */
-        border: 3px solid transparent;
-        border-radius: 4px;
-    }
-
-    .skill-paper:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 10;
-    }
-
-    .skill-paper:active,
-    .skill-paper.dragging,
-    .skill-paper.resizing {
-        z-index: 20;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-    }
-
-    /* Skills content styling */
-    .skill-item-content {
-        padding: 0.5rem;
-        position: relative;
-        z-index: 2;
-        pointer-events: auto;
-        height: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Skills header styling */
-    .skill-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .skill-section:last-child {
         margin-bottom: 0;
-        padding: 0.3rem 0.5rem;
-        /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
-        cursor: move; /* Make it clear this is the draggable area */
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0; /* Don't shrink the header */
-        /* Improve drag performance */
-        transform: translateZ(0);
-        backface-visibility: hidden;
     }
 
-    :global(.dark) .skill-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .skill-name {
-        margin-left: 0.25rem;
-        margin-right: 0.25rem;
-        pointer-events: none;
-        font-family: var(--font-user), serif;
+    .section-title {
         font-weight: bold;
         font-size: 0.9rem;
-        letter-spacing: 0.05em;
-        color: var(--color-surface-900);
+        color: var(--color-surface-800);
+        margin-bottom: 0.5rem;
         text-transform: uppercase;
-        flex-grow: 1;
+        letter-spacing: 0.05em;
     }
 
-    :global(.dark) .skill-name {
+    :global(.dark) .section-title {
+        color: var(--color-surface-200);
+    }
+
+    .section-content {
+        font-size: 0.9rem;
+        color: var(--color-surface-900);
+        font-family: var(--font-user), sans-serif;
+    }
+
+    :global(.dark) .section-content {
         color: var(--color-surface-100);
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .skills-controls-section {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .reset-layout-container {
-            order: -1; /* Show reset button first on mobile */
-        }
-
-        .skill-paper {
-            min-width: 180px;
-        }
+    .section-content :global(strong) {
+        font-weight: 600;
+        color: var(--color-primary-600);
     }
 
+    .section-content :global(ul) {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+    }
 
+    .section-content :global(li) {
+        margin: 0.25rem 0;
+        color: inherit;
+    }
+
+    .section-content :global(p) {
+        margin: 0.5rem 0;
+        color: inherit;
+    }
+
+    .skill-ability-tooltip {
+        font-weight: bold;
+        color: var(--color-primary-600);
+        background: rgba(217, 119, 6, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    :global(.dark) .skill-ability-tooltip {
+        background: rgba(217, 119, 6, 0.2);
+        color: var(--color-primary-400);
+    }
 </style>

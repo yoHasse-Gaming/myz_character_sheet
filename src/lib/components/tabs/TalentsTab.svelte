@@ -114,38 +114,7 @@
                 {/snippet}
                 
                 </PaperCard>
-                    <div class="talent-item-content">
-                        <div class="talent-header">
-                            <span class="talent-name">Yrke: {talent.name}</span>
-                            <div class="talent-controls-right">
-                                <button 
-                                    class="info-icon-button"
-                                    onclick={() => showTalentInfo(talent)}
-                                    aria-label="Information om {talent.name}"
-                                    title="Visa information om {talent.name}"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M9,9h6v6H9z"></path>
-                                        <path d="M9,9h6"></path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="remove-talent-button"
-                                    onclick={() => removeTalent(talent.id)}
-                                    aria-label="Ta bort {talent.name}"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="talent-meta">
-                            <span class="talent-occupation">Yrke: {talent.occupation}</span>
-                        </div>
-                    </div>
+
                 {/each}
                 
             </div>

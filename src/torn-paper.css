@@ -69,11 +69,9 @@
 .tab-content input,
 .tab-content textarea {
     content: '';
-    min-height: 4rem;
+    min-height: 1rem;
     position: relative;
     border-radius: 0;
-    padding-left: 2rem;
-    /* font-size: x-large; */
 
     font-family: var(--font-user);
     color: var(--color-surface-900);

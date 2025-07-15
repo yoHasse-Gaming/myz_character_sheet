@@ -1,7 +1,5 @@
 <script lang="ts">
-    import FormSection from '../FormSection.svelte';
     import BaseAbility from './tabcontents/BaseAbility.svelte';
-    import { onMount } from 'svelte';
     import Skills from './tabcontents/Skills.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import OptionalSkillsModal from '../Modals/OptionalSkillsModal.svelte';
@@ -45,7 +43,7 @@
             <BaseAbility
                 baseAbility={ability}
                 abilityIndex={index}
-                
+                initialPosition={{ x: 20, y: 20 + index * 100 }}
             />
         {/each}
         
@@ -53,6 +51,7 @@
             paperId="conditions"
             tabName={'skillsTab'}
             resizable={false}
+            initialPosition={{ x: 20, y: sheetState.baseAbilities.length * 100 + 20 }}
             > 
             {#snippet header()}
             <div class="conditions-header">
@@ -88,8 +87,22 @@
         <Skills />
     </div>
 
-        <style>
-            .conditions-container {
+<style>
+    .properties-tab {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: visible;
+    }
+
+    /* Make all PaperCard components positioned absolutely within this tab */
+    .properties-tab :global(.paper-card) {
+        position: absolute;
+        width: auto;
+        height: auto;
+    }
+
+    .conditions-container {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;

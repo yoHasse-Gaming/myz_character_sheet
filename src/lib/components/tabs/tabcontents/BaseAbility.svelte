@@ -15,11 +15,11 @@
     let { 
         baseAbility,
         abilityIndex,
-        
+        initialPosition = { x: 0, y: 0 }
     }: {
         baseAbility: BaseAbilityType;
         abilityIndex: number;
-        
+        initialPosition?: { x: number; y: number };
     } = $props();
 
     // Get the ability from global state
@@ -99,7 +99,8 @@
     draggable={true}
     resizable={false}
     minSize={{ width: 250, height: 80 }}
-    class="p-1"
+    initialPosition={initialPosition}
+    class="p-2 pt-4"
     >
 
     {#snippet content()}

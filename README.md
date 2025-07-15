@@ -18,8 +18,11 @@
 * [ ] - Add grouping for all paper-items. Like beeing able to group papers together and have them move together.
 
 # TODO next:
-* Add weapon from weapon.json
-    * Allow user to either add a predefined weapon or create a custom one.
+* [x] Add weapon from weapon.json
+    * [x] Allow user to either add a predefined weapon or create a custom one.
+* [x] Update WeaponModal and EquipmentModal to match MutationsModal/TalentsModal style with card-grid selection and "Custom" option.
+* [x] Update each equiptment, weapon and armor cards to be editable directly instead of using a modal. 
+* [x] Update "Anpassad" to just add an empty card to edit.
 * Allow for modification of existing weapons and equipment and armor.
 * Add selection for dice roll for skills I want the equipment dice to be a dropdown to select equipment with a bonus or a weapon that is connected to that skill.
 

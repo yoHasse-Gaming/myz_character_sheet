@@ -78,12 +78,6 @@
     font-family: var(--font-user);
     color: var(--color-surface-900);
     
-    /* Remove hover effects from inputs */
-    /* Remove filter from the input itself */
-    background: transparent !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
     z-index: 2;
     width: 100%;
     

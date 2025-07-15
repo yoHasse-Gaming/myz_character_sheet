@@ -1,61 +1,98 @@
 <script lang="ts">
-    import { characterActions} from '../../states/character_sheet.svelte';
     import { scale } from 'svelte/transition';
+    import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
     import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { characterActions } from '../../states/character_sheet.svelte';
     import { Modal } from "@skeletonlabs/skeleton-svelte";
+    import weaponsData from '../../data/weapons.json';
+    import type { Weapon } from '../../types';
 
+    // Combine all weapons from the JSON file
+    const allWeapons = [...weaponsData.meleeWeapons, ...weaponsData.rangedWeapons];
 
-    // Form state
-    let newWeaponName = $state('');
-    let newWeaponDescription = $state('');
-    let newWeaponBonus = $state(0);
-    let newWeaponDamage = $state(1);
-    let newWeaponRange = $state(1);
-    let newWeaponWeight = $state(0);
+    // Add a "Custom" option for manual entry at the beginning
+    const weaponOptions: Array<{name: string; bonus: number; damage: number; range: string; comment: string; isCustom?: boolean}> = [
+        { 
+            name: 'Anpassad', 
+            bonus: 0, 
+            damage: 1, 
+            range: 'SHORT', 
+            comment: 'Skapa ett anpassat vapen', 
+            isCustom: true 
+        },
+        ...allWeapons
+    ];
+
+    // Range mapping for display and conversion
+    const rangeLabels: Record<string, string> = {
+        'MELEE': 'Närstrid',
+        'CLOSE': 'Nära',
+        'SHORT': 'Kort',
+        'LONG': 'Lång'
+    };
+
+    const rangeToNumber: Record<string, number> = {
+        'MELEE': 0,
+        'CLOSE': 1,
+        'SHORT': 2,
+        'LONG': 3
+    };
+
+    // Generate unique variants and rotations for weapon cards
+    const weaponVariants = generateUniqueVariants(weaponOptions.length);
+    const cardRotations = generateRandomRotations(weaponOptions.length);
+
+    // Custom weapon form state - no longer needed since we edit directly in cards
+    // let showCustomForm = $state(false);
+    // let customWeaponName = $state('');
+    // let customWeaponDescription = $state('');
+    // let customWeaponBonus = $state(0);
+    // let customWeaponDamage = $state(1);
+    // let customWeaponRange = $state('SHORT');
+    // let customWeaponWeight = $state(0);
 
     // Generate random IDs for new items
     function generateId() {
         return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    function addWeapon() {
-        if (newWeaponName.trim()) {
-            characterActions.addWeapon({
+    function selectWeapon(weapon: any) {
+        if (weapon.isCustom) {
+            // Add empty weapon for custom editing
+            const newWeapon: Weapon = {
                 id: generateId(),
-                name: newWeaponName.trim(),
-                description: newWeaponDescription.trim(),
-                bonus: newWeaponBonus,
-                damage: newWeaponDamage,
-                range: newWeaponRange,
-                weight: newWeaponWeight,
+                name: '',
+                description: '',
+                bonus: 0,
+                damage: 1,
+                range: 2, // SHORT
+                weight: 0,
                 equipped: false
-            });
+            };
             
-            resetForm();
-            closeDialogueOption('weapons');
+            characterActions.addWeapon(newWeapon);
+            closeModal();
+        } else {
+            // Add predefined weapon directly (will be editable in the tab)
+            const newWeapon: Weapon = {
+                id: generateId(),
+                name: weapon.name,
+                description: weapon.comment || '',
+                bonus: weapon.bonus,
+                damage: weapon.damage,
+                range: rangeToNumber[weapon.range] ?? 2,
+                weight: 0, // Default weight since it's not in weapons.json
+                equipped: false
+            };
+            
+            characterActions.addWeapon(newWeapon);
+            closeModal();
         }
-    }
-
-    function resetForm() {
-        newWeaponName = '';
-        newWeaponDescription = '';
-        newWeaponBonus = 0;
-        newWeaponDamage = 1;
-        newWeaponRange = 1;
-        newWeaponWeight = 0;
     }
 
     function closeModal() {
         closeDialogueOption('weapons');
     }
-
-    function handleClose() {
-        resetForm();
-        closeModal();
-    }
-
-
-
 </script>
 
 <Modal
@@ -66,248 +103,361 @@
     }
   }}
   backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
-  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
+  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
   positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
   closeOnInteractOutside={true}
   closeOnEscape={true}
 >
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
   
   {#snippet content()}
-    <div class="weapon-modal-content torn-input-wrapper variant-1 modal-content-wrapper">
+    <div class="weapons-modal-content">
+        <!-- Weapon Selection Grid -->
         <div class="modal-header">
-            <div class="modal-title-container">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            <h2 class="modal-title">Välj Vapen</h2>
+            <button 
+                class="modal-close-button" 
+                onclick={closeModal} 
+                aria-label="Stäng vapenfönster"
+                type="button"
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-                <h3 class="modal-title">Lägg till vapen</h3>
-            </div>
-            <button class="modal-close-button"
-                    aria-label="Stäng modal" 
-                    onclick={handleClose}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addWeapon(); }}>
-                <div class="form-group">
-                    <label for="weapon-name">Namn:</label>
-                    <div class="torn-input-wrapper variant-3">
-                        <input 
-                            id="weapon-name"
-                            type="text" 
-                            class="torn-input"
-                            bind:value={newWeaponName}
-                            placeholder="Namn på vapen"
-                            required
-                        />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="weapon-description">Beskrivning:</label>
-                    <div class="torn-input-wrapper variant-4">
-                        <textarea 
-                            id="weapon-description"
-                            class="torn-input"
-                            bind:value={newWeaponDescription}
-                            placeholder="Beskrivning (valfritt)"
-                            rows="2"
-                        ></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="weapon-bonus">Bonus:</label>
-                        <div class="torn-input-wrapper variant-5">
-                            <input 
-                                id="weapon-bonus"
-                                type="number" 
-                                class="torn-input"
-                                bind:value={newWeaponBonus}
-                                min="0"
-                            />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="weapon-damage">Skada:</label>
-                        <div class="torn-input-wrapper variant-6">
-                            <input 
-                                id="weapon-damage"
-                                type="number" 
-                                class="torn-input"
-                                bind:value={newWeaponDamage}
-                                min="1"
-                                required
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="weapon-range">Räckvidd:</label>
-                        <div class="torn-input-wrapper variant-7">
-                            <input 
-                                id="weapon-range"
-                                type="number" 
-                                class="torn-input"
-                                bind:value={newWeaponRange}
-                                min="1"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="weapon-weight">Vikt (kg):</label>
-                        <div class="torn-input-wrapper variant-8">
-                            <input 
-                                id="weapon-weight"
-                                type="number" 
-                                class="torn-input"
-                                bind:value={newWeaponWeight}
-                                min="0"
-                                step="0.1"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick={handleClose}>
-                        Avbryt
-                    </button>
-                    <div class="torn-input-wrapper variant-9 btn-wrapper">
-                        <button type="submit" class="btn-primary">
-                            Lägg till
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </button>
         </div>
+        
+        <div class="card-grid">
+            {#each weaponOptions as weapon, index}
+                {@const rotation = cardRotations[index] || 0}
+                
+                <button 
+                    class="card-wrapper"
+                    style="--random-rotation: {rotation}deg"
+                    transition:scale={{ duration: 400, delay: index * 50 }}
+                    onclick={() => selectWeapon(weapon)}
+                    type="button"
+                    aria-label="Välj vapen: {weapon.name}"
+                >
+                    <div class="torn-input-wrapper {weaponVariants[index]} {weapon.isCustom ? 'custom-option' : ''}">
+                        <div class="card-content">
+                            <div class="card-header">
+                                <h3 class="card-name">{weapon.name}</h3>
+                                {#if !weapon.isCustom}
+                                    <div class="card-meta">
+                                        <span class="card-stat">Bonus: +{weapon.bonus}</span>
+                                        <span class="card-stat">Skada: {weapon.damage}</span>
+                                        <span class="card-range">{rangeLabels[weapon.range]}</span>
+                                    </div>
+                                {/if}
+                            </div>
+                            
+                            <div class="card-description">
+                                {weapon.comment || (weapon.isCustom ? 'Lägg till ett tomt vapen att redigera' : 'Inget beskrivning tillgänglig')}
+                            </div>
+                            
+                            <div class="card-footer">
+                                {#if weapon.isCustom}
+                                    <div class="custom-indicator">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                        <span>Anpassad</span>
+                                    </div>
+                                {:else}
+                                    <div class="select-hint">
+                                        Klicka för att lägga till
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </button>
+            {/each}
+        </div>
+    </div>
   {/snippet}
 </Modal>
 
 <style>
-    /* Weapon Modal Specific Styles */
-    .weapon-modal-content {
-        /* Weapon-specific adjustments if needed */
-        min-height: 400px; /* Slightly taller than default */
-
-    /* All other styles now in torn-paper.css for reusability */
-        box-shadow: none !important;
-        padding: 2rem;
-        min-height: 400px;
-        max-width: 500px;
-        width: 100%;
+    /* Modal Content Styles */
+    .weapons-modal-content {
+        position: relative;
+        z-index: 102;
     }
 
     .modal-header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 2rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid rgba(217, 119, 6, 0.2);
-        position: relative;
-        z-index: 103;
+        border-bottom: 1px solid var(--color-surface-200);
     }
 
-    .modal-title-container {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .modal-icon {
-        color: var(--color-primary-600);
-        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2));
-    }
-
-    :global(.dark) .modal-icon {
-        color: var(--color-primary-400);
+    :global(.dark) .modal-header {
+        border-color: var(--color-surface-600);
     }
 
     .modal-title {
-        font-family: var(--form-labels), serif;
+        margin: 0;
         font-size: 1.5rem;
         font-weight: bold;
         color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin: 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     :global(.dark) .modal-title {
         color: var(--color-surface-100);
     }
 
-
-    .modal-form {
+    .modal-close-button {
         display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        position: relative;
-        z-index: 103;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: transparent;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--color-surface-500);
     }
 
-    .form-group {
+    .modal-close-button:hover {
+        background: var(--color-surface-200);
+        color: var(--color-surface-700);
+    }
+
+    :global(.dark) .modal-close-button:hover {
+        background: var(--color-surface-600);
+        color: var(--color-surface-300);
+    }
+
+    /* Card Grid */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        width: 100%;
+        min-height: 100vh;
+        perspective: 1000px;
+        padding: 2rem 0;
+    }
+
+    /* Card Wrapper */
+    .card-wrapper {
+        width: 100%;
+        min-height: 320px;
+        padding: 0;
+        margin: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        perspective: 1000px;
+        animation: fadeInUp 0.6s ease-out forwards;
+        animation-fill-mode: both;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .card-wrapper:hover {
+        transform: rotate(var(--random-rotation, 0deg)) translateY(-8px) scale(1.05);
+        filter: brightness(1.1);
+    }
+
+    /* Stagger animation delays */
+    .card-wrapper:nth-child(1) { animation-delay: 0.1s; }
+    .card-wrapper:nth-child(2) { animation-delay: 0.2s; }
+    .card-wrapper:nth-child(3) { animation-delay: 0.3s; }
+    .card-wrapper:nth-child(4) { animation-delay: 0.4s; }
+    .card-wrapper:nth-child(5) { animation-delay: 0.5s; }
+    .card-wrapper:nth-child(6) { animation-delay: 0.6s; }
+    .card-wrapper:nth-child(7) { animation-delay: 0.7s; }
+    .card-wrapper:nth-child(8) { animation-delay: 0.8s; }
+    .card-wrapper:nth-child(9) { animation-delay: 0.9s; }
+    .card-wrapper:nth-child(n+10) { animation-delay: 1s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Card Content */
+    .card-content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+    }
+
+    .torn-input-wrapper.custom-option {
+        background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
+        border: 2px dashed rgba(217, 119, 6, 0.3);
+    }
+
+    .torn-input-wrapper.custom-option:hover {
+        background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.08));
+        border-color: rgba(217, 119, 6, 0.5);
+    }
+
+    /* Card Header */
+    .card-header {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+    .card-name {
+        font-family: var(--form-labels), serif;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--color-surface-900);
+        margin: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        line-height: 1.2;
     }
 
-
-
-    .modal-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-        align-items: center;
-        margin-top: 1rem;
-        padding-top: 1.5rem;
-        border-top: 2px solid rgba(217, 119, 6, 0.2);
-    }
-
-    /* Override for non-wrapped buttons */
-
-
-    :global(.dark) .btn-secondary {
-        color: var(--color-surface-300);
-        border-color: var(--color-surface-600);
-    }
-
-    :global(.dark) .btn-secondary:hover {
-        background: var(--color-surface-800);
+    :global(.dark) .card-name {
         color: var(--color-surface-100);
-        border-color: var(--color-surface-400);
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
-        .weapon-modal-content {
-            padding: 1.5rem;
-            max-width: 90vw;
+    .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .card-stat,
+    .card-range {
+        font-weight: bold;
+        color: var(--color-primary-600);
+        background: rgba(217, 119, 6, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.85rem;
+        border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+
+    :global(.dark) .card-stat,
+    :global(.dark) .card-range {
+        background: rgba(217, 119, 6, 0.2);
+        color: var(--color-primary-400);
+    }
+
+    /* Card Content Sections */
+    .card-description {
+        font-size: 0.9rem;
+        color: var(--color-surface-800);
+        line-height: 1.4;
+        flex-grow: 1;
+    }
+
+    :global(.dark) .card-description {
+        color: var(--color-surface-200);
+    }
+
+    /* Card Footer */
+    .card-footer {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-surface-200);
+    }
+
+    :global(.dark) .card-footer {
+        border-top-color: var(--color-surface-600);
+    }
+
+    .custom-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary-600);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    :global(.dark) .custom-indicator {
+        color: var(--color-primary-400);
+    }
+
+    .custom-indicator svg {
+        color: var(--color-primary-600);
+    }
+
+    :global(.dark) .custom-indicator svg {
+        color: var(--color-primary-400);
+    }
+
+    .select-hint {
+        color: var(--color-surface-700);
+        font-style: italic;
+        font-size: 0.85rem;
+        text-align: center;
+        opacity: 0.8;
+    }
+
+    :global(.dark) .select-hint {
+        color: var(--color-surface-300);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+    @media (max-width: 1200px) {
+        .card-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
-        .form-row {
-            grid-template-columns: 1fr;
+        .card-content {
+            padding: 1.25rem;
+        }
+
+        .card-name {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-grid {
             gap: 1rem;
         }
 
-        .modal-actions {
-            flex-direction: column;
+        .card-content {
+            padding: 1rem;
+            gap: 0.75rem;
         }
 
-        .modal-title {
-            font-size: 1.25rem;
+        .card-name {
+            font-size: 1.1rem;
+        }
+
+        .card-wrapper {
+            min-height: 240px;
         }
     }
+}
+
 </style>
+
+

@@ -32,15 +32,8 @@
         comment: item.comment || ''
     }));
 
-    // Initialize equipment table with 10 empty rows if not already set
-    if (!sheetState.equipmentTable || sheetState.equipmentTable.length === 0) {
-        sheetState.equipmentTable = Array(10).fill(null).map((_, index) => ({
-            id: `eq-${index}`,
-            name: '',
-            quantity: 0,
-            weight: 0
-        }));
-    }
+    // Initialize empty arrays if not already set - the modal actions will populate them
+    // No longer using equipmentTable as we use sheetState.equipment directly
 
     // Modal states are now managed globally through isDialogueOpen
     
@@ -56,51 +49,12 @@
         dragOverSection = '';
     }
 
-    // Equipment management
-    // Equipment management - now handled by modal
-    function handleEquipmentAdd(event: CustomEvent) {
-        const equipment = event.detail;
-        
-        // Check if item exists in equipmentTable, if not add new row
-        const emptyIndex = sheetState.equipmentTable.findIndex(item => !item.name);
-        if (emptyIndex !== -1) {
-            sheetState.equipmentTable[emptyIndex] = {
-                id: `eq-${emptyIndex}`,
-                name: equipment.name,
-                quantity: equipment.quantity,
-                weight: equipment.weight
-            };
-        } else {
-            // Add new item if no empty slots
-            sheetState.equipmentTable.push({
-                id: `eq-${sheetState.equipmentTable.length}`,
-                name: equipment.name,
-                quantity: equipment.quantity,
-                weight: equipment.weight
-            });
-        }
-    }
-
-    function removeEquipment(index: number) {
-        sheetState.equipmentTable[index] = {
-            id: `eq-${index}`,
-            name: '',
-            quantity: 0,
-            weight: 0
-        };
-    }
-
-    // Filter out empty equipment items for display
-    const equipmentItems = $derived(
-        sheetState.equipmentTable.filter(item => item.name && item.name.trim() !== '')
-    );
-
     // Calculate total weight from equipment items
     const totalWeight = $derived(() => {
-        const total = equipmentItems.reduce((sum, item) => 
+        const total = sheetState.equipment.reduce((sum, item) => 
             sum + (item.quantity * item.weight), 0
         );
-        console.log('Total weight calculated:', total, 'from items:', equipmentItems);
+        console.log('Total weight calculated:', total, 'from items:', sheetState.equipment);
         return total;
     });
 
@@ -110,7 +64,7 @@
     }
 
     // Generate variants for visual variety
-    const equipmentVariants = $derived(generateUniqueVariants(equipmentItems.length + 1));
+    const equipmentVariants = $derived(generateUniqueVariants(sheetState.equipment.length + 1));
     const weaponVariants = $derived(generateUniqueVariants(sheetState.weapons.length + 1));
     const armorVariants = $derived(generateUniqueVariants(sheetState.armor.length + 1));
     
@@ -141,14 +95,21 @@
             <FormSection header="UTRUSTNING" headerIcon={Backpack}>
                 <!-- Equipment list -->
                 <div class="section-items-list">
-                    {#each equipmentItems as item, index}
+                    {#each sheetState.equipment as item, index}
                         <div class="torn-input-wrapper {equipmentVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
-                                    <h4 class="section-item-name">{item.name}</h4>
+                                    <div class="section-item-name-input">
+                                        <input 
+                                            type="text" 
+                                            bind:value={item.name}
+                                            placeholder="Utrustningsnamn"
+                                            class="inline-edit-input name-input"
+                                        />
+                                    </div>
                                     <button 
                                         class="section-remove-button" 
-                                        onclick={() => removeEquipment(sheetState.equipmentTable.findIndex(eq => eq.id === item.id))}
+                                        onclick={() => characterActions.removeEquipment(item.id)}
                                         aria-label="Ta bort {item.name}"
                                     >
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -157,10 +118,39 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="section-item-stats">
-                                    <span class="section-stat">Antal: {item.quantity}</span>
-                                    <span class="section-stat">Vikt: {item.weight} kg</span>
-                                    <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
+                                {#if item.description || item.name === ''}
+                                    <div class="section-item-description-input">
+                                        <textarea 
+                                            bind:value={item.description}
+                                            placeholder="Beskrivning (valfritt)"
+                                            class="inline-edit-input description-input"
+                                            rows="2"
+                                        ></textarea>
+                                    </div>
+                                {/if}
+                                <div class="section-item-stats-inputs">
+                                    <div class="stat-input-group">
+                                        <label>Antal:</label>
+                                        <input 
+                                            type="number" 
+                                            bind:value={item.quantity}
+                                            min="1"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                    </div>
+                                    <div class="stat-input-group">
+                                        <label>Vikt/st:</label>
+                                        <input 
+                                            type="number" 
+                                            bind:value={item.weight}
+                                            min="0"
+                                            step="0.1"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                    </div>
+                                    <div class="stat-display">
+                                        <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -183,8 +173,15 @@
                         <div class="torn-input-wrapper {weaponVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
-                                    <h4 class="section-item-name">{weapon.name}</h4>
-                                    <div class="section-item-actions">
+                                    <div class="section-item-name-input torn-input-wrapper">
+                                        <input 
+                                            type="text" 
+                                            bind:value={weapon.name}
+                                            placeholder="Vapennamn"
+                                            class="inline-edit-input name-input"
+                                        />
+                                    </div>
+                                    <div class="section-item-actions ">
                                         <label class="section-equipped-checkbox">
                                             <input 
                                                 type="checkbox" 
@@ -204,14 +201,72 @@
                                         </button>
                                     </div>
                                 </div>
-                                {#if weapon.description}
-                                    <p class="section-item-description">{weapon.description}</p>
+                                {#if weapon.description || weapon.name === ''}
+                                    <div class="section-item-description-input torn-input-wrapper">
+                                        <textarea 
+                                            bind:value={weapon.description}
+                                            placeholder="Beskrivning (valfritt)"
+                                            class="inline-edit-input description-input"
+                                            rows="2"
+                                        ></textarea>
+                                    </div>
                                 {/if}
-                                <div class="section-item-stats">
-                                    <span class="section-stat">Bonus: +{weapon.bonus}</span>
-                                    <span class="section-stat">Skada: {weapon.damage}</span>
-                                    <span class="section-stat">Räckvidd: {weapon.range}</span>
-                                    <span class="section-stat">Vikt: {weapon.weight} kg</span>
+                                <div class="section-item-stats-inputs">
+                                    <div class="stat-input-group ">
+                                        <label for="bonus">Bonus:</label>
+
+                                        <div class="torn-input-wrapper">
+                                        <input 
+                                            type="number" 
+                                            bind:value={weapon.bonus}
+                                            name="bonus"
+                                            min="0"
+                                            max="10"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                            </div>  
+
+                                    </div>
+                                    <div class="stat-input-group">
+                                        <label>Skada:</label>
+                                        <div class="torn-input-wrapper">
+
+                                        <input 
+                                            type="number" 
+                                            bind:value={weapon.damage}
+                                            min="1"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                        </div>
+                                    </div>
+                                    <div class="stat-input-group">
+                                        <label>Räckvidd:</label>
+                                        <div class="torn-input-wrapper">
+
+                                        <select 
+                                            bind:value={weapon.range}
+                                            class="inline-edit-input stat-input"
+                                        >
+                                            <option value={0}>Närstrid</option>
+                                            <option value={1}>Nära</option>
+                                            <option value={2}>Kort</option>
+                                            <option value={3}>Lång</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="stat-input-group">
+                                        <label>Vikt:</label>
+                                        <div class="torn-input-wrapper">
+
+                                        <input 
+                                            type="number" 
+                                            bind:value={weapon.weight}
+                                            min="0"
+                                            step="0.1"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +284,14 @@
                         <div class="torn-input-wrapper {armorVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
-                                    <h4 class="section-item-name">{armor.name}</h4>
+                                    <div class="section-item-name-input">
+                                        <input 
+                                            type="text" 
+                                            bind:value={armor.name}
+                                            placeholder="Rustningsnamn"
+                                            class="inline-edit-input name-input"
+                                        />
+                                    </div>
                                     <div class="section-item-actions">
                                         <label class="section-equipped-checkbox">
                                             <input 
@@ -250,12 +312,36 @@
                                         </button>
                                     </div>
                                 </div>
-                                {#if armor.description}
-                                    <p class="section-item-description">{armor.description}</p>
+                                {#if armor.description || armor.name === ''}
+                                    <div class="section-item-description-input">
+                                        <textarea 
+                                            bind:value={armor.description}
+                                            placeholder="Beskrivning (valfritt)"
+                                            class="inline-edit-input description-input"
+                                            rows="2"
+                                        ></textarea>
+                                    </div>
                                 {/if}
-                                <div class="section-item-stats">
-                                    <span class="section-stat">Skydd: {armor.protection}</span>
-                                    <span class="section-stat">Vikt: {armor.weight} kg</span>
+                                <div class="section-item-stats-inputs">
+                                    <div class="stat-input-group">
+                                        <label>Skydd:</label>
+                                        <input 
+                                            type="number" 
+                                            bind:value={armor.protection}
+                                            min="0"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                    </div>
+                                    <div class="stat-input-group">
+                                        <label>Vikt:</label>
+                                        <input 
+                                            type="number" 
+                                            bind:value={armor.weight}
+                                            min="0"
+                                            step="0.1"
+                                            class="inline-edit-input stat-input"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -446,4 +532,118 @@
     :global(.dark) .section-total-label {
         color: var(--color-surface-100);
     }
+
+    /* Inline Editing Styles */
+
+
+    .inline-edit-input {
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        font-family: inherit;
+        font-size: inherit;
+        color: inherit;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
+
+    .inline-edit-input:hover {
+        border-color: var(--color-surface-300);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .inline-edit-input:focus {
+        outline: none;
+        border-color: var(--color-primary-500);
+        background: var(--color-surface-50);
+        color: var(--color-surface-900);
+    }
+
+    :global(.dark) .inline-edit-input:focus {
+        background: var(--color-surface-800);
+        color: var(--color-surface-100);
+    }
+
+    .name-input {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .description-input {
+        resize: vertical;
+        min-height: 2rem;
+        line-height: 1.4;
+        font-style: italic;
+    }
+
+    /* .section-item-description-input::before {
+        filter: url(#squiggle_lines);
+    } */
+    .section-item-description-input{
+        margin: 0.5rem 0;
+
+
+    }
+
+    .section-item-stats-inputs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .stat-input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .stat-input-group label {
+        font-size: 0.9rem;
+        color: var(--color-surface-700);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    :global(.dark) .stat-input-group label {
+        color: var(--color-surface-300);
+    }
+
+    .stat-input {
+        width: 80px;
+        text-align: center;
+    }
+
+    .stat-input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .stat-input::-webkit-outer-spin-button,
+    .stat-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .stat-display {
+        margin-left: auto;
+    }
+
+    /* Ensure proper layout for inputs */
+    .section-item-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    /* Equipment Grid Layout */
 </style>

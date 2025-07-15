@@ -103,7 +103,7 @@ async function checkDiceExtensionMetadata(): Promise<{ available: boolean; versi
         console.warn("[MYZDiceIntegration] MYZ Dice metadata not found:", metadata[key]);
         return { available: false };
     }
-    if (Date.now() - timestamp > 60000) { // 1 minute timeout
+    if (Date.now() - timestamp > 1200000) { 
         console.warn("[MYZDiceIntegration] MYZ Dice metadata is outdated");
         return { available: false };
     }

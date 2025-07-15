@@ -235,11 +235,13 @@
                     <div class="character-header">
                         <label for="job" class="character-label">Syssla</label>
                     </div>
+                    <div class="torn-input-wrapper">
                     <input type="text" 
                         class="torn-input font-user character-input" 
                         id="job" 
                         placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
                         bind:value={formData.job} />
+                    </div>
                 </div>
             </div>
         </div>

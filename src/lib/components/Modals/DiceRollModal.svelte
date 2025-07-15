@@ -187,7 +187,7 @@
 >
   
   {#snippet content()}
-    <div class="dice-roll-modal-content torn-input-wrapper variant-1 modal-content-wrapper">
+    <div class="dice-roll-modal-content torn-paper-wrapper variant-1 modal-content-wrapper">
         <div class="modal-header">
             <div class="modal-title-container">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
@@ -297,7 +297,7 @@
                 <button type="button" class="btn-secondary" onclick={handleClose}>
                     Avbryt
                 </button>
-                <div class="torn-input-wrapper variant-9 btn-wrapper">
+                <div class="torn-paper-wrapper variant-9 btn-wrapper">
                     <button type="button" class="btn-primary roll-button" onclick={executeRoll}>
                         🎲 Slå tärning
                     </button>

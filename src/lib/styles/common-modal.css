@@ -98,13 +98,13 @@
     overflow-y: auto;
 }
 
-.torn-input-wrapper {
+.torn-paper-wrapper {
     height: 100%;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 0.75rem;
 }
 
-.torn-input-wrapper.selected {
+.torn-paper-wrapper.selected {
     box-shadow: 0 0 20px rgba(217, 119, 6, 0.6), 0 8px 25px rgba(0, 0, 0, 0.2);
     transform: scale(1.02);
 }

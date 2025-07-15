@@ -142,7 +142,7 @@
                     type="button"
                     aria-label="Välj vapen: {weapon.name}"
                 >
-                    <div class="torn-input-wrapper {weaponVariants[index]} {weapon.isCustom ? 'custom-option' : ''}">
+                    <div class="torn-paper-wrapper {weaponVariants[index]} {weapon.isCustom ? 'custom-option' : ''}">
                         <div class="card-content">
                             <div class="card-header">
                                 <h3 class="card-name">{weapon.name}</h3>
@@ -304,12 +304,12 @@
         z-index: 2;
     }
 
-    .torn-input-wrapper.custom-option {
+    .torn-paper-wrapper.custom-option {
         background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
         border: 2px dashed rgba(217, 119, 6, 0.3);
     }
 
-    .torn-input-wrapper.custom-option:hover {
+    .torn-paper-wrapper.custom-option:hover {
         background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.08));
         border-color: rgba(217, 119, 6, 0.5);
     }

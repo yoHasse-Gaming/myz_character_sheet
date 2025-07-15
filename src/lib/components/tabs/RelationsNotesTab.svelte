@@ -65,7 +65,7 @@
                 <div class="relations-section" data-drop-zone="relations">
                     <div class="relations-grid">
                         {#each sheetState.relations as relation, index}
-                            <div class="torn-input-wrapper {relationVariants[index]} relation-card {relation.isClose ? 'close-relation' : ''}" 
+                            <div class="torn-paper-wrapper {relationVariants[index]} relation-card {relation.isClose ? 'close-relation' : ''}" 
                                  data-x="0" 
                                  data-y="0"
                                  data-paper-id="relation-{relation.id}">
@@ -102,7 +102,7 @@
                 <div class="notes-section" data-drop-zone="notes">
                     <div class="notes-grid">
                         {#each sheetState.notes as note, index}
-                            <div class="torn-input-wrapper {noteVariants[index]} note-card" 
+                            <div class="torn-paper-wrapper {noteVariants[index]} note-card" 
                                  data-x="0" 
                                  data-y="0"
                                  data-paper-id="note-{index}">

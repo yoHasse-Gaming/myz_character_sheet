@@ -117,7 +117,7 @@
 
 /* NEW: Torn paper input styles with randomization */
 /* Create wrapper for torn paper inputs with randomized backgrounds */
-.torn-input-wrapper {
+.torn-paper-wrapper {
     position: relative;
     display: inline-block;
     filter: drop-shadow(black 0.01rem 0.01rem 2px);
@@ -127,7 +127,7 @@
     transform: scale(1);
 }
 
-.torn-input-wrapper:hover {
+.torn-paper-wrapper:hover {
     /* Popout, like it's raising from the paper */
     transform: scale(1.001);
     filter: drop-shadow(black 0.01rem 0.5rem 7px);
@@ -140,7 +140,7 @@
 }
 
 /* Base torn input background */
-.torn-input-wrapper::before {
+.torn-paper-wrapper::before {
     content: '';
     position: absolute;
     top: 0;
@@ -159,47 +159,47 @@
     will-change: filter;
 }
 
-.dark .torn-input-wrapper::before {
+.dark .torn-paper-wrapper::before {
     background: url('/img/card_bg_dark.png'); /* Use a torn paper background image */
 }
 
 /* Random variations for torn inputs */
-.torn-input-wrapper.variant-1::before {
+.torn-paper-wrapper.variant-1::before {
     background-position: 15% 25%;
     transform: rotate(0.2deg) scale(1.02);
 }
 
-.torn-input-wrapper.variant-2::before {
+.torn-paper-wrapper.variant-2::before {
     background-position: 85% 75%;
     transform: rotate(-0.8deg) scale(0.98);
 }
 
-.torn-input-wrapper.variant-3::before {
+.torn-paper-wrapper.variant-3::before {
     background-position: 30% 60%;
     transform: rotate(0.5deg) scale(1.01);
 }
 
-.torn-input-wrapper.variant-4::before {
+.torn-paper-wrapper.variant-4::before {
     background-position: 70% 40%;
     transform: rotate(-0.5deg) scale(1.05);
 }
 
-.torn-input-wrapper.variant-5::before {
+.torn-paper-wrapper.variant-5::before {
     background-position: 50% 10%;
     transform: rotate(0.3deg) scale(1.03);
 }
 
-.torn-input-wrapper.variant-6::before {
+.torn-paper-wrapper.variant-6::before {
     background-position: 20% 90%;
     transform: rotate(-0.6deg) scale(0.97);
 }
 
-.torn-input-wrapper.variant-7::before {
+.torn-paper-wrapper.variant-7::before {
     background-position: 90% 20%;
     transform: rotate(1deg) scale(1.01);
 }
 
-.torn-input-wrapper.variant-8::before {
+.torn-paper-wrapper.variant-8::before {
     background-position: 40% 80%;
     transform: rotate(-0.4deg) scale(1.02);
 }
@@ -524,7 +524,7 @@ textarea.torn-input {
         resize: none;
     }
 
-    .form-group .torn-input-wrapper {
+    .form-group .torn-paper-wrapper {
         padding: 0.5rem;
         min-height: 50px;
         display: flex;
@@ -533,7 +533,7 @@ textarea.torn-input {
         transition: all 0.2s ease;
     }
 
-    .form-group .torn-input-wrapper:focus-within {
+    .form-group .torn-paper-wrapper:focus-within {
         filter: brightness(0.9) contrast(1.2);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
@@ -645,7 +645,7 @@ textarea.torn-input {
     color: var(--color-surface-200);
 }
 
-.form-group .torn-input-wrapper {
+.form-group .torn-paper-wrapper {
     padding: 0.5rem;
     min-height: 50px;
     display: flex;
@@ -654,7 +654,7 @@ textarea.torn-input {
     transition: all 0.2s ease;
 }
 
-.form-group .torn-input-wrapper:focus-within {
+.form-group .torn-paper-wrapper:focus-within {
     filter: brightness(0.9) contrast(1.2);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
@@ -682,11 +682,11 @@ textarea.torn-input {
     filter: brightness(1.1) contrast(1.3);
 }
 
-.dark .form-group .torn-input-wrapper {
+.dark .form-group .torn-paper-wrapper {
     filter: brightness(0.8) contrast(1.1);
 }
 
-.dark .form-group .torn-input-wrapper:focus-within {
+.dark .form-group .torn-paper-wrapper:focus-within {
     filter: brightness(0.8) contrast(1.4);
 }
 

@@ -46,123 +46,6 @@
                 }
             }
         });
-
-        //     .draggable({
-        //         allowFrom: '.character-header', // Use component-specific selector
-        //         listeners: {
-        //             start: (event) => {
-        //                 console.log('Drag started on:', event.target);
-        //                 event.target.style.zIndex = '1000';
-        //             },
-        //             move: (event) => {
-        //                 const target = event.target;
-        //                 const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        //                 const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        //                 target.style.transform = `translate(${x}px, ${y}px)`;
-        //                 target.setAttribute('data-x', x.toString());
-        //                 target.setAttribute('data-y', y.toString());
-                        
-        //                 // Use throttled save for better performance
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     throttledSaveLayout('characterTab', paperId, { x, y });
-        //                 }
-        //             },
-        //             end: (event) => {
-        //                 event.target.style.zIndex = '';
-                        
-        //                 // Final save when drag ends
-        //                 const target = event.target;
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
-        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
-        //                     const currentLayout = characterActions.getPaperLayout('characterTab', paperId) || {};
-        //                     characterActions.savePaperLayout('characterTab', paperId, {
-        //                         ...currentLayout,
-        //                         x,
-        //                         y
-        //                     });
-        //                 }
-        //             }
-        //         },
-        //         modifiers: [
-        //             // Restrict dragging to within the tab-content container
-        //             interact.modifiers.restrictRect({
-        //                 restriction: '.tab-content',
-        //                 endOnly: true
-        //             })
-        //         ]
-        //     })
-        //     .resizable({
-        //         edges: { left: true, right: true, bottom: true, top: true },
-        //         listeners: {
-        //             start: (event) => {
-        //                 console.log('Resize started on:', event.target);
-        //                 event.target.style.zIndex = '1000';
-        //             },
-        //             move: (event) => {
-        //                 const target = event.target;
-        //                 let x = (parseFloat(target.getAttribute('data-x')) || 0);
-        //                 let y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-        //                 // Calculate minimum height based on content
-        //                 const minHeight = getMinHeightForContent(target);
-                        
-        //                 // Ensure height doesn't go below minimum
-        //                 const newHeight = Math.max(event.rect.height, minHeight);
-
-        //                 // Update the element's style
-        //                 target.style.width = event.rect.width + 'px';
-        //                 target.style.height = newHeight + 'px';
-
-        //                 // Translate when resizing from top or left edges
-        //                 x += event.deltaRect.left;
-        //                 y += event.deltaRect.top;
-
-        //                 target.style.transform = `translate(${x}px, ${y}px)`;
-        //                 target.setAttribute('data-x', x.toString());
-        //                 target.setAttribute('data-y', y.toString());
-                        
-        //                 // Use throttled save for better performance
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     throttledSaveLayout('characterTab', paperId, {
-        //                         x,
-        //                         y,
-        //                         width: event.rect.width,
-        //                         height: newHeight
-        //                     });
-        //                 }
-        //             },
-        //             end: (event) => {
-        //                 event.target.style.zIndex = '';
-                        
-        //                 // Final save when resize ends
-        //                 const target = event.target;
-        //                 const paperId = target.getAttribute('data-paper-id');
-        //                 if (paperId) {
-        //                     const x = parseFloat(target.getAttribute('data-x')) || 0;
-        //                     const y = parseFloat(target.getAttribute('data-y')) || 0;
-        //                     const width = parseFloat(target.style.width) || 0;
-        //                     const height = parseFloat(target.style.height) || 0;
-        //                     characterActions.savePaperLayout('characterTab', paperId, {
-        //                         x,
-        //                         y,
-        //                         width,
-        //                         height
-        //                     });
-        //                 }
-        //             }
-        //         },
-        //         modifiers: [
-        //             // Static minimum size constraints
-        //             interact.modifiers.restrictSize({
-        //                 min: { width: 250, height: 120 }
-        //             })
-        //         ]
-        //     });
     });
 
     function resetCharacterLayout() {
@@ -212,7 +95,7 @@
     <div class="character-papers-container">
         <!-- Name Field -->
         <div class="character-item-wrapper" style="top: 20px; left: 20px;">
-            <div class="torn-input-wrapper {nameVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-name">
+            <div class="torn-paper-wrapper {nameVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-name">
                 <div class="character-item-content">
                     <div class="character-header">
                         <label for="name" class="character-label">Namn</label>
@@ -230,12 +113,12 @@
 
         <!-- Job Field -->
         <div class="character-item-wrapper" style="top: 20px; left: 350px;">
-            <div class="torn-input-wrapper {jobVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-job">
+            <div class="torn-paper-wrapper {jobVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-job">
                 <div class="character-item-content">
                     <div class="character-header">
                         <label for="job" class="character-label">Syssla</label>
                     </div>
-                    <div class="torn-input-wrapper">
+                    <div class="torn-paper-wrapper">
                     <input type="text" 
                         class="torn-input font-user character-input" 
                         id="job" 
@@ -248,7 +131,7 @@
 
         <!-- Face Field -->
         <div class="character-item-wrapper" style="top: 200px; left: 50px;">
-            <div class="torn-input-wrapper {faceVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-face">
+            <div class="torn-paper-wrapper {faceVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-face">
                 <div class="character-item-content">
                     <div class="character-header">
                         <label for="face" class="character-label">Ansikte</label>
@@ -264,7 +147,7 @@
 
         <!-- Body Field -->
         <div class="character-item-wrapper" style="top: 200px; left: 400px;">
-            <div class="torn-input-wrapper {bodyVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-body">
+            <div class="torn-paper-wrapper {bodyVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-body">
                 <div class="character-item-content">
                     <div class="character-header">
                         <label for="body" class="character-label">Kropp</label>
@@ -280,7 +163,7 @@
 
         <!-- Clothes Field -->
         <div class="character-item-wrapper" style="top: 380px; left: 120px;">
-            <div class="torn-input-wrapper {clothesVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-clothes">
+            <div class="torn-paper-wrapper {clothesVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-clothes">
                 <div class="character-item-content">
                     <div class="character-header">
                         <label for="clothes" class="character-label">Kläder</label>

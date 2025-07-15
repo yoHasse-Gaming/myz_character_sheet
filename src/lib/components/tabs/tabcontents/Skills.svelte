@@ -192,7 +192,7 @@
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
         {@const position = getInitialPosition(index)}
         <div class="skill-item-wrapper" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
+            <div class="torn-paper-wrapper {skillVariants[index]} skill-paper" data-x="0" data-y="0" data-paper-id="skill-{index}">
                 <div class="skill-item-content">
                     <div class="skill-header">
                             <Tooltip
@@ -266,7 +266,7 @@
         {@const skillIndex = sheetState.skills.length + index}
         {@const position = getInitialPosition(skillIndex)}
         <div class="skill-item-wrapper optional-skill" style="top: {position.y}px; left: {position.x}px;">
-            <div class="torn-input-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
+            <div class="torn-paper-wrapper {skillVariants[skillIndex]} optional-skill-wrapper skill-paper" data-x="0" data-y="0" data-paper-id="optional-skill-{skill.id}">
                 <div class="skill-item-content">
                     <div class="skill-header">
                             <Tooltip

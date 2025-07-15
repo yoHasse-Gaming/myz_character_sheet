@@ -47,7 +47,7 @@
                 </svg>
 
             </button>
-            <div class="torn-input-wrapper variant-1 info-modal-wrapper">
+            <div class="torn-paper-wrapper variant-1 info-modal-wrapper">
                 <div class="info-modal-content">
                     <div class="info-modal-header">
                         <h2 class="info-modal-title">{infoModalState.title}</h2>

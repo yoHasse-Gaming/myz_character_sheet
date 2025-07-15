@@ -28,7 +28,7 @@
 
 <div class="draggable-add-container" style="top: {position.top}px; right: {position.right}px;">
     <div 
-        class="draggable-add-item torn-input-wrapper {variant}"
+        class="draggable-add-item torn-paper-wrapper {variant}"
         role="button"
         tabindex="0"
         aria-label={ariaLabel}

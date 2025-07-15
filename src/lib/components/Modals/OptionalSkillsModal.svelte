@@ -85,7 +85,7 @@
                         type="button"
                         aria-label="Välj färdighet: {skill.name}"
                     >
-                        <div class="torn-input-wrapper {skillVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                        <div class="torn-paper-wrapper {skillVariants[variantIndex]} {isSelected ? 'selected' : ''}">
                             <div class="card-content">
                                 <div class="card-header">
                                     <h3 class="card-name">{skill.name}</h3>

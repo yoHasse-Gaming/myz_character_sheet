@@ -107,7 +107,7 @@
                         style="--random-rotation: {rotation}deg"
                         onclick={() => addTalent(talent)}
                     >
-                        <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                        <div class="torn-paper-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
                             <div class="card-content">
                                 <div class="card-header">
                                     <h3 class="card-name">{talent.name}</h3>
@@ -189,7 +189,7 @@
                         style="--random-rotation: {rotation}deg"
                         onclick={() => addTalent(talent)}
                     >
-                        <div class="torn-input-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+                        <div class="torn-paper-wrapper {talentVariants[variantIndex]} {isSelected ? 'selected' : ''}">
                             <div class="card-content">
                                 <div class="card-header">
                                     <h3 class="card-name">{talent.name}</h3>

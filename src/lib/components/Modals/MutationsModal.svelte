@@ -97,7 +97,7 @@
             type="button"
             aria-label="Välj mutation: {mutation.name}"
           >
-            <div class="torn-input-wrapper {mutationVariants[variantIndex]} {isSelected ? 'selected' : ''}">
+            <div class="torn-paper-wrapper {mutationVariants[variantIndex]} {isSelected ? 'selected' : ''}">
               <div class="card-content">
                 <div class="card-header">
                   <h3 class="card-name">{mutation.name}</h3>

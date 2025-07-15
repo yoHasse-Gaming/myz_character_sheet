@@ -93,7 +93,7 @@
 </script>
 
 
-<div class="torn-input-wrapper variant-{(abilityIndex % 6) + 1}">
+<div class="torn-paper-wrapper variant-{(abilityIndex % 6) + 1}">
     <div class="base-ability-container">
         <div class="ability-row">
             <div class="ability-section">
@@ -167,7 +167,7 @@
 </div>
 
 <style>
-    .torn-input-wrapper {
+    .torn-paper-wrapper {
         position: relative;
         width: 100%;
         max-width: 350px;
@@ -179,7 +179,7 @@
         transform: scale(1);
     }
 
-    .torn-input-wrapper:hover {
+    .torn-paper-wrapper:hover {
         transform: scale(1.02);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
@@ -370,7 +370,7 @@
 
     /* Responsive adjustments */
     @media (max-width: 639px) {
-        .torn-input-wrapper {
+        .torn-paper-wrapper {
             max-width: 100%;
             margin: 0.25rem 0;
         }
@@ -396,7 +396,7 @@
     }
 
     @media (min-width: 640px) {
-        .torn-input-wrapper {
+        .torn-paper-wrapper {
             margin: 0.5rem 0;
         }
 
@@ -423,7 +423,7 @@
     }
 
     @media (min-width: 768px) {
-        .torn-input-wrapper {
+        .torn-paper-wrapper {
             max-width: 380px;
         }
 

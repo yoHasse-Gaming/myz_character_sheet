@@ -59,7 +59,7 @@
 >
   
   {#snippet content()}
-    <div class="relation-modal-content torn-input-wrapper variant-1 modal-content-wrapper">
+    <div class="relation-modal-content torn-paper-wrapper variant-1 modal-content-wrapper">
         <div class="modal-header">
             <div class="modal-title-container">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
@@ -82,7 +82,7 @@
             <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addRelation(); }}>
                 <div class="form-group">
                     <label for="relation-name">Namn:</label>
-                    <div class="torn-input-wrapper variant-3">
+                    <div class="torn-paper-wrapper variant-3">
                         <input 
                             id="relation-name"
                             type="text" 
@@ -95,7 +95,7 @@
                 </div>
                 <div class="form-group">
                     <label for="relation-description">Beskrivning:</label>
-                    <div class="torn-input-wrapper variant-4">
+                    <div class="torn-paper-wrapper variant-4">
                         <textarea 
                             id="relation-description"
                             class="torn-input"
@@ -119,7 +119,7 @@
                     <button type="button" class="btn-secondary" onclick={handleClose}>
                         Avbryt
                     </button>
-                    <div class="torn-input-wrapper variant-5 btn-wrapper">
+                    <div class="torn-paper-wrapper variant-5 btn-wrapper">
                         <button type="submit" class="btn-primary">
                             Lägg till
                         </button>

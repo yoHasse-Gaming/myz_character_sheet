@@ -96,7 +96,7 @@
                 <!-- Equipment list -->
                 <div class="section-items-list">
                     {#each sheetState.equipment as item, index}
-                        <div class="torn-input-wrapper {equipmentVariants[index]} section-item-card">
+                        <div class="torn-paper-wrapper {equipmentVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
                                     <div class="section-item-name-input">
@@ -170,10 +170,10 @@
                 <!-- Weapons list -->
                 <div class="section-items-list">
                     {#each sheetState.weapons as weapon, index}
-                        <div class="torn-input-wrapper {weaponVariants[index]} section-item-card">
+                        <div class="torn-paper-wrapper {weaponVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
-                                    <div class="section-item-name-input torn-input-wrapper">
+                                    <div class="section-item-name-input torn-paper-wrapper">
                                         <input 
                                             type="text" 
                                             bind:value={weapon.name}
@@ -202,7 +202,7 @@
                                     </div>
                                 </div>
                                 {#if weapon.description || weapon.name === ''}
-                                    <div class="section-item-description-input torn-input-wrapper">
+                                    <div class="section-item-description-input torn-paper-wrapper">
                                         <textarea 
                                             bind:value={weapon.description}
                                             placeholder="Beskrivning (valfritt)"
@@ -215,7 +215,7 @@
                                     <div class="stat-input-group ">
                                         <label for="bonus">Bonus:</label>
 
-                                        <div class="torn-input-wrapper">
+                                        <div class="torn-paper-wrapper">
                                         <input 
                                             type="number" 
                                             bind:value={weapon.bonus}
@@ -229,7 +229,7 @@
                                     </div>
                                     <div class="stat-input-group">
                                         <label>Skada:</label>
-                                        <div class="torn-input-wrapper">
+                                        <div class="torn-paper-wrapper">
 
                                         <input 
                                             type="number" 
@@ -241,7 +241,7 @@
                                     </div>
                                     <div class="stat-input-group">
                                         <label>Räckvidd:</label>
-                                        <div class="torn-input-wrapper">
+                                        <div class="torn-paper-wrapper">
 
                                         <select 
                                             bind:value={weapon.range}
@@ -256,7 +256,7 @@
                                     </div>
                                     <div class="stat-input-group">
                                         <label>Vikt:</label>
-                                        <div class="torn-input-wrapper">
+                                        <div class="torn-paper-wrapper">
 
                                         <input 
                                             type="number" 
@@ -281,7 +281,7 @@
                 <!-- Armor list -->
                 <div class="section-items-list">
                     {#each sheetState.armor as armor, index}
-                        <div class="torn-input-wrapper {armorVariants[index]} section-item-card">
+                        <div class="torn-paper-wrapper {armorVariants[index]} section-item-card">
                             <div class="section-item-content">
                                 <div class="section-item-header">
                                     <div class="section-item-name-input">

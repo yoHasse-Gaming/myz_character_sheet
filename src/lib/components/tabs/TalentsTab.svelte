@@ -71,7 +71,7 @@
     <div class="talents-section" data-drop-zone="occupational-talents">
             <div class="talents-list">
                 {#each occupationalTalents as talent, index}
-                        <div class="torn-input-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  
+                        <div class="torn-paper-wrapper {talentVariants[index % talentVariants.length]} talent-item-card"  
                             data-x="0" 
                             data-y="0" 
                             data-paper-id="occuptalent-{talent.id}">
@@ -121,7 +121,7 @@
             
             <div class="talents-list">
                 {#each genericTalents as talent, index}
-                        <div class="torn-input-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" 
+                        <div class="torn-paper-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" 
                         data-x="0" 
                         data-y="0" 
                         data-paper-id="generictalent-{talent.id}">

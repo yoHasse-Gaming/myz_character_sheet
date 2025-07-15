@@ -44,7 +44,7 @@
 >
   
   {#snippet content()}
-    <div class="note-modal-content torn-input-wrapper variant-2 modal-content-wrapper">
+    <div class="note-modal-content torn-paper-wrapper variant-2 modal-content-wrapper">
         <div class="modal-header">
             <div class="modal-title-container">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
@@ -68,7 +68,7 @@
             <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addNote(); }}>
                 <div class="form-group">
                     <label for="note-text">Anteckning:</label>
-                    <div class="torn-input-wrapper variant-3">
+                    <div class="torn-paper-wrapper variant-3">
                         <textarea 
                             id="note-text"
                             class="torn-input"
@@ -83,7 +83,7 @@
                     <button type="button" class="btn-secondary" onclick={handleClose}>
                         Avbryt
                     </button>
-                    <div class="torn-input-wrapper variant-4 btn-wrapper">
+                    <div class="torn-paper-wrapper variant-4 btn-wrapper">
                         <button type="submit" class="btn-primary">
                             Lägg till anteckning
                         </button>

@@ -65,7 +65,7 @@
   {/snippet}
   
   {#snippet content()}
-    <div class="armor-modal-content torn-input-wrapper variant-2 modal-content-wrapper">
+    <div class="armor-modal-content torn-paper-wrapper variant-2 modal-content-wrapper">
         <div class="modal-header">
             <div class="modal-title-container">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
@@ -85,7 +85,7 @@
             <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addArmor(); }}>
                 <div class="form-group">
                     <label for="armor-name">Namn:</label>
-                    <div class="torn-input-wrapper variant-3">
+                    <div class="torn-paper-wrapper variant-3">
                         <input 
                             id="armor-name"
                             type="text" 
@@ -98,7 +98,7 @@
                 </div>
                 <div class="form-group">
                     <label for="armor-description">Beskrivning:</label>
-                    <div class="torn-input-wrapper variant-4">
+                    <div class="torn-paper-wrapper variant-4">
                         <textarea 
                             id="armor-description"
                             class="torn-input"
@@ -111,7 +111,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="armor-protection">Skydd:</label>
-                        <div class="torn-input-wrapper variant-5">
+                        <div class="torn-paper-wrapper variant-5">
                             <input 
                                 id="armor-protection"
                                 type="number" 
@@ -124,7 +124,7 @@
                     </div>
                     <div class="form-group">
                         <label for="armor-weight">Vikt (kg):</label>
-                        <div class="torn-input-wrapper variant-6">
+                        <div class="torn-paper-wrapper variant-6">
                             <input 
                                 id="armor-weight"
                                 type="number" 
@@ -140,7 +140,7 @@
                     <button type="button" class="btn-secondary" onclick={closeModal}>
                         Avbryt
                     </button>
-                    <div class="torn-input-wrapper variant-7 btn-wrapper">
+                    <div class="torn-paper-wrapper variant-7 btn-wrapper">
                         <button type="submit" class="btn-primary">
                             Lägg till
                         </button>

@@ -216,7 +216,7 @@ export function initInteractForElement(
     }
 
     export function autoResizePaper(textarea: HTMLTextAreaElement, paperHeader: HTMLElement | string, tabName: TabName) {
-        const paper = textarea.closest('.torn-input-wrapper') as HTMLElement;
+        const paper = textarea.closest('.torn-paper-wrapper') as HTMLElement;
         if (!paper) return;
         
         // Prevent infinite resize loops and conflicts with manual resize

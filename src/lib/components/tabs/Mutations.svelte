@@ -147,7 +147,7 @@
         <!-- Selected Mutations -->
             {#each sheetState.mutations as mutation, index}
                 <div class="mutation-item-wrapper">
-                    <div class="torn-input-wrapper {mutationVariants[index % mutationVariants.length]} mutation-paper" data-x="0" data-y="0" data-paper-id="mutation-{index}">
+                    <div class="torn-paper-wrapper {mutationVariants[index % mutationVariants.length]} mutation-paper" data-x="0" data-y="0" data-paper-id="mutation-{index}">
                         <div class="mutation-item-content">
                             <div class="mutation-header">
                                 <span class="mutation-name"><Dna />  {mutation.name}</span>
@@ -193,7 +193,7 @@
     </div>
 
         <div class="mutation-points-floating-container">
-        <div class="torn-input-wrapper variant-2 mutation-points-wrapper" data-x="0" data-y="0" data-paper-id="mutation-points">
+        <div class="torn-paper-wrapper variant-2 mutation-points-wrapper" data-x="0" data-y="0" data-paper-id="mutation-points">
             <div class="mutation-points-content">
                 <div class="mutation-points-header">
                     <Microscope size={20} class="mutation-points-icon" />

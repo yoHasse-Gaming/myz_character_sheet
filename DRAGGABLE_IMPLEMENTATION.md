@@ -64,7 +64,7 @@ Implemented InteractJS to make papers both draggable and resizable within tabs. 
 #### CharacterTab.svelte
 - Completely restructured layout to move all labels inside torn paper wrappers
 - Added drag handles with grip dots icon to each field
-- Added `character-paper` class to torn-input-wrapper elements
+- Added `character-paper` class to torn-paper-wrapper elements
 - Added `data-x="0" data-y="0"` attributes for position tracking
 - Changed from grid/card layout to flexible paper container
 - Fields now include: Name, Job/Syssla, Face/Ansikte, Body/Kropp, Clothes/Kläder
@@ -73,7 +73,7 @@ Implemented InteractJS to make papers both draggable and resizable within tabs. 
 #### Skills.svelte
 - Moved skill names inside the torn paper wrapper (in header section)
 - Added drag handle with grip dots icon
-- Added `skill-paper` class to torn-input-wrapper elements
+- Added `skill-paper` class to torn-paper-wrapper elements
 - Added `data-x="0" data-y="0"` attributes for position tracking
 - Restructured skill controls to separate header (name + drag handle) from controls (info button + input)
 

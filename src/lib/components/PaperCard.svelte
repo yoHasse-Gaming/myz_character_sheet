@@ -1,0 +1,312 @@
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { generateUniqueVariants } from '../utils/styleUtils';
+    import { autoResizePaper, initInteractForElement, type TabName } from '../utils/interactjsUtils';
+    import { characterActions } from '../states/character_sheet.svelte';
+
+    // Props
+    let {
+        paperId,
+        tabName,
+        variant = '',
+        draggable = true,
+        resizable = true,
+        dragHandle = '.paper-header',
+        initialPosition = { x: 0, y: 0 },
+        initialSize = { width: 'auto', height: 'auto' },
+        minSize = { width: 250, height: 120 },
+        header = '',
+        children,
+        autoResize = false,
+        class: additionalClasses = ''
+    }: {
+        paperId: string;
+        tabName: TabName;
+        variant?: string;
+        draggable?: boolean;
+        resizable?: boolean;
+        dragHandle?: string;
+        initialPosition?: { x: number; y: number };
+        initialSize?: { width: string | number; height: string | number };
+        minSize?: { width: number; height: number };
+        header?: string;
+        children?: any;
+        autoResize?: boolean;
+        class?: string;
+    } = $props();
+
+    let paperElement: HTMLElement;
+    let contentElement: HTMLElement;
+
+    // Generate a variant if none provided
+    const cardVariant = variant || generateUniqueVariants(1)[0];
+
+    // TODO: maybe add $effect and look for ANY change to character sheet state.
+
+    onMount(() => {
+        if (paperElement) {
+            // Initialize InteractJS for draggable and resizable functionality
+            if (draggable || resizable) {
+                initInteractForElement(paperElement, tabName, dragHandle);
+            }
+
+            // Restore saved layout
+            const savedLayout = characterActions.getPaperLayout(tabName, paperId);
+            if (savedLayout) {
+                console.log('Restoring layout for', paperId, savedLayout);
+                
+                // Apply saved position
+                paperElement.style.transform = `translate(${savedLayout.x}px, ${savedLayout.y}px)`;
+                paperElement.setAttribute('data-x', savedLayout.x.toString());
+                paperElement.setAttribute('data-y', savedLayout.y.toString());
+                
+                // Apply saved size if available
+                if (savedLayout.width) paperElement.style.width = savedLayout.width + 'px';
+                if (savedLayout.height) paperElement.style.height = savedLayout.height + 'px';
+            } else {
+                // Apply initial position and size
+                paperElement.style.transform = `translate(${initialPosition.x}px, ${initialPosition.y}px)`;
+                paperElement.setAttribute('data-x', initialPosition.x.toString());
+                paperElement.setAttribute('data-y', initialPosition.y.toString());
+                
+                if (typeof initialSize.width === 'number') {
+                    paperElement.style.width = initialSize.width + 'px';
+                }
+                if (typeof initialSize.height === 'number') {
+                    paperElement.style.height = initialSize.height + 'px';
+                }
+            }
+        }
+    });
+
+    // Handle auto-resize for textareas
+    function handleTextareaInput(event: Event) {
+        if (autoResize && event.target instanceof HTMLTextAreaElement) {
+            autoResizePaper(event.target, dragHandle, tabName);
+        }
+    }
+</script>
+
+<div 
+    bind:this={paperElement}
+    class="torn-paper-wrapper {cardVariant} paper-card {additionalClasses}"
+    data-x="0" 
+    data-y="0" 
+    data-paper-id={paperId}
+    style="--min-width: {minSize.width}px; --min-height: {minSize.height}px;"
+>
+    <div class="paper-content" bind:this={contentElement}>
+        {#if header}
+            <div class="paper-header">
+                <div class="paper-label">{header}</div>
+                {#if draggable}
+                    <div class="drag-handle" title="Dra för att flytta">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="12" r="1"></circle>
+                            <circle cx="9" cy="5" r="1"></circle>
+                            <circle cx="9" cy="19" r="1"></circle>
+                            <circle cx="15" cy="12" r="1"></circle>
+                            <circle cx="15" cy="5" r="1"></circle>
+                            <circle cx="15" cy="19" r="1"></circle>
+                        </svg>
+                    </div>
+                {/if}
+            </div>
+        {/if}
+        
+        <div class="paper-body" oninput={handleTextareaInput}>
+            {@render children?.()}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Paper card container */
+    .paper-card {
+        cursor: default;
+        user-select: none;
+        position: relative;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        min-width: var(--min-width, 250px);
+        min-height: var(--min-height, 120px);
+        border: 3px solid transparent;
+        border-radius: 4px;
+        width: fit-content;
+        max-width: 450px;
+    }
+
+    .paper-card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+
+    .paper-card:active,
+    .paper-card.dragging,
+    .paper-card.resizing {
+        z-index: 20;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Paper content container */
+    .paper-content {
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+        pointer-events: auto;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Paper header with label and drag handle */
+    .paper-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: move;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 4px 4px 0 0;
+        transition: background-color 0.2s ease;
+        flex-shrink: 0;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    :global(.dark) .paper-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .paper-header:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    :global(.dark) .paper-header:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .paper-label {
+        pointer-events: none;
+        font-family: var(--form-labels), serif;
+        font-weight: bold;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        flex-grow: 1;
+    }
+
+    :global(.dark) .paper-label {
+        color: var(--color-surface-100);
+    }
+
+    .drag-handle {
+        color: var(--color-surface-400);
+        opacity: 0.7;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+    }
+
+    .drag-handle:hover,
+    .paper-header:hover .drag-handle {
+        opacity: 1;
+        color: var(--color-primary-600);
+    }
+
+    /* Paper body content */
+    .paper-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0; /* Allow flexible sizing */
+    }
+
+    /* Global styles for inputs and textareas inside paper cards */
+    .paper-card :global(.paper-input) {
+        width: 100%;
+        border: none;
+        background: transparent;
+        font-size: 1rem;
+        padding: 0.5rem 0;
+        box-sizing: border-box;
+        font-family: var(--font-user), sans-serif;
+        color: var(--color-surface-900);
+    }
+
+    .paper-card :global(.paper-textarea) {
+        width: 100%;
+        border: none;
+        background: transparent;
+        font-size: 1rem;
+        padding: 0.5rem 0;
+        resize: none;
+        box-sizing: border-box;
+        flex: 1;
+        min-height: 3rem;
+        font-family: var(--font-user), sans-serif;
+        color: var(--color-surface-900);
+    }
+
+    :global(.dark) .paper-card :global(.paper-input),
+    :global(.dark) .paper-card :global(.paper-textarea) {
+        color: var(--color-surface-100);
+    }
+
+    .paper-card :global(.paper-input:focus),
+    .paper-card :global(.paper-textarea:focus) {
+        outline: none;
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.25rem;
+    }
+
+    .paper-card :global(.paper-input::placeholder),
+    .paper-card :global(.paper-textarea::placeholder) {
+        color: var(--color-surface-500);
+        font-style: italic;
+    }
+
+    :global(.dark) .paper-card :global(.paper-input::placeholder),
+    :global(.dark) .paper-card :global(.paper-textarea::placeholder) {
+        color: var(--color-surface-400);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .paper-card {
+            min-width: 280px;
+            max-width: 100%;
+        }
+
+        .paper-content {
+            padding: 0.75rem;
+        }
+
+        .paper-label {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .paper-card {
+            min-width: 250px;
+        }
+
+        .paper-content {
+            padding: 0.5rem;
+        }
+
+        .paper-header {
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>

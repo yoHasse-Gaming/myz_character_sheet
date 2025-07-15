@@ -16,6 +16,7 @@
 * [ ] - Finish all tabs so they are usable.
 * [ ] - Make sure character data is saved and loaded correctly.
 * [ ] - Add grouping for all paper-items. Like beeing able to group papers together and have them move together.
+* [ ] - Add a "lock" to be able to lock the layout of the papers so they can't be moved.
 
 # TODO next:
 * [x] Add weapon from weapon.json

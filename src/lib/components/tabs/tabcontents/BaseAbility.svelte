@@ -115,20 +115,7 @@
             name={baseAbility.label} 
             value={ability?.value || 1}
             oninput={handleValueChange} />
-        {#if diceStates.isDicePluginAvailable}
-        <button 
-            class="dice-roll-button"
-            onclick={() => rollForAbility()}
-            aria-label="Slå tärning för {baseAbility.label}"
-            title="Slå tärning för {baseAbility.label}"
-        >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="9" cy="9" r="1"></circle>
-                <circle cx="15" cy="15" r="1"></circle>
-            </svg>
-        </button>
-        {/if}
+
         
         <div class="damage-section">
             <div class="damage-header">
@@ -145,6 +132,20 @@
                         <path d="M9,9h6"></path>
                     </svg>
                 </button>
+                {#if diceStates.isDicePluginAvailable}
+                <button 
+                    class="info-icon-button"
+                    onclick={() => rollForAbility()}
+                    aria-label="Slå tärning för {baseAbility.label}"
+                    title="Slå tärning för {baseAbility.label}"
+                >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="9" cy="9" r="1"></circle>
+                        <circle cx="15" cy="15" r="1"></circle>
+                    </svg>
+                </button>
+                {/if}
             </div>
             <div class="damage-indicators">
                 {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}

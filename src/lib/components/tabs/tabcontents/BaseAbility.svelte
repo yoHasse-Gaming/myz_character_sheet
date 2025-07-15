@@ -9,6 +9,7 @@
     import { onMount } from 'svelte';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import type { AbilityType, BaseAbilityType } from '../../../types';
+    import PaperCard from '../../PaperCard.svelte';
     
 
     let { 
@@ -92,139 +93,85 @@
     });
 </script>
 
+<PaperCard 
+    paperId={baseAbility.type}
+    tabName={'skillsTab'}
+    >
+    {#snippet header()}
+    <div style="">   
+    <AbilityIcon />
+    {baseAbility.label}
+    <div class="damage-header">
+        <span class="damage-label">{baseAbility.damageLabel}</span>
+        <button 
+            class="info-icon-button"
+            onclick={showTraumaInfo}
+            aria-label="Information om {baseAbility.damageLabel}"
+            title="Visa information om {baseAbility.damageLabel}"
+        >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9,9h6v6H9z"></path>
+                <path d="M9,9h6"></path>
+            </svg>
+        </button>
+    </div>
+    </div>
+    {/snippet}
 
-<div class="torn-paper-wrapper variant-{(abilityIndex % 6) + 1}">
-    <div class="base-ability-container">
-        <div class="ability-row">
-            <div class="ability-section">
-                <label for={baseAbility.label} class="ability-label">
-                    <AbilityIcon />
-                    {baseAbility.label}</label>
-                <div class="ability-controls">
-                    <input type="number" 
-                        max="10" 
-                        min="1" 
-                        class="ability-input font-user" 
-                        name={baseAbility.label} 
-                        value={ability?.value || 1}
-                        oninput={handleValueChange} />
-                    {#if diceStates.isDicePluginAvailable}
-                    <button 
-                        class="dice-roll-button"
-                        onclick={() => rollForAbility()}
-                        aria-label="Slå tärning för {baseAbility.label}"
-                        title="Slå tärning för {baseAbility.label}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="9" cy="9" r="1"></circle>
-                            <circle cx="15" cy="15" r="1"></circle>
-                        </svg>
-                    </button>
-                    {/if}
-                </div>
-            </div>
-            
+    {#snippet content()}
 
-            <div class="damage-section">
-                <div class="damage-header">
-                    <span class="damage-label">{baseAbility.damageLabel}</span>
+    <div class="ability-controls">
+        <input type="number" 
+            max="10" 
+            min="1" 
+            class="ability-input font-user" 
+            name={baseAbility.label} 
+            value={ability?.value || 1}
+            oninput={handleValueChange} />
+        {#if diceStates.isDicePluginAvailable}
+        <button 
+            class="dice-roll-button"
+            onclick={() => rollForAbility()}
+            aria-label="Slå tärning för {baseAbility.label}"
+            title="Slå tärning för {baseAbility.label}"
+        >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="9" cy="9" r="1"></circle>
+                <circle cx="15" cy="15" r="1"></circle>
+            </svg>
+        </button>
+        {/if}
+    </div>
+    
+
+    <div class="damage-section">
+
+        <div class="damage-controls">
+            <div class="damage-indicators">
+                {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}
                     <button 
-                        class="info-icon-button"
-                        onclick={showTraumaInfo}
-                        aria-label="Information om {baseAbility.damageLabel}"
-                        title="Visa information om {baseAbility.damageLabel}"
+                        class="damage-indicator"
+                        onclick={() => toggleDamage(idx)}
+                        aria-label="Toggle damage for indicator {idx + 1}"
                     >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9,9h6v6H9z"></path>
-                            <path d="M9,9h6"></path>
-                        </svg>
+                        
+                        
+                        {#if (ability?.damage || 0) > idx}
+                            <Circle size={24} fill="red"  />
+                        {:else}
+                            <Circle size={24} />
+                        {/if}
                     </button>
-                </div>
-                <div class="damage-controls">
-                    <div class="damage-indicators">
-                        {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}
-                            <button 
-                                class="damage-indicator"
-                                onclick={() => toggleDamage(idx)}
-                                aria-label="Toggle damage for indicator {idx + 1}"
-                            >
-                                
-                                
-                                {#if (ability?.damage || 0) > idx}
-                                    <Circle size={24} fill="red"  />
-                                {:else}
-                                    <Circle size={24} />
-                                {/if}
-                            </button>
-                        {/each}
-                    </div>
-                </div>
+                {/each}
             </div>
         </div>
     </div>
-</div>
-
+    {/snippet}
+</PaperCard>
+    
 <style>
-    .torn-paper-wrapper {
-        position: relative;
-        width: 100%;
-        max-width: 350px;
-        margin: 0.5rem 0;
-        padding: 0;
-        border-radius: 0;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        transform: scale(1);
-    }
-
-    .torn-paper-wrapper:hover {
-        transform: scale(1.02);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .base-ability-container {
-        position: relative;
-        width: 100%;
-        padding: 1rem;
-        z-index: 2;
-        background: transparent;
-    }
-
-    .ability-row {
-        display: flex;
-        flex-direction: row;
-        gap: 0.1rem;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .ability-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.25rem;
-        flex: 0 0 auto;
-    }
-
-    .ability-label {
-        font-family: var(--form-labels), serif;
-        font-size: 1rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--color-surface-900);
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        margin: 0;
-        position: relative;
-        z-index: 3;
-    }
-
-    :global(.dark) .ability-label {
-        color: var(--color-surface-100);
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    }
 
     .ability-input {
         width: 3rem;

@@ -5,6 +5,7 @@
     import Skills from './tabcontents/Skills.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import OptionalSkillsModal from '../Modals/OptionalSkillsModal.svelte';
+    import PaperCard from '../PaperCard.svelte';
 
     type Condition = {
         name: keyof typeof sheetState.conditions;
@@ -39,54 +40,54 @@
 </div>
 {/snippet}
 
-        <div class="properties-tab">
-            <div class="grid s:grid-cols-1 grid-cols-2 gap-4 lg:gap-6">
-                <div class="space-y-4 lg:space-y-6">
-                    <FormSection header="GRUNDEGENSKAPER">
-                        <div class="space-y-4 ">
-                            {#each sheetState.baseAbilities as ability, index}
-                                <BaseAbility
-                                    baseAbility={ability}
-                                    abilityIndex={index}
-                                    
-                                />
-                            {/each}
-                        </div>
-                    </FormSection>
-                    
-                    <FormSection header="TILLSTÅND">
-                        <div class="conditions-container">
-                            {#each conditionAndToggle as condition, index}
-                                {#if index % 2 === 0}
-                                    <div class="condition-row">
-                                        {@render conditionItem(condition)}
-                                        {#if conditionAndToggle[index + 1]}
-                                            {@render conditionItem(conditionAndToggle[index + 1])}
-                                        {/if}
-                                    </div>
-                                {/if}
-                            {/each}
-
-                            <div class="condition-row critical-injuries">
-                                <div class="condition-item critical-item">
-                                    <span class="condition-label critical-label">Kritiska skador:</span>
-                                    <input 
-                                        type="text" 
-                                        class="critical-input font-user" 
-                                        placeholder="Beskrivning av allvarliga skador..." 
-                                        bind:value={sheetState.criticalInjuries} 
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </FormSection>
+    <div class="properties-tab">
+        {#each sheetState.baseAbilities as ability, index}
+            <BaseAbility
+                baseAbility={ability}
+                abilityIndex={index}
+                
+            />
+        {/each}
+        
+            <PaperCard 
+                paperId="conditions"
+                tabName={'skillsTab'}> 
+                {#snippet header()}
+                <div class="conditions-header">
+                    <h3 class="conditions-title">Tillstånd</h3>
                 </div>
-                <div >
-                    <FormSection header="FÄRDIGHETER">
-                        <Skills />
-                    </FormSection>
+                {/snippet}
+                
+                {#snippet content()}
+                                    <div class="conditions-container">
+                {#each conditionAndToggle as condition, index}
+                    {#if index % 2 === 0}
+                        <div class="condition-row">
+                            {@render conditionItem(condition)}
+                            {#if conditionAndToggle[index + 1]}
+                                {@render conditionItem(conditionAndToggle[index + 1])}
+                            {/if}
+                        </div>
+                    {/if}
+                {/each}
+
+                <div class="condition-row critical-injuries">
+                    <div class="condition-item critical-item">
+                        <span class="condition-label critical-label">Kritiska skador:</span>
+                        <input 
+                            type="text" 
+                            class="critical-input font-user" 
+                            placeholder="Beskrivning av allvarliga skador..." 
+                            bind:value={sheetState.criticalInjuries} 
+                        />
+                    </div>
                 </div>
             </div>
+            {/snippet}
+
+            </PaperCard>
+
+            <Skills />
         </div>
 
         <style>

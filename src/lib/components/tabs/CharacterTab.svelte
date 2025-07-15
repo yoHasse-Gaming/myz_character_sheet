@@ -5,6 +5,7 @@
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { characterActions } from '../../states/character_sheet.svelte';
     import { autoResizePaper, debouncedAutoResize, getMinHeightForContent, initInteractForElement, throttledSaveLayout } from '../../utils/interactjsUtils';
+    import PaperCard from '../PaperCard.svelte';
 
     let formData = {
         name: '',
@@ -93,89 +94,105 @@
     </div>
     
     <div class="character-papers-container">
-        <!-- Name Field -->
-        <div class="character-item-wrapper" style="top: 20px; left: 20px;">
-            <div class="torn-paper-wrapper {nameVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-name">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="name" class="character-label">Namn</label>
-                    </div>
-                    <input type="text" 
-                        class="torn-input font-user character-input" 
-                        data-tooltip="Vad kallar dig de andra överlevarna?" 
-                        id="name" 
-                        data-placement="bottom" 
-                        placeholder="t.ex. Rust, Echo, Zero..." 
-                        bind:value={formData.name} />
-                </div>
-            </div>
-        </div>
 
-        <!-- Job Field -->
-        <div class="character-item-wrapper" style="top: 20px; left: 350px;">
-            <div class="torn-paper-wrapper {jobVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-job">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="job" class="character-label">Syssla</label>
-                    </div>
-                    <div class="torn-paper-wrapper">
-                    <input type="text" 
-                        class="torn-input font-user character-input" 
-                        id="job" 
-                        placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
-                        bind:value={formData.job} />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <PaperCard 
+                paperId="character-name"
+                tabName="characterTab"
+            >
+            {#snippet header()}
+            Namn
+            {/snippet}
+            {#snippet content()}
+            <div class="torn-paper-wrapper">
+            <textarea
+                data-tooltip="Vad kallar dig de andra överlevarna?" 
+                id="name" 
+                data-placement="bottom" 
+                placeholder="t.ex. Rust, Echo, Zero..." 
+                bind:value={formData.name} > </textarea>
 
-        <!-- Face Field -->
-        <div class="character-item-wrapper" style="top: 200px; left: 50px;">
-            <div class="torn-paper-wrapper {faceVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-face">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="face" class="character-label">Ansikte</label>
-                    </div>
-                    <textarea 
-                        class="torn-input font-user character-textarea" 
-                        placeholder="Ärrat, väderbitit, maskerat..." 
-                        bind:value={formData.appearance.face}
-                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement, '.character-header', 'characterTab')}></textarea>
-                </div>
             </div>
-        </div>
+            {/snippet}
 
-        <!-- Body Field -->
-        <div class="character-item-wrapper" style="top: 200px; left: 400px;">
-            <div class="torn-paper-wrapper {bodyVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-body">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="body" class="character-label">Kropp</label>
-                    </div>
-                    <textarea 
-                        class="torn-input font-user character-textarea" 
-                        placeholder="Mager, muskulös, deformerad..." 
-                        bind:value={formData.appearance.body}
-                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement,'.character-header', 'characterTab')}></textarea>
-                </div>
-            </div>
-        </div>
 
-        <!-- Clothes Field -->
-        <div class="character-item-wrapper" style="top: 380px; left: 120px;">
-            <div class="torn-paper-wrapper {clothesVariant} character-paper" data-x="0" data-y="0" data-paper-id="character-clothes">
-                <div class="character-item-content">
-                    <div class="character-header">
-                        <label for="clothes" class="character-label">Kläder</label>
-                    </div>
-                    <textarea 
-                        class="torn-input font-user character-textarea" 
-                        placeholder="Lappade trasor, läder, folie..." 
-                        bind:value={formData.appearance.clothes}
-                        oninput={(e) => autoResizePaper(e.target as HTMLTextAreaElement,'.character-header', 'characterTab')}></textarea>
-                </div>
+        </PaperCard>
+
+        <PaperCard 
+            paperId="character-job"
+            tabName="characterTab"
+            >
+            {#snippet header()}
+            Syssla
+            {/snippet}
+            {#snippet content()}
+
+            <div class="torn-paper-wrapper">
+            <textarea
+                data-tooltip="Vad gör du för att överleva?" 
+                id="job" 
+                data-placement="bottom" 
+                placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
+                bind:value={formData.job} > </textarea>
             </div>
-        </div>
+            {/snippet}
+        </PaperCard>
+
+        <PaperCard 
+            paperId="character-face"
+            tabName="characterTab"
+            >
+            {#snippet header()}
+            Ansikte
+            {/snippet}
+            {#snippet content()}
+
+            <div class="torn-paper-wrapper {faceVariant}">
+                <textarea 
+                    placeholder="Ärrat, väderbitit, maskerat..." 
+                    bind:value={formData.appearance.face}></textarea>
+            </div>
+            {/snippet}
+
+
+        </PaperCard>
+
+        <PaperCard 
+            paperId="character-body"
+            
+            tabName="characterTab"
+            >
+            {#snippet header()}
+            Kropp
+            {/snippet}
+
+            {#snippet content()}
+
+            <div class="torn-paper-wrapper {bodyVariant}">
+                <textarea 
+                    placeholder="Mager, muskulös, deformerad..." 
+                    bind:value={formData.appearance.body}></textarea>
+            </div>
+            {/snippet}
+        </PaperCard>
+
+        <PaperCard 
+            paperId="character-clothes"
+        
+            tabName="characterTab"
+            >
+            {#snippet header()}
+            Kläder
+            {/snippet}
+            {#snippet content()}
+
+            <div class="torn-paper-wrapper {clothesVariant}">
+                <textarea 
+                    placeholder="Lappade trasor, läder, folie..." 
+                    bind:value={formData.appearance.clothes}></textarea>
+            </div>
+            {/snippet}
+        </PaperCard>
+
     </div>
 </div>
 

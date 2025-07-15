@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, type Snippet } from 'svelte';
     import { generateUniqueVariants } from '../utils/styleUtils';
     import { autoResizePaper, initInteractForElement, type TabName } from '../utils/interactjsUtils';
     import { characterActions } from '../states/character_sheet.svelte';
+    import type { Icon as IconType } from '@lucide/svelte';
 
     // Props
     let {
@@ -15,8 +16,9 @@
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
         minSize = { width: 250, height: 120 },
-        header = '',
-        children,
+        header = undefined,
+        HeaderIcon = undefined,
+        content,
         autoResize = false,
         class: additionalClasses = ''
     }: {
@@ -29,8 +31,9 @@
         initialPosition?: { x: number; y: number };
         initialSize?: { width: string | number; height: string | number };
         minSize?: { width: number; height: number };
-        header?: string;
-        children?: any;
+        header?: Snippet;
+        HeaderIcon?: typeof IconType;
+        content?: Snippet;
         autoResize?: boolean;
         class?: string;
     } = $props();
@@ -98,24 +101,14 @@
     <div class="paper-content" bind:this={contentElement}>
         {#if header}
             <div class="paper-header">
-                <div class="paper-label">{header}</div>
-                {#if draggable}
-                    <div class="drag-handle" title="Dra för att flytta">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="9" cy="12" r="1"></circle>
-                            <circle cx="9" cy="5" r="1"></circle>
-                            <circle cx="9" cy="19" r="1"></circle>
-                            <circle cx="15" cy="12" r="1"></circle>
-                            <circle cx="15" cy="5" r="1"></circle>
-                            <circle cx="15" cy="19" r="1"></circle>
-                        </svg>
-                    </div>
-                {/if}
+                <div class="paper-label">
+                    {@render header?.()}
+                </div>
             </div>
         {/if}
         
         <div class="paper-body" oninput={handleTextareaInput}>
-            {@render children?.()}
+            {@render content?.()}
         </div>
     </div>
 </div>
@@ -177,19 +170,7 @@
         flex-shrink: 0;
         transform: translateZ(0);
         backface-visibility: hidden;
-    }
-
-    :global(.dark) .paper-header {
         border-bottom-color: rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.02);
-    }
-
-    .paper-header:hover {
-        background: rgba(0, 0, 0, 0.05);
-    }
-
-    :global(.dark) .paper-header:hover {
-        background: rgba(255, 255, 255, 0.05);
     }
 
     .paper-label {
@@ -205,21 +186,6 @@
 
     :global(.dark) .paper-label {
         color: var(--color-surface-100);
-    }
-
-    .drag-handle {
-        color: var(--color-surface-400);
-        opacity: 0.7;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        pointer-events: none;
-    }
-
-    .drag-handle:hover,
-    .paper-header:hover .drag-handle {
-        opacity: 1;
-        color: var(--color-primary-600);
     }
 
     /* Paper body content */

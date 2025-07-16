@@ -1,7 +1,7 @@
 <script lang="ts">
     import { scale } from 'svelte/transition';
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
-    import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { closeDialogueOption, isDialogueOpen, openDialogueOption } from '../../states/modals.svelte';
     import { characterActions } from '../../states/character_sheet.svelte';
     import { Modal } from "@skeletonlabs/skeleton-svelte";
     import weaponsData from '../../data/weapons.json';
@@ -58,20 +58,9 @@
 
     function selectWeapon(weapon: any) {
         if (weapon.isCustom) {
-            // Add empty weapon for custom editing
-            const newWeapon: Weapon = {
-                id: generateId(),
-                name: '',
-                description: '',
-                bonus: 0,
-                damage: 1,
-                range: 2, // SHORT
-                weight: 0,
-                equipped: false
-            };
-            
-            characterActions.addWeapon(newWeapon);
+            // Open the NewWeaponModal for custom weapon
             closeModal();
+            openDialogueOption('newWeapon');
         } else {
             // Add predefined weapon directly (will be editable in the tab)
             const newWeapon: Weapon = {

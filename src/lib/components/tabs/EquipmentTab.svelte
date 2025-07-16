@@ -5,6 +5,8 @@
     import EquipmentModal from '../Modals/EquipmentModal.svelte';
     import WeaponModal from '../Modals/WeaponModal.svelte';
     import ArmorModal from '../Modals/ArmorModal.svelte';
+    import NewEquipmentModal from '../Modals/NewEquipmentModal.svelte';
+    import NewWeaponModal from '../Modals/NewWeaponModal.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import { Backpack, BowArrow, ShieldHalf } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
@@ -127,6 +129,10 @@
 <WeaponModal />
 
 <ArmorModal />
+
+<NewEquipmentModal />
+
+<NewWeaponModal />
 
 <div class="equipment-tab">
     <!-- Draggable Add Item -->

@@ -7,6 +7,7 @@
     import { openDialogueOption } from '../../states/modals.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { initInteractForElement } from '../../utils/interactjsUtils';
+    import PaperCard from '../PaperCard.svelte';
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
@@ -25,117 +26,112 @@
     // Re-initialize InteractJS when items are added/removed
     $effect(() => {
         // Watch for changes in relations/notes length
-        sheetState.relations.length;
-        sheetState.notes.length;
+        // sheetState.relations.length;
+        // sheetState.notes.length;
         
-        // Re-setup draggable functionality when items change
-        const relationCards = document.querySelectorAll('.relation-card');
-        relationCards.forEach(card => {
-            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-                initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
-                    enableDraggable: true,
-                    enableResizable: false
-                });
-                card.setAttribute('data-interact-initialized', 'true');
-            }
-        });
+        // const relationCards = document.querySelectorAll('.relation-card');
+        // relationCards.forEach(card => {
+        //     if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+        //         initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+        //             enableDraggable: true,
+        //             enableResizable: false
+        //         });
+        //         card.setAttribute('data-interact-initialized', 'true');
+        //     }
+        // });
 
-        const noteCards = document.querySelectorAll('.note-card');
-        noteCards.forEach(card => {
-            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-                initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
-                    enableDraggable: true,
-                    enableResizable: true
-                });
-                card.setAttribute('data-interact-initialized', 'true');
-            }
-        });
+        // const noteCards = document.querySelectorAll('.note-card');
+        // noteCards.forEach(card => {
+        //     if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
+        //         initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
+        //             enableDraggable: true,
+        //             enableResizable: true
+        //         });
+        //         card.setAttribute('data-interact-initialized', 'true');
+        //     }
+        // });
     });
 
 </script>
 
-<div class="relations-notes-tab space-y-6">
-    <!-- Relations and Notes Section -->
-    <FormSection header="👥 RELATIONER & ANTECKNINGAR">
-        <div class="relations-notes-section">
-            <!-- Combined Items Grid -->
-            <div class="items-grid">
-                <!-- Relations Section -->
-                <div class="relations-section" data-drop-zone="relations">
-                    <div class="relations-grid">
-                        {#each sheetState.relations as relation, index}
-                            <div class="torn-paper-wrapper {relationVariants[index]} relation-card {relation.isClose ? 'close-relation' : ''}" 
-                                 data-x="0" 
-                                 data-y="0"
-                                 data-paper-id="relation-{relation.id}">
-                                <div class="relation-content">
-                                    <div class="relation-header">
-                                        <div class="item-type-badge relation-badge">👥</div>
-                                        <h4 class="relation-name">
-                                            {relation.name}
-                                            {#if relation.isClose}
-                                                <span class="close-badge">❤️</span>
-                                            {/if}
-                                        </h4>
-                                        <button 
-                                            class="remove-button" 
-                                            onclick={() => characterActions.removeRelation(relation.id)}
-                                            aria-label="Ta bort relation med {relation.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    {#if relation.description}
-                                        <p class="relation-description">{relation.description}</p>
-                                    {/if}
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
+<!-- Relations Section -->
+<div class="relations-section" data-drop-zone="relations">
+        {#each sheetState.relations as relation, index}
+            <PaperCard 
+                paperId={`relation-${relation.id}`}
+                tabName={'relationsNotesTab'}
+                resizable={false}
+                initialPosition={{ x: 20, y: 20 + index * 100 }}
+            >
+            {#snippet content()}
+
+                <div class="relation-content">
+                <h4 class="relation-name">
+                    {relation.name}
+                    {#if relation.isClose}
+                        <span class="close-badge">❤️</span>
+                    {/if}
+                </h4>
+                <button 
+                    class="remove-button" 
+                    onclick={() => characterActions.removeRelation(relation.id)}
+                    aria-label="Ta bort relation med {relation.name}"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                    {#if relation.description}
+                        <p class="relation-description">{relation.description}</p>
+                    {/if}
                 </div>
 
-                <!-- Notes Section -->
-                <div class="notes-section" data-drop-zone="notes">
-                    <div class="notes-grid">
-                        {#each sheetState.notes as note, index}
-                            <div class="torn-paper-wrapper {noteVariants[index]} note-card" 
-                                 data-x="0" 
-                                 data-y="0"
-                                 data-paper-id="note-{index}">
-                                <div class="note-content">
-                                    <div class="note-header">
-                                        <div class="item-type-badge note-badge">📝</div>
-                                        <span class="note-number">Anteckning #{index + 1}</span>
-                                        <button 
-                                            class="remove-button" 
-                                            onclick={() => characterActions.removeNote(index)}
-                                            aria-label="Ta bort anteckning #{index + 1}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <textarea 
-                                        class="note-text font-user"
-                                        rows="4"
-                                        value={note}
-                                        placeholder="Skriv din anteckning här..."
-                                        oninput={(e) => updateNote(index, e)}
-                                    ></textarea>
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </FormSection>
+            {/snippet}
+        </PaperCard>
+
+        {/each}
 </div>
+
+<!-- Notes Section -->
+<div class="notes-section" data-drop-zone="notes">
+        {#each sheetState.notes as note, index}
+        <PaperCard 
+            paperId={`note-${index}`}
+            tabName={'relationsNotesTab'}
+            resizable={true}
+            initialPosition={{ x: 20, y: 20 + (sheetState.relations.length * 100) + (index * 100) }}
+            >
+            {#snippet content()}
+
+                <div class="note-content">
+                    <div class="note-header">
+                        <div class="item-type-badge note-badge">📝</div>
+                        <span class="note-number">Anteckning #{index + 1}</span>
+                        <button 
+                            class="remove-button" 
+                            onclick={() => characterActions.removeNote(index)}
+                            aria-label="Ta bort anteckning #{index + 1}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <textarea 
+                        class="note-text font-user"
+                        rows="4"
+                        value={note}
+                        placeholder="Skriv din anteckning här..."
+                        oninput={(e) => updateNote(index, e)}
+                    ></textarea>
+                </div>
+            {/snippet}
+        </PaperCard>
+        {/each}
+</div>
+
 
 <!-- Floating Draggable Add Items -->
 <DraggableAddItem 

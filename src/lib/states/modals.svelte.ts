@@ -2,7 +2,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import type { DiceRollConfig } from './dice.svelte';
 
 // Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes' | 'diceRoll';
+export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes' | 'diceRoll' | 'newEquipment' | 'newWeapon' | 'newArmor';
 
 // Info modal state to hold content
 export const infoModalState = $state({
@@ -41,7 +41,10 @@ const openDialogue = new SvelteMap<DialogueOption, boolean>([
     ['armor', false],
     ['relations', false],
     ['notes', false],
-    ['diceRoll', false]
+    ['diceRoll', false],
+    ['newEquipment', false],
+    ['newWeapon', false],
+    ['newArmor', false]
 ]);
 
 // Convert to reactive state

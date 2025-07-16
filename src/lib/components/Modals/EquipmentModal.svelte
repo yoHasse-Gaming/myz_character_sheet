@@ -1,7 +1,7 @@
 <script lang="ts">
     import { scale } from 'svelte/transition';
     import { generateUniqueVariants, generateRandomRotations } from '../../utils/styleUtils';
-    import { closeDialogueOption, isDialogueOpen } from '../../states/modals.svelte';
+    import { closeDialogueOption, isDialogueOpen, openDialogueOption } from '../../states/modals.svelte';
     import { characterActions } from '../../states/character_sheet.svelte';
     import { Modal } from "@skeletonlabs/skeleton-svelte";
     import itemsData from '../../data/items.json';
@@ -63,18 +63,9 @@
 
     function selectEquipment(equipment: any) {
         if (equipment.isCustom) {
-            // Add empty equipment for custom editing
-            const newEquipment: Equipment = {
-                id: generateId(),
-                name: '',
-                description: '',
-                quantity: 1,
-                weight: 0,
-                bonuses: []
-            };
-            
-            characterActions.addEquipment(newEquipment);
+            // Open the NewEquipmentModal for custom equipment
             closeModal();
+            openDialogueOption('newEquipment');
         } else {
             // Add predefined equipment directly (will be editable in the tab)
             // Convert bonuses from items.json format to Equipment type format

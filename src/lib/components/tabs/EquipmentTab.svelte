@@ -372,6 +372,8 @@
         border: 1px solid var(--color-border);
         border-radius: 3px;
         background: var(--color-background);
+        pointer-events: auto; /* Allow interaction with input */
+        cursor: text;
     }
 
     /* Weapon styles */
@@ -389,6 +391,7 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        pointer-events: none;
     }
 
     .weapon-controls {
@@ -412,6 +415,7 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        pointer-events: none;
     }
 
     .armor-controls {
@@ -427,6 +431,7 @@
         gap: 0.25rem;
         font-size: 0.7rem;
         cursor: pointer;
+        pointer-events: auto;
     }
 
     .equipped-label {
@@ -440,6 +445,7 @@
         cursor: pointer;
         opacity: 0.7;
         transition: opacity 0.2s;
+        pointer-events: auto;
     }
 
     .info-icon-button:hover {
@@ -456,6 +462,7 @@
         color: var(--color-danger);
         opacity: 0.7;
         transition: opacity 0.2s;
+        pointer-events: auto;
     }
 
     .remove-equipment-button:hover, 

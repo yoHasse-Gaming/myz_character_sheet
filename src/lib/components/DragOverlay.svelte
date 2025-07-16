@@ -12,7 +12,7 @@
         {
             id: 'equipment-general',
             text: 'Lägg till utrustning',
-            selector: '[data-drop-zone="equipment"], .equipment-section',
+            selector: '[data-drop-zone="equipment"]',
             action: () => openDialogueOption('equipment')
         },
         {

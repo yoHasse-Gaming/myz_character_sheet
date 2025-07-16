@@ -74,6 +74,7 @@ export const sheetState = $state({
         talentsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
         mutationsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
         relationsNotesTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
+        equipmentTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
     }
 });
 

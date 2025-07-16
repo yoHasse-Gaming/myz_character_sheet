@@ -5,7 +5,7 @@
     import DiceRollModal from './lib/components/Modals/DiceRollModal.svelte';
     import DragOverlay from './lib/components/DragOverlay.svelte';
     import { onMount } from 'svelte';
-    import Tabs from './lib/components/Tabs.svelte';
+    import PanZoomContainer from './lib/components/PanZoomContainer.svelte';
     import SvgContent from './lib/components/contents/SvgContent.svelte';
     import ThemeSelector from './lib/components/ThemeSelector.svelte';
     import SizeSelector from './lib/components/SizeSelector.svelte';
@@ -64,7 +64,7 @@ TODO: Use this instead of the AppBar component
 <main class="sheet-container">
 
 <SvgContent />
-<Tabs />
+<PanZoomContainer />
 
 </main>
 

@@ -134,15 +134,14 @@
 
 <NewWeaponModal />
 
-<div class="equipment-tab">
     <!-- Draggable Add Item -->
-    <DraggableAddItem 
+    <!-- <DraggableAddItem 
         text="Dra för att lägga till"
         ariaLabel="Dra för att lägga till föremål"
         variant={addItemVariant}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-    />
+    /> -->
 
     <!-- Equipment Section -->
     <div class="equipment-section" data-drop-zone="equipment">
@@ -150,7 +149,7 @@
         {#each sheetState.equipment as item, index}
             <PaperCard
                 paperId={`equipment-${item.id}`}
-                tabName="equipmentTab"
+
                 variant={equipmentVariants[index % equipmentVariants.length]}
                 draggable={true}
                 resizable={false}
@@ -201,7 +200,7 @@
             <!-- Total weight display -->
             <!-- <PaperCard
                 paperId="equipment-total"
-                tabName="equipmentTab"
+
                 draggable={false}
                 resizable={false}
                 initialPosition={{ x: 20, y: 20 + Math.ceil(sheetState.equipment.length / 3) * 80 + 20 }}
@@ -220,7 +219,7 @@
             {#each sheetState.weapons as weapon, index}
                 <PaperCard
                     paperId={`weapon-${weapon.id}`}
-                    tabName="equipmentTab"
+
                     variant={weaponVariants[index % weaponVariants.length]}
                     draggable={true}
                     resizable={false}
@@ -273,7 +272,7 @@
             {#each sheetState.armor as armor, index}
                 <PaperCard
                     paperId={`armor-${armor.id}`}
-                    tabName="equipmentTab"
+
                     variant={armorVariants[index % armorVariants.length]}
                     draggable={true}
                     resizable={false}
@@ -320,20 +319,12 @@
                 </PaperCard>
             {/each}
         </div>
-</div>
 
 <!-- Drag Overlay -->
 
 
 
 <style>
-    .equipment-tab {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        position: relative;
-    }
-
     /* Section containers for better drop zone targeting */
     .equipment-section,
     .weapons-section,

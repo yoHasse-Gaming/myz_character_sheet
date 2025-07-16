@@ -38,69 +38,54 @@
 </div>
 {/snippet}
 
-<div class="properties-tab" data-drop-zone="skills">
-    {#each sheetState.baseAbilities as ability, index}
-    <BaseAbility
-        baseAbility={ability}
-        abilityIndex={index}
-        initialPosition={{ x: 20, y: 20 + index * 100 }}
-    />
-    {/each}
-    
-    <PaperCard 
-        paperId="conditions"
-        tabName={'skillsTab'}
-        resizable={false}
-        initialPosition={{ x: 20, y: sheetState.baseAbilities.length * 100 + 20 }}
-        > 
-        {#snippet header()}
-        <div class="conditions-header">
-            <h3 class="conditions-title">Tillstånd</h3>
-        </div>
-        {/snippet}
-        
-        {#snippet content()}
-        <div class="conditions-container">
-        {#each conditionAndToggle as condition, index}
-            {#if index % 2 === 0}
-                <div class="condition-row">
-                    {@render conditionItem(condition)}
-                    {#if conditionAndToggle[index + 1]}
-                        {@render conditionItem(conditionAndToggle[index + 1])}
-                    {/if}
-                </div>
-            {/if}
-        {/each}
-        <span class="">Kritiska skador:</span>
-        <div class="torn-paper-wrapper">
-            <textarea 
-                class="critical-input font-user" 
-                placeholder="Beskrivning av allvarliga skador..." 
-                bind:value={sheetState.criticalInjuries} 
-            ></textarea>
-        </div>
+{#each sheetState.baseAbilities as ability, index}
+<BaseAbility 
+    baseAbility={ability}
+    abilityIndex={index}
+    initialPosition={{ x: 20, y: 20 + index * 100 }}
+/>
+{/each}
+
+<PaperCard 
+    paperId="conditions"
+
+    resizable={false}
+    initialPosition={{ x: 20, y: sheetState.baseAbilities.length * 100 + 20 }}
+    > 
+    {#snippet header()}
+    <div class="conditions-header">
+        <h3 class="conditions-title">Tillstånd</h3>
     </div>
     {/snippet}
-
-    </PaperCard>
-
-    <Skills />
+    
+    {#snippet content()}
+    <div class="conditions-container">
+    {#each conditionAndToggle as condition, index}
+        {#if index % 2 === 0}
+            <div class="condition-row">
+                {@render conditionItem(condition)}
+                {#if conditionAndToggle[index + 1]}
+                    {@render conditionItem(conditionAndToggle[index + 1])}
+                {/if}
+            </div>
+        {/if}
+    {/each}
+    <span class="">Kritiska skador:</span>
+    <div class="torn-paper-wrapper">
+        <textarea 
+            class="critical-input font-user" 
+            placeholder="Beskrivning av allvarliga skador..." 
+            bind:value={sheetState.criticalInjuries} 
+        ></textarea>
+    </div>
 </div>
+{/snippet}
+
+</PaperCard>
+
+<Skills />
 
 <style>
-    .properties-tab {
-        position: relative;
-        width: 100%;
-        height: 100vh;
-        overflow: visible;
-    }
-
-    /* Make all PaperCard components positioned absolutely within this tab */
-    .properties-tab :global(.paper-card) {
-        position: absolute;
-        width: auto;
-        height: auto;
-    }
 
     .conditions-container {
                 display: flex;

@@ -3,7 +3,7 @@
 
 import { BicepsFlexed, Brain, UsersRound, VenetianMask } from '@lucide/svelte';
 import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType } from '../types';
-import type { LayoutType, TabName } from '../utils/interactjsUtils';
+import type { LayoutType } from '../utils/interactjsUtils';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 import skills from '../data/skills.json';
 import { openDiceRollModal } from '../states/modals.svelte';
@@ -68,14 +68,7 @@ export const sheetState = $state({
     notes: [] as string[],
     
     // Paper layout data for preserving positions and sizes across tab switches
-    paperLayouts: {
-        characterTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        skillsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        talentsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        mutationsTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        relationsNotesTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>,
-        equipmentTab: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
-    }
+    paperLayouts: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
 });
 
 // Helper functions for managing the state
@@ -374,25 +367,16 @@ export const characterActions = {
     },
     
     // Paper layout management
-    savePaperLayout(tabName: TabName, paperId: string, layout: LayoutType) {
-        sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts][paperId] = layout;
+    savePaperLayout(paperId: string, layout: LayoutType) {
+        sheetState.paperLayouts[paperId] = layout;
     },
     
-    getPaperLayout(tabName: TabName, paperId: string) {
-        const layouts = sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts];
-        return layouts ? layouts[paperId] || null : null;
+    getPaperLayout(paperId: string) {
+        return sheetState.paperLayouts[paperId] || null;
     },
     
-    clearPaperLayouts(tabName?: TabName) {
-        if (tabName) {
-            sheetState.paperLayouts[tabName as keyof typeof sheetState.paperLayouts] = {};
-        } else {
-            sheetState.paperLayouts.characterTab = {};
-            sheetState.paperLayouts.skillsTab = {};
-            sheetState.paperLayouts.talentsTab = {};
-            sheetState.paperLayouts.mutationsTab = {};
-            sheetState.paperLayouts.relationsNotesTab = {};
-        }
+    clearPaperLayouts() {
+        sheetState.paperLayouts = {};
     },
 
     // Dice rolling functions

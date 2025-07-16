@@ -43,7 +43,7 @@
             if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
                 card.setAttribute('data-interact-initialized', 'true');
 
-                initInteractForElement(card, 'talentsTab', undefined, undefined, {
+                initInteractForElement(card, undefined, undefined, {
                     enableDraggable: true,
                     enableResizable: true
                 });
@@ -60,128 +60,117 @@
 <TalentsModal modalType="occupational" />
 <TalentsModal modalType="generic" />
 
-<div class="talents-tab">
     <!-- Draggable Add Item -->
-    <DraggableAddItem 
+    <!-- <DraggableAddItem 
         text="Dra för talanger"
         ariaLabel="Dra för att lägga till talanger"
         variant="variant-4"
-    />
+    /> -->
 
     <!-- Occupational Talents Section -->
-    <div class="talents-section" data-drop-zone="occupational-talents">
-            <div class="talents-list">
-                {#each occupationalTalents as talent, index}
-                <PaperCard
-                    paperId={`occupational-talent-${talent.id}`}
-                    tabName="talentsTab"
-                    draggable={true}
-                    resizable={false}
-                    minSize={{ width: 250, height: 60 }}
-                    class="p-1 pt-3"
-                    >
-                
-                {#snippet content()}
-                    <div class="talent-content">
-                        <span class="talent-name">{talent.name}</span>
-                        <div class="talent-controls-right">
-                        <button 
-                            class="info-icon-button"
-                            onclick={() => showTalentInfo(talent)}
-                            aria-label="Information om {talent.name}"
-                            title="Visa information om {talent.name}"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9,9h6v6H9z"></path>
-                                <path d="M9,9h6"></path>
-                            </svg>
-                        </button>
-                        <button
-                            class="remove-talent-button"
-                            onclick={() => removeTalent(talent.id)}
-                            aria-label="Ta bort {talent.name}"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    </div>
-                {/snippet}
-                
-                </PaperCard>
+<div class="talents-section" data-drop-zone="occupational-talents">
+        <div class="talents-list">
+            {#each occupationalTalents as talent, index}
+            <PaperCard
+                paperId={`occupational-talent-${talent.id}`}
 
-                {/each}
-                
-            </div>
-    </div>
-
-    <!-- Generic Talents Section -->
-    <div class="talents-section" data-drop-zone="generic-talents">
-            <!-- <div class="talent-info">
-                <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
-            </div> -->
+                draggable={true}
+                resizable={false}
+                minSize={{ width: 250, height: 60 }}
+                class="p-1 pt-3"
+                >
             
-            <div class="talents-list">
-                {#each genericTalents as talent, index}
-                <PaperCard
-                    paperId={`generic-talent-${talent.id}`}
-                    tabName="talentsTab"
-                    draggable={true}
-                    resizable={false}
-                    minSize={{ width: 250, height: 60 }}
-                    class="p-1 pt-3"
-                    >
-                {#snippet content()}
+            {#snippet content()}
                 <div class="talent-content">
                     <span class="talent-name">{talent.name}</span>
                     <div class="talent-controls-right">
-                        <button 
-                            class="info-icon-button"
-                            onclick={() => showTalentInfo(talent)}
-                            aria-label="Information om {talent.name}"
-                            title="Visa information om {talent.name}"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9,9h6v6H9z"></path>
-                                <path d="M9,9h6"></path>
-                            </svg>
-                        </button>
-                        <button
-                            class="remove-talent-button"
-                            onclick={() => removeTalent(talent.id)}
-                            aria-label="Ta bort {talent.name}"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
+                    <button 
+                        class="info-icon-button"
+                        onclick={() => showTalentInfo(talent)}
+                        aria-label="Information om {talent.name}"
+                        title="Visa information om {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9,9h6v6H9z"></path>
+                            <path d="M9,9h6"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="remove-talent-button"
+                        onclick={() => removeTalent(talent.id)}
+                        aria-label="Ta bort {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                {/snippet}
-                
+                </div>
+            {/snippet}
+            
+            </PaperCard>
 
-                </PaperCard>
-                {/each}
-                
+            {/each}
+            
+        </div>
+</div>
+
+    <!-- Generic Talents Section -->
+<div class="talents-section" data-drop-zone="generic-talents">
+        <!-- <div class="talent-info">
+            <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
+        </div> -->
+        
+        <div class="talents-list">
+            {#each genericTalents as talent, index}
+            <PaperCard
+                paperId={`generic-talent-${talent.id}`}
+
+                draggable={true}
+                resizable={false}
+                minSize={{ width: 250, height: 60 }}
+                class="p-1 pt-3"
+                >
+            {#snippet content()}
+            <div class="talent-content">
+                <span class="talent-name">{talent.name}</span>
+                <div class="talent-controls-right">
+                    <button 
+                        class="info-icon-button"
+                        onclick={() => showTalentInfo(talent)}
+                        aria-label="Information om {talent.name}"
+                        title="Visa information om {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9,9h6v6H9z"></path>
+                            <path d="M9,9h6"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="remove-talent-button"
+                        onclick={() => removeTalent(talent.id)}
+                        aria-label="Ta bort {talent.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
-    </div>
+            {/snippet}
+            
+
+            </PaperCard>
+            {/each}
+            
+        </div>
 </div>
 
 <style>
-    .talents-tab {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        width: 100%;
-        min-height: 100vh;
-
-    }
-
     .talents-section {
         width: 100%;
         min-height: 200px;

@@ -213,16 +213,13 @@
                     // Try to find equipment sections by data attribute or class
                     if (zone.id === 'equipment-general') {
                         element = document.querySelector('[data-drop-zone="equipment"]') ||
-                                 document.querySelector('.equipment-section') ||
-                                 document.querySelector('.equipment-tab') as HTMLElement;
+                                 document.querySelector('.equipment-section') as HTMLElement;
                     } else if (zone.id === 'weapons') {
                         element = document.querySelector('[data-drop-zone="weapons"]') ||
-                                 document.querySelector('.weapons-section') ||
-                                 document.querySelector('.equipment-tab') as HTMLElement;
+                                 document.querySelector('.weapons-section') as HTMLElement;
                     } else if (zone.id === 'armor') {
                         element = document.querySelector('[data-drop-zone="armor"]') ||
-                                 document.querySelector('.armor-section') ||
-                                 document.querySelector('.equipment-tab') as HTMLElement;
+                                 document.querySelector('.armor-section') as HTMLElement;
                     }
                 } else if (zone.id === 'mutations') {
                     element = document.querySelector('.mutations-list') ||
@@ -272,16 +269,13 @@
                 
                 if (zone.id === 'equipment-general') {
                     element = document.querySelector('[data-drop-zone="equipment"]') ||
-                             document.querySelector('.equipment-section') ||
-                             document.querySelector('.equipment-tab') as HTMLElement;
+                             document.querySelector('.equipment-section') as HTMLElement;
                 } else if (zone.id === 'weapons') {
                     element = document.querySelector('[data-drop-zone="weapons"]') ||
-                             document.querySelector('.weapons-section') ||
-                             document.querySelector('.equipment-tab') as HTMLElement;
+                             document.querySelector('.weapons-section')  as HTMLElement;
                 } else if (zone.id === 'armor') {
                     element = document.querySelector('[data-drop-zone="armor"]') ||
-                             document.querySelector('.armor-section') ||
-                             document.querySelector('.equipment-tab') as HTMLElement;
+                             document.querySelector('.armor-section') as HTMLElement;
                 }
             } else if (zone.id === 'mutations') {
                 // Try different mutations selectors - prioritize content area

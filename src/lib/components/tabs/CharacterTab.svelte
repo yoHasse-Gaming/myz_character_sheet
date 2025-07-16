@@ -27,7 +27,7 @@
         characterElements.forEach((element, index) => {
             const paperId = element.getAttribute('data-paper-id');
             if (paperId) {
-                const savedLayout = characterActions.getPaperLayout('characterTab', paperId);
+                const savedLayout = characterActions.getPaperLayout(paperId);
                 if (savedLayout) {
                     console.log('Restoring layout for', paperId, savedLayout);
                     const htmlElement = element as HTMLElement;
@@ -46,7 +46,7 @@
 
     function resetCharacterLayout() {
         // Clear saved layouts
-        characterActions.clearPaperLayouts('characterTab');
+        characterActions.clearPaperLayouts();
         
         // Reset all character papers to default positions and sizes
         const characterElements = document.querySelectorAll('.character-paper');
@@ -72,7 +72,6 @@
 
 
 
-<div class="character-tab">
     <!-- Reset Layout Button -->
     <div class="reset-layout-container">
         <button 
@@ -88,121 +87,106 @@
         </button>
     </div>
     
-    <div class="character-papers-container">
 
-        <PaperCard 
-                paperId="character-name"
-                tabName="characterTab"
-            >
-            {#snippet header()}
-            Namn
-            {/snippet}
-            {#snippet content()}
-            <div class="torn-paper-wrapper">
-            <textarea
-                data-tooltip="Vad kallar dig de andra överlevarna?" 
-                id="name" 
-                data-placement="bottom" 
-                placeholder="t.ex. Rust, Echo, Zero..." 
-                bind:value={formData.name} > </textarea>
-
-            </div>
-            {/snippet}
-
-
-        </PaperCard>
-
-        <PaperCard 
-            paperId="character-job"
-            tabName="characterTab"
-            >
-            {#snippet header()}
-            Syssla
-            {/snippet}
-            {#snippet content()}
-
-            <div class="torn-paper-wrapper">
-            <textarea
-                data-tooltip="Vad gör du för att överleva?" 
-                id="job" 
-                data-placement="bottom" 
-                placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
-                bind:value={formData.job} > </textarea>
-            </div>
-            {/snippet}
-        </PaperCard>
-
-        <PaperCard 
-            paperId="character-face"
-            tabName="characterTab"
-            >
-            {#snippet header()}
-            Ansikte
-            {/snippet}
-            {#snippet content()}
-
-            <div class="torn-paper-wrapper {faceVariant}">
-                <textarea 
-                    placeholder="Ärrat, väderbitit, maskerat..." 
-                    bind:value={formData.appearance.face}></textarea>
-            </div>
-            {/snippet}
-
-
-        </PaperCard>
-
-        <PaperCard 
-            paperId="character-body"
-            
-            tabName="characterTab"
-            >
-            {#snippet header()}
-            Kropp
-            {/snippet}
-
-            {#snippet content()}
-
-            <div class="torn-paper-wrapper {bodyVariant}">
-                <textarea 
-                    placeholder="Mager, muskulös, deformerad..." 
-                    bind:value={formData.appearance.body}></textarea>
-            </div>
-            {/snippet}
-        </PaperCard>
-
-        <PaperCard 
-            paperId="character-clothes"
-            autoResize={true}
-            tabName="characterTab"
-            >
-            {#snippet header()}
-            Kläder
-            {/snippet}
-            {#snippet content()}
-
-            <div class="torn-paper-wrapper {clothesVariant}">
-                <textarea 
-                    placeholder="Lappade trasor, läder, folie..." 
-                    bind:value={formData.appearance.clothes}
-                    ></textarea>
-            </div>
-            {/snippet}
-        </PaperCard>
+<PaperCard 
+        paperId="character-name"
+    >
+    {#snippet header()}
+    Namn
+    {/snippet}
+    {#snippet content()}
+    <div class="torn-paper-wrapper">
+    <textarea
+        data-tooltip="Vad kallar dig de andra överlevarna?" 
+        id="name" 
+        data-placement="bottom" 
+        placeholder="t.ex. Rust, Echo, Zero..." 
+        bind:value={formData.name} > </textarea>
 
     </div>
-</div>
+    {/snippet}
+
+
+</PaperCard>
+
+<PaperCard 
+    paperId="character-job"
+    >
+    {#snippet header()}
+    Syssla
+    {/snippet}
+    {#snippet content()}
+
+    <div class="torn-paper-wrapper">
+    <textarea
+        data-tooltip="Vad gör du för att överleva?" 
+        id="job" 
+        data-placement="bottom" 
+        placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
+        bind:value={formData.job} > </textarea>
+    </div>
+    {/snippet}
+</PaperCard>
+
+<PaperCard 
+    paperId="character-face"
+    >
+    {#snippet header()}
+    Ansikte
+    {/snippet}
+    {#snippet content()}
+
+    <div class="torn-paper-wrapper {faceVariant}">
+        <textarea 
+            placeholder="Ärrat, väderbitit, maskerat..." 
+            bind:value={formData.appearance.face}></textarea>
+    </div>
+    {/snippet}
+
+
+</PaperCard>
+
+<PaperCard 
+    paperId="character-body"
+    
+
+    >
+    {#snippet header()}
+    Kropp
+    {/snippet}
+
+    {#snippet content()}
+
+    <div class="torn-paper-wrapper {bodyVariant}">
+        <textarea 
+            placeholder="Mager, muskulös, deformerad..." 
+            bind:value={formData.appearance.body}></textarea>
+    </div>
+    {/snippet}
+</PaperCard>
+
+<PaperCard 
+    paperId="character-clothes"
+    autoResize={true}
+
+    >
+    {#snippet header()}
+    Kläder
+    {/snippet}
+    {#snippet content()}
+
+    <div class="torn-paper-wrapper {clothesVariant}">
+        <textarea 
+            placeholder="Lappade trasor, läder, folie..." 
+            bind:value={formData.appearance.clothes}
+            ></textarea>
+    </div>
+    {/snippet}
+</PaperCard>
+
 
 
 <style>
-    /* Character tab container */
-    .character-tab {
-        display: block;
-        width: 100%;
-        min-height: 100vh;
-        position: relative;
-        padding: 1rem;
-        overflow: visible; /* Allow papers to move freely */
-    }
 
     /* Reset layout button */
     .reset-layout-container {
@@ -253,7 +237,6 @@
         gap: 1rem;
         width: 100%;
         position: relative;
-        min-height: 80vh; /* Give plenty of space for dragging */
     }
 
     /* Character item wrapper */

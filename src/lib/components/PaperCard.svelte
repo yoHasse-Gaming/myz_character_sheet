@@ -1,14 +1,13 @@
 <script lang="ts">
     import { onMount, type Snippet } from 'svelte';
     import { generateUniqueVariants } from '../utils/styleUtils';
-    import { autoResizePaper, initInteractForElement, type TabName } from '../utils/interactjsUtils';
+    import { autoResizePaper, initInteractForElement } from '../utils/interactjsUtils';
     import { characterActions } from '../states/character_sheet.svelte';
     import type { Icon as IconType } from '@lucide/svelte';
 
     // Props
     let {
         paperId,
-        tabName,
         variant = '',
         draggable = true,
         resizable = true,
@@ -23,7 +22,6 @@
         class: additionalClasses = ''
     }: {
         paperId: string;
-        tabName: TabName;
         variant?: string;
         draggable?: boolean;
         resizable?: boolean;
@@ -50,7 +48,7 @@
         if (paperElement) {
             // Initialize InteractJS for draggable and resizable functionality
             if (draggable || resizable) {
-                initInteractForElement(paperElement, tabName, dragHandle, undefined, {
+                initInteractForElement(paperElement, dragHandle, undefined, {
                     enableDraggable: draggable,
                     enableResizable: resizable,
                 });
@@ -61,7 +59,7 @@
             }
 
             // Restore saved layout
-            const savedLayout = characterActions.getPaperLayout(tabName, paperId);
+            const savedLayout = characterActions.getPaperLayout(paperId);
             if (savedLayout) {
                 console.log('Restoring layout for', paperId, savedLayout);
                 
@@ -94,7 +92,7 @@
         console.log('Textarea input event:', event);
         if (autoResize && event.target instanceof HTMLTextAreaElement) {
             console.log('Auto-resizing textarea:', event.target);
-            autoResizePaper(event.target, tabName);
+            autoResizePaper(event.target);
         }
     }
 </script>

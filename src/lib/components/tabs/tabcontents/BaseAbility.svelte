@@ -95,7 +95,7 @@
 
 <PaperCard 
     paperId={baseAbility.type}
-    tabName={'skillsTab'}
+
     draggable={true}
     resizable={false}
     minSize={{ width: 250, height: 80 }}

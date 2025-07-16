@@ -59,7 +59,7 @@
         {#each sheetState.relations as relation, index}
             <PaperCard 
                 paperId={`relation-${relation.id}`}
-                tabName={'relationsNotesTab'}
+
                 resizable={false}
                 initialPosition={{ x: 20, y: 20 + index * 100 }}
             >
@@ -98,7 +98,7 @@
         {#each sheetState.notes as note, index}
         <PaperCard 
             paperId={`note-${index}`}
-            tabName={'relationsNotesTab'}
+
             resizable={true}
             initialPosition={{ x: 20, y: 20 + (sheetState.relations.length * 100) + (index * 100) }}
             >
@@ -134,45 +134,19 @@
 
 
 <!-- Floating Draggable Add Items -->
-<DraggableAddItem 
+<!-- <DraggableAddItem 
     text="Dra för att lägga till"
     ariaLabel="Dra för att lägga till relation eller anteckning"
     variant="variant-3"
     dragType="add-item"
     position={{ top: 120, right: -60 }}
-/>
+/> -->
 
 <!-- Modals -->
 <RelationModal />
 
 <style>
-    .relations-notes-tab {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        height: 100vh;
-    }
 
-    .section-description {
-        font-size: 0.9rem;
-        color: var(--color-surface-600);
-        margin-bottom: 1.5rem;
-        font-style: italic;
-        line-height: 1.4;
-    }
-
-    :global(.dark) .section-description {
-        color: var(--color-surface-400);
-    }
-
-    /* Combined items grid */
-    .items-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        position: relative;
-        min-height: 100px;
-    }
 
     /* Section containers */
     .relations-section,

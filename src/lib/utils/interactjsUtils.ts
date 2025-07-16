@@ -1,11 +1,8 @@
 import interact from "interactjs";
 import { characterActions } from "../states/character_sheet.svelte";
 
-export type TabName = 'characterTab' | 'skillsTab' | 'equipmentTab' | 'mutationsTab' | 'talentsTab' | 'relationsNotesTab';
-
 export function initInteractForElement(
     element: HTMLElement | string, 
-    tabName: TabName,
     headerElem: HTMLElement | string | undefined = undefined,
     allowFrom: HTMLElement | string | undefined = undefined,
     options: {
@@ -14,7 +11,7 @@ export function initInteractForElement(
     } = { enableDraggable: true, enableResizable: true }
 ) {
 
-    console.log('Initializing Interact.js for element:', element, 'in tab:', tabName);
+    console.log('Initializing Interact.js for element:', element);
     // Initialize Interact.js for the given element
     const interactElement = interact(element);
     
@@ -39,7 +36,7 @@ export function initInteractForElement(
                     // Use throttled save for better performance
                     const paperId = target.getAttribute('data-paper-id');
                     if (paperId) {
-                        throttledSaveLayout(tabName, paperId, { x, y });
+                        throttledSaveLayout(paperId, { x, y });
                     }
                 },
                 end: (event) => {
@@ -51,8 +48,8 @@ export function initInteractForElement(
                     if (paperId) {
                         const x = parseFloat(target.getAttribute('data-x')) || 0;
                         const y = parseFloat(target.getAttribute('data-y')) || 0;
-                        const currentLayout = characterActions.getPaperLayout(tabName, paperId) || {};
-                        characterActions.savePaperLayout(tabName, paperId, {
+                        const currentLayout = characterActions.getPaperLayout(paperId) || {};
+                        characterActions.savePaperLayout(paperId, {
                             ...currentLayout,
                             x,
                             y
@@ -61,11 +58,11 @@ export function initInteractForElement(
                 }
             },
             modifiers: [
-                // Restrict dragging to within the tab-content container
-                interact.modifiers.restrictRect({
-                    restriction: '.tab-content',
-                    endOnly: true
-                })
+                // Restrict dragging to within the panzoom container
+                // interact.modifiers.restrictRect({
+                //     restriction: '.panzoom-content',
+                //     endOnly: true
+                // })
             ]
         });
     }
@@ -105,7 +102,7 @@ export function initInteractForElement(
                     // Use throttled save for better performance
                     const paperId = target.getAttribute('data-paper-id');
                     if (paperId) {
-                        throttledSaveLayout(tabName, paperId, {
+                        throttledSaveLayout(paperId, {
                             x,
                             y,
                             width: event.rect.width,
@@ -124,7 +121,7 @@ export function initInteractForElement(
                         const y = parseFloat(target.getAttribute('data-y')) || 0;
                         const width = parseFloat(target.style.width) || 0;
                         const height = parseFloat(target.style.height) || 0;
-                        characterActions.savePaperLayout(tabName, paperId, {
+                        characterActions.savePaperLayout(paperId, {
                             x,
                             y,
                             width,
@@ -170,8 +167,8 @@ export function initInteractForElement(
         height?: number;
     };
 
-    export const throttledSaveLayout = throttle((tabName: TabName, paperId: string, layout: LayoutType) => {
-        characterActions.savePaperLayout(tabName, paperId, layout);
+    export const throttledSaveLayout = throttle((paperId: string, layout: LayoutType) => {
+        characterActions.savePaperLayout(paperId, layout);
     }, 100); // Save at most every 100ms
 
     export function getMinHeightForContent(element: HTMLElement, headerElem: HTMLElement | string): number {
@@ -217,7 +214,7 @@ export function initInteractForElement(
         return Math.max(120, minHeight); // Never smaller than default minimum
     }
 
-    export function autoResizePaper(textarea: HTMLTextAreaElement, tabName: TabName) {
+    export function autoResizePaper(textarea: HTMLTextAreaElement) {
         const paper = textarea.closest('.paper-card') as HTMLElement;
         if (!paper) return;
         
@@ -243,7 +240,7 @@ export function initInteractForElement(
                     const y = parseFloat(paper.getAttribute('data-y') || '0') || 0;
                     const width = parseFloat(paper.style.width) || paper.offsetWidth;
                     
-                    characterActions.savePaperLayout(tabName, paperId, {
+                    characterActions.savePaperLayout(paperId, {
                         x,
                         y,
                         width,
@@ -260,8 +257,8 @@ export function initInteractForElement(
     }
 
         // Debounced auto-resize function to avoid excessive calls during typing
-    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement, tabName: TabName) => {
+    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement) => {
         console.log('Debounced auto-resize triggered for:', textarea);
-        autoResizePaper(textarea, tabName);
+        autoResizePaper(textarea);
     }, 150); // Wait 150ms after user stops typing
 

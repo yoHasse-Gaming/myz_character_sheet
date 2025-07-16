@@ -62,7 +62,7 @@
             if (paperId) {
                 
                 try {
-                    const savedLayout = characterActions.getPaperLayout('skillsTab', paperId);
+                    const savedLayout = characterActions.getPaperLayout(paperId);
                     if (savedLayout) {
                         console.log('Restoring layout for', paperId, savedLayout);
                         const htmlElement = element as HTMLElement;
@@ -84,7 +84,7 @@
 
     function resetSkillsLayout() {
         // Clear saved layouts
-        characterActions.clearPaperLayouts('skillsTab');
+        characterActions.clearPaperLayouts();
         
         // Reset all skill papers to default positions and sizes
         const skillElements = document.querySelectorAll('.skill-paper');
@@ -195,7 +195,7 @@
         {@const position = getInitialPosition(index)}
         <PaperCard
             paperId="skill-{index}"
-            tabName="skillsTab"
+
             draggable={true}
             resizable={false}
             initialPosition={position}
@@ -274,7 +274,7 @@
         {@const position = getInitialPosition(skillIndex)}
         <PaperCard
             paperId="optional-skill-{skill.id}"
-            tabName="skillsTab"
+
             draggable={true}
             resizable={false}
             initialPosition={position}

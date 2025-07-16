@@ -161,25 +161,13 @@
         <div class="panzoom-content" bind:this={contentElement}>
             <!-- Character Tab Content -->
             <CharacterTab />
-
             <!-- Abilities Tab Content -->
             <AbilitiesTab />
+            <Mutations />
 
-            <!-- Mutations Tab Content -->
-            <div class="talents-mutations-tab">
-                <FormSection header="MUTATIONER" headerIcon={Dna}>
-                    <Mutations />
-                </FormSection>
-            </div>
-
-            <!-- Talents Tab Content -->
-            <FormSection header="TALANGER" headerIcon={GraduationCap}>
-                <TalentsTab />
-            </FormSection>
-
+            <TalentsTab />
             <!-- Equipment Tab Content -->
             <EquipmentTab />
-
             <!-- Relations Tab Content -->
             <RelationsNotesTab />
         </div>
@@ -345,10 +333,6 @@
     }
 
     /* Override tab-specific styles */
-    :global(.character-tab) {
-        padding: 0 !important;
-        min-height: auto !important;
-    }
 
     :global(.reset-layout-container) {
         position: relative !important;

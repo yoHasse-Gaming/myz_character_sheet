@@ -213,13 +213,16 @@
                     // Try to find equipment sections by data attribute or class
                     if (zone.id === 'equipment-general') {
                         element = document.querySelector('[data-drop-zone="equipment"]') ||
-                                 document.querySelector('.equipment-section') as HTMLElement;
+                                 document.querySelector('.equipment-section') ||
+                                 document.querySelector('.equipment-tab') as HTMLElement;
                     } else if (zone.id === 'weapons') {
                         element = document.querySelector('[data-drop-zone="weapons"]') ||
-                                 document.querySelector('.weapons-section') as HTMLElement;
+                                 document.querySelector('.weapons-section') ||
+                                 document.querySelector('.equipment-tab') as HTMLElement;
                     } else if (zone.id === 'armor') {
                         element = document.querySelector('[data-drop-zone="armor"]') ||
-                                 document.querySelector('.armor-section') as HTMLElement;
+                                 document.querySelector('.armor-section') ||
+                                 document.querySelector('.equipment-tab') as HTMLElement;
                     }
                 } else if (zone.id === 'mutations') {
                     element = document.querySelector('.mutations-list') ||
@@ -269,13 +272,16 @@
                 
                 if (zone.id === 'equipment-general') {
                     element = document.querySelector('[data-drop-zone="equipment"]') ||
-                             document.querySelector('.equipment-section') as HTMLElement;
+                             document.querySelector('.equipment-section') ||
+                             document.querySelector('.equipment-tab') as HTMLElement;
                 } else if (zone.id === 'weapons') {
                     element = document.querySelector('[data-drop-zone="weapons"]') ||
-                             document.querySelector('.weapons-section') as HTMLElement;
+                             document.querySelector('.weapons-section') ||
+                             document.querySelector('.equipment-tab') as HTMLElement;
                 } else if (zone.id === 'armor') {
                     element = document.querySelector('[data-drop-zone="armor"]') ||
-                             document.querySelector('.armor-section') as HTMLElement;
+                             document.querySelector('.armor-section') ||
+                             document.querySelector('.equipment-tab') as HTMLElement;
                 }
             } else if (zone.id === 'mutations') {
                 // Try different mutations selectors - prioritize content area
@@ -377,13 +383,13 @@
         justify-content: center;
         pointer-events: none;
         
-        width: 300px;
-        height: 300px;
+        width: 400px;
+        height: 400px;
         
         transform: translate(-50%, -50%);
         
         /* Realistic white flashlight effect */
-        background: radial-gradient(circle, rgba(179, 44, 44, 0.8) 0%, transparent 60%);
+        background: radial-gradient(circle, rgba(179, 44, 44, 0.8) 0%, transparent 70%);
         
         /* Krgba(221, 54, 54, 0.8)de for realistic lighting */
         mix-blend-mode: screen;
@@ -393,9 +399,9 @@
 
     .flashlight-zone.active {
         /* Brighter and larger when active */
-        background: radial-gradient(circle, rgba(179, 44, 44, 0.8) 0%, transparent 60%);
+        background: radial-gradient(circle, rgba(179, 44, 44, 0.9) 0%, transparent 70%);
         
-        transform: translate(-50%, -50%) scale(1.01);
+        transform: translate(-50%, -50%) scale(1.1);
         
         /* Add a subtle golden tint for active state */
         filter: sepia(0.8) saturate(2) hue-rotate(10deg) brightness(1.3);

@@ -7,9 +7,9 @@
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
     import { Dna, DnaOff, Microscope, X } from '@lucide/svelte';
-    import { initInteractForElement, type TabName } from '../../utils/interactjsUtils';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
     import type { Mutation } from '../../types';
+    import PaperCard from '../PaperCard.svelte';
 
     // Generate unique variants for mutation items to make them look different
     const mutationVariants = generateUniqueVariants(20); // Generate enough variants
@@ -50,52 +50,13 @@
         }
         
         console.log('Mutation layout reset to defaults');
+    
     }
-
-    // async function onMutationSelected(mutation: Mutation, selected: boolean) {
-    //     // need to find the mutation and init interact for it
-    //     // wait for dom to be ready
-    //     await tick();
-    //     // check if items has been initialized
-    //     const mutationItems = document.querySelectorAll('.mutation-paper');
-    //     mutationItems.forEach((item, index) => {
-    //         if (!initializedMutations.includes(item.getAttribute('data-paper-id') || '')) {
-    //             initInteractForElement(item as HTMLElement, 'mutationsTab', '.mutation-header', '.mutation-header');
-    //             initializedMutations.push(item.getAttribute('data-paper-id') || '');
-    //         }
-    //     });
-
-    // }
-
-    $effect(() => {
-        // Watch for changes in relations/notes length
-        sheetState.mutations.length;
-        
-        // Re-setup draggable functionality when items change
-        const mutationItems = document.querySelectorAll('.mutation-paper');
-        mutationItems.forEach(card => {
-            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-                initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
-                    enableDraggable: true,
-                    enableResizable: true
-                });
-                card.setAttribute('data-interact-initialized', 'true');
-            }
-        });
-        
-    });
-
 
     onMount(() => {
         // Initialize InteractJS for the mutation points component
         const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
-        if (mutationPointsElement) {
-            // Initialize InteractJS for this specific element
-            initInteractForElement('.mutation-points-wrapper', 'mutationsTab', '.mutation-points-header', undefined, {
-                enableResizable: false,
-                enableDraggable: true
-            });
-            
+        if (mutationPointsElement) {            
             // Apply saved layout if it exists
             const savedLayout = characterActions.getPaperLayout('mutationsTab', 'mutation-points');
             if (savedLayout) {
@@ -146,43 +107,47 @@
     <div data-drop-zone="mutations">
         <!-- Selected Mutations -->
             {#each sheetState.mutations as mutation, index}
-                <div class="mutation-item-wrapper">
-                    <div class="torn-paper-wrapper {mutationVariants[index % mutationVariants.length]} mutation-paper" data-x="0" data-y="0" data-paper-id="mutation-{index}">
-                        <div class="mutation-item-content">
-                            <div class="mutation-header">
-                                <span class="mutation-name"><Dna />  {mutation.name}</span>
-                                <div class="mutation-controls-right">
-                                    <button 
-                                        class="info-icon-button"
-                                        onclick={() => showMutationInfo(mutation)}
-                                        aria-label="Information om {mutation.name}"
-                                        title="Visa information om {mutation.name}"
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <path d="M9,9h6v6H9z"></path>
-                                            <path d="M9,9h6"></path>
-                                        </svg>
-                                    </button>
-                                    <button
-                                        class="remove-mutation-button"
-                                        onclick={() => removeMutation(mutation.id)}
-                                        aria-label="Ta bort {mutation.name}"
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="mutation-meta">
-                                <span class="mutation-trigger">Utlöses: {mutation.trigger_when}</span>
-                            </div>
-                        </div>
+                <PaperCard 
+                    paperId={`mutation-${mutation.id}`}
+                    tabName="mutationsTab"
+                    variant={mutationVariants[index % mutationVariants.length]}
+                    draggable={true}
+                    resizable={false}
+                    minSize={{ width: 250, height: 60 }}
+                    initialPosition={{ x: 20 + (index % 3) * 400, y: 20 + Math.floor(index / 3) * 150 }}
+                    class="p-2 pt-3"
+                    >
+                    {#snippet content()}
+                    <div class="mutation-content">
+                    <span class="mutation-name"><Dna />  {mutation.name}</span>
+                    <div class="mutation-controls-right">
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showMutationInfo(mutation)}
+                            aria-label="Information om {mutation.name}"
+                            title="Visa information om {mutation.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9,9h6v6H9z"></path>
+                                <path d="M9,9h6"></path>
+                            </svg>
+                        </button>
+                        <button
+                            class="remove-mutation-button"
+                            onclick={() => removeMutation(mutation.id)}
+                            aria-label="Ta bort {mutation.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
-                </div>
+                    </div>
+
+                    {/snippet}
+                </PaperCard>
             {/each}
             
             {#if sheetState.mutations.length === 0}
@@ -203,7 +168,7 @@
                 <div class="mutation-points-display">
                     <div class="mutation-points-controls">
                         <div class="mutation-points-indicators">
-                            <!-- {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                            {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
                                 <button 
                                     class="mutation-point-indicator"
                                     onclick={() => {
@@ -224,33 +189,10 @@
                                         />
                                     {/if}
                                 </button>
-                            {/each} -->
-                            <!-- add icon here which will clear the last mutationpoint -->
+                            {/each}
                             
-                            <button 
-                            title="Ta bort sista mutationpoängen"
-                            disabled={sheetState.mutationPoints === 0}
-                                onclick={() => {
-                                    if (sheetState.mutationPoints > 0) {
-                                        characterActions.setTotalMutationPoints(sheetState.mutationPoints - 1);
-                                    }
-                                }}
-                            >
-                                <DnaOff size={24} />
-                            </button>
                             
-                            <Rating 
-                                value={sheetState.mutationPoints} 
-                                count={10}
-                                onValueChange={(value) => characterActions.setTotalMutationPoints(value.value)}
-                            >
-                                {#snippet iconEmpty()}
-                                    <Dna size={24} />
-                                {/snippet}
-                                {#snippet iconFull()}
-                                    <Dna size={24} color="red" />
-                                {/snippet}
-                            </Rating>
+                        
                         </div>
                     </div>
                 </div>
@@ -265,6 +207,15 @@
 
 
 <style>
+
+    .mutation-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem;
+        min-height: 2rem;
+    }
+
     .mutations-tab {
         display: flex;
         flex-direction: column;
@@ -318,87 +269,16 @@
         flex-shrink: 0;
     }
 
-    .add-mutations-section {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-
-    .add-mutation-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-    }
-
-    .add-mutation-btn:hover {
-        background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4);
-    }
-
-    .add-mutation-btn:active {
-        transform: translateY(0);
-    }
-
-    .mutation-paper {
-        width: 350px;
-        max-width: 100%;
-        height: auto;
-        min-height: 120px;
-        max-height: 200px;
-        cursor: default;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-        will-change: transform;
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        border: 2px solid transparent;
-        border-radius: 4px;
-    }
-
-    .mutation-paper:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 10;
-    }
-
-    .mutation-item-content {
-        position: relative;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        z-index: 1;
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .mutation-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-
     .mutation-name {
+        font-family: var(--font-user), serif;
         font-weight: bold;
-        font-size: 1rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
         color: var(--color-surface-900);
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        flex: 1;
-    }
-
-    .lucide {
-        display: inline-block;
+        text-transform: uppercase;
+        flex-grow: 1;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
     }
 
     :global(.dark) .mutation-name {
@@ -409,6 +289,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        margin-left: auto;
         flex-shrink: 0;
     }
 
@@ -465,79 +346,10 @@
         transform: scale(1.1);
     }
 
-    .mutation-meta {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        font-size: 0.85rem;
-        color: var(--color-surface-600);
-    }
-
-    :global(.dark) .mutation-meta {
-        color: var(--color-surface-400);
-    }
-
-    .mutation-id-display {
-        font-weight: bold;
-        color: var(--color-primary-600);
-    }
-
-    :global(.dark) .mutation-id-display {
-        color: var(--color-primary-400);
-    }
-
-    .mutation-trigger {
-        font-style: italic;
-    }
-
     .no-mutations-message {
         text-align: center;
         padding: 3rem 2rem;
         color: var(--color-surface-500);
-    }
-
-    .no-mutations-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.7;
-    }
-
-    .no-mutations-text {
-        font-size: 1.25rem;
-        font-weight: bold;
-        margin: 0 0 0.5rem 0;
-        color: var(--color-surface-700);
-    }
-
-    :global(.dark) .no-mutations-text {
-        color: var(--color-surface-300);
-    }
-
-    .no-mutations-subtext {
-        font-size: 0.9rem;
-        font-style: italic;
-        margin: 0;
-        color: var(--color-surface-500);
-    }
-
-    :global(.dark) .no-mutations-subtext {
-        color: var(--color-surface-400);
-    }
-
-    /* Mutation tooltip styling */
-    .mutation-id-tooltip {
-        font-weight: bold;
-        color: var(--color-primary-600);
-        background: rgba(217, 119, 6, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.9rem;
-        display: inline-block;
-    }
-
-    :global(.dark) .mutation-id-tooltip {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-primary-400);
     }
 
     /* Responsive adjustments */

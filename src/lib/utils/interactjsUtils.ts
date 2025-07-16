@@ -13,6 +13,8 @@ export function initInteractForElement(
         enableResizable?: boolean;
     } = { enableDraggable: true, enableResizable: true }
 ) {
+
+    console.log('Initializing Interact.js for element:', element, 'in tab:', tabName);
     // Initialize Interact.js for the given element
     const interactElement = interact(element);
     

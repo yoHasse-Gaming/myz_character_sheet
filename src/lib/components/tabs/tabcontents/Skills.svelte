@@ -10,8 +10,8 @@
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
 
-    const { startPosition }: {
-        startPosition: { x: number, y: number }
+    const { startPosition = { x: 350, y: 20 } }: {
+        startPosition?: { x: number, y: number }
     } = $props();
 
     // Generate unique variants for skill items to make them look different
@@ -45,19 +45,6 @@
 
     $effect(() => {
         // Debug: Check if characterActions is available
-        sheetState.optionalSkills.length;
-        
-        // Initialize interact for all skill papers
-        const skillElements = document.querySelectorAll('.skill-paper');
-        skillElements.forEach((card, index) => {
-            if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-                initInteractForElement(card as HTMLElement, 'skillsTab', undefined, undefined, {
-                    enableDraggable: true,
-                    enableResizable: false
-                });
-            }
-
-        });
     });
 
     onMount(() => {
@@ -214,7 +201,7 @@
             initialPosition={position}
             minSize={{ width: 250, height: 60 }}
             variant={skillVariants[index]}
-            class="p-2 pt-4"
+            class="p-2 pt-3"
         >
             {#snippet content()}
                 <div class="skill-content">
@@ -373,9 +360,7 @@
 <!-- <OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} /> -->
 
 <style>
-    .z-1000 {
-        z-index: 1000;
-    }
+
 
     .skill-content {
         display: flex;

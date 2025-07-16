@@ -1,10 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import interact from 'interactjs';
-    import FormSection from '../FormSection.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { characterActions } from '../../states/character_sheet.svelte';
-    import { autoResizePaper, getMinHeightForContent, initInteractForElement, throttledSaveLayout } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
 
     let formData = {
@@ -29,8 +26,6 @@
         // Restore saved positions and sizes
         characterElements.forEach((element, index) => {
             const paperId = element.getAttribute('data-paper-id');
-            initInteractForElement((element as HTMLElement), 'characterTab', '.character-header');
-
             if (paperId) {
                 const savedLayout = characterActions.getPaperLayout('characterTab', paperId);
                 if (savedLayout) {

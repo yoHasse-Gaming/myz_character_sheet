@@ -2,7 +2,6 @@
     import { onMount, onDestroy } from 'svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import DragOverlay from '../DragOverlay.svelte';
     import RelationModal from '../Modals/RelationModal.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { openDialogueOption } from '../../states/modals.svelte';
@@ -137,9 +136,6 @@
         </div>
     </FormSection>
 </div>
-
-
-<DragOverlay />
 
 <!-- Floating Draggable Add Items -->
 <DraggableAddItem 

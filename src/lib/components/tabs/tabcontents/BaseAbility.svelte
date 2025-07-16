@@ -100,7 +100,7 @@
     resizable={false}
     minSize={{ width: 250, height: 80 }}
     initialPosition={initialPosition}
-    class="p-2 pt-4"
+    class="p-2 pt-3"
     >
 
     {#snippet content()}

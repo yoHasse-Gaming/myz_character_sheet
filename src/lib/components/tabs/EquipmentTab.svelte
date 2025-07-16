@@ -1,14 +1,13 @@
 <script lang="ts">
-    import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import DragOverlay from '../DragOverlay.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import itemsData from '../../data/items.json';
     import EquipmentModal from '../Modals/EquipmentModal.svelte';
     import WeaponModal from '../Modals/WeaponModal.svelte';
     import ArmorModal from '../Modals/ArmorModal.svelte';
+    import { openInfoModal } from '../../states/modals.svelte';
     import { Backpack, BowArrow, ShieldHalf } from '@lucide/svelte';
+    import PaperCard from '../PaperCard.svelte';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -25,12 +24,6 @@
         
     }
 
-    // Create equipment items from items.json with parsed weights
-    const availableItems = itemsData.map(item => ({
-        name: item.name,
-        weight: parseWeight(item.weight),
-        comment: item.comment || ''
-    }));
 
     // Initialize empty arrays if not already set - the modal actions will populate them
     // No longer using equipmentTable as we use sheetState.equipment directly
@@ -58,10 +51,6 @@
         return total;
     });
 
-    // Generate random IDs for new items
-    function generateId() {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
 
     // Generate variants for visual variety
     const equipmentVariants = $derived(generateUniqueVariants(sheetState.equipment.length + 1));
@@ -70,6 +59,67 @@
     
     // Special variant for the draggable add item
     const addItemVariant = 'variant-6'; // Using a vibrant variant for the add item
+
+    // Function to show equipment info in modal
+    function showEquipmentInfo(item: any) {
+        const totalWeight = (item.quantity * item.weight).toFixed(2);
+        const content = `
+            <div class="equipment-section">
+                <h4 class="section-title">Beskrivning:</h4>
+                <div class="section-content">${item.description || 'Ingen beskrivning tillgänglig'}</div>
+            </div>
+            <div class="equipment-section">
+                <h4 class="section-title">Detaljer:</h4>
+                <div class="section-content">
+                    <p><strong>Antal:</strong> ${item.quantity}</p>
+                    <p><strong>Vikt per stycke:</strong> ${item.weight} kg</p>
+                    <p><strong>Total vikt:</strong> ${totalWeight} kg</p>
+                </div>
+            </div>
+        `;
+        openInfoModal(item.name || 'Utrustning', content, 'equipment');
+    }
+
+    // Function to show weapon info in modal
+    function showWeaponInfo(weapon: any) {
+        const rangeNames = ['Närstrid', 'Nära', 'Kort', 'Lång'];
+        const content = `
+            <div class="equipment-section">
+                <h4 class="section-title">Beskrivning:</h4>
+                <div class="section-content">${weapon.description || 'Ingen beskrivning tillgänglig'}</div>
+            </div>
+            <div class="equipment-section">
+                <h4 class="section-title">Kampstatistik:</h4>
+                <div class="section-content">
+                    <p><strong>Bonus:</strong> +${weapon.bonus || 0}</p>
+                    <p><strong>Skada:</strong> ${weapon.damage || 1}</p>
+                    <p><strong>Räckvidd:</strong> ${rangeNames[weapon.range] || 'Närstrid'}</p>
+                    <p><strong>Vikt:</strong> ${weapon.weight || 0} kg</p>
+                    <p><strong>Status:</strong> ${weapon.equipped ? 'Utrustad' : 'Inte utrustad'}</p>
+                </div>
+            </div>
+        `;
+        openInfoModal(weapon.name || 'Vapen', content, 'weapon');
+    }
+
+    // Function to show armor info in modal
+    function showArmorInfo(armor: any) {
+        const content = `
+            <div class="equipment-section">
+                <h4 class="section-title">Beskrivning:</h4>
+                <div class="section-content">${armor.description || 'Ingen beskrivning tillgänglig'}</div>
+            </div>
+            <div class="equipment-section">
+                <h4 class="section-title">Skyddsstatistik:</h4>
+                <div class="section-content">
+                    <p><strong>Skydd:</strong> ${armor.protection || 0}</p>
+                    <p><strong>Vikt:</strong> ${armor.weight || 0} kg</p>
+                    <p><strong>Status:</strong> ${armor.equipped ? 'Utrustad' : 'Inte utrustad'}</p>
+                </div>
+            </div>
+        `;
+        openInfoModal(armor.name || 'Rustning', content, 'armor');
+    }
 </script>
 
 <EquipmentModal />
@@ -88,272 +138,185 @@
         onDragEnd={handleDragEnd}
     />
 
-    <!-- Equipment Grid -->
-    <div class="equipment-grid">
-        <!-- Equipment Section -->
-        <div class="equipment-section" data-drop-zone="equipment">
-            <FormSection header="UTRUSTNING" headerIcon={Backpack}>
-                <!-- Equipment list -->
-                <div class="section-items-list">
-                    {#each sheetState.equipment as item, index}
-                        <div class="torn-paper-wrapper {equipmentVariants[index]} section-item-card">
-                            <div class="section-item-content">
-                                <div class="section-item-header">
-                                    <div class="section-item-name-input">
-                                        <input 
-                                            type="text" 
-                                            bind:value={item.name}
-                                            placeholder="Utrustningsnamn"
-                                            class="inline-edit-input name-input"
-                                        />
-                                    </div>
-                                    <button 
-                                        class="section-remove-button" 
-                                        onclick={() => characterActions.removeEquipment(item.id)}
-                                        aria-label="Ta bort {item.name}"
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                {#if item.description || item.name === ''}
-                                    <div class="section-item-description-input">
-                                        <textarea 
-                                            bind:value={item.description}
-                                            placeholder="Beskrivning (valfritt)"
-                                            class="inline-edit-input description-input"
-                                            rows="2"
-                                        ></textarea>
-                                    </div>
-                                {/if}
-                                <div class="section-item-stats-inputs">
-                                    <div class="stat-input-group">
-                                        <label>Antal:</label>
-                                        <input 
-                                            type="number" 
-                                            bind:value={item.quantity}
-                                            min="1"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                    </div>
-                                    <div class="stat-input-group">
-                                        <label>Vikt/st:</label>
-                                        <input 
-                                            type="number" 
-                                            bind:value={item.weight}
-                                            min="0"
-                                            step="0.1"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                    </div>
-                                    <div class="stat-display">
-                                        <span class="section-stat">Tot: {(item.quantity * item.weight).toFixed(2)} kg</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/each}
-                </div>
+    <!-- Equipment Section -->
+    <div class="equipment-section" data-drop-zone="equipment">
+        
+        {#each sheetState.equipment as item, index}
+            <PaperCard
+                paperId={`equipment-${item.id}`}
+                tabName="equipmentTab"
+                variant={equipmentVariants[index % equipmentVariants.length]}
+                draggable={true}
+                resizable={false}
+                minSize={{ width: 250, height: 60 }}
+                initialPosition={{ x: 20 + (index % 3) * 400, y: 80 + Math.floor(index / 3) * 150 }}
+                class="p-2 pt-3"
+            >
+                {#snippet content()}
+                    <div class="equipment-content">
+                        <span class="equipment-name"><Backpack size={16} />{item.name || 'Utrustning'}</span>
+                        <input
+                                type="number"
+                                min="1"
+                                class="equipment-quantity"
+                                bind:value={item.quantity}
+                                title="Antal"
+                            />
+                        <div class="equipment-controls">
+                            <button 
+                                class="info-icon-button"
+                                onclick={() => showEquipmentInfo(item)}
+                                aria-label="Information om {item.name}"
+                                title="Visa information om {item.name}"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9,9h6v6H9z"></path>
+                                    <path d="M9,9h6"></path>
+                                </svg>
+                            </button>
 
-                <!-- Total weight display -->
-                <div class="section-total-weight">
-                    <span class="section-total-label">Total: {totalWeight().toFixed(2)} kg</span>
-                </div>
-            </FormSection>
-        </div>
+                            <button
+                                class="remove-equipment-button"
+                                onclick={() => characterActions.removeEquipment(item.id)}
+                                aria-label="Ta bort {item.name}"
+                            >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                {/snippet}
+            </PaperCard>
+        {/each}
+    </div>
+            <!-- Total weight display -->
+            <!-- <PaperCard
+                paperId="equipment-total"
+                tabName="equipmentTab"
+                draggable={false}
+                resizable={false}
+                initialPosition={{ x: 20, y: 20 + Math.ceil(sheetState.equipment.length / 3) * 80 + 20 }}
+                minSize={{ width: 200, height: 60 }}
+            >
+                {#snippet content()}
+                    <div class="total-weight-content">
+                        <span class="total-weight-label">Total vikt: {totalWeight().toFixed(2)} kg</span>
+                    </div>
+                {/snippet}
+            </PaperCard> -->
 
         <!-- Weapons Section -->
         <div class="weapons-section" data-drop-zone="weapons">
-            <FormSection header="VAPEN" headerIcon={BowArrow}>
-                <!-- Weapons list -->
-                <div class="section-items-list">
-                    {#each sheetState.weapons as weapon, index}
-                        <div class="torn-paper-wrapper {weaponVariants[index]} section-item-card">
-                            <div class="section-item-content">
-                                <div class="section-item-header">
-                                    <div class="section-item-name-input torn-paper-wrapper">
-                                        <input 
-                                            type="text" 
-                                            bind:value={weapon.name}
-                                            placeholder="Vapennamn"
-                                            class="inline-edit-input name-input"
-                                        />
-                                    </div>
-                                    <div class="section-item-actions ">
-                                        <label class="section-equipped-checkbox">
-                                            <input 
-                                                type="checkbox" 
-                                                bind:checked={weapon.equipped}
-                                            />
-                                            <span class="section-checkbox-label">Utrustad</span>
-                                        </label>
-                                        <button 
-                                            class="section-remove-button" 
-                                            onclick={() => characterActions.removeWeapon(weapon.id)}
-                                            aria-label="Ta bort {weapon.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                {#if weapon.description || weapon.name === ''}
-                                    <div class="section-item-description-input torn-paper-wrapper">
-                                        <textarea 
-                                            bind:value={weapon.description}
-                                            placeholder="Beskrivning (valfritt)"
-                                            class="inline-edit-input description-input"
-                                            rows="2"
-                                        ></textarea>
-                                    </div>
-                                {/if}
-                                <div class="section-item-stats-inputs">
-                                    <div class="stat-input-group ">
-                                        <label for="bonus">Bonus:</label>
-
-                                        <div class="torn-paper-wrapper">
-                                        <input 
-                                            type="number" 
-                                            bind:value={weapon.bonus}
-                                            name="bonus"
-                                            min="0"
-                                            max="10"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                            </div>  
-
-                                    </div>
-                                    <div class="stat-input-group">
-                                        <label>Skada:</label>
-                                        <div class="torn-paper-wrapper">
-
-                                        <input 
-                                            type="number" 
-                                            bind:value={weapon.damage}
-                                            min="1"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                        </div>
-                                    </div>
-                                    <div class="stat-input-group">
-                                        <label>Räckvidd:</label>
-                                        <div class="torn-paper-wrapper">
-
-                                        <select 
-                                            bind:value={weapon.range}
-                                            class="inline-edit-input stat-input"
-                                        >
-                                            <option value={0}>Närstrid</option>
-                                            <option value={1}>Nära</option>
-                                            <option value={2}>Kort</option>
-                                            <option value={3}>Lång</option>
-                                        </select>
-                                        </div>
-                                    </div>
-                                    <div class="stat-input-group">
-                                        <label>Vikt:</label>
-                                        <div class="torn-paper-wrapper">
-
-                                        <input 
-                                            type="number" 
-                                            bind:value={weapon.weight}
-                                            min="0"
-                                            step="0.1"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                        </div>
-                                    </div>
-                                </div>
+            
+            {#each sheetState.weapons as weapon, index}
+                <PaperCard
+                    paperId={`weapon-${weapon.id}`}
+                    tabName="equipmentTab"
+                    variant={weaponVariants[index % weaponVariants.length]}
+                    draggable={true}
+                    resizable={false}
+                    initialPosition={{ x: 20 + (index % 3) * 300, y: 380 + Math.floor(index / 3) * 80 }}
+                    minSize={{ width: 280, height: 60 }}
+                >
+                    {#snippet content()}
+                        <div class="weapon-content">
+                            <BowArrow size={16} />
+                            <span class="weapon-name">{weapon.name || 'Vapen'}</span>
+                            <div class="weapon-controls">
+                                <label class="equipped-checkbox">
+                                    <input 
+                                        type="checkbox" 
+                                        bind:checked={weapon.equipped}
+                                    />
+                                    <span class="equipped-label">Utrustad</span>
+                                </label>
+                                <button 
+                                    class="info-icon-button"
+                                    onclick={() => showWeaponInfo(weapon)}
+                                    aria-label="Information om {weapon.name}"
+                                    title="Visa information om {weapon.name}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9,9h6v6H9z"></path>
+                                        <path d="M9,9h6"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="remove-weapon-button"
+                                    onclick={() => characterActions.removeWeapon(weapon.id)}
+                                    aria-label="Ta bort {weapon.name}"
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                    {/each}
-                </div>
-            </FormSection>
+                    {/snippet}
+                </PaperCard>
+            {/each}
         </div>
-
         <!-- Armor Section -->
         <div class="armor-section" data-drop-zone="armor">
-            <FormSection header="RUSTNING" headerIcon={ShieldHalf}>
-                <!-- Armor list -->
-                <div class="section-items-list">
-                    {#each sheetState.armor as armor, index}
-                        <div class="torn-paper-wrapper {armorVariants[index]} section-item-card">
-                            <div class="section-item-content">
-                                <div class="section-item-header">
-                                    <div class="section-item-name-input">
-                                        <input 
-                                            type="text" 
-                                            bind:value={armor.name}
-                                            placeholder="Rustningsnamn"
-                                            class="inline-edit-input name-input"
-                                        />
-                                    </div>
-                                    <div class="section-item-actions">
-                                        <label class="section-equipped-checkbox">
-                                            <input 
-                                                type="checkbox" 
-                                                bind:checked={armor.equipped}
-                                            />
-                                            <span class="section-checkbox-label">Utrustad</span>
-                                        </label>
-                                        <button 
-                                            class="section-remove-button" 
-                                            onclick={() => characterActions.removeArmor(armor.id)}
-                                            aria-label="Ta bort {armor.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                {#if armor.description || armor.name === ''}
-                                    <div class="section-item-description-input">
-                                        <textarea 
-                                            bind:value={armor.description}
-                                            placeholder="Beskrivning (valfritt)"
-                                            class="inline-edit-input description-input"
-                                            rows="2"
-                                        ></textarea>
-                                    </div>
-                                {/if}
-                                <div class="section-item-stats-inputs">
-                                    <div class="stat-input-group">
-                                        <label>Skydd:</label>
-                                        <input 
-                                            type="number" 
-                                            bind:value={armor.protection}
-                                            min="0"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                    </div>
-                                    <div class="stat-input-group">
-                                        <label>Vikt:</label>
-                                        <input 
-                                            type="number" 
-                                            bind:value={armor.weight}
-                                            min="0"
-                                            step="0.1"
-                                            class="inline-edit-input stat-input"
-                                        />
-                                    </div>
-                                </div>
+            
+            {#each sheetState.armor as armor, index}
+                <PaperCard
+                    paperId={`armor-${armor.id}`}
+                    tabName="equipmentTab"
+                    variant={armorVariants[index % armorVariants.length]}
+                    draggable={true}
+                    resizable={false}
+                    initialPosition={{ x: 20 + (index % 3) * 300, y: 580 + Math.floor(index / 3) * 80 }}
+                    minSize={{ width: 280, height: 60 }}
+                >
+                    {#snippet content()}
+                        <div class="armor-content">
+                            <ShieldHalf size={16} />
+                            <span class="armor-name">{armor.name || 'Rustning'}</span>
+                            <div class="armor-controls">
+                                <label class="equipped-checkbox">
+                                    <input 
+                                        type="checkbox" 
+                                        bind:checked={armor.equipped}
+                                    />
+                                    <span class="equipped-label">Utrustad</span>
+                                </label>
+                                <button 
+                                    class="info-icon-button"
+                                    onclick={() => showArmorInfo(armor)}
+                                    aria-label="Information om {armor.name}"
+                                    title="Visa information om {armor.name}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9,9h6v6H9z"></path>
+                                        <path d="M9,9h6"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="remove-armor-button"
+                                    onclick={() => characterActions.removeArmor(armor.id)}
+                                    aria-label="Ta bort {armor.name}"
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                    {/each}
-                </div>
-            </FormSection>
+                    {/snippet}
+                </PaperCard>
+            {/each}
         </div>
-    </div>
 </div>
 
 <!-- Drag Overlay -->
-<DragOverlay />
 
 
 
@@ -362,288 +325,142 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
+        position: relative;
     }
 
-    /* Equipment Grid Layout */
-    .equipment-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 1.5rem;
-        align-items: start;
-    }
-
-    @media (max-width: 768px) {
-        .equipment-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Section Content Styles */
-    .section-content {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+    /* Section containers for better drop zone targeting */
+    .equipment-section,
+    .weapons-section,
+    .armor-section {
         position: relative;
         min-height: 200px;
         padding: 1rem;
-        border-radius: 0.5rem;
-    }
-
-    .section-items-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .section-item-card {
-        padding: 1rem;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-        transition: all 0.2s ease;
-    }
-
-    .section-item-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        z-index: 2;
-    }
-
-    .section-item-content {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .section-item-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .section-item-name {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-        flex: 1;
-    }
-
-    :global(.dark) .section-item-name {
-        color: var(--color-surface-100);
-    }
-
-    .section-item-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .section-equipped-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        cursor: pointer;
-    }
-
-    :global(.dark) .section-equipped-checkbox {
-        color: var(--color-surface-300);
-    }
-
-    .section-checkbox-label {
-        white-space: nowrap;
-    }
-
-    .section-remove-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        background: var(--color-danger-500);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        padding: 0;
-    }
-
-    .section-remove-button:hover {
-        background: var(--color-danger-600);
-        transform: scale(1.1);
-    }
-
-    .section-item-description {
-        margin: 0;
-        font-style: italic;
-        color: var(--color-surface-600);
-        line-height: 1.4;
-    }
-
-    :global(.dark) .section-item-description {
-        color: var(--color-surface-400);
-    }
-
-    .section-item-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .section-stat {
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        font-weight: 600;
-        background: rgba(0, 0, 0, 0.05);
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-    }
-
-    :global(.dark) .section-stat {
-        color: var(--color-surface-300);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .section-total-weight {
-        margin-top: 1rem;
-        padding: 0.75rem;
-        background: rgba(217, 119, 6, 0.1);
-        border-radius: 0.5rem;
-        text-align: center;
-        position: relative;
-        z-index: 10;
-    }
-
-    .section-total-label {
-        font-weight: bold;
-        font-size: 1.1rem;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    :global(.dark) .section-total-label {
-        color: var(--color-surface-100);
-    }
-
-    /* Inline Editing Styles */
-
-
-    .inline-edit-input {
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        font-family: inherit;
-        font-size: inherit;
-        color: inherit;
-        width: 100%;
-        transition: all 0.2s ease;
-    }
-
-    .inline-edit-input:hover {
-        border-color: var(--color-surface-300);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .inline-edit-input:focus {
-        outline: none;
-        border-color: var(--color-primary-500);
-        background: var(--color-surface-50);
-        color: var(--color-surface-900);
-    }
-
-    :global(.dark) .inline-edit-input:focus {
-        background: var(--color-surface-800);
-        color: var(--color-surface-100);
-    }
-
-    .name-input {
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
-
-    .description-input {
-        resize: vertical;
-        min-height: 2rem;
-        line-height: 1.4;
-        font-style: italic;
-    }
-
-    /* .section-item-description-input::before {
-        filter: url(#squiggle_lines);
-    } */
-    .section-item-description-input{
-        margin: 0.5rem 0;
-
+        border-radius: 8px;
 
     }
 
-    .section-item-stats-inputs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .stat-input-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        min-width: 0;
-    }
-
-    .stat-input-group label {
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    :global(.dark) .stat-input-group label {
-        color: var(--color-surface-300);
-    }
-
-    .stat-input {
-        width: 80px;
-        text-align: center;
-    }
-
-    .stat-input[type="number"] {
-        -moz-appearance: textfield;
-    }
-
-    .stat-input::-webkit-outer-spin-button,
-    .stat-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .stat-display {
-        margin-left: auto;
-    }
-
-    /* Ensure proper layout for inputs */
-    .section-item-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .section-item-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-shrink: 0;
-    }
 
     /* Equipment Grid Layout */
+    .equipment-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .equipment-name {
+        flex: 1;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .equipment-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .equipment-quantity {
+        width: 40px;
+        height: 24px;
+        padding: 2px 4px;
+        font-size: 0.75rem;
+        text-align: center;
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        background: var(--color-background);
+    }
+
+    /* Weapon styles */
+    .weapon-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .weapon-name {
+        flex: 1;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .weapon-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Armor styles */
+    .armor-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .armor-name {
+        flex: 1;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .armor-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Shared styles for equipped checkbox */
+    .equipped-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+
+    .equipped-label {
+        white-space: nowrap;
+    }
+
+    .info-icon-button {
+        padding: 2px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .info-icon-button:hover {
+        opacity: 1;
+    }
+
+    .remove-equipment-button, 
+    .remove-weapon-button, 
+    .remove-armor-button {
+        padding: 2px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--color-danger);
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .remove-equipment-button:hover, 
+    .remove-weapon-button:hover, 
+    .remove-armor-button:hover {
+        opacity: 1;
+    }
 </style>

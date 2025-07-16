@@ -8,7 +8,7 @@ export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupati
 export const infoModalState = $state({
     title: '',
     content: '',
-    type: '' as 'skill' | 'trauma' | 'mutation' | 'talent' | ''
+    type: '' as 'skill' | 'trauma' | 'mutation' | 'talent' | 'equipment' | 'weapon' | 'armor'
 });
 
 // Dice roll modal state
@@ -86,7 +86,7 @@ export function closeDialogueOption(dialogue: DialogueOption | undefined = undef
 }
 
 // Function to open info modal with specific content
-export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' | 'talent' = 'skill') {
+export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' | 'equipment' | 'weapon' | 'armor' | 'talent' = 'skill' ) {
     infoModalState.title = title;
     infoModalState.content = content;
     infoModalState.type = type;

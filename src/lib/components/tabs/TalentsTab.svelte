@@ -77,40 +77,38 @@
                     tabName="talentsTab"
                     draggable={true}
                     resizable={false}
+                    minSize={{ width: 250, height: 60 }}
+                    class="p-1 pt-3"
                     >
-                {#snippet header()}
-                    <span class="talent-name">Yrke: {talent.name}</span>
-                    <div class="talent-controls-right">
-                    <button 
-                        class="info-icon-button"
-                        onclick={() => showTalentInfo(talent)}
-                        aria-label="Information om {talent.name}"
-                        title="Visa information om {talent.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9,9h6v6H9z"></path>
-                            <path d="M9,9h6"></path>
-                        </svg>
-                    </button>
-                    <button
-                        class="remove-talent-button"
-                        onclick={() => removeTalent(talent.id)}
-                        aria-label="Ta bort {talent.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                {/snippet}
                 
                 {#snippet content()}
-
-                <div class="talent-meta">
-                    <span class="talent-occupation">Yrke: {talent.occupation}</span>
-                </div>
+                    <div class="talent-content">
+                        <span class="talent-name">{talent.name}</span>
+                        <div class="talent-controls-right">
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showTalentInfo(talent)}
+                            aria-label="Information om {talent.name}"
+                            title="Visa information om {talent.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9,9h6v6H9z"></path>
+                                <path d="M9,9h6"></path>
+                            </svg>
+                        </button>
+                        <button
+                            class="remove-talent-button"
+                            onclick={() => removeTalent(talent.id)}
+                            aria-label="Ta bort {talent.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    </div>
                 {/snippet}
                 
                 </PaperCard>
@@ -128,44 +126,46 @@
             
             <div class="talents-list">
                 {#each genericTalents as talent, index}
-                        <div class="torn-paper-wrapper {talentVariants[(index + occupationalTalents.length) % talentVariants.length]} talent-item-card" 
-                        data-x="0" 
-                        data-y="0" 
-                        data-paper-id="generictalent-{talent.id}">
-                            <div class="talent-item-content">
-                                <div class="talent-header">
-                                    <span class="talent-name">Generisk: {talent.name}</span>
-                                    <div class="talent-controls-right">
-                                        <button 
-                                            class="info-icon-button"
-                                            onclick={() => showTalentInfo(talent)}
-                                            aria-label="Information om {talent.name}"
-                                            title="Visa information om {talent.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <path d="M9,9h6v6H9z"></path>
-                                                <path d="M9,9h6"></path>
-                                            </svg>
-                                        </button>
-                                        <button
-                                            class="remove-talent-button"
-                                            onclick={() => removeTalent(talent.id)}
-                                            aria-label="Ta bort {talent.name}"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="talent-meta">
-                                    <span class="talent-id-display">🎯 {talent.id}</span>
-                                    <span class="talent-occupation">Typ: Generisk</span>
-                                </div>
-                            </div>
-                        </div>
+                <PaperCard
+                    paperId={`generic-talent-${talent.id}`}
+                    tabName="talentsTab"
+                    draggable={true}
+                    resizable={false}
+                    minSize={{ width: 250, height: 60 }}
+                    class="p-1 pt-3"
+                    >
+                {#snippet content()}
+                <div class="talent-content">
+                    <span class="talent-name">{talent.name}</span>
+                    <div class="talent-controls-right">
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showTalentInfo(talent)}
+                            aria-label="Information om {talent.name}"
+                            title="Visa information om {talent.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9,9h6v6H9z"></path>
+                                <path d="M9,9h6"></path>
+                            </svg>
+                        </button>
+                        <button
+                            class="remove-talent-button"
+                            onclick={() => removeTalent(talent.id)}
+                            aria-label="Ta bort {talent.name}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {/snippet}
+                
+
+                </PaperCard>
                 {/each}
                 
             </div>
@@ -198,6 +198,14 @@
         margin: 0 0 0.5rem 0;
         font-weight: 600;
         color: var(--color-surface-700);
+    }
+
+    .talent-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem;
+        min-height: 2rem;
     }
 
     :global(.dark) .talent-description {
@@ -266,10 +274,15 @@
     }
 
     .talent-name {
+        font-family: var(--font-user), serif;
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
         color: var(--color-surface-900);
-        flex: 1;
+        text-transform: uppercase;
+        flex-grow: 1;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
     }
 
     :global(.dark) .talent-name {
@@ -315,22 +328,24 @@
     }
 
     .remove-talent-button {
+        padding: 0.2rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-error-500);
+        background: transparent;
+        color: var(--color-error-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 1.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
-        background: var(--color-danger-500);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        padding: 0;
     }
 
     .remove-talent-button:hover {
-        background: var(--color-danger-600);
+        background: var(--color-error-600);
+        color: white;
         transform: scale(1.1);
     }
 

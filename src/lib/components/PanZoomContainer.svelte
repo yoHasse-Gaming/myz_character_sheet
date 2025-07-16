@@ -18,39 +18,67 @@
     let containerElement: HTMLElement;
     let contentElement: HTMLElement;
     let panzoom: PanzoomObject | null = null;
+    let isPanMode = $state(false);
 
     onMount(() => {
         if (containerElement && contentElement) {
-            // Initialize Panzoom
+            // Initialize Panzoom with proper settings that don't conflict with InteractJS
             panzoom = Panzoom(contentElement, {
                 maxScale: 3,
                 minScale: 0.3,
                 step: 0.1,
-                startScale: 0.8, // Start slightly zoomed out to see more content
+                startScale: 0.8,
                 startX: 0,
                 startY: 0,
-                contain: 'outside', // Allow panning outside the bounds
-                cursor: 'move',
-                // Allow panning with mouse wheel + ctrl
+                contain: 'outside',
+                // Enable native panning but only when space is held
+                disablePan: true,
+                // Allow zooming with mouse wheel
                 wheel: true,
                 wheelStep: 0.1,
-                // Smooth transitions
                 animate: true,
                 duration: 200,
-                easing: 'ease-in-out'
+                easing: 'ease-in-out',
+                // Exclude InteractJS elements from panzoom events
+                exclude: '.character-paper, .paper-card, [data-draggable], .interact-draggable'
             });
 
-            // Add wheel event listener for zoom with Ctrl key
-            const handleWheel = (event: WheelEvent) => {
-                if (event.ctrlKey || event.metaKey) {
+            // Space key handlers for pan mode
+            const handleKeyDown = (event: KeyboardEvent) => {
+                if (event.code === 'Space' && !event.repeat) {
                     event.preventDefault();
-                    // Use panzoom's built-in wheel handling
+                    isPanMode = true;
+                    // Enable panning when space is pressed
+                    panzoom?.setOptions({ disablePan: false });
+                    document.body.style.cursor = 'grab';
+                }
+                if (event.code === 'KeyR' && !event.repeat) {
+                    event.preventDefault();
+                    resetView();
                 }
             };
 
-            containerElement.addEventListener('wheel', handleWheel, { passive: false });
+            const handleKeyUp = (event: KeyboardEvent) => {
+                if (event.code === 'Space') {
+                    event.preventDefault();
+                    isPanMode = false;
+                    // Disable panning when space is released
+                    panzoom?.setOptions({ disablePan: true });
+                    document.body.style.cursor = '';
+                }
+            };
 
-            console.log('PanZoom initialized');
+            // Add event listeners
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+
+            console.log('PanZoom initialized successfully');
+
+            // Cleanup function
+            return () => {
+                document.removeEventListener('keydown', handleKeyDown);
+                document.removeEventListener('keyup', handleKeyUp);
+            };
         }
     });
 
@@ -58,6 +86,8 @@
         if (panzoom) {
             panzoom.destroy();
         }
+        // Reset cursor
+        document.body.style.cursor = '';
     });
 
     // Reset pan and zoom to default
@@ -78,6 +108,15 @@
     function zoomOut() {
         if (panzoom) {
             panzoom.zoomOut();
+        }
+    }
+
+    // Toggle pan mode
+    function togglePanMode() {
+        isPanMode = !isPanMode;
+        if (panzoom) {
+            panzoom.setOptions({ disablePan: !isPanMode });
+            document.body.style.cursor = isPanMode ? 'grab' : '';
         }
     }
 </script>
@@ -101,8 +140,15 @@
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </button>
+
+        <button class="control-btn {isPanMode ? 'active' : ''}" onclick={togglePanMode} title="Panorera-läge (Håll mellanslag)" aria-label="Panorera-läge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"></path>
+                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path>
+            </svg>
+        </button>
         
-        <button class="control-btn" onclick={resetView} title="Återställ vy" aria-label="Återställ vy">
+        <button class="control-btn" onclick={resetView} title="Återställ vy (R)" aria-label="Återställ vy">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                 <path d="M3 3v5h5"></path>
@@ -111,55 +157,43 @@
     </div>
 
     <!-- Pan/Zoom Container -->
-    <div class="panzoom-container" bind:this={containerElement}>
+    <div class="panzoom-container {isPanMode ? 'pan-mode' : ''}" bind:this={containerElement}>
         <div class="panzoom-content" bind:this={contentElement}>
-            <!-- Character Section -->
-            <div class="content-section character-section">
-                <h2 class="section-title">Karaktär</h2>
-                <CharacterTab />
-            </div>
+            <!-- Character Tab Content -->
+            <CharacterTab />
 
-            <!-- Abilities Section -->
-            <div class="content-section abilities-section">
-                <h2 class="section-title">Egenskaper</h2>
-                <AbilitiesTab />
-            </div>
+            <!-- Abilities Tab Content -->
+            <AbilitiesTab />
 
-            <!-- Mutations Section -->
-            <div class="content-section mutations-section">
-                <h2 class="section-title">Mutationer</h2>
-                <div class="talents-mutations-tab">
-                    <FormSection header="MUTATIONER" headerIcon={Dna}>
-                        <Mutations />
-                    </FormSection>
-                </div>
-            </div>
-
-            <!-- Talents Section -->
-            <div class="content-section talents-section">
-                <h2 class="section-title">Talanger</h2>
-                <FormSection header="TALANGER" headerIcon={GraduationCap}>
-                    <TalentsTab />
+            <!-- Mutations Tab Content -->
+            <div class="talents-mutations-tab">
+                <FormSection header="MUTATIONER" headerIcon={Dna}>
+                    <Mutations />
                 </FormSection>
             </div>
 
-            <!-- Equipment Section -->
-            <div class="content-section equipment-section">
-                <h2 class="section-title">Utrustning</h2>
-                <EquipmentTab />
-            </div>
+            <!-- Talents Tab Content -->
+            <FormSection header="TALANGER" headerIcon={GraduationCap}>
+                <TalentsTab />
+            </FormSection>
 
-            <!-- Relations Section -->
-            <div class="content-section relations-section">
-                <h2 class="section-title">Relationer & Anteckningar</h2>
-                <RelationsNotesTab />
-            </div>
+            <!-- Equipment Tab Content -->
+            <EquipmentTab />
+
+            <!-- Relations Tab Content -->
+            <RelationsNotesTab />
         </div>
     </div>
 
     <!-- Instructions -->
     <div class="instructions">
-        <p>🖱️ Dra för att panorera • 🔍 Ctrl + Scroll för att zooma • ⌨️ Använd knapparna för snabba kommandon</p>
+        <p>
+            {#if isPanMode}
+                🎯 <strong>PANORERA-LÄGE PÅ</strong> • Dra för att panorera • Släpp mellanslag för att stoppa
+            {:else}
+                🎯 Håll <strong>MELLANSLAG</strong> för att panorera • 🔍 Ctrl + Scroll för zooma • ⌨️ R för återställa
+            {/if}
+        </p>
     </div>
 </div>
 
@@ -168,35 +202,46 @@
         position: relative;
         width: 100%;
         height: 100vh;
-        overflow: hidden;
-        background: var(--color-surface-50);
+        overflow: hidden; /* Ensure no scrollbars */
         border-radius: 8px;
-    }
-
-    :global(.dark) .panzoom-wrapper {
-        background: var(--color-surface-900);
     }
 
     .panzoom-container {
         width: 100%;
         height: 100%;
         overflow: hidden;
-        cursor: grab;
+        cursor: default;
         position: relative;
     }
 
-    .panzoom-container:active {
+    .panzoom-container.pan-mode {
+        cursor: grab;
+    }
+
+    .panzoom-container.pan-mode:active {
         cursor: grabbing;
     }
 
+    /* Disable pointer events on draggable elements when in pan mode */
+    .panzoom-container.pan-mode .character-paper,
+    .panzoom-container.pan-mode .paper-card,
+    .panzoom-container.pan-mode [data-draggable] {
+        pointer-events: none;
+    }
+
+    .panzoom-container.pan-mode .character-paper:hover,
+    .panzoom-container.pan-mode .paper-card:hover,
+    .panzoom-container.pan-mode [data-draggable]:hover {
+        transform: none !important;
+    }
+
     .panzoom-content {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(2, auto);
-        gap: 2rem;
+        display: block; /* Remove grid layout */
+        position: relative;
         padding: 2rem;
-        min-width: 200vw; /* Make content wider than viewport to enable panning */
-        min-height: 150vh; /* Make content taller than viewport */
+        min-width: 300vw; /* Make content much wider for free-form layout */
+        min-height: 200vh; /* Make content taller for more space */
+        width: max-content; /* Ensure content doesn't get clipped */
         background: linear-gradient(45deg, 
             rgba(0,0,0,0.02) 0%, 
             rgba(0,0,0,0.01) 25%, 
@@ -212,81 +257,6 @@
             transparent 50%, 
             rgba(255,255,255,0.01) 75%, 
             rgba(255,255,255,0.02) 100%);
-    }
-
-    .content-section {
-        background: var(--color-surface-100);
-        border: 2px solid var(--color-surface-200);
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        min-height: 600px;
-        position: relative;
-        overflow: visible;
-    }
-
-    :global(.dark) .content-section {
-        background: var(--color-surface-800);
-        border-color: var(--color-surface-700);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .content-section:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    :global(.dark) .content-section:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-        margin-bottom: 1rem;
-        text-align: center;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        border-bottom: 2px solid var(--color-primary-500);
-        padding-bottom: 0.5rem;
-        font-family: var(--font-user), serif;
-    }
-
-    :global(.dark) .section-title {
-        color: var(--color-surface-100);
-    }
-
-    /* Grid layout for sections */
-    .character-section {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .abilities-section {
-        grid-column: 2;
-        grid-row: 1;
-    }
-
-    .mutations-section {
-        grid-column: 3;
-        grid-row: 1;
-    }
-
-    .talents-section {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    .equipment-section {
-        grid-column: 2;
-        grid-row: 2;
-    }
-
-    .relations-section {
-        grid-column: 3;
-        grid-row: 2;
     }
 
     /* Pan/Zoom Controls */
@@ -335,6 +305,16 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
+    .control-btn.active {
+        background: var(--color-primary-600);
+        box-shadow: 0 0 0 2px var(--color-primary-200);
+    }
+
+    :global(.dark) .control-btn.active {
+        background: var(--color-primary-400);
+        box-shadow: 0 0 0 2px var(--color-primary-800);
+    }
+
     /* Instructions */
     .instructions {
         position: fixed;
@@ -357,69 +337,7 @@
     }
 
     /* Responsive adjustments */
-    @media (max-width: 1200px) {
-        .panzoom-content {
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(3, auto);
-        }
-
-        .mutations-section {
-            grid-column: 1;
-            grid-row: 2;
-        }
-
-        .talents-section {
-            grid-column: 2;
-            grid-row: 2;
-        }
-
-        .equipment-section {
-            grid-column: 1;
-            grid-row: 3;
-        }
-
-        .relations-section {
-            grid-column: 2;
-            grid-row: 3;
-        }
-    }
-
     @media (max-width: 768px) {
-        .panzoom-content {
-            grid-template-columns: 1fr;
-            grid-template-rows: repeat(6, auto);
-            min-width: 100vw;
-        }
-
-        .character-section,
-        .abilities-section,
-        .mutations-section,
-        .talents-section,
-        .equipment-section,
-        .relations-section {
-            grid-column: 1;
-        }
-
-        .abilities-section {
-            grid-row: 2;
-        }
-
-        .mutations-section {
-            grid-row: 3;
-        }
-
-        .talents-section {
-            grid-row: 4;
-        }
-
-        .equipment-section {
-            grid-row: 5;
-        }
-
-        .relations-section {
-            grid-row: 6;
-        }
-
         .instructions {
             font-size: 0.75rem;
             padding: 0.5rem 1rem;

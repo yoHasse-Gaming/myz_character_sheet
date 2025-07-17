@@ -142,7 +142,7 @@
     variant="variant-1"
     class="mutation-points-floating-container"
     draggable={true}
-    resizable={true}
+    resizable={false}
     minSize={{ width: 300, height: 100 }}
     initialPosition={{ x: 20, y: 20 }}
 > 

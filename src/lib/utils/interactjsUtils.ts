@@ -11,7 +11,7 @@ export function initInteractForElement(
     } = { enableDraggable: true, enableResizable: true }
 ) {
 
-    console.log('Initializing Interact.js for element:', element);
+    console.debug('Initializing Interact.js for element:', element);
     // Initialize Interact.js for the given element
     const interactElement = interact(element);
     
@@ -21,7 +21,7 @@ export function initInteractForElement(
             allowFrom: allowFrom, // Use component-specific selector
             listeners: {
                 start: (event) => {
-                    console.log('Drag started on:', event.target);
+                    // console.log('Drag started on:', event.target);
                     event.target.style.zIndex = '1000';
                 },
                 move: (event) => {

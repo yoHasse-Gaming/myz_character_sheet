@@ -68,8 +68,7 @@
     /> -->
 
     <!-- Occupational Talents Section -->
-<div class="talents-section" data-drop-zone="occupational-talents">
-        <div class="talents-list">
+
             {#each occupationalTalents as talent, index}
             <PaperCard
                 paperId={`occupational-talent-${talent.id}`}
@@ -114,16 +113,6 @@
 
             {/each}
             
-        </div>
-</div>
-
-    <!-- Generic Talents Section -->
-<div class="talents-section" data-drop-zone="generic-talents">
-        <!-- <div class="talent-info">
-            <p class="talent-description">Generiska talanger ({genericTalents.length}/5) - Allmänna färdigheter tillgängliga för alla</p>
-        </div> -->
-        
-        <div class="talents-list">
             {#each genericTalents as talent, index}
             <PaperCard
                 paperId={`generic-talent-${talent.id}`}
@@ -167,14 +156,8 @@
             </PaperCard>
             {/each}
             
-        </div>
-</div>
 
 <style>
-    .talents-section {
-        width: 100%;
-        min-height: 200px;
-    }
 
     .talent-content {
         display: flex;
@@ -185,11 +168,6 @@
     }
 
 
-    .talents-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
 
 
     .talent-name {

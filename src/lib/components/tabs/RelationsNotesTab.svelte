@@ -55,7 +55,6 @@
 </script>
 
 <!-- Relations Section -->
-<div class="relations-section" data-drop-zone="relations">
         {#each sheetState.relations as relation, index}
             <PaperCard 
                 paperId={`relation-${relation.id}`}
@@ -91,10 +90,8 @@
         </PaperCard>
 
         {/each}
-</div>
 
 <!-- Notes Section -->
-<div class="notes-section" data-drop-zone="notes">
         {#each sheetState.notes as note, index}
         <PaperCard 
             paperId={`note-${index}`}
@@ -130,7 +127,6 @@
             {/snippet}
         </PaperCard>
         {/each}
-</div>
 
 
 <!-- Floating Draggable Add Items -->

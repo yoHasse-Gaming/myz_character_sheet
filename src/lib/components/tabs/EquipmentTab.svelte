@@ -144,7 +144,6 @@
     /> -->
 
     <!-- Equipment Section -->
-    <div class="equipment-section" data-drop-zone="equipment">
         
         {#each sheetState.equipment as item, index}
             <PaperCard
@@ -196,7 +195,6 @@
                 {/snippet}
             </PaperCard>
         {/each}
-    </div>
             <!-- Total weight display -->
             <!-- <PaperCard
                 paperId="equipment-total"
@@ -214,7 +212,6 @@
             </PaperCard> -->
 
         <!-- Weapons Section -->
-        <div class="weapons-section" data-drop-zone="weapons">
             
             {#each sheetState.weapons as weapon, index}
                 <PaperCard
@@ -265,9 +262,7 @@
                     {/snippet}
                 </PaperCard>
             {/each}
-        </div>
         <!-- Armor Section -->
-        <div class="armor-section" data-drop-zone="armor">
             
             {#each sheetState.armor as armor, index}
                 <PaperCard
@@ -318,7 +313,6 @@
                     {/snippet}
                 </PaperCard>
             {/each}
-        </div>
 
 <!-- Drag Overlay -->
 

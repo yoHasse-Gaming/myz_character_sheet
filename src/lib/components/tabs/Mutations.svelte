@@ -130,11 +130,6 @@
     </PaperCard>
 {/each}
 
-{#if sheetState.mutations.length === 0}
-    <div class="no-mutations-message">
-        <p>Inga mutationer valda. Dra papperet hit för att lägga till mutationer.</p>
-    </div>
-{/if}
 
 
 <PaperCard 
@@ -281,27 +276,12 @@
         transform: scale(1.1);
     }
 
-    .no-mutations-message {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: var(--color-surface-500);
-    }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .mutation-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
 
         .mutation-controls-right {
             align-self: flex-end;
-        }
-
-        .mutation-paper {
-            width: 300px;
-            min-height: 100px;
         }
     }
 

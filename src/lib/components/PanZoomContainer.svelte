@@ -10,10 +10,6 @@
     import TalentsTab from './tabs/TalentsTab.svelte';
     import EquipmentTab from './tabs/EquipmentTab.svelte';
     import RelationsNotesTab from './tabs/RelationsNotesTab.svelte';
-    import FormSection from './FormSection.svelte';
-    
-    import Dna from "@lucide/svelte/icons/dna";
-    import { GraduationCap } from "@lucide/svelte";
 
     let containerElement: HTMLElement;
     let contentElement: HTMLElement;
@@ -32,7 +28,7 @@
                 startY: 0,
                 contain: 'outside',
                 cursor: 'default',
-                disablePan: true,
+                noBind: true, // Disable default event binding to avoid conflicts
                 wheel: true,
                 wheelStep: 0.1,
                 animate: true ,
@@ -40,41 +36,40 @@
                 easing: 'ease-in-out'
             });
 
-            // Space key handlers for pan mode
-            const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.code === 'Space' && !event.repeat) {
-                    event.preventDefault();
-                    isPanMode = true;
-                    // Enable panning when space is pressed
-                    panzoom?.setOptions({ disablePan: false });
-                    document.body.style.cursor = 'grab';
+            function handlePointerDown(event: PointerEvent) {
+                console.log('Pointer down event:', event);
+                if (event.button === 1) { // Middle mouse button
+                    console.log('Middle mouse button pressed');
+                    panzoom?.handleDown(event);
                 }
-                if (event.code === 'KeyR' && !event.repeat) {
-                    event.preventDefault();
-                    resetView();
-                }
-            };
+            }
 
-            const handleKeyUp = (event: KeyboardEvent) => {
-                if (event.code === 'Space') {
-                    event.preventDefault();
-                    isPanMode = false;
-                    // Disable panning when space is released
-                    panzoom?.setOptions({ disablePan: true });
-                    document.body.style.cursor = '';
-                }
-            };
+            function handleMove(event: PointerEvent) {
+                console.log('Pointer move event:', event);
+                panzoom?.handleMove(event);
+            }
+
+            function handlePointerUp(event: PointerEvent) {
+                console.log('Pointer up event:', event);
+                panzoom?.handleUp(event);
+            }
 
             // Add event listeners
-            document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('keyup', handleKeyUp);
+            containerElement.addEventListener('pointerdown', handlePointerDown);
+            containerElement.addEventListener('pointermove', handleMove);
+            containerElement.addEventListener('pointerup', handlePointerUp);
 
             console.log('PanZoom initialized successfully');
 
             // Cleanup function
             return () => {
-                document.removeEventListener('keydown', handleKeyDown);
-                document.removeEventListener('keyup', handleKeyUp);
+                if (panzoom) {
+                    panzoom.destroy();
+                }
+                containerElement.removeEventListener('pointerdown', handlePointerDown);
+                containerElement.removeEventListener('pointermove', handleMove);
+                containerElement.removeEventListener('pointerup', handlePointerUp);
+
             };
         }
     });
@@ -152,7 +147,7 @@
             </svg>
         </button>
 
-        <button class="control-btn {isPanMode ? 'active' : ''}" onclick={togglePanMode} title="Panorera-läge (Håll mellanslag)" aria-label="Panorera-läge">
+        <button class="control-btn {isPanMode ? 'active' : ''}" onclick={togglePanMode} title="Panorera-läge (Håll mittenknappen)" aria-label="Panorera-läge">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 12l2 2 4-4"></path>
                 <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path>
@@ -188,9 +183,9 @@
     <div class="instructions">
         <p>
             {#if isPanMode}
-                🎯 <strong>PANORERA-LÄGE PÅ</strong> • Dra för att panorera • Släpp mellanslag för att stoppa
+                🎯 <strong>PANORERA-LÄGE PÅ</strong> • Dra för att panorera • Släpp mittenknappen för att stoppa
             {:else}
-                🎯 Håll <strong>MELLANSLAG</strong> för att panorera • 🔍 Ctrl + Scroll för zooma • ⌨️ R för återställa
+                🎯 Håll <strong>MITTENKNAPPEN</strong> för att panorera • 🔍 Ctrl + Scroll för zooma • ⌨️ R för återställa
             {/if}
         </p>
     </div>

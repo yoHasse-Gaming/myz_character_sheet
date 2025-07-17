@@ -86,105 +86,111 @@
         ariaLabel="Dra för att lägga till mutation"
         variant="variant-3"
     /> -->
+{#each sheetState.mutations as mutation, index}
+    <PaperCard 
+        paperId={`mutation-${mutation.id}`}
 
-    <!-- Mutations Section -->
-<div data-drop-zone="mutations">
-    <!-- Selected Mutations -->
-        {#each sheetState.mutations as mutation, index}
-            <PaperCard 
-                paperId={`mutation-${mutation.id}`}
+        variant={mutationVariants[index % mutationVariants.length]}
+        draggable={true}
+        resizable={false}
+        minSize={{ width: 250, height: 60 }}
+        initialPosition={{ x: 20 + (index % 3) * 400, y: 20 + Math.floor(index / 3) * 150 }}
+        class="p-2 pt-3"
+        >
+        {#snippet content()}
+        <div class="mutation-content">
+        <span class="mutation-name"><Dna />  {mutation.name}</span>
+        <div class="mutation-controls-right">
+            <button 
+                class="info-icon-button"
+                onclick={() => showMutationInfo(mutation)}
+                aria-label="Information om {mutation.name}"
+                title="Visa information om {mutation.name}"
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9,9h6v6H9z"></path>
+                    <path d="M9,9h6"></path>
+                </svg>
+            </button>
+            <button
+                class="remove-mutation-button"
+                onclick={() => removeMutation(mutation.id)}
+                aria-label="Ta bort {mutation.name}"
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        </div>
 
-                variant={mutationVariants[index % mutationVariants.length]}
-                draggable={true}
-                resizable={false}
-                minSize={{ width: 250, height: 60 }}
-                initialPosition={{ x: 20 + (index % 3) * 400, y: 20 + Math.floor(index / 3) * 150 }}
-                class="p-2 pt-3"
+        {/snippet}
+    </PaperCard>
+{/each}
+
+{#if sheetState.mutations.length === 0}
+    <div class="no-mutations-message">
+        <p>Inga mutationer valda. Dra papperet hit för att lägga till mutationer.</p>
+    </div>
+{/if}
+
+
+<PaperCard 
+    paperId="mutation-points"
+    variant="variant-1"
+    class="mutation-points-floating-container"
+    draggable={true}
+    resizable={true}
+    minSize={{ width: 300, height: 100 }}
+    initialPosition={{ x: 20, y: 20 }}
+> 
+
+{#snippet header()}
+    
+    <h3 class="mutation-points-title" ><Microscope size={20} class="mutation-points-icon" /> MUTATIONSPOÄNG</h3>
+
+{/snippet}
+{#snippet content()}
+        <div class="mutation-points-indicators">
+            {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                <button 
+                    class="mutation-point-indicator"
+                    onclick={() => {
+                        if (sheetState.mutationPoints > idx) {
+                            characterActions.setTotalMutationPoints(idx);
+                        } else {
+                            characterActions.setTotalMutationPoints(idx + 1);
+                        }
+                    }}
+                    aria-label="Toggle mutation point {idx + 1}"
                 >
-                {#snippet content()}
-                <div class="mutation-content">
-                <span class="mutation-name"><Dna />  {mutation.name}</span>
-                <div class="mutation-controls-right">
-                    <button 
-                        class="info-icon-button"
-                        onclick={() => showMutationInfo(mutation)}
-                        aria-label="Information om {mutation.name}"
-                        title="Visa information om {mutation.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9,9h6v6H9z"></path>
-                            <path d="M9,9h6"></path>
-                        </svg>
-                    </button>
-                    <button
-                        class="remove-mutation-button"
-                        onclick={() => removeMutation(mutation.id)}
-                        aria-label="Ta bort {mutation.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                </div>
-
-                {/snippet}
-            </PaperCard>
-        {/each}
+                    <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" />
+                    {#if sheetState.mutationPoints > idx}
+                        <img 
+                            src='/img/strokes/x.svg' 
+                            alt="Point available" 
+                            class="stroke-image x-layer" 
+                        />
+                    {/if}
+                </button>
+            {/each}
+            
+            
         
-        {#if sheetState.mutations.length === 0}
-            <div class="no-mutations-message">
-                <p>Inga mutationer valda. Dra papperet hit för att lägga till mutationer.</p>
-            </div>
-        {/if}
-</div>
-
-<div class="mutation-points-floating-container">
-<div class="torn-paper-wrapper variant-2 mutation-points-wrapper" data-x="0" data-y="0" data-paper-id="mutation-points">
-    <div class="mutation-points-content">
-        <div class="mutation-points-header">
-            <Microscope size={20} class="mutation-points-icon" />
-            <h3 class="mutation-points-title">MUTATIONSPOÄNG</h3>
         </div>
-        
-        <div class="mutation-points-display">
-            <div class="mutation-points-controls">
-                <div class="mutation-points-indicators">
-                    {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
-                        <button 
-                            class="mutation-point-indicator"
-                            onclick={() => {
-                                if (sheetState.mutationPoints > idx) {
-                                    characterActions.setTotalMutationPoints(idx);
-                                } else {
-                                    characterActions.setTotalMutationPoints(idx + 1);
-                                }
-                            }}
-                            aria-label="Toggle mutation point {idx + 1}"
-                        >
-                            <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" />
-                            {#if sheetState.mutationPoints > idx}
-                                <img 
-                                    src='/img/strokes/x.svg' 
-                                    alt="Point available" 
-                                    class="stroke-image x-layer" 
-                                />
-                            {/if}
-                        </button>
-                    {/each}
-                    
-                    
-                
-                </div>
-            </div>
-        </div>
-        
+{/snippet}
+
+</PaperCard>
+
+<div class="mutation-points-display">
+    <div class="mutation-points-controls">
 
     </div>
 </div>
-</div>
+        
+
 
 
 

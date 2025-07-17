@@ -228,6 +228,60 @@
     color: var(--color-surface-800);
 }
 
+/* Textarea styling inside torn-paper-wrapper */
+.torn-paper-wrapper textarea {
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    width: 100%;
+    padding: 1rem;
+    font-family: var(--font-user);
+    color: var(--color-surface-800);
+    resize: none;
+    
+    /* Override any framework styles */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.torn-paper-wrapper textarea:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+/* Dark mode specific styles */
+.dark .torn-paper-wrapper textarea {
+    color: var(--color-surface-100);
+    border: none !important;
+    border-color: transparent !important;
+    background: transparent !important;
+}
+
+.dark .torn-paper-wrapper textarea:focus {
+    border: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Placeholder styling for torn-paper-wrapper textareas */
+.torn-paper-wrapper textarea::placeholder {
+    color: var(--color-surface-600);
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.dark .torn-paper-wrapper textarea::placeholder {
+    color: var(--color-surface-400);
+    opacity: 0.8;
+}
+
 .paper-body textarea {
     width: 100%;
     height: 100%;

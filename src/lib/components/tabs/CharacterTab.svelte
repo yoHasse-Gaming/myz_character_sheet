@@ -72,7 +72,7 @@
 
 
 
-    <!-- Reset Layout Button -->
+<!-- 
     <div class="reset-layout-container">
         <button 
             class="reset-layout-button"
@@ -85,7 +85,7 @@
             </svg>
             Återställ layout
         </button>
-    </div>
+    </div> -->
     
 
 <PaperCard 

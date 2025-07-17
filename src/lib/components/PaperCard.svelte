@@ -99,7 +99,7 @@
 
 <div 
     bind:this={paperElement}
-    class="torn-paper-wrapper {cardVariant} paper-card "
+    class="torn-paper-wrapper {cardVariant} paper-card panzoom-exclude"
     data-x="0" 
     data-y="0" 
     data-paper-id={paperId}

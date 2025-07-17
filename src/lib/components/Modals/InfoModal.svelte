@@ -24,6 +24,7 @@
       closeModal();
     }
   }}
+  classes="panzoom-exclude"
   backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
   contentBase="!z-[101] card bg-surface-100-900 p-0 shadow-xl max-w-2xl max-h-[90vh] overflow-hidden"
   positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"

@@ -31,17 +31,17 @@
                 startX: 0,
                 startY: 0,
                 contain: 'outside',
-                cursor: 'grab',
+                cursor: 'default',
                 // Enable native panning but only when space is held
                 disablePan: true,
                 // Allow zooming with mouse wheel
                 wheel: true,
                 wheelStep: 0.1,
-                animate: false ,
+                animate: true ,
                 duration: 200,
-                easing: 'ease-in-out',
+                easing: 'ease-in-out'
                 // Exclude InteractJS elements from panzoom events
-                excludeClass: 'paper-card'
+                
             });
 
             // Space key handlers for pan mode

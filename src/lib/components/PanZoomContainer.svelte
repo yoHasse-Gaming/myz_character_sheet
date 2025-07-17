@@ -32,16 +32,12 @@
                 startY: 0,
                 contain: 'outside',
                 cursor: 'default',
-                // Enable native panning but only when space is held
                 disablePan: true,
-                // Allow zooming with mouse wheel
                 wheel: true,
                 wheelStep: 0.1,
                 animate: true ,
                 duration: 200,
                 easing: 'ease-in-out'
-                // Exclude InteractJS elements from panzoom events
-                
             });
 
             // Space key handlers for pan mode
@@ -112,6 +108,20 @@
         }
     }
 
+    function onWheel(event: WheelEvent) {
+        if (!panzoom) {
+            return;
+
+        }
+        // Check if ctrl is pressed for zooming
+        if (!event.ctrlKey && !event.metaKey) {
+            return;
+        }
+        
+        // Use panzoom's zoomWithWheel method
+        panzoom.zoomWithWheel(event);
+    }
+
     // Toggle pan mode
     function togglePanMode() {
         isPanMode = !isPanMode;
@@ -158,8 +168,8 @@
     </div>
 
     <!-- Pan/Zoom Container -->
-    <div class="panzoom-container {isPanMode ? 'pan-mode' : ''}" bind:this={containerElement}>
-        <div class="panzoom-content non-draggable" bind:this={contentElement}>
+    <div class="panzoom-container {isPanMode ? 'pan-mode' : ''}" bind:this={containerElement} onwheel={onWheel}>
+        <div class="panzoom-content" bind:this={contentElement}>
             <!-- Character Tab Content -->
             <CharacterTab />
             <!-- Abilities Tab Content -->
@@ -211,18 +221,6 @@
         cursor: grabbing;
     }
 
-    /* Disable pointer events on draggable elements when in pan mode */
-    .panzoom-container.pan-mode .character-paper,
-    .panzoom-container.pan-mode .paper-card,
-    .panzoom-container.pan-mode [data-draggable] {
-        pointer-events: none;
-    }
-
-    .panzoom-container.pan-mode .character-paper:hover,
-    .panzoom-container.pan-mode .paper-card:hover,
-    .panzoom-container.pan-mode [data-draggable]:hover {
-        transform: none !important;
-    }
 
     .panzoom-content {
         display: block; /* Remove grid layout */

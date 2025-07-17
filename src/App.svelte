@@ -30,16 +30,20 @@
 
 
 
+
+
+<!-- Add test component for the new dice roll modal -->
+<!-- <DiceRollTest /> -->
+
+<!-- Main Content -->
+<main class="sheet-container">
+
+<PanZoomContainer />
+<SvgContent />
+
 <!-- Global Modals -->
 <InfoModal />
 <DiceRollModal />
-
-
-
-<!-- {#if isDialogueOpen()}
-<div class="modal-backdrop">
-</div>
-{/if} -->
 
 <!-- Drag and Drop Overlay -->
 <DragOverlay />
@@ -53,20 +57,9 @@ TODO: Use this instead of the AppBar component
 <ThemeSelector />
 <SizeSelector />
 
-{#if diceStates.isDicePluginAvailable && diceStates.broadCastAvailabilityCheck}
-    <DiceRollerTest />
-{/if}
-
-<!-- Add test component for the new dice roll modal -->
-<!-- <DiceRollTest /> -->
-
-<!-- Main Content -->
-<main class="sheet-container">
-
-<SvgContent />
-<PanZoomContainer />
-
 </main>
+
+
 
 
 

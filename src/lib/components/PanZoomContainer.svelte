@@ -31,21 +31,24 @@
                 noBind: true, // Disable default event binding to avoid conflicts
                 wheel: true,
                 wheelStep: 0.1,
-                animate: true ,
+                animate: true,
                 duration: 200,
                 easing: 'ease-in-out'
             });
 
             function handlePointerDown(event: PointerEvent) {
                 console.log('Pointer down event:', event);
-                if (event.button === 1) { // Middle mouse button
-                    console.log('Middle mouse button pressed');
+                // Handle middle mouse button or when in pan mode
+                if (event.button === 1 || isPanMode) { 
+                    console.log('Pan operation initiated');
+                    event.preventDefault(); // Prevent default middle-click behavior
                     panzoom?.handleDown(event);
                 }
             }
 
             function handleMove(event: PointerEvent) {
                 console.log('Pointer move event:', event);
+                // Only handle move if we're in the middle of a pan operation
                 panzoom?.handleMove(event);
             }
 
@@ -147,13 +150,6 @@
             </svg>
         </button>
 
-        <button class="control-btn {isPanMode ? 'active' : ''}" onclick={togglePanMode} title="Panorera-läge (Håll mittenknappen)" aria-label="Panorera-läge">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 12l2 2 4-4"></path>
-                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path>
-            </svg>
-        </button>
-        
         <button class="control-btn" onclick={resetView} title="Återställ vy (R)" aria-label="Återställ vy">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -224,21 +220,14 @@
         min-width: 300vw; /* Make content much wider for free-form layout */
         min-height: 200vh; /* Make content taller for more space */
         width: max-content; /* Ensure content doesn't get clipped */
-        background: linear-gradient(45deg, 
-            rgba(0,0,0,0.02) 0%, 
-            rgba(0,0,0,0.01) 25%, 
-            transparent 50%, 
-            rgba(0,0,0,0.01) 75%, 
-            rgba(0,0,0,0.02) 100%);
+        /* Create a visible pattern that moves with panning */
+        background-image: url('/img/sheet_bg.png') !important;
+
+        background-size: 1920px 1920px;
     }
 
     :global(.dark) .panzoom-content {
-        background: linear-gradient(45deg, 
-            rgba(255,255,255,0.02) 0%, 
-            rgba(255,255,255,0.01) 25%, 
-            transparent 50%, 
-            rgba(255,255,255,0.01) 75%, 
-            rgba(255,255,255,0.02) 100%);
+        background-image: url('/img/sheet_bg_dark.png') !important;
     }
 
     /* Pan/Zoom Controls */

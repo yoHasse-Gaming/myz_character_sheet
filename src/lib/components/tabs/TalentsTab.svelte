@@ -176,19 +176,6 @@
         min-height: 200px;
     }
 
-    .talent-info {
-        margin-bottom: 1rem;
-        padding: 1rem;
-        background: rgba(217, 119, 6, 0.05);
-        border-radius: 0.5rem;
-    }
-
-    .talent-description {
-        margin: 0 0 0.5rem 0;
-        font-weight: 600;
-        color: var(--color-surface-700);
-    }
-
     .talent-content {
         display: flex;
         align-items: center;
@@ -197,20 +184,6 @@
         min-height: 2rem;
     }
 
-    :global(.dark) .talent-description {
-        color: var(--color-surface-300);
-    }
-
-    .talent-requirement {
-        margin: 0;
-        font-size: 0.9rem;
-        color: var(--color-warning-700);
-        font-style: italic;
-    }
-
-    :global(.dark) .talent-requirement {
-        color: var(--color-warning-400);
-    }
 
     .talents-list {
         display: flex;
@@ -218,49 +191,6 @@
         gap: 1rem;
     }
 
-    .talent-item-wrapper {
-        width: 100%;
-    }
-
-    .talent-item-card {
-        padding: 1rem;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-        transition: all 0.2s ease;
-        cursor: move;
-        touch-action: none;
-        user-select: none;
-        will-change: transform;
-        transform: translateZ(0); /* Force hardware acceleration */
-    }
-
-    .talent-item-card:hover {
-        transform: translateY(-2px) translateZ(0);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        z-index: 2;
-    }
-
-    .talent-item-card:active {
-        opacity: 0.8;
-        z-index: 20;
-        transition: none; /* Disable transition during drag */
-    }
-
-    .talent-item-content {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        z-index: 1;
-    }
-
-    .talent-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
 
     .talent-name {
         font-family: var(--font-user), serif;

@@ -310,43 +310,6 @@
         box-sizing: border-box;
     }
 
-    /* Character header with label and drag handle */
-    .character-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        cursor: move; /* Make it clear this is the draggable area */
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0; /* Don't shrink the header */
-        /* Improve drag performance */
-        transform: translateZ(0);
-        backface-visibility: hidden;
-    }
-
-    :global(.dark) .character-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .character-label {
-        pointer-events: none;
-        font-family: var(--font-user), serif;
-        font-weight: bold;
-        font-size: 1.1rem;
-        letter-spacing: 0.05em;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        flex-grow: 1;
-    }
-
-    :global(.dark) .character-label {
-        color: var(--color-surface-100);
-    }
-
     .drag-handle {
         color: var(--color-surface-200);
         opacity: 0.7;

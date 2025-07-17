@@ -31,16 +31,17 @@
                 startX: 0,
                 startY: 0,
                 contain: 'outside',
+                cursor: 'grab',
                 // Enable native panning but only when space is held
                 disablePan: true,
                 // Allow zooming with mouse wheel
                 wheel: true,
                 wheelStep: 0.1,
-                animate: true,
+                animate: false ,
                 duration: 200,
                 easing: 'ease-in-out',
                 // Exclude InteractJS elements from panzoom events
-                exclude: '.character-paper, .paper-card, [data-draggable], .interact-draggable'
+                excludeClass: 'paper-card'
             });
 
             // Space key handlers for pan mode
@@ -158,7 +159,7 @@
 
     <!-- Pan/Zoom Container -->
     <div class="panzoom-container {isPanMode ? 'pan-mode' : ''}" bind:this={containerElement}>
-        <div class="panzoom-content" bind:this={contentElement}>
+        <div class="panzoom-content non-draggable" bind:this={contentElement}>
             <!-- Character Tab Content -->
             <CharacterTab />
             <!-- Abilities Tab Content -->

@@ -194,40 +194,10 @@
         flex-shrink: 0;
     }
 
-    .relation-badge {
-        background: rgba(34, 197, 94, 0.2);
-        color: var(--color-success-700);
-    }
 
     .note-badge {
         background: rgba(59, 130, 246, 0.2);
         color: var(--color-info-700);
-    }
-
-    /* Shared card styles */
-    .relation-card,
-    .note-card {
-        transition: all 0.2s ease;
-        cursor: move;
-        position: relative;
-        touch-action: none;
-        user-select: none;
-        will-change: transform;
-        transform: translateZ(0); /* Force hardware acceleration */
-    }
-
-    .relation-card:hover,
-    .note-card:hover {
-        transform: translateY(-2px) translateZ(0);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        z-index: 10;
-    }
-
-    .relation-card:active,
-    .note-card:active {
-        opacity: 0.8;
-        z-index: 20;
-        transition: none; /* Disable transition during drag */
     }
 
     .relation-content,
@@ -238,18 +208,6 @@
         height: 100%;
     }
 
-    .relation-card.close-relation {
-        border-color: rgba(239, 68, 68, 0.3);
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-    }
-
-    .relation-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0.5rem;
-        gap: 0.5rem;
-    }
 
     .relation-name {
         font-family: var(--form-labels), serif;

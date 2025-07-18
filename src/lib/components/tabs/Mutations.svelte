@@ -139,7 +139,7 @@
     draggable={true}
     resizable={false}
     minSize={{ width: 300, height: 100 }}
-    initialPosition={{ x: 20, y: 20 }}
+    initialPosition={{ x: 20, y: 770 }}
 > 
 
 {#snippet header()}

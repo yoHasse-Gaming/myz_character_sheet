@@ -72,7 +72,7 @@
             {#each occupationalTalents as talent, index}
             <PaperCard
                 paperId={`occupational-talent-${talent.id}`}
-
+                initialPosition={{ x: 20 + (index % 2) * 300, y: 20 + Math.floor(index / 2) * 80 }}
                 draggable={true}
                 resizable={false}
                 minSize={{ width: 250, height: 60 }}
@@ -116,7 +116,7 @@
             {#each genericTalents as talent, index}
             <PaperCard
                 paperId={`generic-talent-${talent.id}`}
-
+                initialPosition={{ x: 20 + (index % 2) * 300, y: 200 + Math.floor(index / 2) * 80 }}
                 draggable={true}
                 resizable={false}
                 minSize={{ width: 250, height: 60 }}

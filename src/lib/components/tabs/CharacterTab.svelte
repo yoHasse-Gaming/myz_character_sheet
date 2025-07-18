@@ -15,7 +15,18 @@
     };
 
     // Generate random variants for each input to make them unique
-    const [nameVariant, jobVariant, faceVariant, bodyVariant, clothesVariant] = generateUniqueVariants(5);
+    const [faceVariant, bodyVariant, clothesVariant] = generateUniqueVariants(5);
+
+    const startPos = { x: 20, y: 20 };
+
+    const characterPositions = {
+        name: { x: startPos.x, y: startPos.y },
+        job: { x: startPos.x + 380, y: startPos.y },
+        clothes: { x: startPos.x + 520, y: startPos.y + 60 },
+        face: { x: startPos.x, y: startPos.y + 60 },
+        body: { x: startPos.x + 260, y: startPos.y + 60 }
+    };
+    
 
     onMount(() => {
         // Initialize InteractJS for draggable and resizable character papers
@@ -51,46 +62,48 @@
 
 <PaperCard 
         paperId="character-name"
+        initialPosition={characterPositions.name}
+        resizable={false}
+        minSize={{ width: 380, height: 50 }}
+        class="p-2"
     >
-    {#snippet header()}
-    Namn
-    {/snippet}
     {#snippet content()}
-    <div class="torn-paper-wrapper">
-    <textarea
-        data-tooltip="Vad kallar dig de andra överlevarna?" 
-        id="name" 
-        data-placement="bottom" 
-        placeholder="t.ex. Rust, Echo, Zero..." 
-        bind:value={formData.name} > </textarea>
-
+    <div class="compact-field">
+        <span class="field-label">NAMN</span>
+        <input
+            type="text"
+            class="compact-input font-user"
+            placeholder="t.ex. Rust, Echo, Zero..."
+            bind:value={formData.name}
+        />
     </div>
     {/snippet}
-
-
 </PaperCard>
 
 <PaperCard 
     paperId="character-job"
+    initialPosition={characterPositions.job}
+    resizable={false}
+    minSize={{ width: 380, height: 50 }}
+    class="p-2"
     >
-    {#snippet header()}
-    Syssla
-    {/snippet}
     {#snippet content()}
-
-    <div class="torn-paper-wrapper">
-    <textarea
-        data-tooltip="Vad gör du för att överleva?" 
-        id="job" 
-        data-placement="bottom" 
-        placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..." 
-        bind:value={formData.job} > </textarea>
+    <div class="compact-field">
+        <span class="field-label">SYSSLA</span>
+        <input
+            type="text"
+            class="compact-input font-user"
+            placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..."
+            bind:value={formData.job}
+        />
     </div>
     {/snippet}
 </PaperCard>
 
 <PaperCard 
     paperId="character-face"
+    initialPosition={characterPositions.face}
+    minSize={{ width: 250, height: 80 }}
     >
     {#snippet header()}
     Ansikte
@@ -109,8 +122,8 @@
 
 <PaperCard 
     paperId="character-body"
-    
-
+    initialPosition={characterPositions.body}
+    minSize={{ width: 250, height: 80 }}
     >
     {#snippet header()}
     Kropp
@@ -128,8 +141,8 @@
 
 <PaperCard 
     paperId="character-clothes"
-    autoResize={true}
-
+    initialPosition={characterPositions.clothes}
+    minSize={{ width: 250, height: 80 }}
     >
     {#snippet header()}
     Kläder
@@ -148,6 +161,53 @@
 
 
 <style>
+
+    /* Compact field styling for name and job */
+    .compact-field {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.25rem;
+        min-height: 2rem;
+    }
+
+    .field-label {
+        font-family: var(--font-user), serif;
+        font-weight: bold;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        color: var(--color-surface-700);
+        text-transform: uppercase;
+        flex-shrink: 0;
+        min-width: 60px;
+    }
+
+    :global(.dark) .field-label {
+        color: var(--color-surface-300);
+    }
+
+    .compact-input {
+        width: 100%;
+        height: 1.5rem;
+        font-size: 0.9rem;
+        flex-grow: 1;
+        border: 1px solid var(--color-surface-400);
+        border-radius: 4px;
+        background: transparent;
+        color: var(--color-surface-900);
+        padding: 0.25rem 0.5rem;
+    }
+
+    :global(.dark) .compact-input {
+        color: var(--color-surface-100);
+        border-color: var(--color-surface-600);
+    }
+
+    .compact-input:focus {
+        outline: none;
+        border-color: var(--color-primary-600);
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
+    }
 
     /* Reset layout button */
     .reset-layout-container {

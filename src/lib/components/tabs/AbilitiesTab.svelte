@@ -42,7 +42,7 @@
 <BaseAbility 
     baseAbility={ability}
     abilityIndex={index}
-    initialPosition={{ x: 20, y: 20 + index * 100 }}
+    initialPosition={{ x: 380, y: 280 + index * 85 }}
 />
 {/each}
 
@@ -50,7 +50,8 @@
     paperId="conditions"
 
     resizable={false}
-    initialPosition={{ x: 20, y: sheetState.baseAbilities.length * 100 + 20 }}
+    initialPosition={{ x: 20, y: 280 }}
+    initialSize={{ width: 350, height: 85*4 }}
     > 
     {#snippet header()}
     <div class="conditions-header">
@@ -74,6 +75,7 @@
     <div class="torn-paper-wrapper">
         <textarea 
             class="critical-input font-user" 
+            style="height: 100%;"
             placeholder="Beskrivning av allvarliga skador..." 
             bind:value={sheetState.criticalInjuries} 
         ></textarea>
@@ -83,7 +85,7 @@
 
 </PaperCard>
 
-<Skills />
+<Skills  startPosition={{ x: 650, y: 280 }} />
 
 <style>
 

@@ -10,7 +10,7 @@
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
 
-    const { startPosition = { x: 350, y: 20 } }: {
+    const { startPosition = { x: 1020, y: 20 } }: {
         startPosition?: { x: number, y: number }
     } = $props();
 
@@ -22,26 +22,25 @@
 
     // Function to generate initial positions for skills
     function getInitialPosition(index: number) {
-        const startX = startPosition?.x || 350; // Default to 600 if not provided
-        const startY = startPosition?.y || 20; // Default to 20 if not provided
-        const startPos = { x: startX, y: startY + index * 70 }; // 70px spacing between skills
-
-        const cols = 2;
+        const startX = startPosition?.x || 1020; // Start far to the right to avoid character elements
+        const startY = startPosition?.y || 20; // Start from top
+        
+        const cols = 2; // 2 columns for better organization
+        const cardWidth = 260; // Width of each skill card + margin
+        const cardHeight = 65; // Height of each skill card + margin
+        
         const row = Math.floor(index / cols);
         const col = index % cols;
-        // Position skills in a grid layout
-        const x = col * 280 + startX;
-        const y = row * 70 + startY;
+        
+        // Position skills in a well-spaced grid layout
+        const x = col * cardWidth + startX;
+        const y = row * cardHeight + startY;
         return { x, y };
-
-        // const cols = 2;
-        // const row = Math.floor(index / cols);
-        // const col = index % cols;
-        // // Position skills to the right of abilities (starting at x: 600)
+    }
         // const x = col * 280 + 600;
         // const y = row * 70 + 20;
         // return { x, y };
-    }
+    
 
     $effect(() => {
         // Debug: Check if characterActions is available

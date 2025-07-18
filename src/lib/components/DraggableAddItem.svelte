@@ -3,7 +3,7 @@
         text = "Dra för att lägga till",
         ariaLabel = "Dra för att lägga till föremål", 
         variant = "variant-6",
-        dragType = "add-item",
+        dragType = "add-item", // This can be: add-mutation, add-talent, add-equipment, etc.
         position = { top: 120, right: -60 },
         onDragStart = () => {},
         onDragEnd = () => {}
@@ -12,21 +12,24 @@
     let isDragging = $state(false);
 
     function handleDragStart(event: DragEvent) {
+        console.log('DraggableAddItem: Drag start event fired!', { dragType, event });
         isDragging = true;
         if (event.dataTransfer) {
             event.dataTransfer.effectAllowed = 'copy';
             event.dataTransfer.setData('text/plain', dragType);
+            console.log('DraggableAddItem: DataTransfer set with type:', dragType);
         }
         onDragStart();
     }
 
     function handleDragEnd() {
+        console.log('DraggableAddItem: Drag end event fired!');
         isDragging = false;
         onDragEnd();
     }
 </script>
 
-<div class="draggable-add-container" style="top: {position.top}px; right: {position.right}px;">
+<div class="draggable-add-container">
     <div 
         class="draggable-add-item torn-paper-wrapper {variant}"
         role="button"
@@ -51,13 +54,22 @@
 <style>
     /* Draggable Add Item */
     .draggable-add-container {
-        position: fixed;
-        z-index: 100;
+        position: fixed; /* Keep fixed to always be visible in viewport */
+        z-index: 1000; /* Higher z-index to stay above panzoom content */
         transition: right 0.3s ease;
+        /* Ensure it's always visible - adjust default positioning */
+        top: 120px;
+        min-width: 120px;
+        right: -60px; /* Start partially hidden to show it's there */
     }
 
     .draggable-add-container:hover {
         right: 20px !important; /* Slide fully into view on hover */
+    }
+
+
+    .draggable-add-container:hover::before {
+        opacity: 0;
     }
 
     .draggable-add-item {

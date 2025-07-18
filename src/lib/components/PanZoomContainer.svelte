@@ -10,6 +10,8 @@
     import TalentsTab from './tabs/TalentsTab.svelte';
     import EquipmentTab from './tabs/EquipmentTab.svelte';
     import RelationsNotesTab from './tabs/RelationsNotesTab.svelte';
+    import DraggableAddItem from './DraggableAddItem.svelte';
+    import DropZoneContainer from './DropZoneContainer.svelte';
 
     let containerElement: HTMLElement;
     let contentElement: HTMLElement;
@@ -47,7 +49,7 @@
             }
 
             function handleMove(event: PointerEvent) {
-                console.log('Pointer move event:', event);
+                console.debug('Pointer move event:', event);
                 // Only handle move if we're in the middle of a pan operation
                 panzoom?.handleMove(event);
             }
@@ -120,14 +122,6 @@
         panzoom.zoomWithWheel(event);
     }
 
-    // Toggle pan mode
-    function togglePanMode() {
-        isPanMode = !isPanMode;
-        if (panzoom) {
-            panzoom.setOptions({ disablePan: !isPanMode });
-            document.body.style.cursor = isPanMode ? 'grab' : '';
-        }
-    }
 </script>
 
 <div class="panzoom-wrapper">
@@ -175,6 +169,14 @@
         </div>
     </div>
 
+        <!-- Draggable Add Item -->
+    <DraggableAddItem 
+        text="Lägg till"
+        ariaLabel="Dra för att lägga till nytt innehåll"
+        variant="variant-5"
+        dragType="add-item"
+    />
+
     <!-- Instructions -->
     <div class="instructions">
         <p>
@@ -185,6 +187,9 @@
             {/if}
         </p>
     </div>
+
+    <!-- Drop Zone Container for adding new items -->
+    <DropZoneContainer />
 </div>
 
 <style>

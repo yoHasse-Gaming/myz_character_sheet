@@ -178,17 +178,6 @@
 
 </script>
 
-    <!-- Draggable Add Item -->
-    <DraggableAddItem 
-        text="Dra för färdigheter"
-        ariaLabel="Dra för att lägga till valfria färdigheter"
-        variant="variant-5"
-    />
-
-    <!-- Skills Container -->
-        <!-- Control Buttons Section -->
-
-
     <!-- Core Skills -->
     {#each sheetState.skills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }

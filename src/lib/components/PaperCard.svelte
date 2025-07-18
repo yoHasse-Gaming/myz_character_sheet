@@ -122,21 +122,23 @@
 
 <style>
     /* Paper card container */
+
     .paper-card {
         cursor: default;
         user-select: none;
-        position: relative;
+        position: absolute; /* Back to relative - absolute was causing stretching issues */
         transition: box-shadow 0.2s ease, border-color 0.2s ease;
         will-change: transform;
         transform: translateZ(0);
         backface-visibility: hidden;
         min-width: var(--min-width, 250px);
         min-height: var(--min-height, 120px);
+        max-width: 450px;
+        width: fit-content;
+        height: fit-content;
         border: 3px solid transparent;
         border-radius: 4px;
-        width: fit-content;
-        max-width: 450px;
-    }
+    } 
 
     .paper-card:hover {
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);

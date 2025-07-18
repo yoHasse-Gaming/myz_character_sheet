@@ -44,49 +44,10 @@
         });
     });
 
-    function resetCharacterLayout() {
-        // Clear saved layouts
-        characterActions.clearPaperLayouts();
-        
-        // Reset all character papers to default positions and sizes
-        const characterElements = document.querySelectorAll('.character-paper');
-        characterElements.forEach((element) => {
-            const htmlElement = element as HTMLElement;
-            // Reset transform
-            htmlElement.style.transform = '';
-            htmlElement.setAttribute('data-x', '0');
-            htmlElement.setAttribute('data-y', '0');
-            // Reset size
-            htmlElement.style.width = '';
-            htmlElement.style.height = '';
-        });
-        
-        console.log('Character layout reset to defaults');
-    }
-
-
-
-
 </script>
 
 
 
-
-<!-- 
-    <div class="reset-layout-container">
-        <button 
-            class="reset-layout-button"
-            onclick={resetCharacterLayout}
-            title="Återställ alla pappersposter till standardpositioner"
-        >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-            </svg>
-            Återställ layout
-        </button>
-    </div> -->
-    
 
 <PaperCard 
         paperId="character-name"

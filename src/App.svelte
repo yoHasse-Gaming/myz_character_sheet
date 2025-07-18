@@ -46,7 +46,7 @@
 <DiceRollModal />
 
 <!-- Drag and Drop Overlay -->
-<DragOverlay />
+<!-- <DragOverlay /> -->
 
 <!-- Global Utility Buttons -->
 

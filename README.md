@@ -1,3 +1,7 @@
+# What to fix next:
+* [ ] - fix so papers are not spread out over the whole screen.
+* [ ] - move additem paper so it's always sticky to the right of the screen.
+
 # TODO:
 * [x] - Fix so it's a common function for all tabs. Like, use the same logic for all tabs.
     * [x] Drag and drop for papers, like dragging a paper to a title to "add" new content.

@@ -610,37 +610,6 @@
         color: var(--color-success-300);
     }
 
-    .info-icon-button {
-        padding: 0.25rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-surface-300);
-        background: transparent;
-        color: var(--color-surface-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        pointer-events: auto;
-        opacity: 0.8;
-    }
-
-    .info-icon-button:hover {
-        background: var(--color-surface-100);
-        opacity: 1;
-        transform: scale(1.1);
-    }
-
-    :global(.dark) .info-icon-button {
-        border-color: var(--color-surface-600);
-        color: var(--color-surface-400);
-    }
-
-    :global(.dark) .info-icon-button:hover {
-        background: var(--color-surface-700);
-    }
-
     .remove-button {
         padding: 0.25rem;
         border-radius: 50%;

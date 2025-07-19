@@ -373,37 +373,6 @@
         color: var(--color-surface-100);
     }
 
-    .info-icon-button {
-        background: none;
-        border: none;
-        color: var(--color-surface-600);
-        cursor: pointer;
-        padding: 0.25rem;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.7;
-        flex-shrink: 0;
-    }
-
-    .info-icon-button:hover {
-        background: rgba(217, 119, 6, 0.1);
-        color: var(--color-primary-600);
-        opacity: 1;
-        transform: scale(1.1);
-    }
-
-    :global(.dark) .info-icon-button {
-        color: var(--color-surface-400);
-    }
-
-    :global(.dark) .info-icon-button:hover {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-primary-400);
-    }
-
     .dice-roll-button {
         background: none;
         border: none;

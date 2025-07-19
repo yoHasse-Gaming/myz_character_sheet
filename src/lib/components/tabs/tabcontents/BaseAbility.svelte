@@ -289,39 +289,6 @@
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     }
 
-    .info-icon-button {
-        background: none;
-        border: none;
-        color: var(--color-surface-600);
-        cursor: pointer;
-        padding: 0.15rem;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.7;
-        flex-shrink: 0;
-        width: 1.25rem;
-        height: 1.25rem;
-    }
-
-    .info-icon-button:hover {
-        background: rgba(217, 119, 6, 0.1);
-        color: var(--color-primary-600);
-        opacity: 1;
-        transform: scale(1.1);
-    }
-
-    :global(.dark) .info-icon-button {
-        color: var(--color-surface-400);
-    }
-
-    :global(.dark) .info-icon-button:hover {
-        background: rgba(217, 119, 6, 0.2);
-        color: var(--color-primary-400);
-    }
-
     .damage-indicators {
         display: flex;
         gap: 0.05rem;

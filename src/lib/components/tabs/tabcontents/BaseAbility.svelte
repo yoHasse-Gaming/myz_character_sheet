@@ -194,11 +194,9 @@
         width: 1.75rem;
         height: 1.75rem;
         padding: 0;
-        font-size: 0.9rem;
+        font-size: 1.2rem;
         font-weight: bold;
         text-align: center;
-        border: 2px solid var(--color-surface-600);
-        border-radius: 4px;
         background: transparent;
         color: var(--color-surface-900);
         box-shadow: none;

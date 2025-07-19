@@ -276,15 +276,14 @@ dialog::backdrop {
 
 .dark .input {
     border: none;
-    color: var(--color-surface-900) !important;
     appearance: none;
     -webkit-appearance: none;
     outline-color: transparent;
 }
 
-.input:focus:not(.tab-content input):not(.tab-content textarea) {
+/* .input:focus:not(.tab-content input):not(.tab-content textarea) {
     border-color: #d97706 !important;
-}
+} */
 
 .dark .input:focus {
     outline: none;
@@ -445,7 +444,6 @@ dialog::backdrop {
 }
 
 .skill-item:hover {
-    border-color: #d97706;
     background: rgba(217, 119, 6, 0.1) !important;
     box-shadow: 0 0 10px rgba(217, 119, 6, 0.2);
 }
@@ -777,13 +775,10 @@ label {
 
 .dark .compact-textarea {
     color: var(--color-surface-100);
-    border-color: var(--color-surface-600);
 }
 
 .compact-textarea:focus {
     outline: none;
-    border-color: var(--color-primary-600);
-    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
 }
 
 .compact-textarea::placeholder {
@@ -792,7 +787,7 @@ label {
 }
 
 .dark .compact-textarea::placeholder {
-    color: var(--color-surface-400);
+    color: var(--color-surface-200);
 }
 
 .compact-field {

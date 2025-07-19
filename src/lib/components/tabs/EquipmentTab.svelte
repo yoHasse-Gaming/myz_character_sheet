@@ -438,7 +438,7 @@
         width: 40px;
         height: 24px;
         padding: 2px 4px;
-        font-size: 0.75rem;
+        font-size: 1rem;
         text-align: center;
         border: 1px solid var(--color-border);
         border-radius: 3px;
@@ -506,21 +506,21 @@
     }
 
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.85rem;
         font-weight: 500;
         color: var(--color-surface-600);
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
 
-    .stat-value {
-        font-size: 0.8rem;
+    .stat-input {
+        font-size: 1rem;
         font-weight: bold;
         color: var(--color-primary-600);
     }
 
     :global(.dark) .stat-label {
-        color: var(--color-surface-400);
+        color: var(--color-surface-200);
     }
 
     :global(.dark) .stat-value {

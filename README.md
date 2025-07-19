@@ -1,39 +1,53 @@
-# What to fix next:
-* [ ] - fix so papers are not spread out over the whole screen.
-* [ ] - move additem paper so it's always sticky to the right of the screen.
+# MYZ Character Sheet
 
-# TODO:
-* [x] - Fix so it's a common function for all tabs. Like, use the same logic for all tabs.
-    * [x] Drag and drop for papers, like dragging a paper to a title to "add" new content.
-    * [x] Drop should have a "drop zone" which is like a red-flashlight where the item can be dropped. and become yellow when it's inside of bounds for dropping.
-    * [x] Full overlay system with flashlight circles highlighting all drop zones simultaneously.
-    * [ ] - Add atmospheric glow for flashlight effect
-* [ ] - Fix so the design or style is the same for all tabs.
-    * Paper-style for every section.
-    * [ ] - Mutations should be like skills with dragable mutations.
-    * [ ] - Base-skills should be like skills with dragable base-skills.
-    * [ ] - Conditions should have paper-background style and be draggable.
-    * [ ] - Severe conditions should have paper-background style and be draggable.
-* [ ] - When rolling dice, have a result callback so a toast icon can be shown with the result.
+## High Priority Fixes
+* [ ] Fix paper card positioning - prevent spread across entire screen
+* [ ] Move add item button to always be sticky on the right side of screen
+* [ ] Fix drop zone positioning and calculation for new items
+* [ ] Update card default/starting positions to look good
+* [ ] Add layout lock mechanism to prevent accidental card movement
 
+## UI/UX Improvements
+* [ ] Standardize control buttons (pan/zoom, reset, size, light/dark) - same location and style
+* [ ] Update relation cards to be wider and more readable
+* [ ] Verify modal styling consistency across all modals
+* [ ] Add atmospheric glow effect for flashlight drop zones
 
-* [ ] - Finish all tabs so they are usable.
-* [ ] - Make sure character data is saved and loaded correctly.
-* [ ] - Add grouping for all paper-items. Like beeing able to group papers together and have them move together.
-* [ ] - Add a "lock" to be able to lock the layout of the papers so they can't be moved.
+## Relations System
+* [ ] Add default relations:
+  * [ ] RP 1 
+  * [ ] RP 2
+  * [ ] I hate
+  * [ ] I want to protect
+* [ ] Add ability to edit relations directly on cards (like name, body, face fields)
 
-# TODO next:
-* [x] Add weapon from weapon.json
-    * [x] Allow user to either add a predefined weapon or create a custom one.
-* [x] Update WeaponModal and EquipmentModal to match MutationsModal/TalentsModal style with card-grid selection and "Custom" option.
-* [x] Update each equiptment, weapon and armor cards to be editable directly instead of using a modal. 
-* [x] Update "Anpassad" to just add an empty card to edit.
-* Allow for modification of existing weapons and equipment and armor.
-* Add selection for dice roll for skills I want the equipment dice to be a dropdown to select equipment with a bonus or a weapon that is connected to that skill.
+## Data Persistence
+* [ ] Fix saving card positions to browser local storage
+* [ ] Fix saving to Owlbear integration
+  * [ ] Make it so only DM/GM can view all other characters
 
-For example.
-Weapons.json contains 
+## Design Consistency
+* [ ] Apply paper-style to all sections
+* [ ] Make mutations draggable like skills
+* [ ] Make base abilities draggable like skills  
+* [ ] Add paper-background style to conditions and make them draggable
+* [ ] Add paper-background style to severe conditions and make them draggable
 
+## Features
+* [ ] Add dice roll result callback for toast notifications
+* [ ] Add equipment selection dropdown for dice rolls (equipment with bonuses/weapons for skills)
+* [ ] Add grouping system for paper items to move together
+* [ ] Complete all tabs functionality
+* [ ] Ensure character data saving/loading works correctly
 
-## Bugs:
-* [ ] - Drop zones are as wide as the container, should have a max-width which is the same as the height.
+## Completed Features ✅
+* [✅] Common drag and drop system for all tabs
+* [✅] Flashlight drop zone overlay system with highlighting
+* [✅] Add weapons from weapons.json with custom weapon option
+* [✅] Updated modals to match card-grid selection style
+* [✅] Direct card editing instead of modal-based editing
+* [✅] Custom item creation (weapons, equipment, armor)
+
+## Known Bugs
+* [ ] Drop zones are as wide as container - should have max-width equal to height
+* [ ] Modal backdrops positioning issues

@@ -42,7 +42,8 @@
 <BaseAbility 
     baseAbility={ability}
     abilityIndex={index}
-    initialPosition={{ x: 380, y: 280 + index * 85 }}
+    
+    initialPosition={{ x: 20, y: 20 + index * 85 }}
 />
 {/each}
 
@@ -50,14 +51,11 @@
     paperId="conditions"
 
     resizable={false}
-    initialPosition={{ x: 20, y: 280 }}
-    initialSize={{ width: 350, height: 85*4 }}
+    initialPosition={{ x: 20, y: 380 }}
+    minSize={{ width: 300, height: 0 }}
+    initialSize={{ width: 300, height: 85*4 }}
     > 
-    {#snippet header()}
-    <div class="conditions-header">
-        <h3 class="conditions-title">Tillstånd</h3>
-    </div>
-    {/snippet}
+
     
     {#snippet content()}
     <div class="conditions-container">
@@ -85,20 +83,19 @@
 
 </PaperCard>
 
-<Skills  startPosition={{ x: 650, y: 280 }} />
+<Skills  startPosition={{ x: 340, y: 380 }} />
 
 <style>
 
-    .conditions-container {
+            .conditions-container {
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.25rem;
                 padding: 0.5rem;
-            }
-
-            .condition-row {
+                height: 100%;
+            }            .condition-row {
                 display: flex;
-                gap: 2rem;
+                gap: 1rem;
                 align-items: center;
                 justify-content: space-between;
             }
@@ -107,17 +104,20 @@
                 display: flex;
                 align-items: center;
                 flex: 1;
+                gap: 0.5rem;
+                justify-content: space-between;
             }
 
             .condition-label {
                 font-family: var(--form-labels), serif;
-                font-size: 1rem;
+                font-size: 0.8rem;
                 font-weight: bold;
                 text-transform: uppercase;
-                letter-spacing: 0.1em;
+                letter-spacing: 0.05em;
                 color: var(--color-surface-900);
                 text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-                min-width: 6rem;
+                min-width: 4rem;
+                flex: 1;
             }
 
             :global(.dark) .condition-label {
@@ -126,8 +126,8 @@
             }
 
             .condition-indicator {
-                width: 2rem;
-                height: 2rem;
+                width: 1.5rem;
+                height: 1.5rem;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -137,6 +137,7 @@
                 background: transparent;
                 padding: 0;
                 transition: transform 0.2s ease;
+                flex-shrink: 0;
             }
 
             .condition-indicator:hover {

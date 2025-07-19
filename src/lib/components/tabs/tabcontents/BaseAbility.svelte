@@ -98,7 +98,7 @@
 
     draggable={true}
     resizable={false}
-    minSize={{ width: 250, height: 80 }}
+    minSize={{ width: 300, height: 80 }}
     initialPosition={initialPosition}
     class="p-2 pt-3"
     >

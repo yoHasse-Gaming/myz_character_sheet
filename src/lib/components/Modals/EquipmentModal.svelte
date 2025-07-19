@@ -115,7 +115,7 @@
   }}
   classes="panzoom-exclude"
   backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
-  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
+  contentBase="!z-[101] card p-6 space-y-4 shadow-xl max-w-6xl max-h-[90vh] overflow-y-auto"
   positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
   closeOnInteractOutside={true}
   closeOnEscape={true}

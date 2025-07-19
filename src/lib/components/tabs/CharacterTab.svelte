@@ -17,14 +17,14 @@
     // Generate random variants for each input to make them unique
     const [faceVariant, bodyVariant, clothesVariant] = generateUniqueVariants(5);
 
-    const startPos = { x: 20, y: 20 };
+    const startPos = { x: 340, y: 20 };
 
     const characterPositions = {
         name: { x: startPos.x, y: startPos.y },
-        job: { x: startPos.x + 380, y: startPos.y },
-        clothes: { x: startPos.x + 520, y: startPos.y + 60 },
+        job: { x: startPos.x + 390, y: startPos.y },
         face: { x: startPos.x, y: startPos.y + 60 },
-        body: { x: startPos.x + 260, y: startPos.y + 60 }
+        body: { x: startPos.x + 270, y: startPos.y + 60 },
+        clothes: { x: startPos.x + 540, y: startPos.y + 60 }
     };
     
 
@@ -103,38 +103,40 @@
 <PaperCard 
     paperId="character-face"
     initialPosition={characterPositions.face}
-    minSize={{ width: 250, height: 80 }}
+    minSize={{ width: 260, height: 70 }}
+    resizable={true}
+    autoResize={true}
+    class="p-2"
     >
-    {#snippet header()}
-    Ansikte
-    {/snippet}
     {#snippet content()}
-
-    <div class="torn-paper-wrapper {faceVariant}">
-        <textarea 
-            placeholder="Ärrat, väderbitit, maskerat..." 
-            bind:value={formData.appearance.face}></textarea>
+    <div class="compact-textarea-field">
+        <span class="field-label">ANSIKTE</span>
+        <textarea
+            class="compact-textarea font-user"
+            placeholder="Ärrat, väderbitit, maskerat..."
+            bind:value={formData.appearance.face}
+            rows="2"
+        ></textarea>
     </div>
     {/snippet}
-
-
 </PaperCard>
 
 <PaperCard 
     paperId="character-body"
     initialPosition={characterPositions.body}
-    minSize={{ width: 250, height: 80 }}
+    minSize={{ width: 260, height: 70 }}
+    resizable={true}
+    class="p-2"
     >
-    {#snippet header()}
-    Kropp
-    {/snippet}
-
     {#snippet content()}
-
-    <div class="torn-paper-wrapper {bodyVariant}">
-        <textarea 
-            placeholder="Mager, muskulös, deformerad..." 
-            bind:value={formData.appearance.body}></textarea>
+    <div class="compact-textarea-field">
+        <span class="field-label">KROPP</span>
+        <textarea
+            class="compact-textarea font-user"
+            placeholder="Mager, muskulös, deformerad..."
+            bind:value={formData.appearance.body}
+            rows="2"
+        ></textarea>
     </div>
     {/snippet}
 </PaperCard>
@@ -142,18 +144,19 @@
 <PaperCard 
     paperId="character-clothes"
     initialPosition={characterPositions.clothes}
-    minSize={{ width: 250, height: 80 }}
+    minSize={{ width: 260, height: 70 }}
+    resizable={true}
+    class="p-2"
     >
-    {#snippet header()}
-    Kläder
-    {/snippet}
     {#snippet content()}
-
-    <div class="torn-paper-wrapper {clothesVariant}">
-        <textarea 
-            placeholder="Lappade trasor, läder, folie..." 
+    <div class="compact-textarea-field">
+        <span class="field-label">KLÄDER</span>
+        <textarea
+            class="compact-textarea font-user"
+            placeholder="Lappade trasor, läder, folie..."
             bind:value={formData.appearance.clothes}
-            ></textarea>
+            rows="2"
+        ></textarea>
     </div>
     {/snippet}
 </PaperCard>
@@ -176,14 +179,14 @@
         font-weight: bold;
         font-size: 0.8rem;
         letter-spacing: 0.05em;
-        color: var(--color-surface-700);
+        color: var(--color-surface-900);
         text-transform: uppercase;
         flex-shrink: 0;
         min-width: 60px;
     }
 
     :global(.dark) .field-label {
-        color: var(--color-surface-300);
+        color: var(--color-surface-100);
     }
 
     .compact-input {
@@ -191,8 +194,6 @@
         height: 1.5rem;
         font-size: 0.9rem;
         flex-grow: 1;
-        border: 1px solid var(--color-surface-400);
-        border-radius: 4px;
         background: transparent;
         color: var(--color-surface-900);
         padding: 0.25rem 0.5rem;
@@ -200,13 +201,54 @@
 
     :global(.dark) .compact-input {
         color: var(--color-surface-100);
-        border-color: var(--color-surface-600);
     }
 
     .compact-input:focus {
         outline: none;
+    }
+
+    /* Compact textarea field styling */
+    .compact-textarea-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: 100%;
+        padding: 0.25rem;
+    }
+
+    .compact-textarea {
+        width: 100%;
+        min-height: 2.5rem;
+        font-size: 0.85rem;
+        border: 1px solid var(--color-surface-400);
+        border-radius: 4px;
+        background: transparent;
+        color: var(--color-surface-900);
+        padding:unset;
+        resize: vertical;
+        font-family: inherit;
+        line-height: 1.3;
+        resize: none;
+    }
+
+    :global(.dark) .compact-textarea {
+        color: var(--color-surface-100);
+        border-color: var(--color-surface-600);
+    }
+
+    .compact-textarea:focus {
+        outline: none;
         border-color: var(--color-primary-600);
         box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
+    }
+
+    .compact-textarea::placeholder {
+        color: var(--color-surface-500);
+        font-style: italic;
+    }
+
+    :global(.dark) .compact-textarea::placeholder {
+        color: var(--color-surface-400);
     }
 
     /* Reset layout button */

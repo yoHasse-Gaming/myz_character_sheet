@@ -51,21 +51,21 @@
 </script>
 
 <Modal
-  open={isDialogueOpen('newArmor')}
-  onOpenChange={(e) => {
-    if (!e.open) {
-      closeModal();
-    }
-  }}
-  classes="panzoom-exclude"
-  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
-  contentBase="!z-[101] card bg-surface-100-900 p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
-  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
-  closeOnInteractOutside={true}
-  closeOnEscape={true}
->
-  
-  {#snippet content()}
+    open={isDialogueOpen('newArmor')}
+    onOpenChange={(e) => {
+        if (!e.open) {
+            closeModal();
+        }
+    }}
+    classes="panzoom-exclude"
+    backdropClasses="!z-[100] backdrop-blur-sm bg-black/50"
+    contentBase="!z-[101] card p-6 space-y-4 shadow-xl max-w-2xl max-h-[90vh] overflow-y-auto"
+    positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+    closeOnInteractOutside={true}
+    closeOnEscape={true}
+    >
+
+    {#snippet content()}
     <div class="armor-modal-content torn-paper-wrapper variant-1 modal-content-wrapper">
         <div class="modal-header">
             <div class="modal-title-container">

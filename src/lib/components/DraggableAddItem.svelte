@@ -139,22 +139,35 @@
     }
 
     /* Responsive adjustments for draggable item */
-    @media (max-width: 768px) {
+    @media (max-width: 770px) {
         .draggable-add-container {
-            position: static;
-            right: auto;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: center;
+            position: fixed; /* Keep fixed positioning but adjust placement */
+            top: 20px; /* Move to top of screen */
+            right: 10px; /* Small margin from edge */
+            z-index: 2100; /* Higher than drop zone overlay (2000) */
         }
 
         .draggable-add-container:hover {
-            right: auto;
+            right: 10px; /* Stay in same position on hover */
         }
         
         .draggable-add-item {
             animation: none;
-            transform: rotate(0deg);
+            transform: rotate(0deg) scale(0.9); /* Smaller size for mobile */
+            padding: 0.75rem; /* Reduced padding */
+        }
+
+        .add-item-content {
+            gap: 0.25rem;
+        }
+
+        .add-item-content svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .add-item-text {
+            font-size: 0.7rem;
         }
     }
 </style>

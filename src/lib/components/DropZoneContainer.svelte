@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { characterActions } from '../states/character_sheet.svelte';
     import { openDialogueOption } from '../states/modals.svelte';
-    import { Backpack, Dna, Shield, Star, Swords, Notebook, type Icon as IconType, Users } from '@lucide/svelte';
+    import { Backpack, Dna, Shield, Star, Swords, Notebook, Target, type Icon as IconType, Users } from '@lucide/svelte';
 
     let isDropping = $state(false);
     let dropType = $state('');
@@ -34,6 +34,12 @@
             icon: Backpack,
             description: 'Släpp här för att lägga till ny utrustning', 
             handler: () => openDialogueOption('equipment')
+        },
+        'add-optional-skill': {
+            label: 'Lägg till färdighet',
+            icon: Target,
+            description: 'Släpp här för att lägga till färdighet',
+            handler: () => openDialogueOption('optionalSkills')
         },
         'add-weapon': {
             label: 'Lägg till vapen',
@@ -224,24 +230,51 @@
         
         /* Position zones around the screen using CSS custom properties */
         /* Top row */
-        --positions: 
-            calc(20vw) calc(15vh), /* Top left */
-            calc(50vw - 100px) calc(10vh), /* Top center */
-            calc(80vw - 200px) calc(15vh), /* Top right */
-            calc(85vw - 200px) calc(40vh - 100px), /* Right middle */
-            calc(75vw - 200px) calc(70vh - 200px), /* Bottom right */
-            calc(40vw - 100px) calc(80vh - 200px), /* Bottom center */
-            calc(15vw) calc(65vh - 200px); /* Left middle */
+
     }
 
-    /* Position each zone using nth-child */
-    .flashlight-zone:nth-child(1) { top: 15vh; left: 10vw; }
-    .flashlight-zone:nth-child(2) { top: 10vh; left: calc(50vw - 100px); }
-    .flashlight-zone:nth-child(3) { top: 15vh; right: 10vw; }
-    .flashlight-zone:nth-child(4) { top: calc(40vh - 100px); right: 5vw; }
-    .flashlight-zone:nth-child(5) { bottom: 15vh; right: 15vw; }
-    .flashlight-zone:nth-child(6) { bottom: 10vh; left: calc(50vw - 100px); }
-    .flashlight-zone:nth-child(7) { top: calc(50vh - 100px); left: 5vw; }
+    /* Position each zone using nth-child - improved spacing */
+    .flashlight-zone:nth-child(1) { top: 12vh; left: 5vw; right: auto; }
+    .flashlight-zone:nth-child(2) { top: 5vh; left: calc(50vw - 100px); right: auto; }
+    .flashlight-zone:nth-child(3) { top: 12vh; right: 5vw; left: auto; }
+    .flashlight-zone:nth-child(4) { top: calc(50vh - 100px); right: 2vw; left: auto; }
+    .flashlight-zone:nth-child(5) { bottom: 12vh; right: 8vw; left: auto; top: auto; }
+    .flashlight-zone:nth-child(6) { bottom: 5vh; left: calc(50vw - 100px); right: auto; top: auto; }
+    .flashlight-zone:nth-child(7) { bottom: 12vh; left: 8vw; right: auto; top: auto; }
+    .flashlight-zone:nth-child(8) { top: calc(50vh - 100px); left: 2vw; right: auto; }
+
+    /* Responsive positioning for smaller screens */
+    @media (max-width: 770px) and (min-width: 481px) {
+        .flashlight-zone {
+            width: 120px;
+            height: 120px;
+        }
+        
+        /* Simplified 2x4 grid for mobile */
+        .flashlight-zone:nth-child(1) { top: 10vh; left: 10px; right: auto; }
+        .flashlight-zone:nth-child(2) { top: 10vh; right: 10px; left: auto; }
+        .flashlight-zone:nth-child(3) { top: calc(30vh - 60px); left: 10px; right: auto; }
+        .flashlight-zone:nth-child(4) { top: calc(30vh - 60px); right: 10px; left: auto; }
+        .flashlight-zone:nth-child(5) { top: calc(50vh - 60px); left: 10px; right: auto; }
+        .flashlight-zone:nth-child(6) { top: calc(50vh - 60px); right: 10px; left: auto; }
+        .flashlight-zone:nth-child(7) { top: calc(70vh - 60px); left: 10px; right: auto; }
+        .flashlight-zone:nth-child(8) { top: calc(70vh - 60px); right: 10px; left: auto; }
+        
+        .flashlight-zone :global(svg) {
+            width: 2rem;
+            height: 2rem;
+        }
+        
+        .flashlight-zone:hover :global(svg),
+        .flashlight-zone.hovered :global(svg) {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+        
+        .flashlight-text {
+            font-size: 0.8rem;
+        }
+    }
 
     .flashlight-zone:hover,
     .flashlight-zone.active,
@@ -265,6 +298,8 @@
         padding: 1rem;
         transition: all 0.3s ease;
     }
+
+
 
     /* Icon styling with hover effects */
     .flashlight-zone :global(svg) {
@@ -324,13 +359,6 @@
         background-clip: text;
     }
 
-    .flashlight-description {
-        font-size: 0.8rem;
-        opacity: 0.9;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-        line-height: 1.2;
-    }
-
     .drag-instruction {
         position: absolute;
         top: 50%;
@@ -379,11 +407,21 @@
     }
 
     /* Responsive adjustments */
-    @media (max-width: 1024px) {
+    @media (max-width: 1024px) and (min-width: 771px) {
         .flashlight-zone {
-            width: 160px;
-            height: 160px;
+            width: 140px;
+            height: 140px;
         }
+
+        /* Adjust positioning to prevent overlaps on medium screens */
+        .flashlight-zone:nth-child(1) { top: 12vh; left: 6vw; right: auto; }
+        .flashlight-zone:nth-child(2) { top: 6vh; left: calc(35vw - 70px); right: auto; }
+        .flashlight-zone:nth-child(3) { top: 6vh; left: calc(65vw - 70px); right: auto; }
+        .flashlight-zone:nth-child(4) { top: 12vh; right: 6vw; left: auto; }
+        .flashlight-zone:nth-child(5) { top: calc(50vh - 70px); right: 4vw; left: auto; }
+        .flashlight-zone:nth-child(6) { bottom: 12vh; right: 10vw; left: auto; }
+        .flashlight-zone:nth-child(7) { bottom: 6vh; left: calc(50vw - 70px); right: auto; }
+        .flashlight-zone:nth-child(8) { top: calc(50vh - 70px); left: 4vw; right: auto; }
 
         .flashlight-zone :global(svg) {
             width: 2.5rem;
@@ -406,43 +444,48 @@
         }
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 1025px) {
+        /* Keep default positioning for larger screens */
+    }
+
+    @media (max-width: 480px) {
         .flashlight-zone {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
         }
 
+        /* Even more compact layout for very small screens */
+        .flashlight-zone:nth-child(1) { top: 8vh; left: 5px; right: auto; }
+        .flashlight-zone:nth-child(2) { top: 8vh; right: 5px; left: auto; }
+        .flashlight-zone:nth-child(3) { top: calc(25vh - 50px); left: 5px; right: auto; }
+        .flashlight-zone:nth-child(4) { top: calc(25vh - 50px); right: 5px; left: auto; }
+        .flashlight-zone:nth-child(5) { top: calc(45vh - 50px); left: 5px; right: auto; }
+        .flashlight-zone:nth-child(6) { top: calc(45vh - 50px); right: 5px; left: auto; }
+        .flashlight-zone:nth-child(7) { bottom: calc(15vh - 50px); left: 5px; right: auto; }
+        .flashlight-zone:nth-child(8) { bottom: calc(15vh - 50px); right: 5px; left: auto; }
+
         .flashlight-zone :global(svg) {
-            width: 2rem;
-            height: 2rem;
+            width: 1.5rem;
+            height: 1.5rem;
         }
 
         .flashlight-zone:hover :global(svg),
         .flashlight-zone.hovered :global(svg) {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2rem;
+            height: 2rem;
         }
 
         .flashlight-text {
-            font-size: 0.9rem;
+            font-size: 0.7rem;
         }
 
         .flashlight-zone:hover .flashlight-text,
         .flashlight-zone.hovered .flashlight-text {
-            font-size: 1rem;
+            font-size: 0.8rem;
         }
 
-        /* Adjust positions for mobile */
-        .flashlight-zone:nth-child(1) { top: 10vh; left: 5vw; }
-        .flashlight-zone:nth-child(2) { top: 5vh; left: calc(50vw - 60px); }
-        .flashlight-zone:nth-child(3) { top: 10vh; right: 5vw; }
-        .flashlight-zone:nth-child(4) { top: calc(35vh - 60px); right: 2vw; }
-        .flashlight-zone:nth-child(5) { bottom: 10vh; right: 10vw; }
-        .flashlight-zone:nth-child(6) { bottom: 5vh; left: calc(50vw - 60px); }
-        .flashlight-zone:nth-child(7) { top: calc(50vh - 60px); left: 2vw; }
-
         .drag-instruction p {
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
     }
 </style>

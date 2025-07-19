@@ -8,6 +8,7 @@
     import TalentsModal from '../Modals/TalentsModal.svelte';
     import { initInteractForElement } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
+    import { Star } from '@lucide/svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -81,7 +82,7 @@
             
             {#snippet content()}
                 <div class="talent-content">
-                    <span class="talent-name">{talent.name}</span>
+                    <span class="talent-name"><Star /> {talent.name}</span>
                     <div class="talent-controls-right">
                     <button 
                         class="info-icon-button"
@@ -124,7 +125,7 @@
                 >
             {#snippet content()}
             <div class="talent-content">
-                <span class="talent-name">{talent.name}</span>
+                <span class="talent-name"><Star /> {talent.name}</span>
                 <div class="talent-controls-right">
                     <button 
                         class="info-icon-button"

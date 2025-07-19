@@ -349,6 +349,12 @@
 
 <style>
 
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button {  
+
+        opacity: 1;
+
+    }
 
     .skill-content {
         display: flex;
@@ -450,7 +456,6 @@
         font-weight: bold;
         font-size: 1rem;
         flex-shrink: 0;
-        border: 2px solid var(--color-surface-600);
         border-radius: 4px;
         background: transparent;
         color: var(--color-surface-900);
@@ -458,13 +463,10 @@
 
     :global(.dark) .skill-input {
         color: var(--color-surface-100);
-        border-color: var(--color-surface-400);
     }
 
     .skill-input:focus {
         outline: none;
-        border-color: var(--color-primary-600);
-        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
     }
 
     .remove-skill-button {

@@ -253,6 +253,8 @@
         color: var(--color-surface-400);
     }
 
+
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .paper-card {
@@ -282,5 +284,9 @@
             padding: 0.25rem 0.5rem;
             margin-bottom: 0.5rem;
         }
+    }
+
+    .paper-card :global(.compact-textarea) {
+        padding: 0.2rem;
     }
 </style>

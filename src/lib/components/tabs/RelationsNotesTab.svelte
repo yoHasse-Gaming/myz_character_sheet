@@ -1,91 +1,71 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
-    import FormSection from '../FormSection.svelte';
-    import DraggableAddItem from '../DraggableAddItem.svelte';
     import RelationModal from '../Modals/RelationModal.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
-    import { openDialogueOption } from '../../states/modals.svelte';
-    import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { initInteractForElement } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
-    import { Notebook } from '@lucide/svelte';
+    import { HeartHandshake, Notebook, Users } from '@lucide/svelte';
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
         characterActions.updateNote(index, target.value);
     }
 
-    // Generate variants for visual variety
-    const relationVariants = $derived(generateUniqueVariants(sheetState.relations.length + 1));
-    const noteVariants = $derived(generateUniqueVariants(sheetState.notes.length + 1));
+    const startX = 1100;
+    const startY = 175;
 
-    // InteractJS setup
-    onMount(() => {
-        
-    });
+    const initialPositions = {
+        RP1: { x: startX, y: startY },
+        RP2: { x: startX, y: startY + 120 },
+        RP3: { x: startX, y: startY + 240 },
+        RP4: { x: startX, y: startY + 360 },
+        SL1: { x: startX, y: startY + 480 },
+        SL2: { x: startX, y: startY + 600 }
+    };
 
-    // Re-initialize InteractJS when items are added/removed
-    $effect(() => {
-        // Watch for changes in relations/notes length
-        // sheetState.relations.length;
-        // sheetState.notes.length;
-        
-        // const relationCards = document.querySelectorAll('.relation-card');
-        // relationCards.forEach(card => {
-        //     if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-        //         initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
-        //             enableDraggable: true,
-        //             enableResizable: false
-        //         });
-        //         card.setAttribute('data-interact-initialized', 'true');
-        //     }
-        // });
-
-        // const noteCards = document.querySelectorAll('.note-card');
-        // noteCards.forEach(card => {
-        //     if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
-        //         initInteractForElement(card, 'relationsNotesTab', undefined, undefined, {
-        //             enableDraggable: true,
-        //             enableResizable: true
-        //         });
-        //         card.setAttribute('data-interact-initialized', 'true');
-        //     }
-        // });
-    });
+    function getInitialPosition(relationId: string) {
+        return initialPositions[relationId as keyof typeof initialPositions] || { x: startX, y: startY };
+    }
 
 </script>
 
 <!-- Relations Section -->
+
+
         {#each sheetState.relations as relation, index}
             <PaperCard 
                 paperId={`relation-${relation.id}`}
-
-                resizable={false}
-                initialPosition={{ x: 20, y: 20 + index * 100 }}
+                autoResize={true}
+                resizable={true}
+                initialSize={{ width: 300, height: 110 }}
+                initialPosition={getInitialPosition(relation.id)}
+                class="p-2"
             >
             {#snippet content()}
+            <div class="compact-textarea-field">
+                <div class="relation-header">
+                    <span class="field-label">
+                        <HeartHandshake
+                            fill={relation.isClose ? 'red' : 'none'}
+                        /> {relation.name}
 
-                <div class="relation-content">
-                <h4 class="relation-name">
-                    {relation.name}
-                    {#if relation.isClose}
-                        <span class="close-badge">❤️</span>
-                    {/if}
-                </h4>
-                <button 
-                    class="remove-button" 
-                    onclick={() => characterActions.removeRelation(relation.id)}
-                    aria-label="Ta bort relation med {relation.name}"
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                    {#if relation.description}
-                        <p class="relation-description">{relation.description}</p>
-                    {/if}
+                    </span>
+                    <button 
+                        class="remove-button" 
+                        onclick={() => characterActions.removeRelation(relation.id)}
+                        aria-label="Ta bort relation {relation.name}"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
+                <textarea
+                    class="compact-textarea font-user"
+                    placeholder="Skriv relation här..."
+                    bind:value={relation.description}
+                    rows="2"
+                ></textarea>
+            </div>
 
             {/snippet}
         </PaperCard>
@@ -192,6 +172,7 @@
     }
 
     /* Notes list - now part of items grid */
+    .relation-header,
     .note-header {
         display: flex;
         justify-content: space-between;

@@ -2,7 +2,7 @@
 
 ## High Priority Fixes
 * [ ] Fix paper card positioning - prevent spread across entire screen
-* [ ] Move add item button to always be sticky on the right side of screen
+* [x] Move add item button to always be sticky on the right side of screen
 * [ ] Fix drop zone positioning and calculation for new items
 * [ ] Update card default/starting positions to look good
 * [ ] Add layout lock mechanism to prevent accidental card movement
@@ -37,7 +37,6 @@
 * [ ] Add dice roll result callback for toast notifications
 * [ ] Add equipment selection dropdown for dice rolls (equipment with bonuses/weapons for skills)
 * [ ] Add grouping system for paper items to move together
-* [ ] Complete all tabs functionality
 * [ ] Ensure character data saving/loading works correctly
 
 ## Completed Features ✅

@@ -11,7 +11,8 @@
             face: '',
             body: '',
             clothes: ''
-        }
+        },
+        dream: ''
     };
 
     // Generate random variants for each input to make them unique
@@ -24,7 +25,8 @@
         job: { x: startPos.x + 390, y: startPos.y },
         face: { x: startPos.x, y: startPos.y + 60 },
         body: { x: startPos.x + 270, y: startPos.y + 60 },
-        clothes: { x: startPos.x + 540, y: startPos.y + 60 }
+        clothes: { x: startPos.x + 540, y: startPos.y + 60 },
+        dream: { x: startPos.x + 810, y: startPos.y }
     };
     
 
@@ -141,27 +143,45 @@
     {/snippet}
 </PaperCard>
 
-<PaperCard 
-    paperId="character-clothes"
-    initialPosition={characterPositions.clothes}
-    minSize={{ width: 260, height: 70 }}
-    resizable={true}
-    class="p-2"
+    <PaperCard 
+        paperId="character-clothes"
+        initialPosition={characterPositions.clothes}
+        minSize={{ width: 260, height: 70 }}
+        resizable={true}
+        class="p-2"
+        >
+        {#snippet content()}
+        <div class="compact-textarea-field">
+            <span class="field-label">KLÄDER</span>
+            <textarea
+                class="compact-textarea font-user"
+                placeholder="Lappade trasor, läder, folie..."
+                bind:value={formData.appearance.clothes}
+                rows="2"
+            ></textarea>
+        </div>
+        {/snippet}
+    </PaperCard>
+
+    <PaperCard
+        paperId="character-dream"
+        initialPosition={characterPositions.dream}
+        minSize={{ width: 300, height: 100 }}
+        resizable={true}
+        autoResize={true}
     >
-    {#snippet content()}
-    <div class="compact-textarea-field">
-        <span class="field-label">KLÄDER</span>
-        <textarea
-            class="compact-textarea font-user"
-            placeholder="Lappade trasor, läder, folie..."
-            bind:value={formData.appearance.clothes}
-            rows="2"
-        ></textarea>
-    </div>
-    {/snippet}
-</PaperCard>
-
-
+        {#snippet content()}
+        <div class="compact-textarea-field">
+            <span class="field-label">DRÖM</span>
+            <textarea
+                class="compact-textarea font-user"
+                placeholder="Vad drömmer din karaktär om?"
+                bind:value={formData.dream}
+                rows="4"
+            ></textarea>
+        </div>
+        {/snippet}
+    </PaperCard>
 
 <style>
 
@@ -207,49 +227,7 @@
         outline: none;
     }
 
-    /* Compact textarea field styling */
-    .compact-textarea-field {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        height: 100%;
-        padding: 0.25rem;
-    }
 
-    .compact-textarea {
-        width: 100%;
-        min-height: 2.5rem;
-        font-size: 0.85rem;
-        border: 1px solid var(--color-surface-400);
-        border-radius: 4px;
-        background: transparent;
-        color: var(--color-surface-900);
-        padding:unset;
-        resize: vertical;
-        font-family: inherit;
-        line-height: 1.3;
-        resize: none;
-    }
-
-    :global(.dark) .compact-textarea {
-        color: var(--color-surface-100);
-        border-color: var(--color-surface-600);
-    }
-
-    .compact-textarea:focus {
-        outline: none;
-        border-color: var(--color-primary-600);
-        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
-    }
-
-    .compact-textarea::placeholder {
-        color: var(--color-surface-500);
-        font-style: italic;
-    }
-
-    :global(.dark) .compact-textarea::placeholder {
-        color: var(--color-surface-400);
-    }
 
     /* Reset layout button */
     .reset-layout-container {

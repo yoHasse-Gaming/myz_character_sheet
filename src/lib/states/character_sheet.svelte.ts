@@ -60,9 +60,27 @@ export const sheetState = $state({
     
     // Armor
     armor: [] as Armor[],
+
+
+    //     const defaultRelations = [
+    //     { id: 1, name: 'RP 1', description: 'Beskrivning', initialPosition: { x: 20, y: 20 } },
+    //     { id: 2, name: 'RP 2', description: 'Beskrivning', initialPosition: { x: 20, y: 120 } },
+    //     { id: 3, name: 'RP 3', description: 'Beskrivning', initialPosition: { x: 20, y: 220 } },
+    //     { id: 4, name: 'RP 4', description: 'Beskrivning', initialPosition: { x: 20, y: 320 } },
+    //     { id: 5, name: 'Jag Hatar', description: 'Jag hatar...', initialPosition: { x: 20, y: 420 } },
+    //     { id: 6, name: 'Jag vill skydda', description: 'Jag vill skydda...', initialPosition: { x: 20, y: 520 } },
+    // ];
     
     // Relations with other characters
-    relations: [] as RPRelation[],
+    relations: [
+        {id: 'RP1', name: 'RP 1', description: '', isClose: true},
+        {id: 'RP2', name: 'RP 2', description: '', isClose: false},
+        {id: 'RP3', name: 'RP 3', description: '', isClose: false},
+        {id: 'RP4', name: 'RP 4', description: '', isClose: false},
+        {id: 'SL1', name: 'Jag Hatar', description: '', isClose: false},
+        {id: 'SL2', name: 'Jag vill skydda', description: '', isClose: false}
+    ] as RPRelation[],
+    additionalRelations: [] as RPRelation[],
     
     // Notes or miscellaneous information
     notes: [] as string[],

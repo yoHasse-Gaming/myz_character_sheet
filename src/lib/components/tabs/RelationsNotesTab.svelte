@@ -8,6 +8,7 @@
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { initInteractForElement } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
+    import { Notebook } from '@lucide/svelte';
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
@@ -95,7 +96,7 @@
         {#each sheetState.notes as note, index}
         <PaperCard 
             paperId={`note-${index}`}
-
+            class="p-1"
             resizable={true}
             initialPosition={{ x: 20, y: 20 + (sheetState.relations.length * 100) + (index * 100) }}
             >
@@ -103,8 +104,7 @@
 
                 <div class="note-content">
                     <div class="note-header">
-                        <div class="item-type-badge note-badge">📝</div>
-                        <span class="note-number">Anteckning #{index + 1}</span>
+                        <span class="note-number"> <Notebook /> Anteckning #{index + 1}</span>
                         <button 
                             class="remove-button" 
                             onclick={() => characterActions.removeNote(index)}
@@ -142,59 +142,6 @@
 <RelationModal />
 
 <style>
-
-
-    /* Section containers */
-    .relations-section,
-    .notes-section {
-        position: relative;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-        min-height: 200px;
-    }
-
-
-    /* Section titles */
-    .section-title {
-        font-family: var(--form-labels), serif;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0 0 1rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    :global(.dark) .section-title {
-        color: var(--color-surface-100);
-    }
-
-    /* Individual grids */
-    .relations-grid,
-    .notes-grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-
-    /* Item type badges */
-    .item-type-badge {
-        font-size: 1.2rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-weight: bold;
-        flex-shrink: 0;
-    }
-
-
-    .note-badge {
-        background: rgba(59, 130, 246, 0.2);
-        color: var(--color-info-700);
-    }
 
     .relation-content,
     .note-content {

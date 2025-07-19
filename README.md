@@ -14,12 +14,12 @@
 * [ ] Add atmospheric glow effect for flashlight drop zones
 
 ## Relations System
-* [ ] Add default relations:
-  * [ ] RP 1 
-  * [ ] RP 2
-  * [ ] I hate
-  * [ ] I want to protect
-* [ ] Add ability to edit relations directly on cards (like name, body, face fields)
+* [x] Add default relations:
+  * [x] RP 1 
+  * [x] RP 2
+  * [x] I hate
+  * [x] I want to protect
+* [x] Add ability to edit relations directly on cards (like name, body, face fields)
 
 ## Data Persistence
 * [ ] Fix saving card positions to browser local storage

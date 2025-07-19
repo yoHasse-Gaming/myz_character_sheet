@@ -3,7 +3,7 @@
     import { fade, scale } from 'svelte/transition';
     import { openInfoModal } from '../../../states/modals.svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
-    import { Ban, BicepsFlexed, Bone, Circle, type Icon as IconType } from '@lucide/svelte';
+    import { Ban, BicepsFlexed, Bone, Circle, Info, type Icon as IconType } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
 
     import { onMount } from 'svelte';
@@ -126,11 +126,7 @@
                     aria-label="Information om {baseAbility.damageLabel}"
                     title="Visa information om {baseAbility.damageLabel}"
                 >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M9,9h6v6H9z"></path>
-                        <path d="M9,9h6"></path>
-                    </svg>
+                    <Info size={12} />
                 </button>
                 {#if diceStates.isDicePluginAvailable}
                 <button 

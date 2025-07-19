@@ -8,7 +8,7 @@
     import TalentsModal from '../Modals/TalentsModal.svelte';
     import { initInteractForElement } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
-    import { Star } from '@lucide/svelte';
+    import { Star, Info } from '@lucide/svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -90,11 +90,7 @@
                         aria-label="Information om {talent.name}"
                         title="Visa information om {talent.name}"
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9,9h6v6H9z"></path>
-                            <path d="M9,9h6"></path>
-                        </svg>
+                        <Info size={16} />
                     </button>
                     <button
                         class="remove-talent-button"
@@ -133,11 +129,7 @@
                         aria-label="Information om {talent.name}"
                         title="Visa information om {talent.name}"
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9,9h6v6H9z"></path>
-                            <path d="M9,9h6"></path>
-                        </svg>
+                        <Info size={16} />
                     </button>
                     <button
                         class="remove-talent-button"

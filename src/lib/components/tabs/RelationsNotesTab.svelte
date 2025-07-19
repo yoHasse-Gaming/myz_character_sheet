@@ -1,28 +1,56 @@
 <script lang="ts">
-    import RelationModal from '../Modals/RelationModal.svelte';
     import { sheetState, characterActions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
     import { HeartHandshake, Notebook, Users } from '@lucide/svelte';
+    import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
         characterActions.updateNote(index, target.value);
     }
 
+    // Confirmation modal state
+    let confirmationOpen = $state(false);
+    let relationToDelete = $state<string | null>(null);
+    let relationNameToDelete = $state<string>("");
+
+    function requestDeleteRelation(relationId: string, relationName: string) {
+        relationToDelete = relationId;
+        relationNameToDelete = relationName;
+        confirmationOpen = true;
+    }
+
+    function confirmDeleteRelation() {
+        if (relationToDelete) {
+            characterActions.removeRelation(relationToDelete);
+            relationToDelete = null;
+            relationNameToDelete = "";
+        }
+    }
+
+    function cancelDeleteRelation() {
+        relationToDelete = null;
+        relationNameToDelete = "";
+    }
+
     const startX = 1100;
     const startY = 175;
 
-    const initialPositions = {
-        RP1: { x: startX, y: startY },
-        RP2: { x: startX, y: startY + 120 },
-        RP3: { x: startX, y: startY + 240 },
-        RP4: { x: startX, y: startY + 360 },
-        SL1: { x: startX, y: startY + 480 },
-        SL2: { x: startX, y: startY + 600 }
+    const initialPositions: Record<number, { x: number; y: number }> = {
+        1: { x: startX, y: startY },
+        2: { x: startX, y: startY + 120 },
+        3: { x: startX, y: startY + 240 },
+        4: { x: startX, y: startY + 360 },
+        5: { x: startX, y: startY + 480 },
+        6: { x: startX, y: startY + 600 },
+        7: { x: startX, y: startY + 720 },
+        8: { x: startX, y: startY + 840 },
+        9: { x: startX, y: startY + 960 },
+        10: { x: startX, y: startY + 1080 },
     };
 
-    function getInitialPosition(relationId: string) {
-        return initialPositions[relationId as keyof typeof initialPositions] || { x: startX, y: startY };
+    function getInitialPosition(index: number): { x: number; y: number } {
+        return initialPositions[index] || { x: startX, y: startY };
     }
 
 </script>
@@ -35,34 +63,51 @@
                 paperId={`relation-${relation.id}`}
                 autoResize={true}
                 resizable={true}
-                initialSize={{ width: 300, height: 110 }}
-                initialPosition={getInitialPosition(relation.id)}
+                minSize={{ width: 300, height: 110 }}
+                initialPosition={getInitialPosition(index + 1)}
                 class="p-2"
             >
             {#snippet content()}
             <div class="compact-textarea-field">
                 <div class="relation-header">
-                    <span class="field-label">
+                    <div class="relation-name-section">
                         <HeartHandshake
                             fill={relation.isClose ? 'red' : 'none'}
-                        /> {relation.name}
-
-                    </span>
-                    <button 
-                        class="remove-button" 
-                        onclick={() => characterActions.removeRelation(relation.id)}
-                        aria-label="Ta bort relation {relation.name}"
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
+                        />
+                        <input
+                            type="text"
+                            class="relation-name-input font-user"
+                            bind:value={relation.name}
+                            oninput={(e) => characterActions.updateRelation(relation.id, { name: e.currentTarget.value })}
+                            placeholder="Namn på relation"
+                        />
+                    </div>
+                    <div class="relation-controls">
+                        <button 
+                            class="close-button {relation.isClose ? 'active' : ''}"
+                            onclick={() => characterActions.updateRelation(relation.id, { isClose: !relation.isClose })}
+                            aria-label="Markera som {relation.isClose ? 'vanlig' : 'nära'} relation"
+                            title={relation.isClose ? 'Nära relation' : 'Vanlig relation'}
+                        >
+                            <HeartHandshake size={16} fill={relation.isClose ? 'red' : 'none'} />
+                        </button>
+                        <button 
+                            class="remove-button" 
+                            onclick={() => requestDeleteRelation(relation.id, relation.name)}
+                            aria-label="Ta bort relation {relation.name}"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <textarea
                     class="compact-textarea font-user"
                     placeholder="Skriv relation här..."
                     bind:value={relation.description}
+                    oninput={(e) => characterActions.updateRelation(relation.id, { description: e.currentTarget.value })}
                     rows="2"
                 ></textarea>
             </div>
@@ -118,57 +163,24 @@
     position={{ top: 120, right: -60 }}
 /> -->
 
-<!-- Modals -->
-<RelationModal />
+<!-- Confirmation Modal -->
+<ConfirmationModal 
+    bind:open={confirmationOpen}
+    title="Ta bort relation"
+    message={`Är du säker på att du vill ta bort relationen "${relationNameToDelete}"?`}
+    confirmText="Ta bort"
+    cancelText="Avbryt"
+    onConfirm={confirmDeleteRelation}
+    onCancel={cancelDeleteRelation}
+/>
 
 <style>
 
-    .relation-content,
     .note-content {
         padding: 1rem;
         position: relative;
         z-index: 2;
         height: 100%;
-    }
-
-
-    .relation-name {
-        font-family: var(--form-labels), serif;
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    :global(.dark) .relation-name {
-        color: var(--color-surface-100);
-    }
-
-    .close-badge {
-        font-size: 1rem;
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-    }
-
-    .relation-description {
-        font-size: 0.9rem;
-        color: var(--color-surface-700);
-        margin: 0;
-        line-height: 1.4;
-    }
-
-    :global(.dark) .relation-description {
-        color: var(--color-surface-300);
     }
 
     /* Notes list - now part of items grid */
@@ -179,6 +191,87 @@
         align-items: center;
         margin-bottom: 0.5rem;
         gap: 0.5rem;
+    }
+
+    .relation-name-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .relation-name-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        font-family: var(--form-labels), serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex: 1;
+        min-width: 0;
+    }
+
+    :global(.dark) .relation-name-input {
+        color: var(--color-surface-100);
+    }
+
+    .relation-name-input:focus {
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+    }
+
+    .relation-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .close-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-surface-300);
+        background: transparent;
+        color: var(--color-surface-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .close-button:hover {
+        background: var(--color-surface-100);
+        transform: scale(1.1);
+    }
+
+    .close-button.active {
+        border-color: var(--color-error-500);
+        background: var(--color-error-50);
+        color: var(--color-error-600);
+    }
+
+    .close-button.active:hover {
+        background: var(--color-error-100);
+    }
+
+    :global(.dark) .close-button {
+        border-color: var(--color-surface-600);
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .close-button:hover {
+        background: var(--color-surface-700);
+    }
+
+    :global(.dark) .close-button.active {
+        border-color: var(--color-error-400);
+        background: var(--color-error-900);
+        color: var(--color-error-300);
     }
 
     .note-number {
@@ -232,34 +325,8 @@
         transform: scale(1.1);
     }
 
-    /* Drag states */
-    .items-grid.drag-over {
-        background: rgba(217, 119, 6, 0.1);
-        border: 2px dashed rgba(217, 119, 6, 0.5);
-        border-radius: 0.5rem;
-        padding: 1rem;
-    }
-
-    /* Empty states */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--color-surface-500);
-        font-style: italic;
-    }
-
-    .empty-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.7;
-    }
-
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .relations-list {
-            grid-template-columns: 1fr;
-        }
-
         .relation-header {
             flex-direction: column;
             align-items: flex-start;

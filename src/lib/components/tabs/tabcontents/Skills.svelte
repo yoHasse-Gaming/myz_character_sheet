@@ -7,6 +7,7 @@
     import { initInteractForElement } from '../../../utils/interactjsUtils';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import { Tooltip } from '@skeletonlabs/skeleton-svelte';
+    import { Info } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
 
@@ -218,11 +219,7 @@
                             aria-label="Information om {skill.name}"
                             title="Visa information om {skill.name}"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9,9h6v6H9z"></path>
-                                <path d="M9,9h6"></path>
-                            </svg>
+                            <Info size={16} />
                         </button>
                         {#if diceStates.isDicePluginAvailable}
                         <button 
@@ -296,11 +293,7 @@
                             aria-label="Information om {skill.name}"
                             title="Visa information om {skill.name}"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9,9h6v6H9z"></path>
-                                <path d="M9,9h6"></path>
-                            </svg>
+                            <Info size={16} />
                         </button>
                         {#if diceStates.isDicePluginAvailable}
                         <button 
@@ -348,13 +341,6 @@
 <!-- <OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} /> -->
 
 <style>
-
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button {  
-
-        opacity: 1;
-
-    }
 
     .skill-content {
         display: flex;

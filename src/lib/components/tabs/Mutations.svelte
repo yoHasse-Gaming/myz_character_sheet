@@ -6,7 +6,7 @@
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Dna, DnaOff, Microscope, X } from '@lucide/svelte';
+    import { Dna, DnaOff, Info, Microscope, X } from '@lucide/svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
     import type { Mutation } from '../../types';
     import PaperCard from '../PaperCard.svelte';
@@ -107,11 +107,7 @@
                 aria-label="Information om {mutation.name}"
                 title="Visa information om {mutation.name}"
             >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9,9h6v6H9z"></path>
-                    <path d="M9,9h6"></path>
-                </svg>
+                <Info size={16} />
             </button>
             <button
                 class="remove-mutation-button"

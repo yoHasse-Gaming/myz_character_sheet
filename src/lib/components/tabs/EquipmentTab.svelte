@@ -8,8 +8,9 @@
     import NewEquipmentModal from '../Modals/NewEquipmentModal.svelte';
     import NewWeaponModal from '../Modals/NewWeaponModal.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
-    import { Backpack, BowArrow, ShieldHalf } from '@lucide/svelte';
+    import { Backpack, BowArrow, Grab, Hand, Info, ShieldHalf } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
+    import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -61,6 +62,30 @@
     
     // Special variant for the draggable add item
     const addItemVariant = 'variant-6'; // Using a vibrant variant for the add item
+
+    // Confirmation modal state for weapons
+    let weaponConfirmationOpen = $state(false);
+    let weaponToDelete = $state<string | null>(null);
+    let weaponNameToDelete = $state<string>("");
+
+    function requestDeleteWeapon(weaponId: string, weaponName: string) {
+        weaponToDelete = weaponId;
+        weaponNameToDelete = weaponName;
+        weaponConfirmationOpen = true;
+    }
+
+    function confirmDeleteWeapon() {
+        if (weaponToDelete) {
+            characterActions.removeWeapon(weaponToDelete);
+            weaponToDelete = null;
+            weaponNameToDelete = "";
+        }
+    }
+
+    function cancelDeleteWeapon() {
+        weaponToDelete = null;
+        weaponNameToDelete = "";
+    }
 
     // Function to show equipment info in modal
     function showEquipmentInfo(item: any) {
@@ -158,7 +183,14 @@
             >
                 {#snippet content()}
                     <div class="equipment-content">
-                        <span class="equipment-name"><Backpack size={16} />{item.name || 'Utrustning'}</span>
+                        <Backpack size={16} />
+                        <input 
+                            type="text" 
+                            class="equipment-name-input"
+                            bind:value={item.name}
+                            placeholder="Utrustnings namn"
+                            title="Utrustnings namn"
+                        />
                         <input
                                 type="number"
                                 min="1"
@@ -173,11 +205,7 @@
                                 aria-label="Information om {item.name}"
                                 title="Visa information om {item.name}"
                             >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9,9h6v6H9z"></path>
-                                    <path d="M9,9h6"></path>
-                                </svg>
+                                <Info size={16} />
                             </button>
 
                             <button
@@ -216,47 +244,94 @@
             {#each sheetState.weapons as weapon, index}
                 <PaperCard
                     paperId={`weapon-${weapon.id}`}
-
                     variant={weaponVariants[index % weaponVariants.length]}
                     draggable={true}
                     resizable={false}
-                    initialPosition={{ x: 20 + (index % 3) * 300, y: 380 + Math.floor(index / 3) * 80 }}
-                    minSize={{ width: 280, height: 60 }}
+                    initialPosition={{ x: 20 + (index % 2) * 420, y: 380 + Math.floor(index / 2) * 100 }}
+                    minSize={{ width: 400, height: 80 }}
                 >
                     {#snippet content()}
                         <div class="weapon-content">
-                            <BowArrow size={16} />
-                            <span class="weapon-name">{weapon.name || 'Vapen'}</span>
-                            <div class="weapon-controls">
-                                <label class="equipped-checkbox">
+                            <div class="weapon-header">
+                                <div class="weapon-name-section">
+                                    <BowArrow size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
                                     <input 
-                                        type="checkbox" 
-                                        bind:checked={weapon.equipped}
+                                        type="text" 
+                                        class="weapon-name-input"
+                                        bind:value={weapon.name}
+                                        placeholder="Vapens namn"
+                                        title="Vapens namn"
                                     />
-                                    <span class="equipped-label">Utrustad</span>
-                                </label>
-                                <button 
-                                    class="info-icon-button"
-                                    onclick={() => showWeaponInfo(weapon)}
-                                    aria-label="Information om {weapon.name}"
-                                    title="Visa information om {weapon.name}"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M9,9h6v6H9z"></path>
-                                        <path d="M9,9h6"></path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="remove-weapon-button"
-                                    onclick={() => characterActions.removeWeapon(weapon.id)}
-                                    aria-label="Ta bort {weapon.name}"
-                                >
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
+                                </div>
+                                <div class="weapon-controls">
+                                    <button 
+                                        class="equipped-button {weapon.equipped ? 'active' : ''}"
+                                        onclick={() => weapon.equipped = !weapon.equipped}
+                                        aria-label="Markera som {weapon.equipped ? 'inte utrustad' : 'utrustad'}"
+                                        title={weapon.equipped ? 'Utrustad' : 'Inte utrustad'}
+                                    >
+                                        {#if weapon.equipped}
+                                            <Grab size={16} color="#22c55e" />
+                                        {:else}
+                                            <Hand size={16} />
+                                        {/if}
+                                    </button>
+                                    <button 
+                                        class="info-icon-button"
+                                        onclick={() => showWeaponInfo(weapon)}
+                                        aria-label="Information om {weapon.name}"
+                                        title="Visa information om {weapon.name}"
+                                    >
+                                        <Info size={16} />
+                                    </button>
+                                    <button 
+                                        class="remove-button" 
+                                        onclick={() => requestDeleteWeapon(weapon.id, weapon.name)}
+                                        aria-label="Ta bort vapen {weapon.name}"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="weapon-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Bonus:</span>
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        max="10"
+                                        class="stat-input"
+                                        bind:value={weapon.bonus}
+                                        title="Vapens bonusmodifikator"
+                                    />
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Skada:</span>
+                                    <input 
+                                        type="number" 
+                                        min="1" 
+                                        max="20"
+                                        class="stat-input"
+                                        bind:value={weapon.damage}
+                                        title="Vapens skada"
+                                    />
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Räckvidd:</span>
+                                    <select 
+                                        class="stat-select"
+                                        bind:value={weapon.range}
+                                        title="Vapens räckvidd"
+                                    >
+                                        <option value={0}>Närstrid</option>
+                                        <option value={1}>Nära</option>
+                                        <option value={2}>Kort</option>
+                                        <option value={3}>Lång</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     {/snippet}
@@ -292,11 +367,7 @@
                                     aria-label="Information om {armor.name}"
                                     title="Visa information om {armor.name}"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M9,9h6v6H9z"></path>
-                                        <path d="M9,9h6"></path>
-                                    </svg>
+                                    <Info size={16} />
                                 </button>
                                 <button
                                     class="remove-armor-button"
@@ -316,7 +387,16 @@
 
 <!-- Drag Overlay -->
 
-
+<!-- Weapon Confirmation Modal -->
+<ConfirmationModal 
+    bind:open={weaponConfirmationOpen}
+    title="Ta bort vapen"
+    message={`Är du säker på att du vill ta bort vapnet "${weaponNameToDelete}"?`}
+    confirmText="Ta bort"
+    cancelText="Avbryt"
+    onConfirm={confirmDeleteWeapon}
+    onCancel={cancelDeleteWeapon}
+/>
 
 <style>
     /* Section containers for better drop zone targeting */
@@ -370,25 +450,81 @@
     /* Weapon styles */
     .weapon-content {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        flex-direction: column;
+        gap: 0.75rem;
         width: 100%;
     }
 
-    .weapon-name {
+    .weapon-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .weapon-name-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         flex: 1;
-        font-size: 0.85rem;
-        font-weight: 500;
+    }
+
+    .weapon-name {
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: var(--color-surface-900);
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
         pointer-events: none;
     }
 
+    :global(.dark) .weapon-name {
+        color: var(--color-surface-100);
+    }
+
     .weapon-controls {
         display: flex;
         align-items: center;
         gap: 0.25rem;
+    }
+
+    .weapon-stats {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.25rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--color-surface-600);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: var(--color-primary-600);
+    }
+
+    :global(.dark) .stat-label {
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .stat-value {
+        color: var(--color-primary-400);
     }
 
     /* Armor styles */
@@ -429,22 +565,104 @@
         white-space: nowrap;
     }
 
-    .info-icon-button {
-        padding: 2px;
-        background: none;
-        border: none;
+    .equipped-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-surface-300);
+        background: transparent;
+        color: var(--color-surface-600);
         cursor: pointer;
-        opacity: 0.7;
-        transition: opacity 0.2s;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
         pointer-events: auto;
     }
 
+    .equipped-button:hover {
+        background: var(--color-surface-100);
+        transform: scale(1.1);
+    }
+
+    .equipped-button.active {
+        border-color: var(--color-success-500);
+        background: var(--color-success-50);
+        color: var(--color-success-600);
+    }
+
+    .equipped-button.active:hover {
+        background: var(--color-success-100);
+    }
+
+    :global(.dark) .equipped-button {
+        border-color: var(--color-surface-600);
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .equipped-button:hover {
+        background: var(--color-surface-700);
+    }
+
+    :global(.dark) .equipped-button.active {
+        border-color: var(--color-success-400);
+        background: var(--color-success-900);
+        color: var(--color-success-300);
+    }
+
+    .info-icon-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-surface-300);
+        background: transparent;
+        color: var(--color-surface-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        pointer-events: auto;
+        opacity: 0.8;
+    }
+
     .info-icon-button:hover {
+        background: var(--color-surface-100);
         opacity: 1;
+        transform: scale(1.1);
+    }
+
+    :global(.dark) .info-icon-button {
+        border-color: var(--color-surface-600);
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .info-icon-button:hover {
+        background: var(--color-surface-700);
+    }
+
+    .remove-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-error-500);
+        background: transparent;
+        color: var(--color-error-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        pointer-events: auto;
+    }
+
+    .remove-button:hover {
+        background: var(--color-error-600);
+        color: white;
+        transform: scale(1.1);
     }
 
     .remove-equipment-button, 
-    .remove-weapon-button, 
     .remove-armor-button {
         padding: 2px;
         background: none;
@@ -457,7 +675,6 @@
     }
 
     .remove-equipment-button:hover, 
-    .remove-weapon-button:hover, 
     .remove-armor-button:hover {
         opacity: 1;
     }

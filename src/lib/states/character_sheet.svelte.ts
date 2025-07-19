@@ -302,6 +302,13 @@ export const characterActions = {
             sheetState.relations.splice(index, 1);
         }
     },
+
+    updateRelation(relationId: string, updates: Partial<RPRelation>) {
+        const index = sheetState.relations.findIndex(r => r.id === relationId);
+        if (index !== -1) {
+            Object.assign(sheetState.relations[index], updates);
+        }
+    },
     
     // Notes management
     addNote(note: string) {

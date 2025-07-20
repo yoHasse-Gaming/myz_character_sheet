@@ -91,10 +91,10 @@
 
             if(autoResize) {
                 // Attach auto-resize handler to textareas inside this paper card
-                const textareas = paperElement.querySelectorAll('textarea');
-                textareas.forEach(textarea => {
-                    autoResizePaper(textarea, minSize, maxSize);
-                });
+                // const textareas = paperElement.querySelectorAll('textarea');
+                // textareas.forEach(textarea => {
+                //     autoResizePaper(textarea, minSize, maxSize);
+                // });
             }
         }
     });

@@ -202,20 +202,24 @@ export function initInteractForElement(
             font-family: ${styles.fontFamily};
             line-height: ${styles.lineHeight};
             word-wrap: break-word;
-            white-space: pre-wrap;
+            white-space: pre-wrap; 
             padding: 0;
             margin: 0;
         `;
         tempDiv.textContent = textarea.value || textarea.placeholder;
         document.body.appendChild(tempDiv);
-        
-        const textHeight = tempDiv.offsetHeight;
+        // Check if the last line is empty and adjust height accordingly
+        const lastLine = tempDiv.textContent.split('\n').pop() || '';
+        const emptyRowOffset = lastLine ? 0 : lineHeight;
+        const textHeight = tempDiv.offsetHeight + emptyRowOffset;
         document.body.removeChild(tempDiv);
         
         // Get header height
         // Get element either by string or HTMLElement
         const header = typeof headerElem === 'string' ? element.querySelector(headerElem) : headerElem;
-        const headerHeight = header ? (header as HTMLElement).offsetHeight : 40;
+        // TODO: Might need to calculate for for this in the future. Not sure, it's not needed right now
+        // const headerHeight = header ? (header as HTMLElement).offsetHeight : 40;
+        const headerHeight = 0;
         
         // Calculate total minimum height: header + content padding + text height + some margin
         const contentPadding = 32; // 1rem top + 1rem bottom

@@ -61,16 +61,6 @@ export const sheetState = $state({
     // Armor
     armor: [] as Armor[],
 
-
-    //     const defaultRelations = [
-    //     { id: 1, name: 'RP 1', description: 'Beskrivning', initialPosition: { x: 20, y: 20 } },
-    //     { id: 2, name: 'RP 2', description: 'Beskrivning', initialPosition: { x: 20, y: 120 } },
-    //     { id: 3, name: 'RP 3', description: 'Beskrivning', initialPosition: { x: 20, y: 220 } },
-    //     { id: 4, name: 'RP 4', description: 'Beskrivning', initialPosition: { x: 20, y: 320 } },
-    //     { id: 5, name: 'Jag Hatar', description: 'Jag hatar...', initialPosition: { x: 20, y: 420 } },
-    //     { id: 6, name: 'Jag vill skydda', description: 'Jag vill skydda...', initialPosition: { x: 20, y: 520 } },
-    // ];
-    
     // Relations with other characters
     relations: [
         {id: 'RP1', name: 'RP 1', description: '', isClose: true},
@@ -361,15 +351,17 @@ export const characterActions = {
             conditions: sheetState.conditions,
             timestamp: Date.now()
         }));
+
+        console.log('Setting up Owlbear Rodeo sync');
         
         if (owlbearSync.isInOwlbear) {
             owlbearSync.setupAutoSync(60000); // Sync every minute
-            console.log('🦉 Owlbear Rodeo sync enabled');
+            
             
             // Load existing character data
             owlbearSync.loadData().then((data) => {
                 if (data) {
-                    console.log('Loading character data from Owlbear:', data);
+                    
                     // Update local state with loaded data
                     Object.assign(sheetState, data);
                 }

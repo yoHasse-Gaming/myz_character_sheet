@@ -44,7 +44,7 @@ class OwlbearIntegration {
      * Initialize Owlbear Rodeo SDK
      */
     private async initializeOBR(): Promise<void> {
-        console.log('Initializing Owlbear Rodeo SDK...');
+        
         
         try {
             // Dynamic import to avoid SSR issues
@@ -56,7 +56,7 @@ class OwlbearIntegration {
             
             // Wait for OBR to be ready
             OBR.onReady(async () => {
-                console.log('🦉 Owlbear Rodeo SDK initialized successfully');
+                
                 
                 // Listen for character data updates
                 this.setupCharacterDataListener();
@@ -64,7 +64,7 @@ class OwlbearIntegration {
                 await checkDicePluginAvailability()
 
                 // Initialize dice integration, if available
-                console.log('Character data listener set up');
+                
             });
 
         } catch (error) {
@@ -79,13 +79,13 @@ class OwlbearIntegration {
      */
     private setupCharacterDataListener(): void {
         if (!OBR.isAvailable) return;
-
+        console.log('Setting up character data listener');
         // Listen for room metadata changes where character data might be stored
         OBR.room.onMetadataChange(async (metadata: any) => {
+            console.log('Character data metadata changed:', metadata);
             const characterKey = getExtensionId(await OBR.player.getId());
             if (metadata[characterKey]) {
                 this.characterData = metadata[characterKey] as CharacterData;
-                console.log('Character data updated from Owlbear:', this.characterData);
             }
         });
     }
@@ -104,7 +104,7 @@ class OwlbearIntegration {
                     lastUpdated: Date.now()
                 }
             });
-            console.log('Character data saved to Owlbear room');
+            
         } catch (error) {
             console.warn('Failed to save character data:', error);
         }
@@ -135,7 +135,7 @@ class OwlbearIntegration {
         try {
             await OBR.action.setWidth(width);
             await OBR.action.setHeight(height);
-            console.log(`Popover size set to ${width}x${height}`);
+            
         } catch (error) {
             console.warn('Failed to set popover size:', error);
         }
@@ -228,7 +228,7 @@ class OwlbearIntegration {
                 version: '1.0'
             };
             localStorage.setItem(this.storageOptions.storageKey, JSON.stringify(dataToSave));
-            console.log('Character data saved to localStorage');
+            
         } catch (error) {
             console.warn('Failed to save character data to localStorage:', error);
         }
@@ -244,7 +244,7 @@ class OwlbearIntegration {
             const savedData = localStorage.getItem(this.storageOptions.storageKey);
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
-                console.log('Character data loaded from localStorage');
+                
                 return parsedData;
             }
         } catch (error) {
@@ -260,7 +260,7 @@ class OwlbearIntegration {
 
         try {
             localStorage.removeItem(this.storageOptions.storageKey);
-            console.log('Character data cleared from localStorage');
+            
         } catch (error) {
             console.warn('Failed to clear localStorage:', error);
         }
@@ -291,7 +291,7 @@ class OwlbearIntegration {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            console.log('Character data exported to JSON file');
+            
         } catch (error) {
             console.warn('Failed to export character data:', error);
         }
@@ -318,7 +318,7 @@ class OwlbearIntegration {
                     reader.onload = (e) => {
                         try {
                             const jsonData = JSON.parse(e.target?.result as string);
-                            console.log('Character data imported from JSON file');
+                            
                             resolve(jsonData);
                         } catch (error) {
                             console.warn('Failed to parse imported JSON:', error);
@@ -355,7 +355,7 @@ class OwlbearIntegration {
             }
         }, this.storageOptions.autoSaveInterval);
 
-        console.log(`Auto-save started (interval: ${this.storageOptions.autoSaveInterval}ms)`);
+        
     }
 
     /**
@@ -365,7 +365,7 @@ class OwlbearIntegration {
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
             this.autoSaveTimer = null;
-            console.log('Auto-save stopped');
+            
         }
     }
 
@@ -426,7 +426,7 @@ class OwlbearIntegration {
      */
     public cleanup(): void {
         this.stopAutoSave();
-        console.log('Owlbear integration cleaned up');
+        
     }
 }
 

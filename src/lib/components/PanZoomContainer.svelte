@@ -40,10 +40,8 @@
             });
 
             function handlePointerDown(event: PointerEvent) {
-                console.log('Pointer down event:', event);
                 // Handle middle mouse button or when in pan mode
                 if (event.button === 1 || isPanMode) { 
-                    console.log('Pan operation initiated');
                     event.preventDefault(); // Prevent default middle-click behavior
                     panzoom?.handleDown(event);
                     
@@ -53,7 +51,6 @@
             }
 
             function handleMove(event: PointerEvent) {
-                console.debug('Pointer move event:', event);
                 // Only handle move if we're in the middle of a pan operation
                 panzoom?.handleMove(event);
             }
@@ -85,7 +82,6 @@
             }
 
             function handlePointerCancel(event: PointerEvent) {
-                console.log('Pointer cancel event:', event);
                 // Force end the pan operation when pointer is cancelled
                 panzoom?.handleUp(event);
                 
@@ -109,22 +105,16 @@
             containerElement.addEventListener('pointerleave', handlePointerLeave);
             containerElement.addEventListener('pointercancel', handlePointerCancel);
 
-            console.log('PanZoom initialized successfully');
             // zoom out to fit the content initially
 
             setTimeout(() => panzoom?.zoom(1), 100); // Adjust initial zoom level as needed
 
-            console.log(panzoom.getScale()); // Ensure scale is set correctly
-
-
             // Add global event listeners to catch events when mouse leaves the window
             function handleGlobalPointerUp(event: PointerEvent) {
-                console.log('Global pointer up event:', event);
                 panzoom?.handleUp(event);
             }
 
             function handleGlobalPointerCancel(event: PointerEvent) {
-                console.log('Global pointer cancel event:', event);
                 panzoom?.handleUp(event);
             }
 

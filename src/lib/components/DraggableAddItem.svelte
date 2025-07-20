@@ -12,18 +12,15 @@
     let isDragging = $state(false);
 
     function handleDragStart(event: DragEvent) {
-        console.log('DraggableAddItem: Drag start event fired!', { dragType, event });
         isDragging = true;
         if (event.dataTransfer) {
             event.dataTransfer.effectAllowed = 'copy';
             event.dataTransfer.setData('text/plain', dragType);
-            console.log('DraggableAddItem: DataTransfer set with type:', dragType);
         }
         onDragStart();
     }
 
     function handleDragEnd() {
-        console.log('DraggableAddItem: Drag end event fired!');
         isDragging = false;
         onDragEnd();
     }

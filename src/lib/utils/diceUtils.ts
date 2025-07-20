@@ -24,7 +24,7 @@ export async function focusDiceTray(): Promise<void> {
 
 export async function checkDicePluginAvailability(): Promise<void> {
     try {
-        console.log("🎲 Checking MYZ Dice plugin availability...");
+        
         // Use broadcast channel to check availability instead of direct window API calls
         let metadataCheck = await checkDiceExtensionMetadata();
 
@@ -35,14 +35,14 @@ export async function checkDicePluginAvailability(): Promise<void> {
         }
 
         if (!metadataCheck.available) {
-            console.log(`🎲 MYZ Dice plugin detected (version: ${metadataCheck.version || 'unknown'})`);
+            
             diceStates.isDicePluginAvailable = false;
             return;
         }
 
 
 
-        console.log("🎲 MYZ Dice plugin metadata check passed");
+        
 
         diceStates.isDicePluginAvailable = true;
 
@@ -53,7 +53,7 @@ export async function checkDicePluginAvailability(): Promise<void> {
             
             const broadcastCheck = await checkUsingBroadcastChannel();
             if (!broadcastCheck.available) {
-                console.log("🎲 MYZ Dice plugin not found via broadcast");
+                
                 diceStates.broadCastAvailabilityCheck = false;
                 return;
             }
@@ -62,9 +62,9 @@ export async function checkDicePluginAvailability(): Promise<void> {
 
         
         if (metadataCheck.available) {
-            console.log(`🎲 MYZ Dice plugin detected (version: ${metadataCheck.version || 'unknown'})`);
+            
         } else {
-            console.log("🎲 MYZ Dice plugin not found via broadcast");
+            
         }
     } catch (error) {
         console.warn("🎲 Failed to check dice plugin availability:", error);
@@ -133,12 +133,12 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
         const requestId = `availability-${Date.now()}-${Math.random()}`;
         let resolved = false;
 
-        console.log("[MYZDiceIntegration] Checking MYZ Dice availability...");
+        
 
         const timeout = setTimeout(() => {
             if (!resolved) {
                 resolved = true;
-                console.log("[MYZDiceIntegration] Availability check timed out");
+                
                 channel.close();
                 resolve({ available: false });
             }}, timeoutMs);
@@ -152,7 +152,7 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
             if (!resolved) {
                 resolved = true;
                 clearTimeout(timeout);
-                console.log("[MYZDiceIntegration] MYZ Dice availability confirmed:", response);
+                
                 channel.close();
                 resolve({ available: response.available, version: response.version });
             }
@@ -163,7 +163,7 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
             requestId: requestId
         };
 
-        console.log("[MYZDiceIntegration] Sending availability check request:", request);
+        
             channel.postMessage(request);
     });
 }

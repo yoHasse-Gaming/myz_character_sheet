@@ -65,7 +65,6 @@
             // Restore saved layout
             const savedLayout = characterActions.getPaperLayout(paperId);
             if (savedLayout) {
-                console.log('Restoring layout for', paperId, savedLayout);
                 
                 // Apply saved position
                 paperElement.style.transform = `translate(${savedLayout.x}px, ${savedLayout.y}px)`;
@@ -102,7 +101,6 @@
     // Handle auto-resize for textareas
     function handleTextareaInput(event: Event) {
         if (autoResize && event.target instanceof HTMLTextAreaElement) {
-            console.log('Auto-resizing textarea:', event.target);
             autoResizePaper(event.target, minSize, maxSize);
         }
     }

@@ -68,7 +68,7 @@ export function toggleDialogueOption(dialogue: DialogueOption, open: boolean | u
 
 export function openDialogueOption(dialogue: DialogueOption) {
     // Close all other dialogues first
-    console.log(`Opening dialogue: ${dialogue}`);
+    
     openDialogue.forEach((value, key) => {
         if (key !== dialogue) {
             openDialogue.set(key, false);

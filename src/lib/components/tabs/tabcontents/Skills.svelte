@@ -49,12 +49,9 @@
 
     onMount(() => {
         // Debug: Check if characterActions is available
-        console.log('CharacterActions available:', typeof characterActions, characterActions);
         
         // Initialize InteractJS for draggable and resizable skill papers
-        console.log('Initializing InteractJS for skills...');
         const skillElements = document.querySelectorAll('.skill-paper');
-        console.log('Found skill papers:', skillElements.length);
         
         // Restore saved positions and sizes
         skillElements.forEach((element, index) => {

@@ -72,14 +72,12 @@
         function handleGlobalDragEnter(event: DragEvent) {
             // Only show drop zone if we're dragging something with our drag type
             if (event.dataTransfer && event.dataTransfer.types.includes('text/plain')) {
-                console.log('Drag detected, showing drop zone');
                 isDropping = true;
                 dropType = 'add-item'; // Default, will be updated on dragover
             }
         }
 
         function handleGlobalDragEnd(event: DragEvent) {
-            console.log('Global drag end detected');
             isDropping = false;
             hoveredZone = null;
             dropType = '';

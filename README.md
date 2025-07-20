@@ -26,6 +26,9 @@
 * [ ] Fix saving to Owlbear integration
   * [ ] Make it so only DM/GM can view all other characters
 
+## Logic
+* [ ] OBR.room.onMetadataChange applies for diceRollerReady, could be used for listening to that update...
+
 ## Design Consistency
 * [ ] Apply paper-style to all sections
 * [ ] Make mutations draggable like skills

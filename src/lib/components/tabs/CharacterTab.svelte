@@ -32,17 +32,13 @@
 
     onMount(() => {
         // Initialize InteractJS for draggable and resizable character papers
-        console.log('Initializing InteractJS for character tab...');
         const characterElements = document.querySelectorAll('.character-paper');
-        console.log('Found character papers:', characterElements.length);
-        
         // Restore saved positions and sizes
         characterElements.forEach((element, index) => {
             const paperId = element.getAttribute('data-paper-id');
             if (paperId) {
                 const savedLayout = characterActions.getPaperLayout(paperId);
                 if (savedLayout) {
-                    console.log('Restoring layout for', paperId, savedLayout);
                     const htmlElement = element as HTMLElement;
                     // Apply saved position
                     htmlElement.style.transform = `translate(${savedLayout.x}px, ${savedLayout.y}px)`;

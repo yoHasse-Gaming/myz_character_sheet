@@ -24,7 +24,7 @@ export function initInteractForElement(
             allowFrom: allowFrom, // Use component-specific selector
             listeners: {
                 start: (event) => {
-                    // console.log('Drag started on:', event.target);
+                    // 
                     event.target.style.zIndex = '1000';
                 },
                 move: (event) => {

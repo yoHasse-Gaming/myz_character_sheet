@@ -59,7 +59,6 @@
             }
 
             function handlePointerUp(event: PointerEvent) {
-                console.log('Pointer up event:', event);
                 panzoom?.handleUp(event);
                 
                 // Release pointer capture
@@ -69,7 +68,6 @@
             }
 
             function handlePointerLeave(event: PointerEvent) {
-                console.log('Pointer leave event:', event);
                 // Force end the pan operation when pointer leaves the container
                 panzoom?.handleUp(event);
                 

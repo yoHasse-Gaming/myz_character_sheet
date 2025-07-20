@@ -15,6 +15,7 @@
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
         minSize = { width: 250, height: 80 },
+        maxSize = undefined,
         header = undefined,
         HeaderIcon = undefined,
         content,
@@ -29,6 +30,7 @@
         initialPosition?: { x: number; y: number };
         initialSize?: { width: string | number; height: string | number };
         minSize?: { width: number; height: number };
+        maxSize?: { width: number; height: number };
         header?: Snippet;
         HeaderIcon?: typeof IconType;
         content?: Snippet;
@@ -51,6 +53,8 @@
                 initInteractForElement(paperElement, dragHandle, undefined, {
                     enableDraggable: draggable,
                     enableResizable: resizable,
+                    minSize: minSize,
+                    maxSize: maxSize,
                 });
             }
 
@@ -84,15 +88,22 @@
                     paperElement.style.height = initialSize.height + 'px';
                 }
             }
+
+            if(autoResize) {
+                // Attach auto-resize handler to textareas inside this paper card
+                const textareas = paperElement.querySelectorAll('textarea');
+                textareas.forEach(textarea => {
+                    autoResizePaper(textarea, minSize, maxSize);
+                });
+            }
         }
     });
 
     // Handle auto-resize for textareas
     function handleTextareaInput(event: Event) {
-        console.log('Textarea input event:', event);
         if (autoResize && event.target instanceof HTMLTextAreaElement) {
             console.log('Auto-resizing textarea:', event.target);
-            autoResizePaper(event.target);
+            autoResizePaper(event.target, minSize, maxSize);
         }
     }
 </script>

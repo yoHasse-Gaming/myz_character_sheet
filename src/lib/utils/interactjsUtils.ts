@@ -8,6 +8,9 @@ export function initInteractForElement(
     options: {
         enableDraggable?: boolean;
         enableResizable?: boolean;
+        minSize?: { width: number; height: number };
+        maxSize?: { width: number; height: number };
+        
     } = { enableDraggable: true, enableResizable: true }
 ) {
 
@@ -58,11 +61,7 @@ export function initInteractForElement(
                 }
             },
             modifiers: [
-                // Restrict dragging to within the panzoom container
-                // interact.modifiers.restrictRect({
-                //     restriction: '.panzoom-content',
-                //     endOnly: true
-                // })
+
             ]
         });
     }
@@ -73,7 +72,6 @@ export function initInteractForElement(
             edges: { left: true, right: true, bottom: true, top: true },
             listeners: {
                 start: (event) => {
-                    console.log('Resize started on:', event.target);
                     event.target.style.zIndex = '1000';
                 },
                 move: (event) => {
@@ -82,7 +80,7 @@ export function initInteractForElement(
                     let y = (parseFloat(target.getAttribute('data-y')) || 0);
 
                     // Calculate minimum height based on content
-                    const minHeight = headerElem ? getMinHeightForContent(target, headerElem) : 120; // Default minimum height if no headerElem provided
+                    const minHeight = headerElem ? getMinHeightForContent(target, headerElem, options.minSize, options.maxSize) : (options.minSize?.height || 120); // Default minimum height if no headerElem provided
                     
                     // Ensure height doesn't go below minimum
                     const newHeight = Math.max(event.rect.height, minHeight);
@@ -131,9 +129,16 @@ export function initInteractForElement(
                 }
             },
             modifiers: [
-                // Static minimum size constraints
+                // Dynamic minimum size constraints based on content and options
                 interact.modifiers.restrictSize({
-                    min: { width: 250, height: 120 }
+                    min: { 
+                        width: options.minSize?.width || 250, 
+                        height: options.minSize?.height || 120 
+                    },
+                    max: options.maxSize ? {
+                        width: options.maxSize.width,
+                        height: options.maxSize.height
+                    } : undefined
                 })
             ]
         });
@@ -171,7 +176,12 @@ export function initInteractForElement(
         characterActions.savePaperLayout(paperId, layout);
     }, 100); // Save at most every 100ms
 
-    export function getMinHeightForContent(element: HTMLElement, headerElem: HTMLElement | string): number {
+    export function getMinHeightForContent(
+        element: HTMLElement, 
+        headerElem: HTMLElement | string,
+        minSize?: { width: number; height: number },
+        maxSize?: { width: number; height: number }
+    ): number {
         const textarea = element.querySelector('textarea');
         if (!textarea) return 120; // Default minimum for input fields
         
@@ -209,12 +219,22 @@ export function initInteractForElement(
         
         // Calculate total minimum height: header + content padding + text height + some margin
         const contentPadding = 32; // 1rem top + 1rem bottom
-        const minHeight = headerHeight + contentPadding + textHeight + paddingTop + paddingBottom + 20; // +20 for margin
+        const calculatedMinHeight = headerHeight + contentPadding + textHeight + paddingTop + paddingBottom + 20; // +20 for margin
         
-        return Math.max(120, minHeight); // Never smaller than default minimum
+        // Use the larger of: default minimum (120), calculated content height, or provided minSize.height
+        const defaultMinHeight = 120;
+        const providedMinHeight = minSize?.height || 0;
+        const finalMinHeight = Math.max(defaultMinHeight, calculatedMinHeight, providedMinHeight);
+        
+        // Respect maxSize if provided
+        return maxSize?.height ? Math.min(finalMinHeight, maxSize.height) : finalMinHeight;
     }
 
-    export function autoResizePaper(textarea: HTMLTextAreaElement) {
+    export function autoResizePaper(
+        textarea: HTMLTextAreaElement,
+        minSize?: { width: number; height: number },
+        maxSize?: { width: number; height: number }
+    ) {
         const paper = textarea.closest('.paper-card') as HTMLElement;
         if (!paper) return;
         
@@ -224,9 +244,7 @@ export function initInteractForElement(
         
         try {
             const currentHeight = parseFloat(paper.style.height) || paper.offsetHeight;
-            console.log('Current paper height:', currentHeight);
-            const minHeight =  getMinHeightForContent(paper, '.paper-header');
-            console.log('Calculated minimum height for content:', minHeight);
+            const minHeight =  getMinHeightForContent(paper, '.paper-header', minSize, maxSize);
             
             // Only grow the paper if content needs more space, and add a small buffer to prevent constant resizing
             const buffer = 10; // Small buffer to prevent continuous resizing
@@ -257,8 +275,11 @@ export function initInteractForElement(
     }
 
         // Debounced auto-resize function to avoid excessive calls during typing
-    export const debouncedAutoResize = throttle((textarea: HTMLTextAreaElement) => {
-        console.log('Debounced auto-resize triggered for:', textarea);
-        autoResizePaper(textarea);
+    export const debouncedAutoResize = throttle((
+        textarea: HTMLTextAreaElement,
+        minSize?: { width: number; height: number },
+        maxSize?: { width: number; height: number }
+    ) => {
+        autoResizePaper(textarea, minSize, maxSize);
     }, 150); // Wait 150ms after user stops typing
 

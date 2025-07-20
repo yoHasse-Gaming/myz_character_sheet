@@ -128,6 +128,7 @@
     initialPosition={characterPositions.body}
     minSize={{ width: 260, height: 70 }}
     resizable={true}
+    autoResize={true}
     class="p-2"
     >
     {#snippet content()}
@@ -149,6 +150,7 @@
         minSize={{ width: 260, height: 110 }}
         initialSize={{ width: 260, height: 110 }}
         resizable={true}
+        autoResize={true}
         class="p-2"
         >
         {#snippet content()}

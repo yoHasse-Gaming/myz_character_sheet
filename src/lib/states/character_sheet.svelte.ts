@@ -1,44 +1,74 @@
-// Global character sheet state using Svelte 5 runes
-// This provides reactive state management across all components
-
-import { BicepsFlexed, Brain, UsersRound, VenetianMask } from '@lucide/svelte';
 import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType } from '../types';
 import type { LayoutType } from '../utils/interactjsUtils';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 import skills from '../data/skills.json';
 import { openDiceRollModal } from '../states/modals.svelte';
 
+// Main character data interface - this is the primary type for the entire app
+export interface CharacterSheetData {
+    name: string;
+    occupation: string;
+    appearance: {
+        face: string;
+        body: string;
+        clothes: string;
+    };
+    dream: string;
+    baseAbilities: BaseAbilityType[];
+    skills: SkillType[];
+    optionalSkills: OptionalSkill[];
+    mutations: Mutation[];
+    mutationPoints: number;
+    talents: Talent[];
+    conditions: {
+        isStarving: boolean;
+        isSleepDeprived: boolean;
+        isDehydrated: boolean;
+        isFreezing: boolean;
+    };
+    criticalInjuries: string;
+    equipment: Equipment[];
+    equipmentTable: EquipmentTableItem[];
+    weapons: Weapon[];
+    armor: Armor[];
+    relations: RPRelation[];
+    additionalRelations: RPRelation[];
+    notes: string[];
+    paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
+}
 
-// Define the character sheet state structure
-export const sheetState = $state({
+export const sheetState: CharacterSheetData = $state({
     // Character basic info
-    name: "Okänd Mutant",
-    concept: "",
+    name: "",
     occupation: "",
-    age: 0,
+    appearance: {
+        face: "",
+        body: "",
+        clothes: ""
+    },
+    dream: "",
     // Base abilities with damage tracking
-    
     baseAbilities: [
         { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0, type: 'STRENGTH' },
         { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0, type: 'AGILITY' },
         { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0, type: 'WITS' },
         { label: 'Känsla', damageLabel: 'Tvivel', value: 1, damage: 0, type: 'EMPATHY' }
-    ] as BaseAbilityType[],
+    ],
     
     // Skills with their values and descriptions
     skills: skills.skills as SkillType[],
     
     // Optional skills selected by the user
-    optionalSkills: [] as OptionalSkill[],
+    optionalSkills: [] ,
     
     // Mutations selected by the user
-    mutations: [] as Mutation[],
+    mutations: [],
     
     // Mutation points available to spend
     mutationPoints: 0,
     
     // Talents selected by the user
-    talents: [] as Talent[],
+    talents: [],
     
     // Character conditions
     conditions: {
@@ -52,14 +82,14 @@ export const sheetState = $state({
     criticalInjuries: "",
     
     // Equipment and inventory
-    equipment: [] as Equipment[],
-    equipmentTable: [] as EquipmentTableItem[],
+    equipment: [],
+    equipmentTable: [],
     
     // Weapons
-    weapons: [] as Weapon[],
+    weapons: [],
     
     // Armor
-    armor: [] as Armor[],
+    armor: [],
 
     // Relations with other characters
     relations: [
@@ -69,14 +99,14 @@ export const sheetState = $state({
         {id: 'RP4', name: 'RP 4', description: '', isClose: false},
         {id: 'SL1', name: 'Jag Hatar', description: '', isClose: false},
         {id: 'SL2', name: 'Jag vill skydda', description: '', isClose: false}
-    ] as RPRelation[],
-    additionalRelations: [] as RPRelation[],
+    ],
+    additionalRelations: [],
     
     // Notes or miscellaneous information
-    notes: [] as string[],
+    notes: [],
     
     // Paper layout data for preserving positions and sizes across tab switches
-    paperLayouts: {} as Record<string, { x: number; y: number; width?: number; height?: number }>
+    paperLayouts: {}
 });
 
 // Helper functions for managing the state
@@ -122,6 +152,7 @@ export const characterActions = {
     // Optional skills management
     addOptionalSkill(optionalSkill: OptionalSkill) {
         // Check if skill is already added
+        const test = sheetState.optionalSkills;
         const existingIndex = sheetState.optionalSkills.findIndex(s => s.id === optionalSkill.id);
         if (existingIndex === -1) {
             sheetState.optionalSkills.push(optionalSkill);
@@ -208,16 +239,24 @@ export const characterActions = {
         sheetState.name = name;
     },
     
-    setConcept(concept: string) {
-        sheetState.concept = concept;
-    },
-    
     setOccupation(occupation: string) {
         sheetState.occupation = occupation;
     },
     
-    setAge(age: number) {
-        sheetState.age = Math.max(0, age);
+    setAppearanceFace(face: string) {
+        sheetState.appearance.face = face;
+    },
+    
+    setAppearanceBody(body: string) {
+        sheetState.appearance.body = body;
+    },
+    
+    setAppearanceClothes(clothes: string) {
+        sheetState.appearance.clothes = clothes;
+    },
+    
+    setDream(dream: string) {
+        sheetState.dream = dream;
     },
     
     // Condition functions
@@ -344,13 +383,7 @@ export const characterActions = {
     
     // Owlbear Rodeo integration
     setupOwlbearSync() {
-        const owlbearSync = useOwlbearSync(() => ({
-            name: sheetState.name,
-            baseAbilities: sheetState.baseAbilities,
-            skills: sheetState.skills,
-            conditions: sheetState.conditions,
-            timestamp: Date.now()
-        }));
+        const owlbearSync = useOwlbearSync();
 
         console.log('Setting up Owlbear Rodeo sync');
         
@@ -372,13 +405,7 @@ export const characterActions = {
     },
     
     syncToOwlbear() {
-        const owlbearSync = useOwlbearSync(() => ({
-            name: sheetState.name,
-            baseAbilities: sheetState.baseAbilities,
-            skills: sheetState.skills,
-            conditions: sheetState.conditions,
-            timestamp: Date.now()
-        }));
+        const owlbearSync = useOwlbearSync();
         
         owlbearSync.syncNow();
     },
@@ -410,7 +437,6 @@ export const characterActions = {
             skillName: skillName,
             abilityName: baseAbilityLabel
         });
-     
     },
 
     openAbilityRollModal(abilityLabel: string, abilityValue: number, abilityDamage: number) {

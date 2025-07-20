@@ -1,22 +1,9 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { characterActions } from '../../states/character_sheet.svelte';
+    import { characterActions, sheetState } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
 
-    let formData = {
-        name: '',
-        job: '',
-        appearance: {
-            face: '',
-            body: '',
-            clothes: ''
-        },
-        dream: ''
-    };
-
-    // Generate random variants for each input to make them unique
-    const [faceVariant, bodyVariant, clothesVariant] = generateUniqueVariants(5);
 
     const startPos = { x: 340, y: 20 };
 
@@ -72,7 +59,7 @@
             type="text"
             class="compact-input font-user"
             placeholder="t.ex. Rust, Echo, Zero..."
-            bind:value={formData.name}
+            bind:value={sheetState.name}
         />
     </div>
     {/snippet}
@@ -92,7 +79,7 @@
             type="text"
             class="compact-input font-user"
             placeholder="t.ex. Skräpsamlare, Vakt, Mekaniker..."
-            bind:value={formData.job}
+            bind:value={sheetState.occupation}
         />
     </div>
     {/snippet}
@@ -112,7 +99,7 @@
         <textarea
             class="compact-textarea font-user"
             placeholder="Ärrat, väderbitit, maskerat..."
-            bind:value={formData.appearance.face}
+            bind:value={sheetState.appearance.face}
             rows="2"
         ></textarea>
     </div>
@@ -133,7 +120,7 @@
         <textarea
             class="compact-textarea font-user"
             placeholder="Mager, muskulös, deformerad..."
-            bind:value={formData.appearance.body}
+            bind:value={sheetState.appearance.body}
             rows="2"
         ></textarea>
     </div>
@@ -155,7 +142,7 @@
             <textarea
                 class="compact-textarea font-user"
                 placeholder="Lappade trasor, läder, folie..."
-                bind:value={formData.appearance.clothes}
+                bind:value={sheetState.appearance.clothes}
                 rows="2"
             ></textarea>
         </div>
@@ -175,7 +162,7 @@
             <textarea
                 class="compact-textarea font-user"
                 placeholder="Vad drömmer din karaktär om?"
-                bind:value={formData.dream}
+                bind:value={sheetState.dream}
                 rows="4"
             ></textarea>
         </div>

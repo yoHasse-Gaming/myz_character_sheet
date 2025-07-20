@@ -4,9 +4,9 @@
     import InfoModal from './lib/components/Modals/InfoModal.svelte';
     import DiceRollModal from './lib/components/Modals/DiceRollModal.svelte';
     import SizeControlsModal from './lib/components/Modals/SizeControlsModal.svelte';
+    import StorageControlsModal from './lib/components/Modals/StorageControlsModal.svelte';
     import PanZoomContainer from './lib/components/PanZoomContainer.svelte';
     import SvgContent from './lib/components/contents/SvgContent.svelte';
-    import { AppBar } from '@skeletonlabs/skeleton-svelte';
 
 
 
@@ -29,6 +29,7 @@
 <InfoModal />
 <DiceRollModal />
 <SizeControlsModal />
+<StorageControlsModal />
 
 <!-- Drag and Drop Overlay -->
 

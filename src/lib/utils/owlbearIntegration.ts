@@ -6,18 +6,14 @@
 
 import OBR from "@owlbear-rodeo/sdk";
 import { checkDicePluginAvailability } from "./diceUtils";
+import { sheetState } from "../states/character_sheet.svelte";
+import type { Armor, BaseAbilityType, Equipment, EquipmentTableItem, Mutation, OptionalSkill, RPRelation, SkillType, Talent, Weapon } from "../types";
+import type { CharacterSheet, CharacterSheetData } from "../states/character_sheet.svelte";
 
 export function getExtensionId(path: string): string {
     return `rodeo.owlbear.myz_character_sheet/${path}`;
 }
 
-export interface CharacterData {
-    name: string;
-    baseAbilities: any[];
-    skills: any[];
-    conditions: any;
-    // Add other character sheet properties as needed
-}
 
 export interface StorageOptions {
     useLocalStorage: boolean;
@@ -26,19 +22,22 @@ export interface StorageOptions {
 }
 
 class OwlbearIntegration {
-    private characterData: CharacterData | null = null;
+    private CharacterSheetData: CharacterSheetData | null = null;
     private autoSaveTimer: number | null = null;
     private storageOptions: StorageOptions = {
         useLocalStorage: true,
         autoSaveInterval: 5000, // Auto-save every 5 seconds
         storageKey: 'myz-character-sheet-data'
     };
+    private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
 
     constructor() {
+        // Clear any existing auto-save timers from previous sessions
         this.initializeOBR();
         // Always try to load from localStorage first
         this.loadFromLocalStorage();
     }
+
 
     /**
      * Initialize Owlbear Rodeo SDK
@@ -59,7 +58,7 @@ class OwlbearIntegration {
                 
                 
                 // Listen for character data updates
-                this.setupCharacterDataListener();
+                this.setupCharacterSheetDataListener();
 
                 await checkDicePluginAvailability()
 
@@ -77,15 +76,13 @@ class OwlbearIntegration {
     /**
      * Set up listener for character data changes
      */
-    private setupCharacterDataListener(): void {
+    private setupCharacterSheetDataListener(): void {
         if (!OBR.isAvailable) return;
-        console.log('Setting up character data listener');
         // Listen for room metadata changes where character data might be stored
         OBR.room.onMetadataChange(async (metadata: any) => {
-            console.log('Character data metadata changed:', metadata);
             const characterKey = getExtensionId(await OBR.player.getId());
             if (metadata[characterKey]) {
-                this.characterData = metadata[characterKey] as CharacterData;
+                this.CharacterSheetData = metadata[characterKey] as CharacterSheetData;
             }
         });
     }
@@ -93,14 +90,14 @@ class OwlbearIntegration {
     /**
      * Save character data to Owlbear room metadata
      */
-    public async saveCharacterData(characterData: CharacterData): Promise<void> {
+    public async saveCharacterSheetData(CharacterSheetData: CharacterSheetData): Promise<void> {
         if (!OBR.isAvailable) return;
 
         try {
             const characterKey = getExtensionId(await OBR.player.getId());
             await OBR.room.setMetadata({
                 [characterKey]: {
-                    ...characterData,
+                    ...CharacterSheetData,
                     lastUpdated: Date.now()
                 }
             });
@@ -113,13 +110,13 @@ class OwlbearIntegration {
     /**
      * Load character data from Owlbear room metadata
      */
-    public async loadCharacterData(): Promise<CharacterData | null> {
+    public async loadCharacterSheetData(): Promise<CharacterSheetData | null> {
         if (!OBR.isAvailable) return null;
 
         try {
             const metadata = await OBR.room.getMetadata();
             const characterKey = getExtensionId(await OBR.player.getId());
-            return metadata[characterKey] as CharacterData || null;
+            return metadata[characterKey] as CharacterSheetData || null;
         } catch (error) {
             console.warn('Failed to load character data:', error);
             return null;
@@ -164,15 +161,15 @@ class OwlbearIntegration {
     /**
      * Set up automatic character data sync
      */
-    public setupAutoSync(getCharacterData: () => CharacterData, interval: number = 30000): void {
+    public setupAutoSync(getCharacterSheetData: () => CharacterSheetData, interval: number = 30000): void {
         if (!OBR.isAvailable) return;
 
         // Send initial data
-        this.saveCharacterData(getCharacterData());
+        this.saveCharacterSheetData(getCharacterSheetData());
 
         // Set up periodic sync
         setInterval(() => {
-            this.saveCharacterData(getCharacterData());
+            this.saveCharacterSheetData(getCharacterSheetData());
         }, interval);
     }
 
@@ -197,13 +194,13 @@ class OwlbearIntegration {
     /**
      * Notify other players of character updates
      */
-    public async notifyCharacterUpdate(characterData: CharacterData): Promise<void> {
+    public async notifyCharacterUpdate(CharacterSheetData: CharacterSheetData): Promise<void> {
         if (!OBR.isAvailable) return;
 
         try {
             // Use the broadcast API to notify other players
             await OBR.broadcast.sendMessage('character-sheet-update', {
-                characterData,
+                CharacterSheetData,
                 timestamp: Date.now()
             });
         } catch (error) {
@@ -218,12 +215,12 @@ class OwlbearIntegration {
     /**
      * Save character data to localStorage
      */
-    public saveToLocalStorage(characterData: CharacterData): void {
+    public saveToLocalStorage(CharacterSheetData: CharacterSheetData): void {
         if (!this.storageOptions.useLocalStorage) return;
 
         try {
             const dataToSave = {
-                ...characterData,
+                ...CharacterSheetData,
                 lastUpdated: Date.now(),
                 version: '1.0'
             };
@@ -237,7 +234,7 @@ class OwlbearIntegration {
     /**
      * Load character data from localStorage
      */
-    public loadFromLocalStorage(): CharacterData | null {
+    public loadFromLocalStorage(): CharacterSheetData | null {
         if (!this.storageOptions.useLocalStorage) return null;
 
         try {
@@ -269,11 +266,11 @@ class OwlbearIntegration {
     /**
      * Export character data as JSON file
      */
-    public exportToJSON(characterData: CharacterData, filename?: string): void {
+    public exportToJSON(CharacterSheetData: CharacterSheetData, filename?: string): void {
 
         try {
             const dataToExport = {
-                ...characterData,
+                ...CharacterSheetData,
                 exportedAt: new Date().toISOString(),
                 version: '1.0'
             };
@@ -284,7 +281,7 @@ class OwlbearIntegration {
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = filename || `myz-character-${characterData.name || 'unnamed'}-${new Date().toISOString().split('T')[0]}.json`;
+            link.download = filename || `myz-character-${CharacterSheetData.name || 'unnamed'}-${new Date().toISOString().split('T')[0]}.json`;
             
             document.body.appendChild(link);
             link.click();
@@ -300,7 +297,7 @@ class OwlbearIntegration {
     /**
      * Import character data from JSON file
      */
-    public importFromJSON(): Promise<CharacterData | null> {
+    public importFromJSON(): Promise<CharacterSheetData | null> {
         return new Promise((resolve, reject) => {
             try {
                 const input = document.createElement('input');
@@ -342,20 +339,28 @@ class OwlbearIntegration {
     /**
      * Start automatic saving to localStorage
      */
-    public startAutoSave(getCharacterData: () => CharacterData): void {
+    public startAutoSave(): void {
         if (this.autoSaveTimer) return;
 
         this.autoSaveTimer = window.setInterval(() => {
-            const data = getCharacterData();
-            this.saveToLocalStorage(data);
+            console.log('Auto-saving character data to localStorage');
+
+            this.saveToLocalStorage(sheetState);
             
             // Also save to Owlbear if available
             if (OBR.isAvailable) {
-                this.saveCharacterData(data);
+                this.saveCharacterSheetData(sheetState);
             }
         }, this.storageOptions.autoSaveInterval);
 
-        
+        // Store the timer ID in localStorage so we can clear it on page reload
+        try {
+            localStorage.setItem(OwlbearIntegration.TIMER_ID_KEY, this.autoSaveTimer.toString());
+        } catch (error) {
+            console.warn('Failed to store timer ID:', error);
+        }
+
+        console.log('Auto-save started with interval:', this.storageOptions.autoSaveInterval);
     }
 
     /**
@@ -366,7 +371,45 @@ class OwlbearIntegration {
             clearInterval(this.autoSaveTimer);
             this.autoSaveTimer = null;
             
+            // Remove the stored timer ID
+            try {
+                localStorage.removeItem(OwlbearIntegration.TIMER_ID_KEY);
+            } catch (error) {
+                console.warn('Failed to remove timer ID from localStorage:', error);
+            }
+            
+            console.log('Auto-save stopped');
         }
+    }
+
+    /**
+     * Check if auto-save is currently running
+     */
+    public isAutoSaveRunning(): boolean {
+        return this.autoSaveTimer !== null;
+    }
+
+    /**
+     * Force clear all auto-save timers (for debugging)
+     */
+    public forceStopAllTimers(): void {
+        // Stop current timer
+        this.stopAutoSave();
+        
+        // Clear any stored timer ID and try to clear it
+        try {
+            const savedTimerId = localStorage.getItem(OwlbearIntegration.TIMER_ID_KEY);
+            if (savedTimerId) {
+                const timerId = parseInt(savedTimerId);
+                clearInterval(timerId);
+                localStorage.removeItem(OwlbearIntegration.TIMER_ID_KEY);
+                console.log('Force cleared timer:', timerId);
+            }
+        } catch (error) {
+            console.warn('Failed to force clear timers:', error);
+        }
+        
+        console.log('All auto-save timers force stopped');
     }
 
     /**
@@ -378,7 +421,7 @@ class OwlbearIntegration {
         // Restart auto-save if interval changed and auto-save is active
         if (this.autoSaveTimer && options.autoSaveInterval) {
             this.stopAutoSave();
-            // Note: startAutoSave will need to be called again with the getCharacterData function
+            // Note: startAutoSave will need to be called again with the getCharacterSheetData function
         }
     }
 
@@ -392,25 +435,25 @@ class OwlbearIntegration {
     /**
      * Save character data using the best available method
      */
-    public async saveCharacterDataUniversal(characterData: CharacterData): Promise<void> {
+    public async saveCharacterSheetDataUniversal(CharacterSheetData: CharacterSheetData): Promise<void> {
         // Always save to localStorage as backup
-        this.saveToLocalStorage(characterData);
+        this.saveToLocalStorage(CharacterSheetData);
         
         // Also save to Owlbear if available
         if (OBR.isAvailable) {
-            await this.saveCharacterData(characterData);
+            await this.saveCharacterSheetData(CharacterSheetData);
         }
     }
 
     /**
      * Load character data using the best available method
      */
-    public async loadCharacterDataUniversal(): Promise<CharacterData | null> {
-        let data: CharacterData | null = null;
-        
+    public async loadCharacterSheetDataUniversal(): Promise<CharacterSheetData | null> {
+        let data: CharacterSheetData | null = null;
+
         // Try to load from Owlbear first (if available)
         if (OBR.isAvailable) {
-            data = await this.loadCharacterData();
+            data = await this.loadCharacterSheetData();
         }
         
         // Fall back to localStorage if no Owlbear data
@@ -443,26 +486,28 @@ export function useOwlbearResize() {
     };
 }
 
-export function useOwlbearSync(getCharacterData: () => CharacterData) {
+export function useOwlbearSync() {
     return {
-        syncNow: () => owlbearIntegration.saveCharacterData(getCharacterData()),
-        loadData: () => owlbearIntegration.loadCharacterData(),
-        setupAutoSync: (interval?: number) => owlbearIntegration.setupAutoSync(getCharacterData, interval),
+        syncNow: () => owlbearIntegration.saveCharacterSheetData(sheetState),
+        loadData: () => owlbearIntegration.loadCharacterSheetData(),
+        setupAutoSync: (interval?: number) => owlbearIntegration.setupAutoSync(() => sheetState, interval),
         isInOwlbear: owlbearIntegration.isOwlbearEnvironment,
         
         // Universal storage methods (localStorage + Owlbear)
-        saveUniversal: () => owlbearIntegration.saveCharacterDataUniversal(getCharacterData()),
-        loadUniversal: () => owlbearIntegration.loadCharacterDataUniversal(),
-        startAutoSave: () => owlbearIntegration.startAutoSave(getCharacterData),
+        saveUniversal: () => owlbearIntegration.saveCharacterSheetDataUniversal(sheetState),
+        loadUniversal: () => owlbearIntegration.loadCharacterSheetDataUniversal(),
+        startAutoSave: () => owlbearIntegration.startAutoSave(),
         stopAutoSave: () => owlbearIntegration.stopAutoSave(),
+        isAutoSaveRunning: () => owlbearIntegration.isAutoSaveRunning(),
+        forceStopAllTimers: () => owlbearIntegration.forceStopAllTimers(),
         
         // localStorage specific methods
-        saveLocal: () => owlbearIntegration.saveToLocalStorage(getCharacterData()),
+        saveLocal: () => owlbearIntegration.saveToLocalStorage(sheetState),
         loadLocal: () => owlbearIntegration.loadFromLocalStorage(),
         clearLocal: () => owlbearIntegration.clearLocalStorage(),
         
         // JSON export/import
-        exportJSON: (filename?: string) => owlbearIntegration.exportToJSON(getCharacterData(), filename),
+        exportJSON: (filename?: string) => owlbearIntegration.exportToJSON(sheetState, filename),
         importJSON: () => owlbearIntegration.importFromJSON(),
         
         // Storage configuration
@@ -471,15 +516,17 @@ export function useOwlbearSync(getCharacterData: () => CharacterData) {
     };
 }
 
-export function useLocalStorage(getCharacterData: () => CharacterData) {
+export function useLocalStorage() {
     return {
-        save: () => owlbearIntegration.saveToLocalStorage(getCharacterData()),
+        save: () => owlbearIntegration.saveToLocalStorage(sheetState),
         load: () => owlbearIntegration.loadFromLocalStorage(),
         clear: () => owlbearIntegration.clearLocalStorage(),
-        exportJSON: (filename?: string) => owlbearIntegration.exportToJSON(getCharacterData(), filename),
+        exportJSON: (filename?: string) => owlbearIntegration.exportToJSON(sheetState, filename),
         importJSON: () => owlbearIntegration.importFromJSON(),
-        startAutoSave: () => owlbearIntegration.startAutoSave(getCharacterData),
+        startAutoSave: () => owlbearIntegration.startAutoSave(),
         stopAutoSave: () => owlbearIntegration.stopAutoSave(),
+        isAutoSaveRunning: () => owlbearIntegration.isAutoSaveRunning(),
+        forceStopAllTimers: () => owlbearIntegration.forceStopAllTimers(),
         configureStorage: (options: Partial<StorageOptions>) => owlbearIntegration.configureStorage(options),
         getStorageConfig: () => owlbearIntegration.getStorageConfig()
     };

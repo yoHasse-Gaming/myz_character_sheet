@@ -542,6 +542,20 @@
     z-index: 1;
 }
 
+.btn-wrapper .btn {
+    width: 100%;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    font-weight: bold;
+    position: inherit;
+    font-size: 0.9rem;
+}
+
+:global(.dark) .btn-wrapper .btn {
+    color: var(--color-surface-900);
+}
+
 .btn-wrapper:hover {
     filter: brightness(1.3) contrast(1.15);
     transform: translateY(-2px);

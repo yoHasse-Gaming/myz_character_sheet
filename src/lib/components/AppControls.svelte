@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { AppBar } from '@skeletonlabs/skeleton-svelte';
     import { openDialogueOption } from "../states/modals.svelte";
-    import { Moon, RotateCcw, Ruler, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
+    import { Moon, RotateCcw, Ruler, Save, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
     import OBR from "@owlbear-rodeo/sdk";
 
     // Theme functionality
@@ -42,6 +42,10 @@
 
     function openSizeControls() {
         openDialogueOption('sizeControls');
+    }
+
+    function openStorageControls() {
+        openDialogueOption('storageControls');
     }
 
     onMount(() => {
@@ -101,6 +105,16 @@
             <Ruler size={16} />
         </button>
         {/if}
+
+        <!-- Storage Controls -->
+        <button 
+            class="btn btn-sm variant-filled-surface"
+            onclick={openStorageControls}
+            aria-label="Öppna lagringskontroller"
+            title="Spara & Ladda Data"
+        >
+            <Save size={16} />
+        </button>
 
         <!-- Theme Toggle -->
         <button 

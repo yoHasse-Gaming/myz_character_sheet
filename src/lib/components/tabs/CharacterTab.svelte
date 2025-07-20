@@ -146,7 +146,8 @@
     <PaperCard 
         paperId="character-clothes"
         initialPosition={characterPositions.clothes}
-        minSize={{ width: 260, height: 70 }}
+        minSize={{ width: 260, height: 110 }}
+        initialSize={{ width: 260, height: 110 }}
         resizable={true}
         class="p-2"
         >

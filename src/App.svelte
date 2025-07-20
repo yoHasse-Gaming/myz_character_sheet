@@ -3,10 +3,10 @@
 
     import InfoModal from './lib/components/Modals/InfoModal.svelte';
     import DiceRollModal from './lib/components/Modals/DiceRollModal.svelte';
+    import SizeControlsModal from './lib/components/Modals/SizeControlsModal.svelte';
     import PanZoomContainer from './lib/components/PanZoomContainer.svelte';
     import SvgContent from './lib/components/contents/SvgContent.svelte';
-    import ThemeSelector from './lib/components/ThemeSelector.svelte';
-    import SizeSelector from './lib/components/SizeSelector.svelte';
+    import { AppBar } from '@skeletonlabs/skeleton-svelte';
 
 
 
@@ -28,6 +28,7 @@
 <!-- Global Modals -->
 <InfoModal />
 <DiceRollModal />
+<SizeControlsModal />
 
 <!-- Drag and Drop Overlay -->
 
@@ -37,8 +38,6 @@
 TODO: Use this instead of the AppBar component
 <AppBar></AppBar> 
 -->
-<ThemeSelector />
-<SizeSelector />
 
 </main>
 

@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { useOwlbearResize } from '../utils/owlbearIntegration';
     import OBR from '@owlbear-rodeo/sdk';
+    import { Laptop, Monitor, Smartphone } from '@lucide/svelte';
     
 
     let { 
@@ -55,30 +56,25 @@
 </script>
 
 <div class="size-controls">
-    {#if OBR.isAvailable}
-        <div class="owlbear-indicator">
-            🦉 Connected to Owlbear Rodeo
-        </div>
-    {/if}
     
     <div class="size-presets">
         <button 
             class="btn btn-sm variant-ghost-surface" 
             onclick={() => presetSize('small')}
         >
-            📱 Small
+        <Smartphone size={16} /> Small
         </button>
         <button 
             class="btn btn-sm variant-ghost-surface" 
             onclick={() => presetSize('medium')}
         >
-            💻 Medium
+            <Laptop size={16} /> Medium
         </button>
         <button 
             class="btn btn-sm variant-ghost-surface" 
             onclick={() => presetSize('large')}
         >
-            🖥️ Large
+            <Monitor size={16} /> Large
         </button>
     </div>
     

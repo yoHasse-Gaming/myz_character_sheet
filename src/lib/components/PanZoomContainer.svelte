@@ -12,6 +12,7 @@
     import RelationsNotesTab from './tabs/RelationsNotesTab.svelte';
     import DraggableAddItem from './DraggableAddItem.svelte';
     import DropZoneContainer from './DropZoneContainer.svelte';
+    import AppControls from './AppControls.svelte';
 
     let containerElement: HTMLElement;
     let contentElement: HTMLElement;
@@ -24,15 +25,15 @@
             panzoom = Panzoom(contentElement, {
                 maxScale: 3,
                 minScale: 0.3,
-                step: 0.1,
-                startScale: 0.8,
+                step: 0.2,
+                startScale: 3,
                 startX: 0,
                 startY: 0,
                 contain: 'outside',
                 cursor: 'default',
                 noBind: true, // Disable default event binding to avoid conflicts
                 wheel: true,
-                wheelStep: 0.1,
+                wheelStep: 0.3,
                 animate: true,
                 duration: 200,
                 easing: 'ease-in-out'
@@ -45,6 +46,9 @@
                     console.log('Pan operation initiated');
                     event.preventDefault(); // Prevent default middle-click behavior
                     panzoom?.handleDown(event);
+                    
+                    // Set pointer capture to ensure we get all pointer events
+                    containerElement.setPointerCapture(event.pointerId);
                 }
             }
 
@@ -57,14 +61,79 @@
             function handlePointerUp(event: PointerEvent) {
                 console.log('Pointer up event:', event);
                 panzoom?.handleUp(event);
+                
+                // Release pointer capture
+                if (containerElement.hasPointerCapture(event.pointerId)) {
+                    containerElement.releasePointerCapture(event.pointerId);
+                }
+            }
+
+            function handlePointerLeave(event: PointerEvent) {
+                console.log('Pointer leave event:', event);
+                // Force end the pan operation when pointer leaves the container
+                panzoom?.handleUp(event);
+                
+                // Release pointer capture if we have it
+                if (containerElement.hasPointerCapture(event.pointerId)) {
+                    containerElement.releasePointerCapture(event.pointerId);
+                }
+                
+                // Additional safety: force release all pointer captures
+                try {
+                    containerElement.releasePointerCapture(event.pointerId);
+                } catch (e) {
+                    // Ignore errors if pointer capture wasn't set
+                }
+            }
+
+            function handlePointerCancel(event: PointerEvent) {
+                console.log('Pointer cancel event:', event);
+                // Force end the pan operation when pointer is cancelled
+                panzoom?.handleUp(event);
+                
+                // Release pointer capture if we have it
+                if (containerElement.hasPointerCapture(event.pointerId)) {
+                    containerElement.releasePointerCapture(event.pointerId);
+                }
+                
+                // Additional safety: force release all pointer captures
+                try {
+                    containerElement.releasePointerCapture(event.pointerId);
+                } catch (e) {
+                    // Ignore errors if pointer capture wasn't set
+                }
             }
 
             // Add event listeners
             containerElement.addEventListener('pointerdown', handlePointerDown);
             containerElement.addEventListener('pointermove', handleMove);
             containerElement.addEventListener('pointerup', handlePointerUp);
+            containerElement.addEventListener('pointerleave', handlePointerLeave);
+            containerElement.addEventListener('pointercancel', handlePointerCancel);
 
             console.log('PanZoom initialized successfully');
+            // zoom out to fit the content initially
+
+            setTimeout(() => panzoom?.zoom(1), 100); // Adjust initial zoom level as needed
+
+            console.log(panzoom.getScale()); // Ensure scale is set correctly
+
+
+            // Add global event listeners to catch events when mouse leaves the window
+            function handleGlobalPointerUp(event: PointerEvent) {
+                console.log('Global pointer up event:', event);
+                panzoom?.handleUp(event);
+            }
+
+            function handleGlobalPointerCancel(event: PointerEvent) {
+                console.log('Global pointer cancel event:', event);
+                panzoom?.handleUp(event);
+            }
+
+            // Add global listeners to catch events outside the container
+            document.addEventListener('pointerup', handleGlobalPointerUp);
+            document.addEventListener('pointercancel', handleGlobalPointerCancel);
+            // document.addEventListener('blur', handleGlobalPointerCancel); // Handle window losing focus
 
             // Cleanup function
             return () => {
@@ -74,8 +143,15 @@
                 containerElement.removeEventListener('pointerdown', handlePointerDown);
                 containerElement.removeEventListener('pointermove', handleMove);
                 containerElement.removeEventListener('pointerup', handlePointerUp);
-
+                containerElement.removeEventListener('pointerleave', handlePointerLeave);
+                containerElement.removeEventListener('pointercancel', handlePointerCancel);
+                
+                // Remove global listeners
+                document.removeEventListener('pointerup', handleGlobalPointerUp);
+                document.removeEventListener('pointercancel', handleGlobalPointerCancel);
+                // document.removeEventListener('blur', handleGlobalPointerCancel);
             };
+
         }
     });
 
@@ -90,7 +166,8 @@
     // Reset pan and zoom to default
     function resetView() {
         if (panzoom) {
-            panzoom.reset();
+            setTimeout(() => panzoom?.zoom(1), 100); // Adjust initial zoom level as needed
+            setTimeout(() => panzoom?.pan(0, 0), 100); // Reset pan position
         }
     }
 
@@ -125,32 +202,8 @@
 </script>
 
 <div class="panzoom-wrapper">
-    <!-- Pan/Zoom Controls -->
-    <div class="panzoom-controls">
-        <button class="control-btn" onclick={zoomIn} title="Zooma in (Ctrl + Scroll)" aria-label="Zooma in">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="M21 21l-4.35-4.35"></path>
-                <line x1="11" y1="8" x2="11" y2="14"></line>
-                <line x1="8" y1="11" x2="14" y2="11"></line>
-            </svg>
-        </button>
-        
-        <button class="control-btn" onclick={zoomOut} title="Zooma ut (Ctrl + Scroll)" aria-label="Zooma ut">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="M21 21l-4.35-4.35"></path>
-                <line x1="8" y1="11" x2="14" y2="11"></line>
-            </svg>
-        </button>
-
-        <button class="control-btn" onclick={resetView} title="Återställ vy (R)" aria-label="Återställ vy">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-            </svg>
-        </button>
-    </div>
+    <!-- App Controls Bar -->
+    <AppControls panZoomControls={{ zoomIn, zoomOut, resetView }} />
 
     <!-- Pan/Zoom Container -->
     <div class="panzoom-container {isPanMode ? 'pan-mode' : ''}" bind:this={containerElement} onwheel={onWheel}>
@@ -221,7 +274,7 @@
     .panzoom-content {
         display: block; /* Remove grid layout */
         position: relative;
-        padding: 2rem;
+        padding: 5rem 2rem 2rem 2rem; /* Add top padding for AppBar */
         min-width: 300vw; /* Make content much wider for free-form layout */
         min-height: 200vh; /* Make content taller for more space */
         width: max-content; /* Ensure content doesn't get clipped */
@@ -233,62 +286,6 @@
 
     :global(.dark) .panzoom-content {
         background-image: url('/img/sheet_bg_dark.png') !important;
-    }
-
-    /* Pan/Zoom Controls */
-    .panzoom-controls {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 8px;
-        padding: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(10px);
-    }
-
-    :global(.dark) .panzoom-controls {
-        background: rgba(0, 0, 0, 0.8);
-    }
-
-    .control-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: var(--color-primary-500);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .control-btn:hover {
-        background: var(--color-primary-600);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .control-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .control-btn.active {
-        background: var(--color-primary-600);
-        box-shadow: 0 0 0 2px var(--color-primary-200);
-    }
-
-    :global(.dark) .control-btn.active {
-        background: var(--color-primary-400);
-        box-shadow: 0 0 0 2px var(--color-primary-800);
     }
 
     /* Instructions */

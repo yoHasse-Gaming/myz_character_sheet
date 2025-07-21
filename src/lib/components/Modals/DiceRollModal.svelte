@@ -131,7 +131,57 @@
         closeModal();
     }
 
-    // Get all equipment with bonuses for selection
+    // Get all equipped weapons and armor for selection
+    function getEquippedItems(): Array<{id: string; name: string; bonus: number; type: string}> {
+        const result: Array<{id: string; name: string; bonus: number; type: string}> = [];
+        
+        // Add equipped weapons
+        sheetState.weapons.forEach(weapon => {
+            if (weapon.equipped) {
+                result.push({
+                    id: weapon.id,
+                    name: weapon.name,
+                    bonus: weapon.bonus,
+                    type: 'Vapen'
+                });
+            }
+        });
+        
+        // Add equipped armor (note: armor doesn't have bonus in the current type definition)
+        sheetState.armor.forEach(armor => {
+            if (armor.equipped) {
+                result.push({
+                    id: armor.id,
+                    name: armor.name,
+                    bonus: 0, // Armor doesn't have bonus dice, only protection
+                    type: 'Skydd'
+                });
+            }
+        });
+        
+        return result;
+    }
+
+    // Handle selection of equipped item from dropdown
+    function onEquippedItemSelect(event: Event) {
+        const select = event.target as HTMLSelectElement;
+        const selectedItemId = select.value;
+        
+        if (selectedItemId && selectedItemId !== '') {
+            // Find the selected item and add its bonus to extraGearDice
+            const equippedItems = getEquippedItems();
+            const selectedItem = equippedItems.find(item => item.id === selectedItemId);
+            
+            if (selectedItem && selectedItem.bonus > 0) {
+                diceRollModalState.modifiers.extraGearDice += selectedItem.bonus;
+            }
+            
+            // Reset the dropdown
+            select.value = '';
+        }
+    }
+
+    // Get all equipment with bonuses for selection (keeping original function for compatibility)
     function getEquipmentWithBonuses(): Array<{id: string; name: string; bonus: number; type: string}> {
         const result: Array<{id: string; name: string; bonus: number; type: string}> = [];
         
@@ -264,6 +314,27 @@
                     </span>
                 </div>
             </div>
+
+            <!-- Equipped Items Dropdown -->
+            {#if getEquippedItems().length > 0}
+                <div class="equipped-items-section">
+                    <h5 class="section-title">Använd utrustad utrustning</h5>
+                    <div class="equipped-dropdown-container">
+                        <select class="equipped-dropdown" onchange={onEquippedItemSelect}>
+                            <option value="">Välj utrustad utrustning...</option>
+                            {#each getEquippedItems() as item (item.id)}
+                                <option value={item.id}>
+                                    {item.name} ({item.type}) 
+                                    {#if item.bonus > 0}+{item.bonus} tärningar{/if}
+                                </option>
+                            {/each}
+                        </select>
+                        <p class="equipped-help-text">
+                            Välj en utrustad vapen eller rustning för att automatiskt lägga till dess bonus till utrustningtärningar.
+                        </p>
+                    </div>
+                </div>
+            {/if}
 
             <!-- Equipment Selection -->
             {#if getEquipmentWithBonuses().length > 0}
@@ -513,6 +584,71 @@
 
     :global(.dark) .equipment-bonus {
         color: var(--color-primary-400);
+    }
+
+    .equipped-items-section {
+        background: rgba(34, 197, 94, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    :global(.dark) .equipped-items-section {
+        background: rgba(34, 197, 94, 0.1);
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .equipped-dropdown-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .equipped-dropdown {
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-surface-300);
+        background: var(--color-surface-50);
+        color: var(--color-surface-900);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .equipped-dropdown:hover {
+        border-color: var(--color-primary-500);
+    }
+
+    .equipped-dropdown:focus {
+        outline: none;
+        border-color: var(--color-primary-600);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    :global(.dark) .equipped-dropdown {
+        background: var(--color-surface-800);
+        color: var(--color-surface-100);
+        border-color: var(--color-surface-600);
+    }
+
+    :global(.dark) .equipped-dropdown:hover {
+        border-color: var(--color-primary-400);
+    }
+
+    :global(.dark) .equipped-dropdown:focus {
+        border-color: var(--color-primary-400);
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+    }
+
+    .equipped-help-text {
+        font-size: 0.85rem;
+        color: var(--color-surface-600);
+        font-style: italic;
+        margin: 0;
+    }
+
+    :global(.dark) .equipped-help-text {
+        color: var(--color-surface-400);
     }
 
     .modal-actions {

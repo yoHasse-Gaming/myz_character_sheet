@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
     import { HeartHandshake, Notebook, Users } from '@lucide/svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
@@ -33,41 +33,21 @@
         relationNameToDelete = "";
     }
 
-    const startX = 1100;
-    const startY = 175;
-
-    const initialPositions: Record<number, { x: number; y: number }> = {
-        1: { x: startX, y: startY },
-        2: { x: startX, y: startY + 120 },
-        3: { x: startX, y: startY + 240 },
-        4: { x: startX, y: startY + 360 },
-        5: { x: startX, y: startY + 480 },
-        6: { x: startX, y: startY + 600 },
-        7: { x: startX, y: startY + 720 },
-        8: { x: startX, y: startY + 840 },
-        9: { x: startX, y: startY + 960 },
-        10: { x: startX, y: startY + 1080 },
-    };
-
-    function getInitialPosition(index: number): { x: number; y: number } {
-        return initialPositions[index] || { x: startX, y: startY };
-    }
-
 </script>
 
 <!-- Relations Section -->
 
-
-        {#each sheetState.relations as relation, index}
-            <PaperCard 
-                paperId={`relation-${relation.id}`}
+        <PaperCard 
+                paperId={`relations`}
                 autoResize={true}
                 resizable={true}
                 minSize={{ width: 300, height: 110 }}
-                initialPosition={getInitialPosition(index + 1)}
+                initialPosition={initialCardPositions["relations-start"]}
                 class="p-2"
             >
             {#snippet content()}
+        {#each sheetState.relations as relation, index}
+
             <div class="compact-textarea-field">
                 <div class="relation-header">
                     <div class="relation-name-section">
@@ -112,10 +92,11 @@
                 ></textarea>
             </div>
 
+
+        {/each}
             {/snippet}
         </PaperCard>
 
-        {/each}
 
 <!-- Notes Section -->
         {#each sheetState.notes as note, index}
@@ -123,7 +104,7 @@
             paperId={`note-${index}`}
             class="p-1"
             resizable={true}
-            initialPosition={{ x: 20, y: 20 + (sheetState.relations.length * 100) + (index * 100) }}
+            initialPosition={characterActions.getNotePosition(index)}
             >
             {#snippet content()}
 
@@ -153,15 +134,6 @@
         </PaperCard>
         {/each}
 
-
-<!-- Floating Draggable Add Items -->
-<!-- <DraggableAddItem 
-    text="Dra för att lägga till"
-    ariaLabel="Dra för att lägga till relation eller anteckning"
-    variant="variant-3"
-    dragType="add-item"
-    position={{ top: 120, right: -60 }}
-/> -->
 
 <!-- Confirmation Modal -->
 <ConfirmationModal 

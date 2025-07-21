@@ -1,6 +1,6 @@
 <script lang="ts">
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+        import { characterActions, sheetState, initialCardPositions } from '../../states/character_sheet.svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import EquipmentModal from '../Modals/EquipmentModal.svelte';
     import WeaponModal from '../Modals/WeaponModal.svelte';
@@ -202,19 +202,18 @@
     /> -->
 
     <!-- Equipment Section -->
-        
-        {#each sheetState.equipment as item, index}
+{#if sheetState.equipment.length > 0}
             <PaperCard
-                paperId={`equipment-${item.id}`}
-
-                variant={equipmentVariants[index % equipmentVariants.length]}
+                paperId={`equipment`}
                 draggable={true}
                 resizable={false}
                 minSize={{ width: 250, height: 60 }}
-                initialPosition={{ x: 20 + (index % 3) * 400, y: 80 + Math.floor(index / 3) * 150 }}
+                initialPosition={initialCardPositions["equipment"]}
                 class="p-2 pt-3"
             >
                 {#snippet content()}
+        {#each sheetState.equipment as item, index}
+
                     <div class="equipment-content">
                         <Backpack size={16} />
                         <input 
@@ -253,37 +252,24 @@
                             </button>
                         </div>
                     </div>
-                {/snippet}
-            </PaperCard>
+
         {/each}
-            <!-- Total weight display -->
-            <!-- <PaperCard
-                paperId="equipment-total"
-
-                draggable={false}
-                resizable={false}
-                initialPosition={{ x: 20, y: 20 + Math.ceil(sheetState.equipment.length / 3) * 80 + 20 }}
-                minSize={{ width: 200, height: 60 }}
-            >
-                {#snippet content()}
-                    <div class="total-weight-content">
-                        <span class="total-weight-label">Total vikt: {totalWeight().toFixed(2)} kg</span>
-                    </div>
-                {/snippet}
-            </PaperCard> -->
-
+                        {/snippet}
+            </PaperCard>
+{/if}
+{#if sheetState.weapons.length > 0}
         <!-- Weapons Section -->
-            
-            {#each sheetState.weapons as weapon, index}
-                <PaperCard
-                    paperId={`weapon-${weapon.id}`}
-                    variant={weaponVariants[index % weaponVariants.length]}
+            <PaperCard
+                    paperId={`weapons`}
                     draggable={true}
                     resizable={false}
-                    initialPosition={{ x: 20 + (index % 2) * 420, y: 380 + Math.floor(index / 2) * 100 }}
+                    initialPosition={initialCardPositions["weapons"]}
                     minSize={{ width: 400, height: 80 }}
                 >
-                    {#snippet content()}
+            {#snippet content()}
+
+            {#each sheetState.weapons as weapon, index}
+
                         <div class="weapon-content">
                             <div class="weapon-header">
                                 <div class="weapon-name-section">
@@ -381,22 +367,24 @@
                                 </div>
                             </div>
                         </div>
-                    {/snippet}
-                </PaperCard>
-            {/each}
-        <!-- Armor Section -->
-            
-            {#each sheetState.armor as armor, index}
-                <PaperCard
-                    paperId={`armor-${armor.id}`}
 
-                    variant={armorVariants[index % armorVariants.length]}
+            {/each}
+                {/snippet}
+            </PaperCard>
+
+{/if}
+{#if sheetState.armor.length > 0}
+        <!-- Armor Section -->
+            <PaperCard
+                    paperId={`armors`}
                     draggable={true}
                     resizable={false}
-                    initialPosition={{ x: 20 + (index % 3) * 300, y: 580 + Math.floor(index / 3) * 80 }}
+                    initialPosition={initialCardPositions["armors"]}
                     minSize={{ width: 280, height: 60 }}
                 >
-                    {#snippet content()}
+                    {#snippet content()}    
+            {#each sheetState.armor as armor, index}
+
                         <div class="armor-content">
                             <ShieldHalf size={16} />
                             <span class="armor-name">{armor.name || 'Rustning'}</span>
@@ -428,9 +416,11 @@
                                 </button>
                             </div>
                         </div>
-                    {/snippet}
-                </PaperCard>
+
             {/each}
+                {/snippet}
+        </PaperCard>
+{/if}
 
 <!-- Drag Overlay -->
 

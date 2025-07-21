@@ -1,7 +1,7 @@
 <script lang="ts">
     import BaseAbility from './tabcontents/BaseAbility.svelte';
     import Skills from './tabcontents/Skills.svelte';
-    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import OptionalSkillsModal from '../Modals/OptionalSkillsModal.svelte';
     import PaperCard from '../PaperCard.svelte';
 
@@ -44,7 +44,7 @@
     draggable={true}
     resizable={false}
     minSize={{ width: 300, height: 80 }}
-    initialPosition={{ x: 20, y: 20 }}
+    initialPosition={initialCardPositions["base-abilities"]}
     class="p-2 pt-3"
     >
 
@@ -65,7 +65,7 @@
     paperId="conditions"
 
     resizable={false}
-    initialPosition={{ x: 20, y: 215 }}
+    initialPosition={initialCardPositions["conditions"]}
     minSize={{ width: 300, height: 0 }}
     initialSize={{ width: 300, height: 200 }}
     > 
@@ -97,7 +97,7 @@
 
 </PaperCard>
 
-<Skills  startPosition={{ x: 330, y: 120 }} />
+<Skills  startPosition={initialCardPositions["skills-core"]} />
 
 <style>
 

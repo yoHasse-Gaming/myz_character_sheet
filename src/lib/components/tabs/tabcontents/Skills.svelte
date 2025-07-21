@@ -297,7 +297,7 @@
     {/each}
             {/snippet}
 
-        </PaperCard>
+    </PaperCard>
 
 
     <!-- Optional Skills -->

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
@@ -69,11 +69,10 @@
     /> -->
 
     <!-- Occupational Talents Section -->
-
-            {#each occupationalTalents as talent, index}
+     {#if occupationalTalents.length > 0 || genericTalents.length > 0}
             <PaperCard
-                paperId={`occupational-talent-${talent.id}`}
-                initialPosition={{ x: 20 + (index % 2) * 300, y: 20 + Math.floor(index / 2) * 80 }}
+                paperId={`talents`}
+                initialPosition={initialCardPositions["talents"]}
                 draggable={true}
                 resizable={false}
                 minSize={{ width: 250, height: 60 }}
@@ -81,6 +80,8 @@
                 >
             
             {#snippet content()}
+            {#each occupationalTalents as talent, index}
+
                 <div class="talent-content">
                     <span class="talent-name"><Star /> {talent.name}</span>
                     <div class="talent-controls-right">
@@ -104,22 +105,10 @@
                     </button>
                 </div>
                 </div>
-            {/snippet}
-            
-            </PaperCard>
-
             {/each}
-            
+
             {#each genericTalents as talent, index}
-            <PaperCard
-                paperId={`generic-talent-${talent.id}`}
-                initialPosition={{ x: 20 + (index % 2) * 300, y: 200 + Math.floor(index / 2) * 80 }}
-                draggable={true}
-                resizable={false}
-                minSize={{ width: 250, height: 60 }}
-                class="p-1 pt-3"
-                >
-            {#snippet content()}
+
             <div class="talent-content">
                 <span class="talent-name"><Star /> {talent.name}</span>
                 <div class="talent-controls-right">
@@ -143,11 +132,13 @@
                     </button>
                 </div>
             </div>
-            {/snippet}
-            
 
-            </PaperCard>
+
+
             {/each}
+                {/snippet}
+            </PaperCard>
+{/if}
             
 
 <style>

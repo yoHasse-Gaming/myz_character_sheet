@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, tick } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { sheetState, characterActions } from '../../states/character_sheet.svelte';
+    import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
@@ -86,45 +86,47 @@
         ariaLabel="Dra för att lägga till mutation"
         variant="variant-3"
     /> -->
-{#each sheetState.mutations as mutation, index}
-    <PaperCard 
-        paperId={`mutation-${mutation.id}`}
+{#if sheetState.mutations.length > 0}
+<PaperCard 
+    paperId={`mutations`}
+    draggable={true}
+    resizable={false}
+    minSize={{ width: 250, height: 60 }}
+    initialPosition={initialCardPositions["mutations"]}
+    class="p-2 pt-3"
+    >
+    {#snippet content()}
+        {#each sheetState.mutations as mutation, index}
 
-        variant={mutationVariants[index % mutationVariants.length]}
-        draggable={true}
-        resizable={false}
-        minSize={{ width: 250, height: 60 }}
-        initialPosition={{ x: 20 + (index % 3) * 400, y: 20 + Math.floor(index / 3) * 150 }}
-        class="p-2 pt-3"
-        >
-        {#snippet content()}
-        <div class="mutation-content">
-        <span class="mutation-name"><Dna />  {mutation.name}</span>
-        <div class="mutation-controls-right">
-            <button 
-                class="info-icon-button"
-                onclick={() => showMutationInfo(mutation)}
-                aria-label="Information om {mutation.name}"
-                title="Visa information om {mutation.name}"
-            >
-                <Info size={16} />
-            </button>
-            <button
-                class="remove-mutation-button"
-                onclick={() => removeMutation(mutation.id)}
-                aria-label="Ta bort {mutation.name}"
-            >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        </div>
+                <div class="mutation-content">
+                <span class="mutation-name"><Dna />  {mutation.name}</span>
+                <div class="mutation-controls-right">
+                    <button 
+                        class="info-icon-button"
+                        onclick={() => showMutationInfo(mutation)}
+                        aria-label="Information om {mutation.name}"
+                        title="Visa information om {mutation.name}"
+                    >
+                        <Info size={16} />
+                    </button>
+                    <button
+                        class="remove-mutation-button"
+                        onclick={() => removeMutation(mutation.id)}
+                        aria-label="Ta bort {mutation.name}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                </div>
 
+
+        {/each}
         {/snippet}
-    </PaperCard>
-{/each}
+</PaperCard>
+{/if}
 
 
 
@@ -135,7 +137,7 @@
     draggable={true}
     resizable={false}
     minSize={{ width: 300, height: 100 }}
-    initialPosition={{ x: 0, y: 710 }}
+    initialPosition={initialCardPositions["mutation-points"]}
 > 
 
 {#snippet content()}

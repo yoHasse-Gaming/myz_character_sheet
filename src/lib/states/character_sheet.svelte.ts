@@ -5,6 +5,27 @@ import skills from '../data/skills.json';
 import { openDiceRollModal } from '../states/modals.svelte';
 
 // Main character data interface - this is the primary type for the entire app
+
+export const initialCardPositions: Record<string, { x: number; y: number }> = {
+    "character-basic-info": { x: 340, y: 20 },
+    "character-looks": { x: 650, y: 20 },
+    "character-dream": { x: 1150, y: 20 },
+    "experience-points": { x: 20, y: 600 },
+    "conditions": { x: 20, y: 215 },
+    "base-abilities": { x: 20, y: 20 },
+    "skills-core": { x: 330, y: 120 },
+    "mutations": { x: 20, y: 20 },
+    "mutation-points": { x: 0, y: 710 },
+    "equipment": { x: 20, y: 20 },
+    "armors": { x: 20, y: 20 },
+    "weapons": { x: 20, y: 20 },
+    "talents": { x: 20, y: 20 },
+    // Relations positioning (base position for stacking)
+    "relations-start": { x: 1100, y: 175 },
+    // Notes positioning (base position for stacking)
+    "notes-start": { x: 20, y: 20 },
+};
+
 export interface CharacterSheetData {
     name: string;
     occupation: string;
@@ -202,7 +223,7 @@ export const characterActions = {
     },
 
 
-    
+
     // Talents management
     addTalent(talent: Talent) {
         // Check if talent is already added
@@ -458,6 +479,24 @@ export const characterActions = {
             gearDice: 0,
             abilityName: abilityLabel
         });
+    },
+
+    // Position helper functions for relations and notes
+    getRelationPosition(index: number): { x: number; y: number } {
+        const basePosition = initialCardPositions["relations-start"];
+        return {
+            x: basePosition.x,
+            y: basePosition.y + (index * 120)
+        };
+    },
+
+    getNotePosition(index: number): { x: number; y: number } {
+        const basePosition = initialCardPositions["notes-start"];
+        const relationCount = sheetState.relations.length;
+        return {
+            x: basePosition.x,
+            y: basePosition.y + (relationCount * 100) + (index * 100)
+        };
     },
 
 };

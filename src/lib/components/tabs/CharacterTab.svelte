@@ -1,22 +1,9 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
-    import { characterActions, sheetState } from '../../states/character_sheet.svelte';
+    import { characterActions, sheetState, initialCardPositions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
     import { Aperture, Award, Circle } from '@lucide/svelte';
-
-
-    const startPos = { x: 340, y: 20 };
-
-    const characterPositions = {
-        name: { x: startPos.x, y: startPos.y },
-        job: { x: startPos.x + 390, y: startPos.y },
-        face: { x: startPos.x, y: startPos.y + 60 },
-        body: { x: startPos.x + 270, y: startPos.y + 60 },
-        clothes: { x: startPos.x + 540, y: startPos.y + 60 },
-        dream: { x: startPos.x + 810, y: startPos.y }
-    };
-    
 
     onMount(() => {
         // Initialize InteractJS for draggable and resizable character papers
@@ -48,7 +35,7 @@
 
 <PaperCard 
         paperId="character-basic-info"
-        initialPosition={startPos}
+        initialPosition={initialCardPositions["character-basic-info"]}
         resizable={false}
         minSize={{ width: 300, height: 50 }}
         class="p-2"
@@ -77,7 +64,7 @@
 
 <PaperCard 
     paperId="character-looks"
-    initialPosition={{ x: startPos.x + 310, y: startPos.y  }}
+    initialPosition={initialCardPositions["character-looks"]}
     minSize={{ width: 260, height: 300 }}
     resizable={true}
     autoResize={true}
@@ -117,7 +104,7 @@
 
     <PaperCard
         paperId="character-dream"
-        initialPosition={characterPositions.dream}
+        initialPosition={initialCardPositions["character-dream"]}
         minSize={{ width: 300, height: 100 }}
         resizable={true}
         autoResize={true}
@@ -142,7 +129,7 @@
         draggable={true}
         resizable={false}
         minSize={{ width: 300, height: 100 }}
-        initialPosition={{ x: 20, y: 600 }}
+        initialPosition={initialCardPositions["experience-points"]}
     > 
     {#snippet content()}
             <span class="points-label"><Aperture size={20} class="points-icon" /> ERFARENHETSPOÄNG</span>

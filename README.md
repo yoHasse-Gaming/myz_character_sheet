@@ -6,12 +6,17 @@
 * [ ] Fix drop zone positioning and calculation for new items
 * [ ] Update card default/starting positions to look good
 * [ ] Add layout lock mechanism to prevent accidental card movement
+* [ ] Add missing papers, Experience, Zonröta, Misc etc. that players want to fill in.
 
 ## UI/UX Improvements
 * [ ] Standardize control buttons (pan/zoom, reset, size, light/dark) - same location and style
+* [ ] Fix Dice roller so it looks better. Have roll button first and add modifiers 2nd.
+  * [ ] Add equipment selection dropdown for dice rolls (equipment with bonuses/weapons for skills)
 * [ ] Update relation cards to be wider and more readable
 * [ ] Verify modal styling consistency across all modals
 * [ ] Add atmospheric glow effect for flashlight drop zones
+* [ ] Fix inconsistent coloring of buttons and icons etc.
+* [ ] Add more colors so it get more colorful.
 
 ## Relations System
 * [x] Add default relations:

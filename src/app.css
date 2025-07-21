@@ -30,6 +30,11 @@ h4>.lucide {
     margin-top: 0.5rem;
 }
 
+.point-indicator>.lucide {
+    position: absolute;
+    
+}
+
 /* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
 :root {
     /* Override theme colors for post-apocalyptic feel */
@@ -68,11 +73,6 @@ h4>.lucide {
     --color-primary-800: #78350f;
     --color-primary-900: #451a03;
     
-    /* Rust and decay colors */
-    --color-warning-400: #dc2626;
-    --color-warning-500: #b91c1c;
-    --color-warning-600: #991b1b;
-
     --font-user: Architects Daughter, sans-serif;
     --form-labels: Architects Daughter, sans-serif;
 }
@@ -608,12 +608,14 @@ label {
 
 
 .stroke-image {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: contain;
     filter: var(--svg-filter-surface-900) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
     transition: filter 0.2s ease;
 }
+
 
 .dark .stroke-image {
     filter: var(--svg-filter-surface-100) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
@@ -649,19 +651,20 @@ label {
         flex-wrap: wrap;
     }
 
-    .mutation-points-label {
+    .points-label {
         font-family: var(--form-labels), serif;
         font-size: 0.9rem;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: var(--color-surface-800);
+        color: var(--color-surface-900);
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
         min-width: 8rem;
+        margin-bottom: 0.5rem;
     }
 
-    .dark .mutation-points-label {
-        color: var(--color-surface-200);
+    .dark .points-label {
+        color: var(--color-surface-100);
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     }
 
@@ -680,44 +683,60 @@ label {
     }
 
 
-.mutation-point-indicator {
-    width: 1.8rem;
-    height: 1.8rem;
+.point-indicator {
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    padding: 0;
-    transition: transform 0.2s ease;
 }
 
-.mutation-point-indicator:hover {
+.point-indicator:hover {
     transform: scale(1.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.mutation-point-indicator:active {
-    transform: scale(0.95);
+
+.points-indicators {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.points-title {
+    font-family: var(--form-labels), serif;
+    font-weight: bold;
+    color: var(--color-surface-900);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
-    .mutation-points-display {
+    .points-display {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .mutation-points-label {
+    .points-label {
         min-width: auto;
     }
 
-    .mutation-points-indicators {
+    .points-indicators {
         justify-content: center;
-        width: 100%;
+        gap: 0.4rem;
+
     }
 
-    .mutation-point-indicator {
+    .point-indicator {
         width: 1.5rem;
         height: 1.5rem;
     }
@@ -845,9 +864,7 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* Global Info Icon Button Styles */
 .info-icon-button {
-    padding: 0.25rem;
     border-radius: 50%;
-    border: 1px solid var(--color-surface-300);
     background: transparent;
     color: var(--color-surface-600);
     cursor: pointer;
@@ -867,8 +884,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .dark .info-icon-button {
-    border-color: var(--color-surface-600);
-    color: var(--color-surface-400);
+    color: var(--color-surface-100);
 }
 
 .dark .info-icon-button:hover {

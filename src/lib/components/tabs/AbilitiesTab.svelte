@@ -38,22 +38,36 @@
 </div>
 {/snippet}
 
-{#each sheetState.baseAbilities as ability, index}
-<BaseAbility 
-    baseAbility={ability}
-    abilityIndex={index}
-    
-    initialPosition={{ x: 20, y: 20 + index * 85 }}
-/>
-{/each}
+<PaperCard 
+    paperId={"base-abilities"}
+
+    draggable={true}
+    resizable={false}
+    minSize={{ width: 300, height: 80 }}
+    initialPosition={{ x: 20, y: 20 }}
+    class="p-2 pt-3"
+    >
+
+    {#snippet content()}
+        {#each sheetState.baseAbilities as ability, index}
+
+        <BaseAbility 
+            baseAbility={ability}
+            abilityIndex={index}
+        />
+
+            
+        {/each}
+    {/snippet}
+</PaperCard>
 
 <PaperCard 
     paperId="conditions"
 
     resizable={false}
-    initialPosition={{ x: 20, y: 380 }}
+    initialPosition={{ x: 20, y: 215 }}
     minSize={{ width: 300, height: 0 }}
-    initialSize={{ width: 300, height: 85*4 }}
+    initialSize={{ width: 300, height: 200 }}
     > 
 
     
@@ -83,7 +97,7 @@
 
 </PaperCard>
 
-<Skills  startPosition={{ x: 340, y: 380 }} />
+<Skills  startPosition={{ x: 330, y: 120 }} />
 
 <style>
 
@@ -93,7 +107,8 @@
                 gap: 0.25rem;
                 padding: 0.5rem;
                 height: 100%;
-            }            .condition-row {
+            }            
+            .condition-row {
                 display: flex;
                 gap: 1rem;
                 align-items: center;
@@ -177,21 +192,6 @@
                 border-top: 1px solid var(--color-surface-300);
             }
 
-            :global(.dark) .critical-injuries {
-                border-top-color: var(--color-surface-600);
-            }
-
-            .critical-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .critical-label {
-                color: var(--color-warning-600);
-                font-size: 1.1rem;
-            }
-
             :global(.dark) .critical-label {
                 color: var(--color-warning-400);
             }
@@ -230,11 +230,11 @@
 
             /* Responsive adjustments */
             @media (max-width: 639px) {
-                .condition-row {
+                /* .condition-row {
                     flex-direction: column;
                     gap: 1rem;
                     align-items: stretch;
-                }
+                } */
 
                 .condition-item {
                     justify-content: space-between;

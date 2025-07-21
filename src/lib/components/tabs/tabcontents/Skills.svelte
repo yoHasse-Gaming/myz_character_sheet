@@ -79,25 +79,6 @@
         });
     });
 
-    function resetSkillsLayout() {
-        // Clear saved layouts
-        characterActions.clearPaperLayouts();
-        
-        // Reset all skill papers to default positions and sizes
-        const skillElements = document.querySelectorAll('.skill-paper');
-        skillElements.forEach((element, index) => {
-            const htmlElement = element as HTMLElement;
-            // Reset transform
-            htmlElement.style.transform = '';
-            htmlElement.setAttribute('data-x', '0');
-            htmlElement.setAttribute('data-y', '0');
-            // Reset size
-            htmlElement.style.width = '';
-            htmlElement.style.height = '';
-        });
-        
-        console.log('Skills layout reset to defaults');
-    }
 
     function showSkillInfo(skill: any) {
         const content = `
@@ -179,20 +160,19 @@
 </script>
 
     <!-- Core Skills -->
-    {#each sheetState.skills as skill, index}
-        {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
-        {@const position = getInitialPosition(index)}
-        <PaperCard
-            paperId="skill-{index}"
+    <PaperCard
+            paperId="skills-core"
 
             draggable={true}
             resizable={false}
-            initialPosition={position}
-            minSize={{ width: 250, height: 60 }}
-            variant={skillVariants[index]}
+            initialPosition={startPosition}
+            minSize={{ width: 300, height: 60 }}
             class="p-2 pt-3"
         >
             {#snippet content()}
+            <span>Skills</span>
+    {#each sheetState.skills as skill, index}
+        {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
                 <div class="skill-content">
                     <Tooltip
                         open={tooltipStates[`skill-${index}`] || false}
@@ -244,25 +224,10 @@
                         />
                     </div>
                 </div>
-            {/snippet}
-        </PaperCard>
     {/each}
-
-    <!-- Optional Skills -->
-    {#each sheetState.optionalSkills as skill, index}
+        {#each sheetState.optionalSkills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility)}
-        {@const skillIndex = sheetState.skills.length + index}
-        {@const position = getInitialPosition(skillIndex)}
-        <PaperCard
-            paperId="optional-skill-{skill.id}"
 
-            draggable={true}
-            resizable={false}
-            initialPosition={position}
-            minSize={{ width: 250, height: 60 }}
-            variant={skillVariants[skillIndex]}
-        >
-            {#snippet content()}
                 <div class="skill-content optional-skill">
                     <Tooltip
                         open={tooltipStates[`optional-skill-${skill.id}`] || false}
@@ -328,9 +293,15 @@
                         </button>
                     </div>
                 </div>
-            {/snippet}
-        </PaperCard>
+
     {/each}
+            {/snippet}
+
+        </PaperCard>
+
+
+    <!-- Optional Skills -->
+
 
 <!-- Optional Skills Modal -->
 <!-- Remove the modal from here since it's now in the layout -->
@@ -370,33 +341,20 @@
     }
 
     .dice-roll-button {
-        background: none;
-        border: none;
-        color: var(--color-surface-600);
-        cursor: pointer;
-        padding: 0.25rem;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.7;
-        flex-shrink: 0;
+        color: var(--color-surface-800);
     }
 
     .dice-roll-button:hover {
-        background: rgba(34, 197, 94, 0.1);
         color: var(--color-success-600);
         opacity: 1;
         transform: scale(1.1);
     }
 
     :global(.dark) .dice-roll-button {
-        color: var(--color-surface-400);
+        color: var(--color-surface-200);
     }
 
     :global(.dark) .dice-roll-button:hover {
-        background: rgba(34, 197, 94, 0.2);
         color: var(--color-success-400);
     }
 

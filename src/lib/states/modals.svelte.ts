@@ -107,6 +107,7 @@ export function openDiceRollModal(config: {
     skillName?: string;
     abilityName?: string;
     abilityType?: AbilityType; // Optional, used for skills
+    selectedEquipment?: string[]; // IDs of selected equipment
 }) {
     diceRollModalState.rollName = config.rollName;
     diceRollModalState.baseRoll.baseDice = config.baseDice;

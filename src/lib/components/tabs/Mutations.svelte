@@ -6,7 +6,7 @@
     import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Dna, DnaOff, Info, Microscope, X } from '@lucide/svelte';
+    import { Circle, Dna, DnaOff, Info, Microscope, Radiation, Radius, X } from '@lucide/svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
     import type { Mutation } from '../../types';
     import PaperCard from '../PaperCard.svelte';
@@ -135,19 +135,16 @@
     draggable={true}
     resizable={false}
     minSize={{ width: 300, height: 100 }}
-    initialPosition={{ x: 20, y: 770 }}
+    initialPosition={{ x: 0, y: 710 }}
 > 
 
-{#snippet header()}
-    
-    <h3 class="mutation-points-title" ><Microscope size={20} class="mutation-points-icon" /> MUTATIONSPOÄNG</h3>
-
-{/snippet}
 {#snippet content()}
-        <div class="mutation-points-indicators">
+        <span class="points-label"><Microscope size={20} class="mutation-points-icon" /> MUTATIONSPOÄNG</span>
+        <div class="points-indicators">
+
             {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
                 <button 
-                    class="mutation-point-indicator"
+                    class="point-indicator"
                     onclick={() => {
                         if (sheetState.mutationPoints > idx) {
                             characterActions.setTotalMutationPoints(idx);
@@ -157,13 +154,13 @@
                     }}
                     aria-label="Toggle mutation point {idx + 1}"
                 >
-                    <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" />
-                    {#if sheetState.mutationPoints > idx}
-                        <img 
-                            src='/img/strokes/x.svg' 
-                            alt="Point available" 
-                            class="stroke-image x-layer" 
+
+                        <Circle size={30} 
+                            color={sheetState.mutationPoints > idx ? 'var(--color-primary-300)' : 'var(--color-surface-200)'}
                         />
+                    <!-- <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" /> -->
+                    {#if sheetState.mutationPoints > idx}
+                        <Radiation size={16} fill="var(--color-primary-300)" color="var(--color-primary-300)" />
                     {/if}
                 </button>
             {/each}
@@ -175,18 +172,10 @@
 
 </PaperCard>
 
-<div class="mutation-points-display">
-    <div class="mutation-points-controls">
-
-    </div>
-</div>
-        
-
-
-
 
 <style>
 
+    
     .mutation-content {
         display: flex;
         align-items: center;
@@ -250,234 +239,13 @@
         }
     }
 
-    @media (max-width: 480px) {
-        .mutation-paper {
-            width: 280px;
-            min-height: 90px;
-        }
-    }
 
-    /* Free-floating Mutation Points styling */
-    .mutation-points-floating-container {
-        position: relative;
-        width: fit-content;
-        max-width: 100%;
-        margin: 2rem auto;
-        transform: rotate(-1deg);
-        transform-origin: center;
-        transition: all 0.2s ease;
-    }
-
-    .mutation-points-floating-container:hover {
-        transform: rotate(-1deg) translateY(-2px);
-        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
-    }
-
-    .mutation-points-wrapper {
-        padding: 1.5rem;
-        width: 450px;
-        position: relative;
-        z-index: 1;
-        cursor: default;
-        user-select: none;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
-        will-change: transform;
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        height: 150px;
-        border: 3px solid transparent;
-        border-radius: 4px;
-    }
-
-    .mutation-points-wrapper:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 10;
-    }
-
-    .mutation-points-wrapper:active,
-    .mutation-points-wrapper.dragging,
-    .mutation-points-wrapper.resizing {
-        z-index: 20;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-    }
-
-    .mutation-points-content {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        position: relative;
-        z-index: 2;
-    }
-
-    .mutation-points-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        justify-content: center;
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        cursor: move;
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0;
-        transform: translateZ(0);
-        backface-visibility: hidden;
-    }
-
-    :global(.dark) .mutation-points-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .mutation-points-title {
-        font-family: var(--form-labels), serif;
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin: 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
 
     :global(.dark) .mutation-points-title {
         color: var(--color-surface-100);
     }
 
-    .mutation-points-icon {
-        color: var(--color-primary-600);
-        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2));
-    }
 
-    :global(.dark) .mutation-points-icon {
-        color: var(--color-primary-400);
-    }
 
-    .mutation-points-display {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
 
-    .mutation-points-controls {
-        display: flex;
-        justify-content: center;
-    }
-
-    .mutation-points-indicators {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 100%;
-    }
-
-    .mutation-point-indicator {
-        position: relative;
-        width: 2rem;
-        height: 2rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .mutation-point-indicator:hover {
-        transform: scale(1.1);
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    }
-
-    .mutation-point-indicator:focus {
-        outline: 2px solid var(--color-primary-500);
-        outline-offset: 2px;
-    }
-
-    .stroke-image {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: all 0.2s ease;
-    }
-
-    .circle-layer {
-        z-index: 1;
-        opacity: 0.8;
-    }
-
-    .x-layer {
-        z-index: 2;
-        opacity: 0.9;
-        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-    }
-
-    .mutation-points-info {
-        margin: auto;
-        text-align: center;
-        max-width: 300px;
-    }
-
-    .mutation-points-explanation {
-        font-size: 0.9rem;
-        line-height: 1.4;
-        color: var(--color-surface-700);
-        margin: 0;
-        font-style: italic;
-    }
-
-    :global(.dark) .mutation-points-explanation {
-        color: var(--color-surface-300);
-    }
-
-    /* Responsive adjustments for mutation points */
-    @media (max-width: 768px) {
-        .mutation-points-wrapper {
-            min-width: auto;
-            width: 100%;
-            max-width: 350px;
-            padding: 1.25rem;
-        }
-
-        .mutation-points-indicators {
-            gap: 0.4rem;
-        }
-
-        .mutation-point-indicator {
-            width: 1.75rem;
-            height: 1.75rem;
-        }
-
-        .mutation-points-title {
-            font-size: 1.1rem;
-        }
-
-        .mutation-points-explanation {
-            font-size: 0.85rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .mutation-points-floating-container {
-            margin: 1.5rem auto;
-        }
-
-        .mutation-points-wrapper {
-            padding: 1rem;
-        }
-
-        .mutation-points-indicators {
-            gap: 0.3rem;
-        }
-
-        .mutation-point-indicator {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-    }
 </style>

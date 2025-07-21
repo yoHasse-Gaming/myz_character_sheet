@@ -19,6 +19,7 @@ export interface CharacterSheetData {
     optionalSkills: OptionalSkill[];
     mutations: Mutation[];
     mutationPoints: number;
+    experiencePoints: number;
     talents: Talent[];
     conditions: {
         isStarving: boolean;
@@ -66,7 +67,9 @@ export const sheetState: CharacterSheetData = $state({
     
     // Mutation points available to spend
     mutationPoints: 0,
-    
+
+    // Experience points for character progression
+    experiencePoints: 0,
     // Talents selected by the user
     talents: [],
     
@@ -192,6 +195,13 @@ export const characterActions = {
     setTotalMutationPoints(points: number) {
         sheetState.mutationPoints = Math.max(0, points);
     },
+
+    // Experience points management
+    setTotalExperiencePoints(points: number) {
+        sheetState.experiencePoints = Math.max(0, points);
+    },
+
+
     
     // Talents management
     addTalent(talent: Talent) {

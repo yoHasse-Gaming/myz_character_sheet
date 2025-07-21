@@ -47,6 +47,8 @@
     // TODO: maybe add $effect and look for ANY change to character sheet state.
 
     onMount(() => {
+
+        console.log("Minsize exists?", minSize, paperId);
         if (paperElement) {
             // Initialize InteractJS for draggable and resizable functionality
             if (draggable || resizable) {
@@ -112,7 +114,9 @@
     data-x="0" 
     data-y="0" 
     data-paper-id={paperId}
-    style="--min-width: {minSize.width}px; --min-height: {minSize.height}px;"
+    style={
+        minSize ? `min-width: ${minSize.width}px; min-height: ${minSize.height}px;` : ''
+    }
 >
     <div class="paper-content {additionalClasses}" bind:this={contentElement}>
         {#if header}
@@ -131,6 +135,10 @@
 
 <style>
     /* Paper card container */
+    :root {
+        --min-width: 250px;
+        --min-height: 120px;
+    }
 
     .paper-card {
         cursor: default;

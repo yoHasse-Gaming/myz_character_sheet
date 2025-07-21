@@ -3,6 +3,7 @@
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { characterActions, sheetState } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
+    import { Aperture, Award, Circle } from '@lucide/svelte';
 
 
     const startPos = { x: 340, y: 20 };
@@ -46,10 +47,10 @@
 
 
 <PaperCard 
-        paperId="character-name"
-        initialPosition={characterPositions.name}
+        paperId="character-basic-info"
+        initialPosition={startPos}
         resizable={false}
-        minSize={{ width: 380, height: 50 }}
+        minSize={{ width: 300, height: 50 }}
         class="p-2"
     >
     {#snippet content()}
@@ -62,18 +63,7 @@
             bind:value={sheetState.name}
         />
     </div>
-    {/snippet}
-</PaperCard>
-
-<PaperCard 
-    paperId="character-job"
-    initialPosition={characterPositions.job}
-    resizable={false}
-    minSize={{ width: 380, height: 50 }}
-    class="p-2"
-    >
-    {#snippet content()}
-    <div class="compact-field">
+        <div class="compact-field">
         <span class="field-label">SYSSLA</span>
         <input
             type="text"
@@ -86,9 +76,9 @@
 </PaperCard>
 
 <PaperCard 
-    paperId="character-face"
-    initialPosition={characterPositions.face}
-    minSize={{ width: 260, height: 70 }}
+    paperId="character-looks"
+    initialPosition={{ x: startPos.x + 310, y: startPos.y  }}
+    minSize={{ width: 260, height: 300 }}
     resizable={true}
     autoResize={true}
     class="p-2"
@@ -103,18 +93,6 @@
             rows="2"
         ></textarea>
     </div>
-    {/snippet}
-</PaperCard>
-
-<PaperCard 
-    paperId="character-body"
-    initialPosition={characterPositions.body}
-    minSize={{ width: 260, height: 70 }}
-    resizable={true}
-    autoResize={true}
-    class="p-2"
-    >
-    {#snippet content()}
     <div class="compact-textarea-field">
         <span class="field-label">KROPP</span>
         <textarea
@@ -124,20 +102,7 @@
             rows="2"
         ></textarea>
     </div>
-    {/snippet}
-</PaperCard>
-
-    <PaperCard 
-        paperId="character-clothes"
-        initialPosition={characterPositions.clothes}
-        minSize={{ width: 260, height: 110 }}
-        initialSize={{ width: 260, height: 110 }}
-        resizable={true}
-        autoResize={true}
-        class="p-2"
-        >
-        {#snippet content()}
-        <div class="compact-textarea-field">
+    <div class="compact-textarea-field">
             <span class="field-label">KLÄDER</span>
             <textarea
                 class="compact-textarea font-user"
@@ -146,8 +111,9 @@
                 rows="2"
             ></textarea>
         </div>
-        {/snippet}
-    </PaperCard>
+    {/snippet}
+</PaperCard>
+
 
     <PaperCard
         paperId="character-dream"
@@ -168,6 +134,49 @@
         </div>
         {/snippet}
     </PaperCard>
+
+    <PaperCard 
+        paperId="experience-points"
+        variant="variant-1"
+        class="experience-points-floating-container"
+        draggable={true}
+        resizable={false}
+        minSize={{ width: 300, height: 100 }}
+        initialPosition={{ x: 20, y: 600 }}
+    > 
+    {#snippet content()}
+            <span class="points-label"><Aperture size={20} class="points-icon" /> ERFARENHETSPOÄNG</span>
+            <div class="points-indicators">
+                {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                    <button 
+                        class="point-indicator"
+                        onclick={() => {
+                            if (sheetState.experiencePoints > idx) {
+                                characterActions.setTotalExperiencePoints(idx);
+                            } else {
+                                characterActions.setTotalExperiencePoints(idx + 1);
+                            }
+                        }}
+                        aria-label="Toggle experience point {idx + 1}"
+                    >
+                        <Circle size={30} 
+                            color={sheetState.experiencePoints > idx ? 'var(--color-primary-800)' : 'var(--color-surface-200)'}
+                        />
+                        {#if sheetState.experiencePoints > idx}
+                            <Award size={18}
+
+                                color='var(--color-primary-800)'
+                            />
+                        {/if}
+                    </button>
+                {/each}
+                
+                
+            
+            </div>
+    {/snippet}
+
+</PaperCard>
 
 <style>
 

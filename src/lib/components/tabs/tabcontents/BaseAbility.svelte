@@ -3,7 +3,7 @@
     import { fade, scale } from 'svelte/transition';
     import { openInfoModal } from '../../../states/modals.svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
-    import { Ban, BicepsFlexed, Bone, Circle, Info, type Icon as IconType } from '@lucide/svelte';
+    import { Ban, BicepsFlexed, Bone, Circle, Dices, Info, type Icon as IconType } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
 
     import { onMount } from 'svelte';
@@ -15,7 +15,6 @@
     let { 
         baseAbility,
         abilityIndex,
-        initialPosition = { x: 0, y: 0 }
     }: {
         baseAbility: BaseAbilityType;
         abilityIndex: number;
@@ -93,21 +92,28 @@
     });
 </script>
 
-<PaperCard 
-    paperId={baseAbility.type}
 
-    draggable={true}
-    resizable={false}
-    minSize={{ width: 300, height: 80 }}
-    initialPosition={initialPosition}
-    class="p-2 pt-3"
-    >
-
-    {#snippet content()}
 
     <div class="ability-controls">
         <AbilityIcon />
         <span class="ability-label">{baseAbility.label}</span>
+        {#if diceStates.isDicePluginAvailable}
+            <button 
+                onclick={() => rollForAbility()}
+                aria-label="Slå tärning för {baseAbility.label}"
+                title="Slå tärning för {baseAbility.label}"
+            >
+                <Dices />
+            </button>
+        {/if}
+        <button 
+            class="info-icon-button"
+            onclick={showTraumaInfo}
+            aria-label="Information om {baseAbility.damageLabel}"
+            title="Visa information om {baseAbility.damageLabel}"
+        >
+            <Info size={12} />
+        </button>
         <input type="number" 
             max="5" 
             min="1" 
@@ -120,28 +126,8 @@
         <div class="damage-section">
             <div class="damage-header">
                 <span class="damage-label">{baseAbility.damageLabel}</span>
-                <button 
-                    class="info-icon-button"
-                    onclick={showTraumaInfo}
-                    aria-label="Information om {baseAbility.damageLabel}"
-                    title="Visa information om {baseAbility.damageLabel}"
-                >
-                    <Info size={12} />
-                </button>
-                {#if diceStates.isDicePluginAvailable}
-                <button 
-                    class="info-icon-button"
-                    onclick={() => rollForAbility()}
-                    aria-label="Slå tärning för {baseAbility.label}"
-                    title="Slå tärning för {baseAbility.label}"
-                >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="9" cy="9" r="1"></circle>
-                        <circle cx="15" cy="15" r="1"></circle>
-                    </svg>
-                </button>
-                {/if}
+
+
             </div>
             <div class="damage-indicators">
                 {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}
@@ -151,7 +137,7 @@
                         aria-label="Toggle damage for indicator {idx + 1}"
                     >
                         {#if (ability?.damage || 0) > idx}
-                            <Circle size={14} fill="red" />
+                            <Circle size={14} fill="var(--color-error-800)" />
                         {:else}
                             <Circle size={14} />
                         {/if}
@@ -163,13 +149,12 @@
     </div>
     
 
-    {/snippet}
-</PaperCard>
-    
+
 <style>
     .ability-controls {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 0.25rem;
         padding: 0.125rem;
         flex-wrap: wrap;
@@ -182,7 +167,6 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--color-surface-800);
-        flex: 1;
         min-width: 0;
     }
 

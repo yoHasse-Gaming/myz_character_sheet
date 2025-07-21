@@ -62,7 +62,14 @@ export function initInteractForElement(
             },
             modifiers: [
 
-            ]
+            ],
+            cursorChecker(action, interactable, element, interacting) {
+                // return 'grab or grabbing based on interaction state
+                if (interacting) {
+                    return 'grabbing';
+                }
+                return 'grab';
+            }
         });
     }
     

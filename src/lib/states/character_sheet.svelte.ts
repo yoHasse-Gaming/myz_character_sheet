@@ -396,7 +396,13 @@ export const characterActions = {
     },
 
     // Dice rolling functions
-    openSkillRollModal(skillName: string, skillValue: number, baseAbilityLabel: string, baseAbilityType: AbilityType, baseAbilityValue: number, baseAbilityDamage: number) {
+    openSkillRollModal(
+        skillName: string, 
+        skillValue: number, 
+        baseAbilityLabel: string, 
+        baseAbilityType: AbilityType, 
+        baseAbilityValue: number, 
+        baseAbilityDamage: number) {
         // Import the function dynamically to avoid circular dependencies
     
         const effectiveAbilityValue = Math.max(0, baseAbilityValue - baseAbilityDamage);
@@ -409,6 +415,25 @@ export const characterActions = {
             skillName: skillName,
             abilityName: baseAbilityLabel,
             abilityType: baseAbilityType
+        });
+    },
+
+    openWeaponRollModal(
+        weapon: Weapon, 
+        skill: SkillType, 
+        baseAbility: BaseAbilityType
+        ) {
+        // Import the function dynamically to avoid circular dependencies
+        const effectiveAbilityValue = Math.max(0, baseAbility.value - baseAbility.damage);
+
+        openDiceRollModal({
+            rollName: `${weapon.name} - ${skill.name}`,
+            baseDice: effectiveAbilityValue,
+            skillDice: skill.value,
+            gearDice: weapon.bonus,
+            abilityName: baseAbility.label,
+            skillName: skill.name,
+            abilityType: baseAbility.type
         });
     },
 

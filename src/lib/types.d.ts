@@ -89,6 +89,7 @@ export type Weapon = {
     range: number;
     weight: number;
     equipped: boolean;
+    type: "MELEE" | "RANGED";
 }
 
 export type RPRelation = {

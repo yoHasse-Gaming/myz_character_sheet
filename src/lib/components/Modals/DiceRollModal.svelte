@@ -26,7 +26,18 @@
         const baseGear = diceRollModalState.baseRoll.gearDice;
         const extraGear = diceRollModalState.modifiers.extraGearDice;
         const equipmentBonus = getSelectedEquipmentBonus();
-        return baseGear + extraGear + equipmentBonus;
+        const equippedItemBonus = getSelectedEquippedItemBonus();
+        return baseGear + extraGear + equipmentBonus + equippedItemBonus;
+    }
+
+    // Get bonus from currently selected equipped item
+    function getSelectedEquippedItemBonus() {
+        if (selectedEquippedItemId === '') return 0;
+        
+        const equippedItems = getEquippedItems();
+        const selectedItem = equippedItems.find(item => item.id === selectedEquippedItemId);
+        
+        return selectedItem ? selectedItem.bonus : 0;
     }
 
     // Calculate bonus from selected equipment
@@ -162,23 +173,13 @@
         return result;
     }
 
+    // Track the currently selected equipped item
+    let selectedEquippedItemId = $state('');
+
     // Handle selection of equipped item from dropdown
     function onEquippedItemSelect(event: Event) {
         const select = event.target as HTMLSelectElement;
-        const selectedItemId = select.value;
-        
-        if (selectedItemId && selectedItemId !== '') {
-            // Find the selected item and add its bonus to extraGearDice
-            const equippedItems = getEquippedItems();
-            const selectedItem = equippedItems.find(item => item.id === selectedItemId);
-            
-            if (selectedItem && selectedItem.bonus > 0) {
-                diceRollModalState.modifiers.extraGearDice += selectedItem.bonus;
-            }
-            
-            // Reset the dropdown
-            select.value = '';
-        }
+        selectedEquippedItemId = select.value;
     }
 
     // Get all equipment with bonuses for selection (keeping original function for compatibility)
@@ -311,6 +312,9 @@
                         {#if getSelectedEquipmentBonus() > 0}
                             + {getSelectedEquipmentBonus()} (utrustning)
                         {/if}
+                        {#if getSelectedEquippedItemBonus() > 0}
+                            + {getSelectedEquippedItemBonus()} (utrustad)
+                        {/if}
                     </span>
                 </div>
             </div>
@@ -320,8 +324,8 @@
                 <div class="equipped-items-section">
                     <h5 class="section-title">Använd utrustad utrustning</h5>
                     <div class="equipped-dropdown-container">
-                        <select class="equipped-dropdown" onchange={onEquippedItemSelect}>
-                            <option value="">Välj utrustad utrustning...</option>
+                        <select class="equipped-dropdown" bind:value={selectedEquippedItemId} onchange={onEquippedItemSelect}>
+                            <option value="">Ingen utrustning vald...</option>
                             {#each getEquippedItems() as item (item.id)}
                                 <option value={item.id}>
                                     {item.name} ({item.type}) 
@@ -335,31 +339,6 @@
                     </div>
                 </div>
             {/if}
-
-            <!-- Equipment Selection -->
-            {#if getEquipmentWithBonuses().length > 0}
-                <div class="equipment-selection">
-                    <h5 class="section-title">Välj utrustning med bonus</h5>
-                    <div class="equipment-grid">
-                        {#each getEquipmentWithBonuses() as item (item.id)}
-                            <label class="equipment-item">
-                                <input 
-                                    type="checkbox" 
-                                    checked={isEquipmentSelected(item.id)}
-                                    onchange={() => toggleEquipmentSelection(item.id)}
-                                />
-                                <span class="equipment-details">
-                                    <strong>{item.name}</strong>
-                                    <span class="equipment-type">({item.type})</span>
-                                    <span class="equipment-bonus">+{item.bonus} tärningar</span>
-                                </span>
-                            </label>
-                        {/each}
-                    </div>
-                </div>
-            {/if}
-
-
         </div>
     </div>
   {/snippet}

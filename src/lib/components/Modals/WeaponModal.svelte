@@ -11,12 +11,13 @@
     const allWeapons = [...weaponsData.meleeWeapons, ...weaponsData.rangedWeapons];
 
     // Add a "Custom" option for manual entry at the beginning
-    const weaponOptions: Array<{name: string; bonus: number; damage: number; range: string; comment: string; isCustom?: boolean}> = [
+    const weaponOptions: Array<{name: string; type: string; bonus: number; damage: number; range: string; comment: string; isCustom?: boolean}> = [
         { 
             name: 'Anpassad', 
             bonus: 0, 
             damage: 1, 
             range: 'SHORT', 
+            type: 'RANGED',
             comment: 'Skapa ett anpassat vapen', 
             isCustom: true 
         },
@@ -69,6 +70,7 @@
                 description: weapon.comment || '',
                 bonus: weapon.bonus,
                 damage: weapon.damage,
+                type: weapon.type || (weapon.range ? 'RANGED' : 'MELEE'),
                 range: rangeToNumber[weapon.range] ?? 2,
                 weight: 0, // Default weight since it's not in weapons.json
                 equipped: false

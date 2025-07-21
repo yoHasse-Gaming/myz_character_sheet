@@ -8,9 +8,11 @@
     import NewEquipmentModal from '../Modals/NewEquipmentModal.svelte';
     import NewWeaponModal from '../Modals/NewWeaponModal.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
-    import { Backpack, BowArrow, Grab, Hand, Info, ShieldHalf } from '@lucide/svelte';
+    import { Backpack, BowArrow, Dices, Grab, Hand, Info, ShieldHalf, Swords } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
+    import type { Weapon } from '../../types';
+    import { diceStates } from '../../states/dice.svelte';
 
     // Parse weight values from items.json (convert fractions to decimals)
     function parseWeight(weightStr: string): number {
@@ -87,6 +89,37 @@
         weaponNameToDelete = "";
     }
 
+    function rollForWeapon(weaponIndex: number) {
+        // Implement the roll logic for the weapon
+        const weapon = sheetState.weapons[weaponIndex];
+        if (!weapon) return;
+
+        const isRanged = weapon.type === 'RANGED';
+        console.log('weapon type:', weapon.type, 'isRanged:', isRanged);
+        // If range, use "skjuta" skill, otherwise use "slåss"
+        const skillId = isRanged ? 'sk_6d8f2g5h' : 'sk_9q3w7e2r'; // sk_9q3w7e2r == slåss, sk_6d8f2g5h == skjuta
+
+        const skill = sheetState.skills.find(s => s.id === skillId);
+        console.log(`Rolling for weapon: ${weapon.name}, using skill: ${skill ? skill.name : 'not found'}`);
+        if (!skill) {
+            console.error(`Skill with ID ${skillId} not found`);
+            return;
+        }
+
+        const baseAbility = sheetState.baseAbilities.find(a => a.type === skill.baseAbility);
+        if (!baseAbility) {
+            console.error(`Base ability with type ${skill.baseAbility} not found`);
+            return;
+        }
+
+        characterActions.openWeaponRollModal(
+            weapon,
+            skill,
+            baseAbility
+        );
+
+    }
+
     // Function to show equipment info in modal
     function showEquipmentInfo(item: any) {
         const totalWeight = (item.quantity * item.weight).toFixed(2);
@@ -108,7 +141,7 @@
     }
 
     // Function to show weapon info in modal
-    function showWeaponInfo(weapon: any) {
+    function showWeaponInfo(weapon: Weapon) {
         const rangeNames = ['Närstrid', 'Nära', 'Kort', 'Lång'];
         const content = `
             <div class="equipment-section">
@@ -254,7 +287,11 @@
                         <div class="weapon-content">
                             <div class="weapon-header">
                                 <div class="weapon-name-section">
+                                    {#if weapon.type === 'MELEE'}
+                                    <Swords size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
+                                    {:else}
                                     <BowArrow size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
+                                    {/if}
                                     <input 
                                         type="text" 
                                         class="weapon-name-input"
@@ -276,6 +313,16 @@
                                             <Hand size={16} />
                                         {/if}
                                     </button>
+                                    {#if diceStates.isDicePluginAvailable}
+                                        <button 
+                                            class="dice-roll-button"
+                                            onclick={() => rollForWeapon(index)}
+                                            aria-label="Slå tärning för {weapon.name}"
+                                            title="Slå tärning för {weapon.name}"
+                                        >
+                                            <Dices />
+                                        </button>
+                                    {/if}
                                     <button 
                                         class="info-icon-button"
                                         onclick={() => showWeaponInfo(weapon)}

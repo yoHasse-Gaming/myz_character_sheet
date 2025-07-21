@@ -381,34 +381,6 @@ export const characterActions = {
         }
     },
     
-    // Owlbear Rodeo integration
-    setupOwlbearSync() {
-        const owlbearSync = useOwlbearSync();
-
-        console.log('Setting up Owlbear Rodeo sync');
-        
-        if (owlbearSync.isInOwlbear) {
-            owlbearSync.setupAutoSync(60000); // Sync every minute
-            
-            
-            // Load existing character data
-            owlbearSync.loadData().then((data) => {
-                if (data) {
-                    
-                    // Update local state with loaded data
-                    Object.assign(sheetState, data);
-                }
-            });
-        }
-        
-        return owlbearSync;
-    },
-    
-    syncToOwlbear() {
-        const owlbearSync = useOwlbearSync();
-        
-        owlbearSync.syncNow();
-    },
     
     // Paper layout management
     savePaperLayout(paperId: string, layout: LayoutType) {

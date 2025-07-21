@@ -7,7 +7,7 @@ Provides a modal interface for all storage operations
     import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
     import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash } from "@lucide/svelte";
-    import { useLocalStorage, useOwlbearSync } from "../../utils/owlbearIntegration";
+    import { useOwlbearSync } from "../../utils/owlbearIntegration";
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     
     function closeModal() {
@@ -15,11 +15,11 @@ Provides a modal interface for all storage operations
     }
 
         // Initialize storage utilities
-    const localStore = useLocalStorage();
     const owlbearSync = useOwlbearSync();
 
+    let storageConfig = $state(owlbearSync.getStorageConfig());
+
     let isAutoSaving = $state(false);
-    let storageConfig = $state(localStore.getStorageConfig());
     let importStatus = $state('');
     let exportStatus = $state('');
 
@@ -34,55 +34,29 @@ Provides a modal interface for all storage operations
     }
 
     function startAutoSave() {
-            localStore.startAutoSave();
-            owlbearSync.startAutoSave();
-            isAutoSaving = true;
-            localStorage.setItem('autoSave', 'true');
+        owlbearSync.startAutoSave();
+        isAutoSaving = true;
+        localStorage.setItem('autoSave', 'true');
     }
 
     function stopAutoSave() {
-        localStore.stopAutoSave();
         owlbearSync.stopAutoSave();
         isAutoSaving = false;
         localStorage.setItem('autoSave', 'false');
     }
 
-    // Manual save operations
-    function saveToLocalStorage() {
-        localStore.save();
-        exportStatus = 'Saved to localStorage';
-        setTimeout(() => exportStatus = '', 3000);
-    }
-
-    function loadFromLocalStorage() {
-        const data = localStore.load();
-        if (data) {
-            // Apply loaded data to character sheet - include all fields
-            Object.assign(sheetState, data);
-            importStatus = 'Loaded from localStorage';
-        } else {
-            importStatus = 'No saved data found';
-        }
-        setTimeout(() => importStatus = '', 3000);
-    }
-
-    function clearLocalStorage() {
-        localStore.clear();
-        exportStatus = 'localStorage cleared';
-        setTimeout(() => exportStatus = '', 3000);
-    }
 
     // JSON export/import
     function exportToJSON() {
         const filename = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-        localStore.exportJSON(filename);
+        owlbearSync.exportJSON(filename);
         exportStatus = 'Character sheet exported';
         setTimeout(() => exportStatus = '', 3000);
     }
 
     async function importFromJSON() {
         try {
-            const data = await localStore.importJSON();
+            const data = await owlbearSync.importJSON();
             if (data) {
                 // Apply imported data to character sheet - include all fields
                 Object.assign(sheetState, data);
@@ -97,16 +71,16 @@ Provides a modal interface for all storage operations
     }
 
     // Universal save/load (localStorage + Owlbear)
-    async function saveUniversal() {
-        await owlbearSync.saveUniversal();
+    async function save() {
+        await owlbearSync.save();
         exportStatus = owlbearSync.isInOwlbear ? 
             'Saved to Owlbear and localStorage' : 
             'Saved to localStorage';
         setTimeout(() => exportStatus = '', 3000);
     }
 
-    async function loadUniversal() {
-        const data = await owlbearSync.loadUniversal();
+    async function load() {
+        const data = await owlbearSync.load();
         if (data) {
             // Apply loaded data to character sheet - include all fields
             Object.assign(sheetState, data);
@@ -123,9 +97,8 @@ Provides a modal interface for all storage operations
     function updateAutoSaveInterval(event: Event) {
         const target = event.target as HTMLInputElement;
         const interval = parseInt(target.value) * 1000; // Convert seconds to milliseconds
-        localStore.configureStorage({ autoSaveInterval: interval });
-        storageConfig = localStore.getStorageConfig();
-        
+        owlbearSync.configureStorage({ autoSaveInterval: interval });
+
         if (isAutoSaving) {
             // Restart auto-save with new interval
             toggleAutoSave();
@@ -135,7 +108,10 @@ Provides a modal interface for all storage operations
 
     onMount(async () => {
         // Ensure the modal is closed when the component mounts
-        await loadUniversal();
+        await load();
+        if(localStorage.getItem('autoSave') === null) {
+            localStorage.setItem('autoSave', 'true');
+        }
         isAutoSaving = localStorage.getItem('autoSave') === 'true';
         if (isAutoSaving) {
             startAutoSave();
@@ -144,7 +120,6 @@ Provides a modal interface for all storage operations
 
     onDestroy(() => {
         // Cleanup if needed when the modal is destroyed
-        localStore.stopAutoSave();
         owlbearSync.stopAutoSave();
     });
 
@@ -224,40 +199,17 @@ Provides a modal interface for all storage operations
 
     <!-- Universal Save/Load (Best of both worlds) -->
     <div class="control-group">
-        <h4><BrainCircuit size={16} /> Smart Save/Load {owlbearSync.isInOwlbear ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
+        <h4><BrainCircuit size={16} /> Manual Save/Load {owlbearSync.isInOwlbear ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
         <div class="control-row">
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn" onclick={saveUniversal}>
-                    <Save size={16} /> Smart Save
+                <button class="btn" onclick={save}>
+                    <Save size={16} /> Save Character
                 </button>
             </div>
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn" onclick={loadUniversal}>
-                    <FolderDown size={16} /> Smart Load
+                <button class="btn" onclick={load}>
+                    <FolderDown size={16} /> Load Character
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- localStorage Controls -->
-    <div class="control-group">
-        <h4><Archive size={16} /> localStorage</h4>
-        <div class="control-row">
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
-
-            <button class="btn" onclick={saveToLocalStorage}>
-                <Save size={16} /> Save Local
-            </button>
-            </div>
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn" onclick={loadFromLocalStorage}>
-                    <FolderDown size={16} /> Load Local
-                </button>
-            </div>
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn " onclick={clearLocalStorage}>
-                    <Trash size={16} color="red" /> Clear Local
-            </button>
             </div>
         </div>
     </div>
@@ -364,6 +316,10 @@ Provides a modal interface for all storage operations
         gap: 0.5rem;
         font-size: 0.85rem;
         color: var(--color-surface-900);
+    }
+
+    :global(.dark) .interval-control {
+        color: var(--color-surface-100);
     }
 
     :global(.dark) .interval-input {

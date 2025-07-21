@@ -7,7 +7,7 @@
     import { initInteractForElement } from '../../../utils/interactjsUtils';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import { Tooltip } from '@skeletonlabs/skeleton-svelte';
-    import { Info } from '@lucide/svelte';
+    import { Dices, Info } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
 
@@ -150,6 +150,7 @@
             skill.name,
             skill.value,
             baseAbility.label,
+            baseAbility.type,
             baseAbility.value,
             baseAbility.damage
         );
@@ -168,8 +169,10 @@
             skill.name,
             skill.value,
             baseAbility.label,
+            baseAbility.type,
             baseAbility.value,
             baseAbility.damage
+            
         );
     }
 
@@ -225,11 +228,7 @@
                             aria-label="Slå tärning för {skill.name}"
                             title="Slå tärning för {skill.name}"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="9" cy="9" r="1"></circle>
-                                <circle cx="15" cy="15" r="1"></circle>
-                            </svg>
+                            <Dices />
                         </button>
                         {/if}
                         <input

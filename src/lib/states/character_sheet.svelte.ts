@@ -1,4 +1,4 @@
-import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType } from '../types';
+import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType, AbilityType } from '../types';
 import type { LayoutType } from '../utils/interactjsUtils';
 import { useOwlbearSync } from '../utils/owlbearIntegration';
 import skills from '../data/skills.json';
@@ -396,7 +396,7 @@ export const characterActions = {
     },
 
     // Dice rolling functions
-    openSkillRollModal(skillName: string, skillValue: number, baseAbilityLabel: string, baseAbilityValue: number, baseAbilityDamage: number) {
+    openSkillRollModal(skillName: string, skillValue: number, baseAbilityLabel: string, baseAbilityType: AbilityType, baseAbilityValue: number, baseAbilityDamage: number) {
         // Import the function dynamically to avoid circular dependencies
     
         const effectiveAbilityValue = Math.max(0, baseAbilityValue - baseAbilityDamage);
@@ -407,7 +407,8 @@ export const characterActions = {
             skillDice: skillValue,
             gearDice: 0,
             skillName: skillName,
-            abilityName: baseAbilityLabel
+            abilityName: baseAbilityLabel,
+            abilityType: baseAbilityType
         });
     },
 

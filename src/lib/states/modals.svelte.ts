@@ -1,5 +1,6 @@
 import { SvelteMap } from 'svelte/reactivity';
 import type { DiceRollConfig } from './dice.svelte';
+import type { AbilityType } from '../types';
 
 // Define dialogue options for modals
 export type DialogueOption = 'optionalSkills' | 'mutations' | 'info' | 'occupational-talents' | 'generic-talents' | 'equipment' | 'weapons' | 'armor' | 'relations' | 'notes' | 'diceRoll' | 'newEquipment' | 'newWeapon' | 'newArmor' | 'sizeControls' | 'storageControls';
@@ -26,7 +27,8 @@ export const diceRollModalState = $state({
     },
     selectedEquipment: [] as string[], // IDs of selected equipment/weapons/armor
     skillName: '',
-    abilityName: ''
+    abilityName: '',
+    abilityType: '' as AbilityType | undefined, // Type of ability for the skill
 });
 
 // Create a reactive map for dialogue states
@@ -104,6 +106,7 @@ export function openDiceRollModal(config: {
     gearDice?: number;
     skillName?: string;
     abilityName?: string;
+    abilityType?: AbilityType; // Optional, used for skills
 }) {
     diceRollModalState.rollName = config.rollName;
     diceRollModalState.baseRoll.baseDice = config.baseDice;
@@ -111,7 +114,8 @@ export function openDiceRollModal(config: {
     diceRollModalState.baseRoll.gearDice = config.gearDice || 0;
     diceRollModalState.skillName = config.skillName || '';
     diceRollModalState.abilityName = config.abilityName || '';
-    
+    diceRollModalState.abilityType = config.abilityType;
+
     // Reset modifiers and selections
     diceRollModalState.modifiers.extraBaseDice = 0;
     diceRollModalState.modifiers.extraSkillDice = 0;

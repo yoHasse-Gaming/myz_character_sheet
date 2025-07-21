@@ -4,6 +4,9 @@
     import { triggerRoll } from '../../utils/diceUtils';
     import type { DiceRollConfig } from '../../states/dice.svelte';
     import { Modal } from "@skeletonlabs/skeleton-svelte";
+    import { getIconForAbility } from '../../utils/iconUtils';
+    import { type AbilityType } from '../../types';
+    import { Dices } from '@lucide/svelte';
 
     // Generate random IDs for new items
     function generateId() {
@@ -181,7 +184,7 @@
   }}
   classes="panzoom-exclude"
   backdropClasses="!z-[100] backdrop-blur-sm bg-black/50 left-0 top-0 h-screen w-screen"
-  contentBase="!z-[101] card p-0 space-y-0 shadow-xl max-w-3xl max-h-[90vh] overflow-y-auto"
+  contentBase="!z-[101] card p-0 space-y-0 shadow-xl max-w-3xl max-h-[90vh] overflow-y-auto p-3"
   positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
   closeOnInteractOutside={true}
   closeOnEscape={true}
@@ -189,37 +192,29 @@
   
   {#snippet content()}
     <div class="dice-roll-modal-content torn-paper-wrapper variant-1 modal-content-wrapper">
-        <div class="modal-header">
-            <div class="modal-title-container">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="9" cy="9" r="1"></circle>
-                    <circle cx="15" cy="15" r="1"></circle>
-                </svg>
-                <h3 class="modal-title">Tärningsslag</h3>
-            </div>
-            <button class="modal-close-button"
-                    aria-label="Stäng modal" 
-                    onclick={handleClose}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-        </div>
-
         <div class="modal-form">
             <!-- Roll Summary -->
             <div class="roll-summary">
-                <h4 class="summary-title">{diceRollModalState.rollName}</h4>
-                {#if diceRollModalState.skillName && diceRollModalState.abilityName}
-                    <p class="summary-details">{diceRollModalState.skillName} ({diceRollModalState.abilityName})</p>
+                <h4 class="summary-title">
+                    {#if diceRollModalState.abilityType}
+                        {@const BaseAbilityIcon = getIconForAbility(diceRollModalState.abilityType as AbilityType) }
+                        <BaseAbilityIcon size={16} /> 
+                    {/if}
+                    {diceRollModalState.rollName}
+                </h4>
+                {#if diceRollModalState.skillName && diceRollModalState.abilityType}
+                    <p class="summary-details"> {diceRollModalState.skillName}</p>
                 {/if}
+            </div>
+            <div class="torn-paper-wrapper variant-9 btn-wrapper">
+                <button type="button" class="btn-primary roll-button" onclick={executeRoll}>
+                    <Dices /> Slå tärning
+                </button>
             </div>
 
             <!-- Dice Breakdown -->
             <div class="dice-breakdown">
-                <h5 class="section-title">Tärningar</h5>
+                <h5 class="section-title">Justering</h5>
                 
                 <div class="dice-row">
                     <span class="dice-label">Grundtärningar:</span>
@@ -293,17 +288,7 @@
                 </div>
             {/if}
 
-            <!-- Action Buttons -->
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick={handleClose}>
-                    Avbryt
-                </button>
-                <div class="torn-paper-wrapper variant-9 btn-wrapper">
-                    <button type="button" class="btn-primary roll-button" onclick={executeRoll}>
-                        🎲 Slå tärning
-                    </button>
-                </div>
-            </div>
+
         </div>
     </div>
   {/snippet}
@@ -403,10 +388,10 @@
     }
 
     .dice-breakdown {
-        background: rgba(217, 119, 6, 0.05);
+        
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid rgba(217, 119, 6, 0.2);
+        
     }
 
     .dice-row {
@@ -423,12 +408,12 @@
 
     .dice-label {
         font-weight: 500;
-        color: var(--color-surface-700);
+        color: var(--color-surface-800);
         min-width: 150px;
     }
 
     :global(.dark) .dice-label {
-        color: var(--color-surface-300);
+        color: var(--color-surface-200);
     }
 
     .dice-controls {
@@ -440,9 +425,6 @@
     .dice-btn {
         width: 32px;
         height: 32px;
-        border: 2px solid var(--color-primary-500);
-        background: var(--color-surface-100);
-        color: var(--color-primary-600);
         border-radius: 4px;
         font-weight: bold;
         cursor: pointer;
@@ -450,18 +432,16 @@
     }
 
     .dice-btn:hover {
-        background: var(--color-primary-500);
-        color: white;
+        background: var(--color-primary-900);
+        color: var(--color-surface-100);
     }
 
     :global(.dark) .dice-btn {
-        background: var(--color-surface-800);
-        color: var(--color-primary-400);
-        border-color: var(--color-primary-400);
+        color: var(--color-surface-100);
     }
 
     :global(.dark) .dice-btn:hover {
-        background: var(--color-primary-400);
+        background: var(--color-surface-100);
         color: var(--color-surface-900);
     }
 

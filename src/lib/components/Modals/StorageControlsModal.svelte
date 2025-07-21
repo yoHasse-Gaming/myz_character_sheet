@@ -101,8 +101,8 @@ Provides a modal interface for all storage operations
 
         if (isAutoSaving) {
             // Restart auto-save with new interval
-            toggleAutoSave();
-            toggleAutoSave();
+            stopAutoSave();
+            startAutoSave();
         }
     }
 

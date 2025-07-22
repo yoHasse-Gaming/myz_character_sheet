@@ -876,9 +876,56 @@ label {
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {  
 
-    opacity: 1;
+    opacity: 0;
 
 }
+
+    .chevron-controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.1rem;
+        margin-left: 0.25rem;
+    }
+
+    .chevron-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 0.75rem;
+        height: 0.8rem;
+        border-radius: 0.2rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        padding: 0;
+        color: var(--color-surface-900);
+    }
+
+    .chevron-button:hover {
+        color: var(--color-surface-800);
+        transform: scale(1.05);
+    }
+
+    .chevron-button:active {
+        transform: scale(0.95);
+    }
+
+    .chevron-button:focus {
+        outline: none;
+    }
+
+    .dark .chevron-button {
+        color: var(--color-surface-100);
+    }
+
+    .dark .chevron-button:hover {
+        color: var(--color-surface-200);
+    }
+
+    .dark .chevron-button:active {
+        background: var(--color-surface-100);
+    }
 
 /* Global Info Icon Button Styles */
 .info-icon-button {
@@ -918,6 +965,24 @@ input[type=number]::-webkit-outer-spin-button {
     pointer-events: auto;
     opacity: 0.8;
     color: var(--color-primary-200);
+}
+
+.dice-roll-button {
+    color: var(--color-surface-800);
+}
+
+.dice-roll-button:hover {
+    color: var(--color-success-600);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.dark .dice-roll-button {
+    color: var(--color-surface-200);
+}
+
+.dark .dice-roll-button:hover {
+    color: var(--color-success-400);
 }
 
 .remove-button {

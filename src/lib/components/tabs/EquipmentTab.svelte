@@ -13,6 +13,7 @@
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
     import type { Weapon } from '../../types';
     import { diceStates } from '../../states/dice.svelte';
+    import ChevronInput from '../ChevronInput.svelte';
 
 
     // Calculate total weight from equipment items
@@ -50,9 +51,31 @@
         armorNameToDelete: ''
     });
 
+    const equipmentHeightCalc = () => {
+        return (sheetState.equipment.length > 0 ? sheetState.equipment.length * 60 : 60) + 70; // Adjust height based on number of items
+    };
+
+    const weaponHeightCalc = () => {
+        return (sheetState.weapons.length > 0 ? sheetState.weapons.length * 110 : 110) + 70; // Adjust height based on number of items
+    };
+
+    const armorHeightCalc = () => {
+        return (sheetState.armor.length > 0 ? sheetState.armor.length * 50 : 50) + 70; // Adjust height based on number of items
+    };
+
     let minSizeForEquipment = $state({
         width: 350,
-        height: (sheetState.equipment.length > 0 ? sheetState.equipment.length * 100 : 100) + 50
+        height: equipmentHeightCalc()
+    });
+
+    let minSizeForArmor = $state({
+        width: 350,
+        height: armorHeightCalc()
+    });
+
+    let minSizeForWeapons = $state({
+        width: 350,
+        height: weaponHeightCalc()
     });
 
     function requestDeleteWeapon(weaponId: string, weaponName: string) {
@@ -176,7 +199,15 @@
         sheetState.armor.length;
         minSizeForEquipment = {
             width: 350,
-            height: (sheetState.equipment.length > 0 ? sheetState.equipment.length * 50 : 100) + 70 // Adjust height based on number of items
+            height: equipmentHeightCalc()
+        };
+        minSizeForWeapons = {
+            width: 350,
+            height: weaponHeightCalc()
+        };
+        minSizeForArmor = {
+            width: 350,
+            height: armorHeightCalc()
         };
 
     });
@@ -193,15 +224,6 @@
 <NewEquipmentModal />
 
 <NewWeaponModal />
-
-    <!-- Draggable Add Item -->
-    <!-- <DraggableAddItem 
-        text="Dra för att lägga till"
-        ariaLabel="Dra för att lägga till föremål"
-        variant={addItemVariant}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-    /> -->
 
     <!-- Equipment Section -->
 <PaperCard
@@ -239,13 +261,20 @@
                 placeholder="Utrustnings namn"
                 title="Utrustnings namn"
             />
-            <input
-                    type="number"
-                    min="1"
-                    class="equipment-quantity"
-                    bind:value={item.quantity}
-                    title="Antal"
+                        
+            <div class="stat-item">
+                <span class="stat-label">Antal:</span>
+
+                <ChevronInput
+                    value={item.quantity || 0}
+                    min={0}
+                    max={19}
+                    name={item.name}
+                    ariaLabel={item.name}
+                    onValueChange={(value) => item.quantity = value}
                 />
+            </div>
+
             <div class="equipment-controls">
                 <button 
                     class="info-icon-button"
@@ -275,7 +304,7 @@
         draggable={true}
         resizable={false}
         initialPosition={initialCardPositions["weapons"]}
-        minSize={{ width: 350, height: 100 }}
+        minSize={minSizeForWeapons}
         initialSize={{ width: 450, height: 100 }}
     >
     {#snippet header()}
@@ -309,7 +338,7 @@
                             title="Vapens namn"
                         />
                     </div>
-                    <div class="weapon-controls">
+                    <div class="equipment-controls">
                         <button 
                             class="equipped-button {weapon.equipped ? 'active' : ''}"
                             onclick={() => weapon.equipped = !weapon.equipped}
@@ -352,25 +381,26 @@
                 <div class="weapon-stats">
                     <div class="stat-item">
                         <span class="stat-label">Bonus:</span>
-                        <input 
-                            type="number" 
-                            min="0" 
-                            max="10"
-                            class="stat-input"
-                            bind:value={weapon.bonus}
-                            title="Vapens bonusmodifikator"
-                        />
+                            <ChevronInput
+                                value={weapon.bonus || 0}
+                                min={0}
+                                max={19}
+                                name={"Vapens bonusmodifikator"}
+                                ariaLabel={"Vapens bonusmodifikator"}
+                                onValueChange={(value) => weapon.bonus = value}
+                            />
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Skada:</span>
-                        <input 
-                            type="number" 
-                            min="1" 
-                            max="20"
-                            class="stat-input"
-                            bind:value={weapon.damage}
-                            title="Vapens skada"
+                        <ChevronInput
+                            value={weapon.damage || 0}
+                            min={0}
+                            max={19}
+                            name={"Vapens skada"}
+                            ariaLabel={"Vapens skada"}
+                            onValueChange={(value) => weapon.damage = value}
                         />
+
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Räckvidd:</span>
@@ -396,10 +426,12 @@
 <PaperCard
         paperId={`armors`}
         draggable={true}
-        resizable={false}
+        resizable={true}
+        autoResize={true}
         initialPosition={initialCardPositions["armors"]}
         initialSize={{ width: 450, height: 100 }}
-        minSize={{ width: 350, height: 100 }}
+        minSize={minSizeForArmor}
+        class=""
     >
         {#snippet header()}
     <span >Rustning</span>
@@ -417,15 +449,17 @@
 
             <div class="armor-content">
                 <ShieldHalf size={16} />
-                <span class="armor-name">{armor.name || 'Rustning'}</span>
+                <input 
+                    type="text" 
+                    class="armor-name-input"
+                    bind:value={armor.name}
+                    placeholder="Rustnings namn"
+                    title="Rustnings namn"
+                />
+
+
+
                 <div class="armor-controls">
-                    <label class="equipped-checkbox">
-                        <input 
-                            type="checkbox" 
-                            bind:checked={armor.equipped}
-                        />
-                        <span class="equipped-label">Utrustad</span>
-                    </label>
                     <button 
                         class="info-icon-button"
                         onclick={() => showArmorInfo(armor)}

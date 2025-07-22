@@ -11,6 +11,7 @@
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
     import ConfirmationModal from '../../Modals/ConfirmationModal.svelte';
+    import ChevronInput from '../../ChevronInput.svelte';
 
     const { startPosition = { x: 1020, y: 20 } }: {
         startPosition?: { x: number, y: number }
@@ -241,17 +242,15 @@
                             <Dices />
                         </button>
                         {/if}
-                        <input
-                            id="skill-{index}"
-                            name={skill.name}
-                            type="number"
-                            min="0"
-                            max="5"
-                            class="skill-input font-user"
-                            value={skill.value}
-                            oninput={(e) => handleSkillChange(index, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                            placeholder="0"
-                        />
+                            <ChevronInput
+                                value={skill.value || 0}
+                                min={0}
+                                max={5}
+                                name={skill.name}
+                                ariaLabel={skill.name}
+                                onValueChange={(value) => handleSkillChange(index, value)}
+                            />
+
                     </div>
                 </div>
     {/each}
@@ -281,6 +280,13 @@
                     </Tooltip>
                     <span class="skill-name">{skill.name}</span>
                     <div class="skill-controls-right">
+                        <button
+                            class="remove-button"
+                            onclick={() => { confirmState.confirmationOpen = true; confirmState.skillNameToDelete = skill.name }}
+                            aria-label="Ta bort {skill.name}"
+                        >
+                            <CircleX size={16} />
+                        </button>
                         <button 
                             class="info-icon-button"
                             onclick={() => showSkillInfo(skill)}
@@ -296,31 +302,18 @@
                             aria-label="Slå tärning för {skill.name}"
                             title="Slå tärning för {skill.name}"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="9" cy="9" r="1"></circle>
-                                <circle cx="15" cy="15" r="1"></circle>
-                            </svg>
+                            <Dices />
                         </button>
                         {/if}
-                        <input
-                            id="optional-skill-{skill.id}"
-                            name={skill.name}
-                            type="number"
-                            min="0"
-                            max="5"
-                            class="skill-input font-user"
-                            value={skill.value}
-                            oninput={(e) => handleOptionalSkillChange(skill.id, parseInt((e.target as HTMLInputElement)?.value) || 0)}
-                            placeholder="0"
-                        />
-                        <button
-                            class="remove-button"
-                            onclick={() => { confirmState.confirmationOpen = true; confirmState.skillNameToDelete = skill.name }}
-                            aria-label="Ta bort {skill.name}"
-                        >
-                            <CircleX size={16} />
-                        </button>
+                        <ChevronInput
+                                value={skill.value || 0}
+                                min={0}
+                                max={5}
+                                name={skill.name}
+                                ariaLabel={skill.name}
+                                onValueChange={(value) => handleOptionalSkillChange(skill.id, value)}
+                            />
+
                     </div>
                 </div>
 
@@ -379,23 +372,6 @@
         color: var(--color-surface-100);
     }
 
-    .dice-roll-button {
-        color: var(--color-surface-800);
-    }
-
-    .dice-roll-button:hover {
-        color: var(--color-success-600);
-        opacity: 1;
-        transform: scale(1.1);
-    }
-
-    :global(.dark) .dice-roll-button {
-        color: var(--color-surface-200);
-    }
-
-    :global(.dark) .dice-roll-button:hover {
-        color: var(--color-success-400);
-    }
 
     .skill-input {
         width: 3rem;

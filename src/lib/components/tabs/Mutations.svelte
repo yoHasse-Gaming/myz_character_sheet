@@ -4,9 +4,9 @@
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import { openInfoModal } from '../../states/modals.svelte';
+    import { openDialogueOption, openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Circle, Dna, DnaOff, Info, Microscope, Radiation, Radius, X } from '@lucide/svelte';
+    import { Circle, Dna, DnaOff, Info, Microscope, PlusCircle, Radiation, Radius, X } from '@lucide/svelte';
     import { Rating } from '@skeletonlabs/skeleton-svelte';
     import type { Mutation } from '../../types';
     import PaperCard from '../PaperCard.svelte';
@@ -86,15 +86,25 @@
         ariaLabel="Dra för att lägga till mutation"
         variant="variant-3"
     /> -->
-{#if sheetState.mutations.length > 0}
 <PaperCard 
     paperId={`mutations`}
     draggable={true}
     resizable={false}
-    minSize={{ width: 250, height: 60 }}
+    minSize={{ width: 300, height: 60 }}
     initialPosition={initialCardPositions["mutations"]}
     class="p-2 pt-3"
     >
+    {#snippet header()}
+    <span>Mutationer</span>
+        <button 
+            class="add-item-button"
+            onclick={() => openDialogueOption('mutations')}
+            aria-label="Lägg till ny relation"
+            title="Lägg till ny relation"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
     {#snippet content()}
         {#each sheetState.mutations as mutation, index}
 
@@ -126,7 +136,6 @@
         {/each}
         {/snippet}
 </PaperCard>
-{/if}
 
 
 

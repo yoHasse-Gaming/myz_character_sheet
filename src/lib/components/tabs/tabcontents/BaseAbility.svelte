@@ -3,13 +3,14 @@
     import { fade, scale } from 'svelte/transition';
     import { openInfoModal } from '../../../states/modals.svelte';
     import { Rating, Tooltip } from '@skeletonlabs/skeleton-svelte';
-    import { Ban, BicepsFlexed, Bone, Circle, Dices, Info, type Icon as IconType } from '@lucide/svelte';
+    import { Ban, BicepsFlexed, Bone, ChevronDown, ChevronUp, Circle, Dices, Info, type Icon as IconType } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
 
     import { onMount } from 'svelte';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import type { AbilityType, BaseAbilityType } from '../../../types';
     import PaperCard from '../../PaperCard.svelte';
+    import ChevronInput from '../../ChevronInput.svelte';
 
 
     let tooltipStates: Record<string, boolean> = $state({});
@@ -39,12 +40,6 @@
             // If this indicator is not damaged, increase damage to include this level
             characterActions.setAbilityDamage(abilityIndex, damageIndex + 1);
         }
-    }
-
-    function handleValueChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const value = parseInt(target.value) || 1;
-        characterActions.setAbilityValue(abilityIndex, value);
     }
 
     // Function to roll dice for this ability
@@ -95,7 +90,7 @@
     });
 </script>
 
-    <div class="grid grid-cols-3 content-center">
+    <div class="grid grid-cols-3 content-center align-center gap-2">
             <Tooltip
                 open={tooltipStates[`ability-${abilityIndex}`] || false}
                 onOpenChange={(e) => (tooltipStates[`ability-${abilityIndex}`] = e.open)}
@@ -121,23 +116,29 @@
             </Tooltip>
 
 
+
+        
+        <div class="flex">
         {#if diceStates.isDicePluginAvailable}
             <button 
+                class="mr-2 dice-roll-button"
                 onclick={() => rollForAbility()}
                 aria-label="Slå tärning för {baseAbility.label}"
                 title="Slå tärning för {baseAbility.label}"
             >
-                <Dices />
+                <Dices size={20} />
             </button>
         {/if}
-
-        <input type="number" 
-            max="5" 
-            min="1" 
-            class="ability-input font-user content-center" 
-            name={baseAbility.label} 
+        <ChevronInput 
             value={ability?.value || 1}
-            oninput={handleValueChange} />
+            min={1}
+            max={5}
+            name={baseAbility.label}
+            ariaLabel={baseAbility.label}
+            onValueChange={(value) => characterActions.setAbilityValue(abilityIndex, value)}
+        />
+
+        </div>
 
         
         <div class="damage-section">
@@ -153,7 +154,7 @@
                 </button>
 
             </div>
-            <div class="damage-indicators">
+            <div class="damage-indicators ">
                 {#each Array.from({length: ability.value}, (_, idx) => idx) as idx}
                     <button 
                         class="damage-indicator"
@@ -175,6 +176,7 @@
 
 
 <style>
+
     .ability-label {
         text-align: left;
         font-family: var(--form-labels), serif;
@@ -188,34 +190,6 @@
 
     :global(.dark) .ability-label {
         color: var(--color-surface-200);
-    }
-
-    .ability-input {
-        width: 1.75rem;
-        height: 1.75rem;
-        padding: 0;
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-align: center;
-        background: transparent;
-        color: var(--color-surface-900);
-        box-shadow: none;
-        transition: all 0.2s ease;
-        cursor: default;
-        position: relative;
-        flex-shrink: 0;
-    }
-
-    :global(.dark) .ability-input {
-        color: var(--color-surface-100);
-        border-color: var(--color-surface-400);
-    }
-
-    .ability-input:focus {
-        outline: none;
-        border-color: var(--color-primary-600);
-        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
-        transform: scale(1.02);
     }
 
     .damage-section {
@@ -282,12 +256,7 @@
     }
 
     /* Responsive adjustments */
-    @media (max-width: 639px) {
-        .ability-controls {
-            flex-wrap: wrap;
-            gap: 0.15rem;
-        }
-        
+    @media (max-width: 639px) {        
         .ability-label {
             font-size: 0.75rem;
         }

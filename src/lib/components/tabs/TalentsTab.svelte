@@ -4,11 +4,11 @@
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import FormSection from '../FormSection.svelte';
     import DraggableAddItem from '../DraggableAddItem.svelte';
-    import { openInfoModal } from '../../states/modals.svelte';
+    import { openDialogueOption, openInfoModal } from '../../states/modals.svelte';
     import TalentsModal from '../Modals/TalentsModal.svelte';
     import { initInteractForElement } from '../../utils/interactjsUtils';
     import PaperCard from '../PaperCard.svelte';
-    import { Star, Info } from '@lucide/svelte';
+    import { Star, Info, PlusCircle, Circle, CircleX } from '@lucide/svelte';
 
     // Generate unique variants for talent items to make them look different
     const talentVariants = generateUniqueVariants(20); // Generate enough variants
@@ -44,7 +44,7 @@
             if (card instanceof HTMLElement && !card.hasAttribute('data-interact-initialized')) {
                 card.setAttribute('data-interact-initialized', 'true');
 
-                initInteractForElement(card, undefined, undefined, {
+                initInteractForElement(card, {
                     enableDraggable: true,
                     enableResizable: true
                 });
@@ -61,85 +61,105 @@
 <TalentsModal modalType="occupational" />
 <TalentsModal modalType="generic" />
 
-    <!-- Draggable Add Item -->
-    <!-- <DraggableAddItem 
-        text="Dra för talanger"
-        ariaLabel="Dra för att lägga till talanger"
-        variant="variant-4"
-    /> -->
+<!-- Occupational Talents Section -->
+<PaperCard
+    paperId={`talents`}
+    initialPosition={initialCardPositions["talents"]}
+    draggable={true}
+    resizable={false}
+    minSize={{ width: 300, height: 60 }}
+    class="p-1 pt-3"
+    >
+{#snippet header()}
+<span>Generiska Talanger</span>
+    <button 
+        class="add-item-button"
+        onclick={() => openDialogueOption('generic-talents')}
+        aria-label="Lägg till ny generisk talang"
+        title="Lägg till ny generisk talang"
+    >
+        <PlusCircle size={16} />
+    </button>
+    
+{/snippet}
+{#snippet content()}
+{#each genericTalents as talent, index}
 
-    <!-- Occupational Talents Section -->
-     {#if occupationalTalents.length > 0 || genericTalents.length > 0}
-            <PaperCard
-                paperId={`talents`}
-                initialPosition={initialCardPositions["talents"]}
-                draggable={true}
-                resizable={false}
-                minSize={{ width: 250, height: 60 }}
-                class="p-1 pt-3"
-                >
-            
-            {#snippet content()}
-            {#each occupationalTalents as talent, index}
+<div class="talent-content">
+    <span class="talent-name"><Star /> {talent.name}</span>
+    <div class="talent-controls-right">
+        <button 
+            class="info-icon-button"
+            onclick={() => showTalentInfo(talent)}
+            aria-label="Information om {talent.name}"
+            title="Visa information om {talent.name}"
+        >
+            <Info size={16} />
+        </button>
+        <button
+            class="remove-button"
+            onclick={() => removeTalent(talent.id)}
+            aria-label="Ta bort {talent.name}"
+        >
+            <CircleX size={16} />
+        </button>
+    </div>
+</div>
 
-                <div class="talent-content">
-                    <span class="talent-name"><Star /> {talent.name}</span>
-                    <div class="talent-controls-right">
-                    <button 
-                        class="info-icon-button"
-                        onclick={() => showTalentInfo(talent)}
-                        aria-label="Information om {talent.name}"
-                        title="Visa information om {talent.name}"
-                    >
-                        <Info size={16} />
-                    </button>
-                    <button
-                        class="remove-talent-button"
-                        onclick={() => removeTalent(talent.id)}
-                        aria-label="Ta bort {talent.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                </div>
-            {/each}
-
-            {#each genericTalents as talent, index}
-
-            <div class="talent-content">
-                <span class="talent-name"><Star /> {talent.name}</span>
-                <div class="talent-controls-right">
-                    <button 
-                        class="info-icon-button"
-                        onclick={() => showTalentInfo(talent)}
-                        aria-label="Information om {talent.name}"
-                        title="Visa information om {talent.name}"
-                    >
-                        <Info size={16} />
-                    </button>
-                    <button
-                        class="remove-talent-button"
-                        onclick={() => removeTalent(talent.id)}
-                        aria-label="Ta bort {talent.name}"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+{/each}
 
 
 
-            {/each}
-                {/snippet}
-            </PaperCard>
-{/if}
-            
+
+{/snippet}
+</PaperCard>
+
+<PaperCard
+    paperId={`occupational-talents`}
+    initialPosition={initialCardPositions["occupational-talents"]}
+    draggable={true}
+    resizable={false}
+    minSize={{ width: 300, height: 60 }}
+    class="p-1 pt-3"
+    >
+{#snippet header()}
+<span>Yrkestalanger</span>
+    <button 
+        class="add-item-button"
+        onclick={() => openDialogueOption('occupational-talents')}
+        aria-label="Lägg till ny yrkestalang"
+        title="Lägg till ny yrkestalang"
+    >
+        <PlusCircle size={16} />
+    </button>
+    
+{/snippet}
+{#snippet content()}
+{#each occupationalTalents as talent, index}
+
+    <div class="talent-content">
+        <span class="talent-name"><Star /> {talent.name}</span>
+        <div class="talent-controls-right">
+        <button 
+            class="info-icon-button"
+            onclick={() => showTalentInfo(talent)}
+            aria-label="Information om {talent.name}"
+            title="Visa information om {talent.name}"
+        >
+            <Info size={16} />
+        </button>
+        <button
+            class="remove-button"
+            onclick={() => removeTalent(talent.id)}
+            aria-label="Ta bort {talent.name}"
+        >
+            <CircleX size={16} />
+        </button>
+    </div>
+    </div>
+{/each}
+{/snippet}
+</PaperCard>        
 
 <style>
 

@@ -97,7 +97,7 @@
         
         {#if OBR.isAvailable}
         <button 
-            class="btn btn-sm variant-filled-surface"
+            class="btn btn-sm variant-filled-primary"
             onclick={openSizeControls}
             aria-label="Öppna storlekskontroller"
             title="Storlekskontroller"
@@ -108,7 +108,7 @@
 
         <!-- Storage Controls -->
         <button 
-            class="btn btn-sm variant-filled-surface"
+            class="btn btn-sm variant-filled-primary"
             onclick={openStorageControls}
             aria-label="Öppna lagringskontroller"
             title="Spara & Ladda Data"
@@ -118,7 +118,7 @@
 
         <!-- Theme Toggle -->
         <button 
-            class="btn btn-sm variant-filled-surface"
+            class="btn btn-sm variant-filled-primary"
             onclick={toggleTheme}
             aria-label="Toggle dark/light mode"
             title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}

@@ -3,7 +3,7 @@
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { characterActions, sheetState, initialCardPositions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
-    import { Aperture, Award, Circle } from '@lucide/svelte';
+    import { Aperture, Award, Circle, EggFried, Radiation } from '@lucide/svelte';
 
     onMount(() => {
         // Initialize InteractJS for draggable and resizable character papers
@@ -123,7 +123,7 @@
         {/snippet}
     </PaperCard>
 
-    <PaperCard 
+<PaperCard 
         paperId="experience-points"
         variant="variant-1"
         draggable={true}
@@ -153,6 +153,48 @@
                             <Award size={12}
 
                                 color='var(--color-primary-800)'
+                            />
+                        {/if}
+                    </button>
+                {/each}
+                
+                
+            
+            </div>
+    {/snippet}
+
+</PaperCard>
+
+<PaperCard 
+        paperId="zone-rot"
+        variant="variant-1"
+        draggable={true}
+        resizable={false}
+        minSize={{ width: 200, height: 60 }}
+        initialPosition={initialCardPositions["zone-rot"]}
+    > 
+    {#snippet content()}
+            <span class="points-label"><Radiation size={20} class="points-icon" /> Zonröta</span>
+            <div class="points-indicators">
+                {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as idx}
+                    <button 
+                        class="point-indicator"
+                        onclick={() => {
+                            if (sheetState.zoneRot > idx) {
+                                characterActions.setTotalZoneRot(idx);
+                            } else {
+                                characterActions.setTotalZoneRot(idx + 1);
+                            }
+                        }}
+                        aria-label="Toggle zone rot point {idx + 1}"
+                    >
+                        <Circle size={22} 
+                            color={sheetState.zoneRot > idx ? 'var(--color-error-800)' : 'var(--color-surface-200)'}
+                        />
+                        {#if sheetState.zoneRot > idx}
+                            <EggFried size={12}
+
+                                color='var(--color-error-800)'
                             />
                         {/if}
                     </button>

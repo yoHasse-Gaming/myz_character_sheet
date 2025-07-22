@@ -13,15 +13,17 @@ export const initialCardPositions: Record<string, { x: number; y: number }> = {
     "conditions": { x: 10, y: 340 },
     "base-abilities": { x: 10, y: 110 },
     "skills-core": { x: 320, y: 10 },
-    "mutations": { x: 20, y: 20 },
+    "mutations": { x: 310, y: 510 },
     "mutation-points": { x: 0, y: 640 },
     "equipment": { x: 570, y: 500 },
-    "armors": { x: 570, y: 610 },
-    "weapons": { x: 570, y: 720 },
-    "talents": { x: 20, y: 20 },
+    "armors": { x: 570, y: 660 },
+    "weapons": { x: 570, y: 790 },
+    "talents": { x: 275, y: 660 },
+    "occupational-talents": { x: 275, y: 790 },
     // Relations positioning (base position for stacking)
     "relations-start": { x: 1035, y: 10 },
     "relations-additional": { x: 1495, y: 10 },
+    "zone-rot": { x: 20, y: 730 },
     // Notes positioning (base position for stacking)
     "notes-start": { x: 20, y: 20 },
 };
@@ -41,6 +43,7 @@ export interface CharacterSheetData {
     mutations: Mutation[];
     mutationPoints: number;
     experiencePoints: number;
+    zoneRot: number;
     talents: Talent[];
     conditions: {
         isStarving: boolean;
@@ -91,6 +94,9 @@ export const sheetState: CharacterSheetData = $state({
 
     // Experience points for character progression
     experiencePoints: 0,
+
+    // Zone rot level
+    zoneRot: 0,
     // Talents selected by the user
     talents: [],
     
@@ -222,7 +228,9 @@ export const characterActions = {
         sheetState.experiencePoints = Math.max(0, points);
     },
 
-
+    setTotalZoneRot(rot: number) {
+        sheetState.zoneRot = Math.max(0, rot);
+    },
 
     // Talents management
     addTalent(talent: Talent) {

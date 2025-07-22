@@ -1,11 +1,12 @@
 {
-  "name": "Hello, World!",
-  "version": "1.0.0",
+  "name": "Mutant: Year Zero Character Sheet - BETA",
+  "version": "0.0.5",
   "manifest_version": 1,
+  "description": "A responsive character sheet for Mutant: Year Zero RPG with real-time sync capabilities",
   "action": {
-    "title": "Hello, World!",
-    "icon": "/icon.svg",
-    "popover": "/",
+    "title": "Mutant: Year Zero Character Sheet",
+    "icon": "/myz_character_sheet/favicon.png",
+    "popover": "/myz_character_sheet",
     "height": 600,
     "width": 800
   }

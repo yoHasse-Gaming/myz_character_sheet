@@ -2,7 +2,6 @@
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../../utils/styleUtils';
     import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
-    import DraggableAddItem from '../../DraggableAddItem.svelte';
     import { openDialogueOption, openInfoModal } from '../../../states/modals.svelte';
     import { initInteractForElement } from '../../../utils/interactjsUtils';
     import { getIconForAbility } from '../../../utils/iconUtils';

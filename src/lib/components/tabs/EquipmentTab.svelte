@@ -14,38 +14,6 @@
     import type { Weapon } from '../../types';
     import { diceStates } from '../../states/dice.svelte';
 
-    // Parse weight values from items.json (convert fractions to decimals)
-    function parseWeight(weightStr: string): number {
-        if (!weightStr || weightStr === '') return 0;
-        
-        // Handle fractions
-        if (weightStr === '¼') return 0.25;
-        if (weightStr === '½') return 0.5;
-        if (weightStr === '¾') return 0.75;
-        
-        // Handle numbers
-        const num = parseFloat(weightStr);
-        return isNaN(num) ? 0 : num;
-        
-    }
-
-
-    // Initialize empty arrays if not already set - the modal actions will populate them
-    // No longer using equipmentTable as we use sheetState.equipment directly
-
-    // Modal states are now managed globally through isDialogueOpen
-    
-    // Drag and drop states
-    let dragOverSection = $state(''); // 'equipment', 'weapons', 'armor', or ''
-
-    // Drag and drop handlers
-    function handleDragStart() {
-        // Dragging started - you could add any global logic here
-    }
-
-    function handleDragEnd() {
-        dragOverSection = '';
-    }
 
     // Calculate total weight from equipment items
     const totalWeight = $derived(() => {
@@ -60,38 +28,52 @@
     });
 
 
-    // Generate variants for visual variety
-    const equipmentVariants = $derived(generateUniqueVariants(sheetState.equipment.length + 1));
-    const weaponVariants = $derived(generateUniqueVariants(sheetState.weapons.length + 1));
-    const armorVariants = $derived(generateUniqueVariants(sheetState.armor.length + 1));
-    
-    // Special variant for the draggable add item
-    const addItemVariant = 'variant-6'; // Using a vibrant variant for the add item
-
     // Confirmation modal state for weapons
-    let weaponConfirmationOpen = $state(false);
-    let weaponToDelete = $state<string | null>(null);
-    let weaponNameToDelete = $state<string>("");
+    let weaponConfirmationOpen = $state({
+        open: false,
+        weaponToDelete: null as string | null,
+        weaponNameToDelete: ''
+    });
+
+    // Confirmation modal state for equipment
+    let equipmentConfirmationOpen = $state({
+        open: false,
+        itemToDelete: null as string | null,
+        itemNameToDelete: ''
+    });
+
+
+    // confirmation modal state for armor
+    let armorConfirmState = $state({
+        open: false,
+        armorToDelete: null as string | null,
+        armorNameToDelete: ''
+    });
+
+    let minSizeForEquipment = $state({
+        width: 350,
+        height: (sheetState.equipment.length > 0 ? sheetState.equipment.length * 100 : 100) + 50
+    });
 
     function requestDeleteWeapon(weaponId: string, weaponName: string) {
-        weaponToDelete = weaponId;
-        weaponNameToDelete = weaponName;
-        weaponConfirmationOpen = true;
+        weaponConfirmationOpen.weaponToDelete = weaponId;
+        weaponConfirmationOpen.weaponNameToDelete = weaponName;
+        weaponConfirmationOpen.open = true;
     }
 
 
 
     function confirmDeleteWeapon() {
-        if (weaponToDelete) {
-            characterActions.removeWeapon(weaponToDelete);
-            weaponToDelete = null;
-            weaponNameToDelete = "";
+        if (weaponConfirmationOpen.weaponToDelete) {
+            characterActions.removeWeapon(weaponConfirmationOpen.weaponToDelete);
+            weaponConfirmationOpen.weaponToDelete = null;
+            weaponConfirmationOpen.weaponNameToDelete = "";
         }
     }
 
     function cancelDeleteWeapon() {
-        weaponToDelete = null;
-        weaponNameToDelete = "";
+        weaponConfirmationOpen.weaponToDelete = null;
+        weaponConfirmationOpen.weaponNameToDelete = "";
     }
 
     function rollForWeapon(weaponIndex: number) {
@@ -185,6 +167,21 @@
         `;
         openInfoModal(armor.name || 'Rustning', content, 'armor');
     }
+
+
+    $effect(() => {
+        // Ensure the initial card positions are set
+        sheetState.equipment.length;
+        sheetState.weapons.length;
+        sheetState.armor.length;
+        minSizeForEquipment = {
+            width: 350,
+            height: (sheetState.equipment.length > 0 ? sheetState.equipment.length * 50 : 100) + 70 // Adjust height based on number of items
+        };
+
+    });
+
+
 </script>
 
 <EquipmentModal />
@@ -213,7 +210,7 @@
     resizable={true}
     autoResize={true}
     initialSize={{ width: 450, height: 100 }}
-    minSize={{ width: 350, height: 100 }}
+    minSize={minSizeForEquipment}
     initialPosition={initialCardPositions["equipment"]}
     class=""
 >
@@ -455,9 +452,9 @@
 
 <!-- Weapon Confirmation Modal -->
 <ConfirmationModal 
-    bind:open={weaponConfirmationOpen}
+    bind:open={weaponConfirmationOpen.open}
     title="Ta bort vapen"
-    message={`Är du säker på att du vill ta bort vapnet "${weaponNameToDelete}"?`}
+    message={`Är du säker på att du vill ta bort vapnet "${weaponConfirmationOpen.weaponNameToDelete}"?`}
     confirmText="Ta bort"
     cancelText="Avbryt"
     onConfirm={confirmDeleteWeapon}

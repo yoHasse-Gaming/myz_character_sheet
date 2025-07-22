@@ -7,13 +7,19 @@
     import { initInteractForElement } from '../../../utils/interactjsUtils';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import { Tooltip } from '@skeletonlabs/skeleton-svelte';
-    import { Dices, Info, PlusCircle } from '@lucide/svelte';
+    import { Circle, CircleX, Dices, Info, PlusCircle } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
+    import ConfirmationModal from '../../Modals/ConfirmationModal.svelte';
 
     const { startPosition = { x: 1020, y: 20 } }: {
         startPosition?: { x: number, y: number }
     } = $props();
+
+    let confirmState = $state({
+        confirmationOpen: false,
+        skillNameToDelete: ''
+    });
 
     // Generate unique variants for skill items to make them look different
     const skillVariants = generateUniqueVariants(sheetState.skills.length + sheetState.optionalSkills.length);
@@ -113,10 +119,6 @@
     function handleOptionalSkillChange(skillId: string, value: number) {
         characterActions.setOptionalSkillValue(skillId, value);
     }
-    
-    function removeOptionalSkill(skillId: string) {
-        characterActions.removeOptionalSkill(skillId);
-    }
 
     // Function to roll dice for a regular skill
     function rollForSkill(skillIndex: number) {
@@ -156,12 +158,20 @@
             
         );
     }
+    $effect(() => {
+        // Update min size when skills change
+        sheetState.skills.length;
+        sheetState.optionalSkills.length;
+        skillsMinSize = { width: 300, height: (35 + sheetState.skills.length * 35 + sheetState.optionalSkills.length * 35) || 300 };
+        
+    });
 
     // Calculate min size based on the number of skills
-    let skillsMinSize = $derived({
+    let skillsMinSize = $state({ // TODO: This isn't reactive, needs to be updated on skill changes
         width: 300,
-        height: (50 + sheetState.skills.length * 35)
+        height: (35 + sheetState.skills.length * 35 + sheetState.optionalSkills.length * 35) || 300
     });
+
 
 </script>
 
@@ -173,7 +183,7 @@
             resizable={false}
             initialPosition={startPosition}
             initialSize={skillsMinSize}
-            bind:minSize={skillsMinSize}
+            minSize={skillsMinSize}
             class="p-2 pt-3"
         >
 
@@ -305,14 +315,11 @@
                             placeholder="0"
                         />
                         <button
-                            class="remove-skill-button"
-                            onclick={() => removeOptionalSkill(skill.id)}
+                            class="remove-button"
+                            onclick={() => { confirmState.confirmationOpen = true; confirmState.skillNameToDelete = skill.name }}
                             aria-label="Ta bort {skill.name}"
                         >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
+                            <CircleX size={16} />
                         </button>
                     </div>
                 </div>
@@ -322,13 +329,22 @@
 
     </PaperCard>
 
-
-    <!-- Optional Skills -->
-
-
-<!-- Optional Skills Modal -->
-<!-- Remove the modal from here since it's now in the layout -->
-<!-- <OptionalSkillsModal bind:isOpen={isOptionalSkillsModalOpen} /> -->
+<!-- Confirmation Modal -->
+<ConfirmationModal 
+    bind:open={confirmState.confirmationOpen}
+    title="Ta bort färdighet"
+    message={`Är du säker på att du vill ta bort färdigheten "${confirmState.skillNameToDelete}"?`}
+    confirmText="Ta bort"
+    cancelText="Avbryt"
+    onConfirm={() => {
+        characterActions.removeOptionalSkill(confirmState.skillNameToDelete);
+        confirmState.confirmationOpen = false;
+    }}
+    onCancel={() => {
+        confirmState.confirmationOpen = false;
+        confirmState.skillNameToDelete = '';
+    }}
+/>
 
 <style>
 
@@ -400,29 +416,6 @@
     .skill-input:focus {
         outline: none;
     }
-
-    .remove-skill-button {
-        padding: 0.2rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-error-500);
-        background: transparent;
-        color: var(--color-error-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-        width: 1.5rem;
-        height: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .remove-skill-button:hover {
-        background: var(--color-error-600);
-        color: white;
-        transform: scale(1.1);
-    }
-
 
 
     /* Modal content styling */

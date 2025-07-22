@@ -32,7 +32,7 @@
                 characterActions.removeOptionalSkill(sheetState.optionalSkills[0].id);
             }
             const selectedSkill: OptionalSkill = skill;
-            characterActions.addOptionalSkill(selectedSkill);
+            sheetState.optionalSkills.push(selectedSkill);
             // Automatically close the modal after selection
             setTimeout(() => closeModal(), 500);
         }

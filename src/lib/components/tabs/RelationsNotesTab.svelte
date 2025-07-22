@@ -22,11 +22,12 @@
     }
 
     function confirmDeleteRelation() {
-        if (relationToDelete) {
-            characterActions.removeRelation(relationToDelete);
-            relationToDelete = null;
-            relationNameToDelete = "";
+        if (!relationToDelete) {
+            return;
         }
+        characterActions.removeRelation(relationToDelete);
+        relationToDelete = null;
+        relationNameToDelete = "";
     }
 
     function cancelDeleteRelation() {
@@ -34,9 +35,17 @@
         relationNameToDelete = "";
     }
 
-    let minSizeForAdditionalRelations = $derived({
+    $effect(() => {
+        sheetState.additionalRelations.length;
+        minSizeForAdditionalRelations = {
+            width: 300,
+            height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100)
+        };
+    });
+
+    let minSizeForAdditionalRelations = $state({
         width: 300,
-        height: Math.max(sheetState.additionalRelations.length * 100, 100)
+        height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100)
     });
 
 </script>
@@ -53,14 +62,14 @@
             >
                     {#snippet header()}
     <span>Viktiga Relationer</span>
-        <button 
+        <!-- <button 
             class="add-item-button"
             onclick={() => sheetState.additionalRelations.push({ id: crypto.randomUUID(), name: '', description: '', isClose: false })}
             aria-label="Lägg till ny relation"
             title="Lägg till ny relation"
         >
             <PlusCircle size={16} />
-        </button>
+        </button> -->
     {/snippet}
             {#snippet content()}
             
@@ -89,13 +98,13 @@
                         >
                             <HeartHandshake size={16} fill={relation.isClose ? 'red' : 'none'} />
                         </button>
-                        <button 
+                        <!-- <button 
                             class="remove-button" 
                             onclick={() => requestDeleteRelation(relation.id, relation.name)}
                             aria-label="Ta bort relation {relation.name}"
                         >
                             <CircleX size={16} />
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 <textarea
@@ -117,8 +126,8 @@
     paperId={`additional-relations`}
     draggable={true}
     resizable={true}
-    initialSize={{ width: 450, height: Math.max(sheetState.additionalRelations.length * 100, 100) }}
-    bind:minSize={minSizeForAdditionalRelations}
+    initialSize={{ width: 450, height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100) }}
+    minSize={minSizeForAdditionalRelations}
     initialPosition={initialCardPositions["relations-additional"]}
     class="p-2"
 >
@@ -150,14 +159,6 @@
                     />
                 </div>
                 <div class="relation-controls">
-                    <button
-                        class="close-button {relation.isClose ? 'active' : ''}"
-                        onclick={() => characterActions.updateRelation(relation.id, { isClose: !relation.isClose })}
-                        aria-label="Markera som {relation.isClose ? 'vanlig' : 'nära'} relation"
-                        title={relation.isClose ? 'Nära relation' : 'Vanlig relation'}
-                    >
-                        <Handshake size={16} fill={relation.isClose ? 'red' : 'none'} />
-                    </button>
                     <button
                         class="remove-button"
                         onclick={() => requestDeleteRelation(relation.id, relation.name)}

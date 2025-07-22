@@ -71,11 +71,8 @@
             </div>
             
             <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick={handleCancel}>
-                    {cancelText}
-                </button>
                 <div class="torn-paper-wrapper variant-5 btn-wrapper">
-                    <button type="button" class="btn-primary btn-danger" onclick={handleConfirm}>
+                    <button type="button" class="btn-primary " onclick={handleConfirm}>
                         {confirmText}
                     </button>
                 </div>
@@ -92,17 +89,23 @@
     .modal-message {
         text-align: center;
         padding: 1rem 0;
+        
     }
+
+    .btn-primary {}
 
     .modal-message p {
         font-size: 1.1rem;
         color: var(--color-surface-800);
         margin: 0;
         line-height: 1.5;
+        position: relative;
+        z-index: 103;
+        
     }
 
     :global(.dark) .modal-message p {
-        color: var(--color-surface-200);
+        color: var(--color-surface-100);
     }
 
     .modal-actions {

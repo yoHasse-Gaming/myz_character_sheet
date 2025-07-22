@@ -358,9 +358,22 @@ export const characterActions = {
     
     removeRelation(relationId: string) {
         const index = sheetState.relations.findIndex(r => r.id === relationId);
+        const additionalIndex = sheetState.additionalRelations.findIndex(r => r.id === relationId);
+
+        if (index === -1 && additionalIndex === -1) {
+            return;
+        }
+
         if (index !== -1) {
             sheetState.relations.splice(index, 1);
+            return;
         }
+
+        if (additionalIndex !== -1) {
+            sheetState.additionalRelations.splice(additionalIndex, 1);
+            return;
+        }
+
     },
 
     updateRelation(relationId: string, updates: Partial<RPRelation>) {

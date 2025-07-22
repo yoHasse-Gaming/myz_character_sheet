@@ -14,7 +14,7 @@
         dragHandle = '',
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
-        minSize = $bindable({ width: 250, height: 80 }),
+        minSize = { width: 250, height: 80 },
         maxSize = undefined,
         header = undefined,
         HeaderIcon = undefined,
@@ -46,9 +46,15 @@
 
     // TODO: maybe add $effect and look for ANY change to character sheet state.
 
-    onMount(() => {
+    $effect(() => {
+        // Ensure the paperId is unique and valid
+        minSize;
+        paperElement.style.setProperty('--min-width', `${minSize.width}px`);
+        paperElement.style.setProperty('--min-height', `${minSize.height}px`);
 
-        console.log("Minsize exists?", minSize, paperId);
+    });
+
+    onMount(() => {
         if (paperElement) {
             // Initialize InteractJS for draggable and resizable functionality
             if (draggable || resizable) {

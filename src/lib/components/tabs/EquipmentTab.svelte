@@ -8,7 +8,7 @@
     import NewEquipmentModal from '../Modals/NewEquipmentModal.svelte';
     import NewWeaponModal from '../Modals/NewWeaponModal.svelte';
     import { openInfoModal } from '../../states/modals.svelte';
-    import { Backpack, BowArrow, Dices, Grab, Hand, Info, ShieldHalf, Swords } from '@lucide/svelte';
+    import { Backpack, BowArrow, CircleX, Dices, Grab, Hand, Info, ShieldHalf, Swords } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
     import type { Weapon } from '../../types';
@@ -52,8 +52,11 @@
         const total = sheetState.equipment.reduce((sum, item) => 
             sum + (item.quantity * item.weight), 0
         );
+        const weaponTotal = sheetState.weapons.reduce((sum, weapon) => 
+            sum + (1), 0 // TODO: update to weapon.weight when available
+        );
         console.log('Total weight calculated:', total, 'from items:', sheetState.equipment);
-        return total;
+        return total + weaponTotal;
     });
 
 
@@ -75,6 +78,8 @@
         weaponNameToDelete = weaponName;
         weaponConfirmationOpen = true;
     }
+
+
 
     function confirmDeleteWeapon() {
         if (weaponToDelete) {
@@ -202,225 +207,216 @@
     /> -->
 
     <!-- Equipment Section -->
-{#if sheetState.equipment.length > 0}
-            <PaperCard
-                paperId={`equipment`}
-                draggable={true}
-                resizable={false}
-                minSize={{ width: 250, height: 60 }}
-                initialPosition={initialCardPositions["equipment"]}
-                class="p-2 pt-3"
-            >
-                {#snippet content()}
-        {#each sheetState.equipment as item, index}
+<PaperCard
+    paperId={`equipment`}
+    draggable={true}
+    resizable={true}
+    autoResize={true}
+    initialSize={{ width: 450, height: 100 }}
+    minSize={{ width: 350, height: 100 }}
+    initialPosition={initialCardPositions["equipment"]}
+    class=""
+>
 
-                    <div class="equipment-content">
-                        <Backpack size={16} />
+    {#snippet content()}
+    <span class="field-label">Utrustning - Total vikt: {totalWeight()} kg</span>
+{#each sheetState.equipment as item, index}
+
+        <div class="equipment-content">
+            <Backpack size={16} />
+            <input 
+                type="text" 
+                class="equipment-name-input"
+                bind:value={item.name}
+                placeholder="Utrustnings namn"
+                title="Utrustnings namn"
+            />
+            <input
+                    type="number"
+                    min="1"
+                    class="equipment-quantity"
+                    bind:value={item.quantity}
+                    title="Antal"
+                />
+            <div class="equipment-controls">
+                <button 
+                    class="info-icon-button"
+                    onclick={() => showEquipmentInfo(item)}
+                    aria-label="Information om {item.name}"
+                    title="Visa information om {item.name}"
+                >
+                    <Info size={16} />
+                </button>
+
+                <button 
+                    class="remove-button" 
+                    onclick={() => characterActions.removeEquipment(item.id)}
+                    aria-label="Ta bort vapen {item.name}"
+                >
+                    <CircleX size={16} />
+                </button>
+            </div>
+        </div>
+
+{/each}
+            {/snippet}
+</PaperCard>
+<!-- Weapons Section -->
+<PaperCard
+        paperId={`weapons`}
+        draggable={true}
+        resizable={false}
+        initialPosition={initialCardPositions["weapons"]}
+        minSize={{ width: 450, height: 100 }}
+    >
+{#snippet content()}
+<span>Vapen</span>
+
+{#each sheetState.weapons as weapon, index}
+
+            <div class="weapon-content">
+                <div class="weapon-header">
+                    <div class="weapon-name-section">
+                        {#if weapon.type === 'MELEE'}
+                        <Swords size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
+                        {:else}
+                        <BowArrow size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
+                        {/if}
                         <input 
                             type="text" 
-                            class="equipment-name-input"
-                            bind:value={item.name}
-                            placeholder="Utrustnings namn"
-                            title="Utrustnings namn"
+                            class="weapon-name-input"
+                            bind:value={weapon.name}
+                            placeholder="Vapens namn"
+                            title="Vapens namn"
                         />
-                        <input
-                                type="number"
-                                min="1"
-                                class="equipment-quantity"
-                                bind:value={item.quantity}
-                                title="Antal"
-                            />
-                        <div class="equipment-controls">
-                            <button 
-                                class="info-icon-button"
-                                onclick={() => showEquipmentInfo(item)}
-                                aria-label="Information om {item.name}"
-                                title="Visa information om {item.name}"
-                            >
-                                <Info size={16} />
-                            </button>
-
-                            <button
-                                class="remove-equipment-button"
-                                onclick={() => characterActions.removeEquipment(item.id)}
-                                aria-label="Ta bort {item.name}"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
                     </div>
+                    <div class="weapon-controls">
+                        <button 
+                            class="equipped-button {weapon.equipped ? 'active' : ''}"
+                            onclick={() => weapon.equipped = !weapon.equipped}
+                            aria-label="Markera som {weapon.equipped ? 'inte utrustad' : 'utrustad'}"
+                            title={weapon.equipped ? 'Utrustad' : 'Inte utrustad'}
+                        >
+                            {#if weapon.equipped}
+                                <Grab size={16} color="#22c55e" />
+                            {:else}
+                                <Hand size={16} />
+                            {/if}
+                        </button>
+                        {#if diceStates.isDicePluginAvailable}
+                            <button 
+                                class="dice-roll-button"
+                                onclick={() => rollForWeapon(index)}
+                                aria-label="Slå tärning för {weapon.name}"
+                                title="Slå tärning för {weapon.name}"
+                            >
+                                <Dices />
+                            </button>
+                        {/if}
+                        <button 
+                            class="info-icon-button"
+                            onclick={() => showWeaponInfo(weapon)}
+                            aria-label="Information om {weapon.name}"
+                            title="Visa information om {weapon.name}"
+                        >
+                            <Info size={16} />
+                        </button>
+                        <button 
+                            class="remove-button" 
+                            onclick={() => requestDeleteWeapon(weapon.id, weapon.name)}
+                            aria-label="Ta bort vapen {weapon.name}"
+                        >
+                            <CircleX size={16} />
+                        </button>
+                    </div>
+                </div>
+                <div class="weapon-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Bonus:</span>
+                        <input 
+                            type="number" 
+                            min="0" 
+                            max="10"
+                            class="stat-input"
+                            bind:value={weapon.bonus}
+                            title="Vapens bonusmodifikator"
+                        />
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Skada:</span>
+                        <input 
+                            type="number" 
+                            min="1" 
+                            max="20"
+                            class="stat-input"
+                            bind:value={weapon.damage}
+                            title="Vapens skada"
+                        />
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Räckvidd:</span>
+                        <select 
+                            class="stat-select"
+                            bind:value={weapon.range}
+                            title="Vapens räckvidd"
+                        >
+                            <option value={0}>Närstrid</option>
+                            <option value={1}>Nära</option>
+                            <option value={2}>Kort</option>
+                            <option value={3}>Lång</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        {/each}
-                        {/snippet}
-            </PaperCard>
-{/if}
-{#if sheetState.weapons.length > 0}
-        <!-- Weapons Section -->
-            <PaperCard
-                    paperId={`weapons`}
-                    draggable={true}
-                    resizable={false}
-                    initialPosition={initialCardPositions["weapons"]}
-                    minSize={{ width: 400, height: 80 }}
-                >
-            {#snippet content()}
+{/each}
+    {/snippet}
+</PaperCard>
 
-            {#each sheetState.weapons as weapon, index}
-
-                        <div class="weapon-content">
-                            <div class="weapon-header">
-                                <div class="weapon-name-section">
-                                    {#if weapon.type === 'MELEE'}
-                                    <Swords size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
-                                    {:else}
-                                    <BowArrow size={18} color={weapon.equipped ? "#22c55e" : "currentColor"} />
-                                    {/if}
-                                    <input 
-                                        type="text" 
-                                        class="weapon-name-input"
-                                        bind:value={weapon.name}
-                                        placeholder="Vapens namn"
-                                        title="Vapens namn"
-                                    />
-                                </div>
-                                <div class="weapon-controls">
-                                    <button 
-                                        class="equipped-button {weapon.equipped ? 'active' : ''}"
-                                        onclick={() => weapon.equipped = !weapon.equipped}
-                                        aria-label="Markera som {weapon.equipped ? 'inte utrustad' : 'utrustad'}"
-                                        title={weapon.equipped ? 'Utrustad' : 'Inte utrustad'}
-                                    >
-                                        {#if weapon.equipped}
-                                            <Grab size={16} color="#22c55e" />
-                                        {:else}
-                                            <Hand size={16} />
-                                        {/if}
-                                    </button>
-                                    {#if diceStates.isDicePluginAvailable}
-                                        <button 
-                                            class="dice-roll-button"
-                                            onclick={() => rollForWeapon(index)}
-                                            aria-label="Slå tärning för {weapon.name}"
-                                            title="Slå tärning för {weapon.name}"
-                                        >
-                                            <Dices />
-                                        </button>
-                                    {/if}
-                                    <button 
-                                        class="info-icon-button"
-                                        onclick={() => showWeaponInfo(weapon)}
-                                        aria-label="Information om {weapon.name}"
-                                        title="Visa information om {weapon.name}"
-                                    >
-                                        <Info size={16} />
-                                    </button>
-                                    <button 
-                                        class="remove-button" 
-                                        onclick={() => requestDeleteWeapon(weapon.id, weapon.name)}
-                                        aria-label="Ta bort vapen {weapon.name}"
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="weapon-stats">
-                                <div class="stat-item">
-                                    <span class="stat-label">Bonus:</span>
-                                    <input 
-                                        type="number" 
-                                        min="0" 
-                                        max="10"
-                                        class="stat-input"
-                                        bind:value={weapon.bonus}
-                                        title="Vapens bonusmodifikator"
-                                    />
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Skada:</span>
-                                    <input 
-                                        type="number" 
-                                        min="1" 
-                                        max="20"
-                                        class="stat-input"
-                                        bind:value={weapon.damage}
-                                        title="Vapens skada"
-                                    />
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Räckvidd:</span>
-                                    <select 
-                                        class="stat-select"
-                                        bind:value={weapon.range}
-                                        title="Vapens räckvidd"
-                                    >
-                                        <option value={0}>Närstrid</option>
-                                        <option value={1}>Nära</option>
-                                        <option value={2}>Kort</option>
-                                        <option value={3}>Lång</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-            {/each}
-                {/snippet}
-            </PaperCard>
-
-{/if}
-{#if sheetState.armor.length > 0}
         <!-- Armor Section -->
-            <PaperCard
-                    paperId={`armors`}
-                    draggable={true}
-                    resizable={false}
-                    initialPosition={initialCardPositions["armors"]}
-                    minSize={{ width: 280, height: 60 }}
-                >
-                    {#snippet content()}    
-            {#each sheetState.armor as armor, index}
+<PaperCard
+        paperId={`armors`}
+        draggable={true}
+        resizable={false}
+        initialPosition={initialCardPositions["armors"]}
+        minSize={{ width: 450, height: 100 }}
+    >
+        {#snippet content()}    
+        <span class="field-label">Rustning</span>
+{#each sheetState.armor as armor, index}
 
-                        <div class="armor-content">
-                            <ShieldHalf size={16} />
-                            <span class="armor-name">{armor.name || 'Rustning'}</span>
-                            <div class="armor-controls">
-                                <label class="equipped-checkbox">
-                                    <input 
-                                        type="checkbox" 
-                                        bind:checked={armor.equipped}
-                                    />
-                                    <span class="equipped-label">Utrustad</span>
-                                </label>
-                                <button 
-                                    class="info-icon-button"
-                                    onclick={() => showArmorInfo(armor)}
-                                    aria-label="Information om {armor.name}"
-                                    title="Visa information om {armor.name}"
-                                >
-                                    <Info size={16} />
-                                </button>
-                                <button
-                                    class="remove-armor-button"
-                                    onclick={() => characterActions.removeArmor(armor.id)}
-                                    aria-label="Ta bort {armor.name}"
-                                >
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+            <div class="armor-content">
+                <ShieldHalf size={16} />
+                <span class="armor-name">{armor.name || 'Rustning'}</span>
+                <div class="armor-controls">
+                    <label class="equipped-checkbox">
+                        <input 
+                            type="checkbox" 
+                            bind:checked={armor.equipped}
+                        />
+                        <span class="equipped-label">Utrustad</span>
+                    </label>
+                    <button 
+                        class="info-icon-button"
+                        onclick={() => showArmorInfo(armor)}
+                        aria-label="Information om {armor.name}"
+                        title="Visa information om {armor.name}"
+                    >
+                        <Info size={16} />
+                    </button>
+                    <button
+                        class="remove-button"
+                        onclick={() => characterActions.removeArmor(armor.id)}
+                        aria-label="Ta bort {armor.name}"
+                    >
+                        <CircleX size={16} />
+                    </button>
+                </div>
+            </div>
 
-            {/each}
-                {/snippet}
-        </PaperCard>
-{/if}
+{/each}
+    {/snippet}
+</PaperCard>
 
 <!-- Drag Overlay -->
 
@@ -452,6 +448,7 @@
     .equipment-content {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 0.5rem;
         width: 100%;
     }
@@ -647,41 +644,5 @@
         color: var(--color-success-300);
     }
 
-    .remove-button {
-        padding: 0.25rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-error-500);
-        background: transparent;
-        color: var(--color-error-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        pointer-events: auto;
-    }
 
-    .remove-button:hover {
-        background: var(--color-error-600);
-        color: white;
-        transform: scale(1.1);
-    }
-
-    .remove-equipment-button, 
-    .remove-armor-button {
-        padding: 2px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--color-danger);
-        opacity: 0.7;
-        transition: opacity 0.2s;
-        pointer-events: auto;
-    }
-
-    .remove-equipment-button:hover, 
-    .remove-armor-button:hover {
-        opacity: 1;
-    }
 </style>

@@ -133,10 +133,9 @@
 <PaperCard 
     paperId="mutation-points"
     variant="variant-1"
-    class="mutation-points-floating-container"
     draggable={true}
     resizable={false}
-    minSize={{ width: 300, height: 100 }}
+    minSize={{ width: 200, height: 60 }}
     initialPosition={initialCardPositions["mutation-points"]}
 > 
 
@@ -157,12 +156,12 @@
                     aria-label="Toggle mutation point {idx + 1}"
                 >
 
-                        <Circle size={30} 
+                        <Circle size={22} 
                             color={sheetState.mutationPoints > idx ? 'var(--color-primary-300)' : 'var(--color-surface-200)'}
                         />
                     <!-- <img src='/img/strokes/o.svg' alt="No points" class="stroke-image circle-layer" /> -->
                     {#if sheetState.mutationPoints > idx}
-                        <Radiation size={16} fill="var(--color-primary-300)" color="var(--color-primary-300)" />
+                        <Radiation size={12} fill="var(--color-primary-300)" color="var(--color-primary-300)" />
                     {/if}
                 </button>
             {/each}

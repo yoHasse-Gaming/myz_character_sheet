@@ -47,8 +47,9 @@
     initialPosition={initialCardPositions["base-abilities"]}
     class="p-2 pt-3"
     >
-
     {#snippet content()}
+<span>Egenskaper</span>
+
         {#each sheetState.baseAbilities as ability, index}
 
         <BaseAbility 

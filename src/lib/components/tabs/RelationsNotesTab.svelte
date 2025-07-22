@@ -1,7 +1,7 @@
 <script lang="ts">
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
-    import { HeartHandshake, Notebook, Users } from '@lucide/svelte';
+    import { Circle, CircleX, HeartHandshake, Notebook, Users } from '@lucide/svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
 
     function updateNote(index: number, event: Event) {
@@ -41,11 +41,13 @@
                 paperId={`relations`}
                 autoResize={true}
                 resizable={true}
-                minSize={{ width: 300, height: 110 }}
+                initialSize={{ width: 450, height: 640 }}
+                minSize={{ width: 300, height: 500 }}
                 initialPosition={initialCardPositions["relations-start"]}
                 class="p-2"
             >
             {#snippet content()}
+            <span>Relations</span>
         {#each sheetState.relations as relation, index}
 
             <div class="compact-textarea-field">
@@ -76,10 +78,7 @@
                             onclick={() => requestDeleteRelation(relation.id, relation.name)}
                             aria-label="Ta bort relation {relation.name}"
                         >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
+                            <CircleX size={16} />
                         </button>
                     </div>
                 </div>
@@ -116,10 +115,7 @@
                             onclick={() => characterActions.removeNote(index)}
                             aria-label="Ta bort anteckning #{index + 1}"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
+                            <CircleX size={16} />
                         </button>
                     </div>
                     <textarea 
@@ -275,26 +271,6 @@
         outline: none;
         background: rgba(217, 119, 6, 0.05);
         border-radius: 0.25rem;
-    }
-
-    .remove-button {
-        padding: 0.25rem;
-        border-radius: 50%;
-        border: 1px solid var(--color-error-500);
-        background: transparent;
-        color: var(--color-error-600);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .remove-button:hover {
-        background: var(--color-error-600);
-        color: white;
-        transform: scale(1.1);
     }
 
     /* Responsive adjustments */

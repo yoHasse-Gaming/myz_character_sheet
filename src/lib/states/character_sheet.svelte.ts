@@ -1,27 +1,26 @@
 import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType, AbilityType } from '../types';
 import type { LayoutType } from '../utils/interactjsUtils';
-import { useOwlbearSync } from '../utils/owlbearIntegration';
 import skills from '../data/skills.json';
 import { openDiceRollModal } from '../states/modals.svelte';
 
 // Main character data interface - this is the primary type for the entire app
 
 export const initialCardPositions: Record<string, { x: number; y: number }> = {
-    "character-basic-info": { x: 340, y: 20 },
-    "character-looks": { x: 650, y: 20 },
-    "character-dream": { x: 1150, y: 20 },
+    "character-basic-info": { x: 10, y: 20 },
+    "character-looks": { x: 640, y: 10 },
+    "character-dream": { x: 640, y: 320 },
     "experience-points": { x: 20, y: 600 },
-    "conditions": { x: 20, y: 215 },
-    "base-abilities": { x: 20, y: 20 },
-    "skills-core": { x: 330, y: 120 },
+    "conditions": { x: 10, y: 340 },
+    "base-abilities": { x: 10, y: 120 },
+    "skills-core": { x: 320, y: 10 },
     "mutations": { x: 20, y: 20 },
     "mutation-points": { x: 0, y: 710 },
-    "equipment": { x: 20, y: 20 },
-    "armors": { x: 20, y: 20 },
-    "weapons": { x: 20, y: 20 },
+    "equipment": { x: 570, y: 500 },
+    "armors": { x: 570, y: 610 },
+    "weapons": { x: 570, y: 720 },
     "talents": { x: 20, y: 20 },
     // Relations positioning (base position for stacking)
-    "relations-start": { x: 1100, y: 175 },
+    "relations-start": { x: 1035, y: 10 },
     // Notes positioning (base position for stacking)
     "notes-start": { x: 20, y: 20 },
 };

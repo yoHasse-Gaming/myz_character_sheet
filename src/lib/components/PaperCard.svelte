@@ -42,7 +42,7 @@
     let contentElement: HTMLElement;
 
     // Generate a variant if none provided
-    const cardVariant = variant || generateUniqueVariants(1)[0];
+    const cardVariant = variant || 'variant-1';
 
     // TODO: maybe add $effect and look for ANY change to character sheet state.
 

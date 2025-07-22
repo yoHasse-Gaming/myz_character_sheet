@@ -65,7 +65,7 @@
 <PaperCard 
     paperId="character-looks"
     initialPosition={initialCardPositions["character-looks"]}
-    minSize={{ width: 260, height: 300 }}
+    minSize={{ width: 450, height: 300 }}
     resizable={true}
     autoResize={true}
     class="p-2"
@@ -105,7 +105,7 @@
     <PaperCard
         paperId="character-dream"
         initialPosition={initialCardPositions["character-dream"]}
-        minSize={{ width: 300, height: 100 }}
+        minSize={{ width: 450, height: 100 }}
         resizable={true}
         autoResize={true}
     >
@@ -125,10 +125,9 @@
     <PaperCard 
         paperId="experience-points"
         variant="variant-1"
-        class="experience-points-floating-container"
         draggable={true}
         resizable={false}
-        minSize={{ width: 300, height: 100 }}
+        minSize={{ width: 200, height: 60 }}
         initialPosition={initialCardPositions["experience-points"]}
     > 
     {#snippet content()}
@@ -146,11 +145,11 @@
                         }}
                         aria-label="Toggle experience point {idx + 1}"
                     >
-                        <Circle size={30} 
+                        <Circle size={22} 
                             color={sheetState.experiencePoints > idx ? 'var(--color-primary-800)' : 'var(--color-surface-200)'}
                         />
                         {#if sheetState.experiencePoints > idx}
-                            <Award size={18}
+                            <Award size={12}
 
                                 color='var(--color-primary-800)'
                             />
@@ -171,25 +170,12 @@
     .compact-field {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.25rem;
         padding: 0.25rem;
         min-height: 2rem;
     }
 
-    .field-label {
-        font-family: var(--font-user), serif;
-        font-weight: bold;
-        font-size: 0.8rem;
-        letter-spacing: 0.05em;
-        color: var(--color-surface-900);
-        text-transform: uppercase;
-        flex-shrink: 0;
-        min-width: 60px;
-    }
 
-    :global(.dark) .field-label {
-        color: var(--color-surface-100);
-    }
 
     .compact-input {
         width: 100%;

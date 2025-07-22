@@ -7,8 +7,8 @@
     import ArmorModal from '../Modals/ArmorModal.svelte';
     import NewEquipmentModal from '../Modals/NewEquipmentModal.svelte';
     import NewWeaponModal from '../Modals/NewWeaponModal.svelte';
-    import { openInfoModal } from '../../states/modals.svelte';
-    import { Backpack, BowArrow, CircleX, Dices, Grab, Hand, Info, ShieldHalf, Swords } from '@lucide/svelte';
+    import { openDialogueOption, openInfoModal } from '../../states/modals.svelte';
+    import { Backpack, BowArrow, CirclePlus, CircleX, Dices, Grab, Hand, Info, PlusCircle, ShieldHalf, Swords } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
     import type { Weapon } from '../../types';
@@ -217,9 +217,20 @@
     initialPosition={initialCardPositions["equipment"]}
     class=""
 >
-
+    {#snippet header()}
+    <span>Utrustning 
+        - Total vikt: {totalWeight()}</span>
+        <button 
+            class="add-item-button"
+            onclick={() => openDialogueOption('equipment')}
+            aria-label="Lägg till ny utrustning"
+            title="Lägg till ny utrustning"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
     {#snippet content()}
-    <span class="field-label">Utrustning - Total vikt: {totalWeight()} kg</span>
+
 {#each sheetState.equipment as item, index}
 
         <div class="equipment-content">
@@ -267,10 +278,21 @@
         draggable={true}
         resizable={false}
         initialPosition={initialCardPositions["weapons"]}
-        minSize={{ width: 450, height: 100 }}
+        minSize={{ width: 350, height: 100 }}
+        initialSize={{ width: 450, height: 100 }}
     >
+    {#snippet header()}
+    <span >Vapen</span>
+        <button 
+            class="add-item-button"
+            onclick={() => openDialogueOption('weapons')}
+            aria-label="Lägg till ny utrustning"
+            title="Lägg till ny utrustning"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
 {#snippet content()}
-<span>Vapen</span>
 
 {#each sheetState.weapons as weapon, index}
 
@@ -379,10 +401,21 @@
         draggable={true}
         resizable={false}
         initialPosition={initialCardPositions["armors"]}
-        minSize={{ width: 450, height: 100 }}
+        initialSize={{ width: 450, height: 100 }}
+        minSize={{ width: 350, height: 100 }}
     >
+        {#snippet header()}
+    <span >Rustning</span>
+        <button 
+            class="add-item-button"
+            onclick={() => openDialogueOption('armor')}
+            aria-label="Lägg till ny utrustning"
+            title="Lägg till ny utrustning"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
         {#snippet content()}    
-        <span class="field-label">Rustning</span>
 {#each sheetState.armor as armor, index}
 
             <div class="armor-content">

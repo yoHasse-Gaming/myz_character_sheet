@@ -2,6 +2,7 @@
 
 ## High Priority Fixes
 * [ ] Fix paper card positioning - prevent spread across entire screen
+* [ ] Fix card resizing issues, it suddenly resizes when manually resizing so the height suddenly jumps to another value than when added a new item.
 * [x] Move add item button to always be sticky on the right side of screen
 * [ ] Fix drop zone positioning and calculation for new items
 * [ ] Update card default/starting positions to look good

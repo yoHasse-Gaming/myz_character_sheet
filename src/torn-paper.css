@@ -113,6 +113,8 @@
     box-shadow: none !important;
 }
 
+
+
 /* NEW: Torn paper input styles with randomization */
 /* Create wrapper for torn paper inputs with randomized backgrounds */
 .torn-paper-wrapper {
@@ -201,6 +203,34 @@
     background-position: 40% 80%;
     transform: rotate(-0.4deg) scale(1.02);
 }
+
+.torn-paper-wrapper.tooltip-wrapper {
+    filter: brightness(0.8) contrast(1.1);
+}
+.torn-paper-wrapper.tooltip-wrapper strong {
+    color: var(--color-primary-600);
+}
+
+.torn-paper-content .tooltip-description {
+    color: var(--color-surface-800);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+
+}
+
+.dark .torn-paper-content .tooltip-description {
+    color: var(--color-surface-100);
+}
+
+.torn-paper-content.tooltip {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    min-width: 120px;
+    position: relative;
+    z-index: 1001;
+    
+}
+
 
 /* Torn input styling */
 .torn-input {
@@ -488,47 +518,6 @@
     width: max-content;
 }
 
-.tooltip-wrapper {
-    position: relative;
-    border-radius: 0.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.tooltip-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('/img/popout_bg.png'); /* Use a torn paper background image */
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: url(#squiggle);
-    border-radius: 0.5rem;
-    z-index: 1;
-}
-
-.dark .tooltip-background {
-    background: url('/img/popout_bg_dark.png'); /* Use a torn paper background image */
-}
-
-.tooltip-content {
-    position: relative;
-    z-index: 2;
-    /* background: rgba(245, 245, 245, 0.95); */
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    line-height: 1.5;
-    font-weight: bold;
-    color: var(--color-surface-800);
-
-}
-
-.dark .tooltip-content {
-    /* background: rgba(26, 26, 26, 0.1); */
-    color: var(--color-surface-100);
-}
 
 /* Torn Paper Button Styling */
 .btn-wrapper {

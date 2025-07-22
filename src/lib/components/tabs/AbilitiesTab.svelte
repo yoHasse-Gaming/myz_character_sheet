@@ -22,27 +22,14 @@
 
 <OptionalSkillsModal />
 
-{#snippet conditionItem(condition: Condition)}
-<div class="condition-item">
-    <span class="condition-label">{condition.label}</span>
-    <button 
-        class="condition-indicator"
-        onclick={() => characterActions.toggleCondition(condition.name)}
-        aria-label={`Toggle ${condition.label.toLowerCase()} tillstånd`}
-    >
-        <img src='/img/strokes/o.svg' alt="Inaktiv" class="stroke-image condition-circle" />
-        {#if sheetState.conditions[condition.name]}
-            <img src='/img/strokes/x.svg' alt="Aktiv" class="stroke-image condition-x" />
-        {/if}
-    </button>
-</div>
-{/snippet}
+
 
 <PaperCard 
     paperId={"base-abilities"}
 
     draggable={true}
     resizable={false}
+    initialSize={{ width: 300, height: 220 }}
     minSize={{ width: 300, height: 80 }}
     initialPosition={initialCardPositions["base-abilities"]}
     class="p-2 pt-3"
@@ -61,6 +48,23 @@
         {/each}
     {/snippet}
 </PaperCard>
+
+
+{#snippet conditionItem(condition: Condition)}
+<div class="condition-item">
+    <span class="condition-label">{condition.label}</span>
+    <button 
+        class="condition-indicator"
+        onclick={() => characterActions.toggleCondition(condition.name)}
+        aria-label={`Toggle ${condition.label.toLowerCase()} tillstånd`}
+    >
+        <img src='/img/strokes/o.svg' alt="Inaktiv" class="stroke-image condition-circle" />
+        {#if sheetState.conditions[condition.name]}
+            <img src='/img/strokes/x.svg' alt="Aktiv" class="stroke-image condition-x" />
+        {/if}
+    </button>
+</div>
+{/snippet}
 
 <PaperCard 
     paperId="conditions"

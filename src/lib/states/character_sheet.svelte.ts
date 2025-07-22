@@ -6,21 +6,22 @@ import { openDiceRollModal } from '../states/modals.svelte';
 // Main character data interface - this is the primary type for the entire app
 
 export const initialCardPositions: Record<string, { x: number; y: number }> = {
-    "character-basic-info": { x: 10, y: 20 },
+    "character-basic-info": { x: 20, y: 10 },
     "character-looks": { x: 640, y: 10 },
     "character-dream": { x: 640, y: 320 },
-    "experience-points": { x: 20, y: 600 },
+    "experience-points": { x: 20, y: 550 },
     "conditions": { x: 10, y: 340 },
-    "base-abilities": { x: 10, y: 120 },
+    "base-abilities": { x: 10, y: 110 },
     "skills-core": { x: 320, y: 10 },
     "mutations": { x: 20, y: 20 },
-    "mutation-points": { x: 0, y: 710 },
+    "mutation-points": { x: 0, y: 640 },
     "equipment": { x: 570, y: 500 },
     "armors": { x: 570, y: 610 },
     "weapons": { x: 570, y: 720 },
     "talents": { x: 20, y: 20 },
     // Relations positioning (base position for stacking)
     "relations-start": { x: 1035, y: 10 },
+    "relations-additional": { x: 1495, y: 10 },
     // Notes positioning (base position for stacking)
     "notes-start": { x: 20, y: 20 },
 };
@@ -70,10 +71,10 @@ export const sheetState: CharacterSheetData = $state({
     dream: "",
     // Base abilities with damage tracking
     baseAbilities: [
-        { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0, type: 'STRENGTH' },
-        { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0, type: 'AGILITY' },
-        { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0, type: 'WITS' },
-        { label: 'Känsla', damageLabel: 'Tvivel', value: 1, damage: 0, type: 'EMPATHY' }
+        { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0, type: 'STRENGTH', description: "Din råa kroppsstyrka. Avgör hur mycket skada du tål. Återhämtas med krubb." },
+        { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0, type: 'AGILITY', description: "Avgör hur kall och kontrollerad du är i livshotande situationer. Avgör hur mycket stress du tål. Återhämtas med vatten." },
+        { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0, type: 'WITS', description: " Intelligens, vaksamhet och sinnesskärpa. Avgör hur mycket förvirring du tål. Återhämtas med sömn." },
+        { label: 'Känsla', damageLabel: 'Tvivel', value: 1, damage: 0, type: 'EMPATHY', description: "Din personliga utstrålning, empati och förmåga att manipulera andra. Avgör hur mycket tvivel du tål. Återhämtas med närhet." }
     ],
     
     // Skills with their values and descriptions

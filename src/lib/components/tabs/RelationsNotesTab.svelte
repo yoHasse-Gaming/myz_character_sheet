@@ -1,8 +1,9 @@
 <script lang="ts">
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
     import PaperCard from '../PaperCard.svelte';
-    import { Circle, CircleX, HeartHandshake, Notebook, Users } from '@lucide/svelte';
+    import { Circle, CircleX, Handshake, HeartHandshake, Notebook, PlusCircle, Users } from '@lucide/svelte';
     import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
+    import { openDialogueOption } from '../../states/modals.svelte';
 
     function updateNote(index: number, event: Event) {
         const target = event.target as HTMLTextAreaElement;
@@ -33,21 +34,36 @@
         relationNameToDelete = "";
     }
 
+    let minSizeForAdditionalRelations = $derived({
+        width: 300,
+        height: Math.max(sheetState.additionalRelations.length * 100, 100)
+    });
+
 </script>
 
 <!-- Relations Section -->
 
-        <PaperCard 
+    <PaperCard 
                 paperId={`relations`}
-                autoResize={true}
                 resizable={true}
                 initialSize={{ width: 450, height: 640 }}
-                minSize={{ width: 300, height: 500 }}
+                minSize={{ width: 300, height: Math.max(sheetState.relations.length * 100, 300) }}
                 initialPosition={initialCardPositions["relations-start"]}
                 class="p-2"
             >
+                    {#snippet header()}
+    <span>Viktiga Relationer</span>
+        <button 
+            class="add-item-button"
+            onclick={() => sheetState.additionalRelations.push({ id: crypto.randomUUID(), name: '', description: '', isClose: false })}
+            aria-label="Lägg till ny relation"
+            title="Lägg till ny relation"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
             {#snippet content()}
-            <span>Relations</span>
+            
         {#each sheetState.relations as relation, index}
 
             <div class="compact-textarea-field">
@@ -95,6 +111,75 @@
         {/each}
             {/snippet}
         </PaperCard>
+
+<!-- Additional relations -->
+<PaperCard 
+    paperId={`additional-relations`}
+    draggable={true}
+    resizable={true}
+    initialSize={{ width: 450, height: Math.max(sheetState.additionalRelations.length * 100, 100) }}
+    bind:minSize={minSizeForAdditionalRelations}
+    initialPosition={initialCardPositions["relations-additional"]}
+    class="p-2"
+>
+    {#snippet header()}
+    <span>Personer jag mött</span>
+    <button 
+        class="add-item-button"
+        onclick={() => sheetState.additionalRelations.push({ id: crypto.randomUUID(), name: 'A', description: 'd', isClose: false })}
+        aria-label="Lägg till ny relation"
+        title="Lägg till ny relation"
+    >
+        <PlusCircle size={16} />
+    </button>
+    {/snippet}
+    {#snippet content()}
+    {#each sheetState.additionalRelations as relation, index}
+        <div class="compact-textarea-field">
+            <div class="relation-header">
+                <div class="relation-name-section">
+                    <Handshake
+                        fill={relation.isClose ? 'red' : 'none'}
+                    />
+                    <input
+                        type="text"
+                        class="relation-name-input font-user"
+                        bind:value={relation.name}
+                        oninput={(e) => characterActions.updateRelation(relation.id, { name: e.currentTarget.value })}
+                        placeholder="Namn på relation"
+                    />
+                </div>
+                <div class="relation-controls">
+                    <button
+                        class="close-button {relation.isClose ? 'active' : ''}"
+                        onclick={() => characterActions.updateRelation(relation.id, { isClose: !relation.isClose })}
+                        aria-label="Markera som {relation.isClose ? 'vanlig' : 'nära'} relation"
+                        title={relation.isClose ? 'Nära relation' : 'Vanlig relation'}
+                    >
+                        <Handshake size={16} fill={relation.isClose ? 'red' : 'none'} />
+                    </button>
+                    <button
+                        class="remove-button"
+                        onclick={() => requestDeleteRelation(relation.id, relation.name)}
+                        aria-label="Ta bort relation {relation.name}"
+                    >
+                        <CircleX size={16} />
+                    </button>
+                </div>
+            </div>
+            <textarea
+                class="compact-textarea font-user"
+                placeholder="Skriv relation här..."
+                bind:value={relation.description}
+                oninput={(e) => characterActions.updateRelation(relation.id, { description: e.currentTarget.value })}
+                rows="2"
+            ></textarea>
+        </div>
+    {/each}
+    {/snippet}
+    </PaperCard>
+    
+
 
 
 <!-- Notes Section -->

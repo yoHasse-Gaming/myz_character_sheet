@@ -113,6 +113,7 @@ export type BaseAbilityType = {
     value: number;
     damage: number;
     type: AbilityType;
+    description: string;
 }
 
 export type MyCharSheet = {

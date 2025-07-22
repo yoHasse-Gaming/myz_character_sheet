@@ -78,16 +78,9 @@
     }
     
     /* Info-specific styles that override common styles if needed */
-    .info-modal-content {
-        position: relative;
-        z-index: 102;
-        max-width: min(90vw, 600px);
-        max-height: min(90vh, 700px);
-        width: 100%;
-    }
-    
+
     .info-modal-container {
-        max-width: min(90vw, 600px);
+        max-width: min(90vw, 800px);
         max-height: min(90vh, 700px);
         width: 100%;
         position: relative;

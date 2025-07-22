@@ -2,7 +2,7 @@
     import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import { fade, scale } from 'svelte/transition';
     import { openInfoModal } from '../../../states/modals.svelte';
-    import { Rating } from '@skeletonlabs/skeleton-svelte';
+    import { Rating, Tooltip } from '@skeletonlabs/skeleton-svelte';
     import { Ban, BicepsFlexed, Bone, Circle, Dices, Info, type Icon as IconType } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
 
@@ -10,6 +10,9 @@
     import { getIconForAbility } from '../../../utils/iconUtils';
     import type { AbilityType, BaseAbilityType } from '../../../types';
     import PaperCard from '../../PaperCard.svelte';
+
+
+    let tooltipStates: Record<string, boolean> = $state({});
     
 
     let { 
@@ -92,11 +95,32 @@
     });
 </script>
 
+    <div class="grid grid-cols-3 content-center">
+            <Tooltip
+                open={tooltipStates[`ability-${abilityIndex}`] || false}
+                onOpenChange={(e) => (tooltipStates[`ability-${abilityIndex}`] = e.open)}
+                positioning={{ placement: 'top' }}
+                contentBase="card preset-filled p-4"
+                openDelay={200}
+                arrow
+            >
+                {#snippet trigger()}            
+                <span class="ability-label content-center">
+                    <AbilityIcon size={20} />
+                    {baseAbility.label}
+                </span>
+            {/snippet}
+                {#snippet content()}
+                    <div class="torn-paper-wrapper tooltip-wrapper">
+                        <div class="torn-paper-content tooltip max-w-100 justify-center align-center">
+                            <strong class="">{baseAbility.label}</strong>
+                            <div class="tooltip-description">{baseAbility.description}</div>
+                        </div>
+                    </div>
+                {/snippet}
+            </Tooltip>
 
 
-    <div class="ability-controls">
-        <AbilityIcon />
-        <span class="ability-label">{baseAbility.label}</span>
         {#if diceStates.isDicePluginAvailable}
             <button 
                 onclick={() => rollForAbility()}
@@ -106,18 +130,11 @@
                 <Dices />
             </button>
         {/if}
-        <button 
-            class="info-icon-button"
-            onclick={showTraumaInfo}
-            aria-label="Information om {baseAbility.damageLabel}"
-            title="Visa information om {baseAbility.damageLabel}"
-        >
-            <Info size={12} />
-        </button>
+
         <input type="number" 
             max="5" 
             min="1" 
-            class="ability-input font-user" 
+            class="ability-input font-user content-center" 
             name={baseAbility.label} 
             value={ability?.value || 1}
             oninput={handleValueChange} />
@@ -126,7 +143,14 @@
         <div class="damage-section">
             <div class="damage-header">
                 <span class="damage-label">{baseAbility.damageLabel}</span>
-
+                <button 
+                    class="info-icon-button"
+                    onclick={showTraumaInfo}
+                    aria-label="Information om {baseAbility.damageLabel}"
+                    title="Visa information om {baseAbility.damageLabel}"
+                >
+                    <Info size={12} />
+                </button>
 
             </div>
             <div class="damage-indicators">
@@ -151,16 +175,8 @@
 
 
 <style>
-    .ability-controls {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.25rem;
-        padding: 0.125rem;
-        flex-wrap: wrap;
-    }
-
     .ability-label {
+        text-align: left;
         font-family: var(--form-labels), serif;
         font-size: 0.8rem;
         font-weight: bold;
@@ -187,7 +203,6 @@
         transition: all 0.2s ease;
         cursor: default;
         position: relative;
-        z-index: 3;
         flex-shrink: 0;
     }
 
@@ -203,42 +218,8 @@
         transform: scale(1.02);
     }
 
-    .dice-roll-button {
-        background: none;
-        border: 1px solid var(--color-primary-500);
-        color: var(--color-primary-600);
-        cursor: pointer;
-        padding: 0.2rem;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        opacity: 0.8;
-        width: 1.75rem;
-        height: 1.75rem;
-    }
-
-    .dice-roll-button:hover {
-        background: var(--color-primary-500);
-        color: white;
-        opacity: 1;
-        transform: scale(1.05);
-    }
-
-    :global(.dark) .dice-roll-button {
-        border-color: var(--color-primary-400);
-        color: var(--color-primary-400);
-    }
-
-    :global(.dark) .dice-roll-button:hover {
-        background: var(--color-primary-400);
-        color: var(--color-surface-900);
-    }
-
     .damage-section {
-        min-width: 80px;
+        min-width: 100px;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -262,7 +243,6 @@
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
         margin: 0;
         position: relative;
-        z-index: 3;
         flex-shrink: 0;
     }
 
@@ -276,7 +256,6 @@
         gap: 0.05rem;
         align-items: center;
         position: relative;
-        z-index: 3;
         flex-shrink: 0;
     }
 
@@ -290,7 +269,6 @@
         background: transparent;
         padding: 0.05rem;
         transition: transform 0.2s ease;
-        z-index: 4;
         width: 1rem;
         height: 1rem;
     }

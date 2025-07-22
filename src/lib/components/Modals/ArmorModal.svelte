@@ -67,6 +67,14 @@
   
   {#snippet content()}
     <div class="armor-modal-content torn-paper-wrapper variant-2 modal-content-wrapper">
+        <button class="modal-close-button"
+            aria-label="Stäng modal" 
+                onclick={closeModal}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
         <div class="modal-header">
             <div class="modal-title-container">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
@@ -74,14 +82,7 @@
                 </svg>
                 <h3 class="modal-title">Lägg till rustning</h3>
             </div>
-            <button class="modal-close-button"
-                    aria-label="Stäng modal" 
-                        onclick={closeModal}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+
             </div>
             <form class="modal-form" onsubmit={(e) => { e.preventDefault(); addArmor(); }}>
                 <div class="form-group">

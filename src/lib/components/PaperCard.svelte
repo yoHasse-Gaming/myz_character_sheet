@@ -11,10 +11,10 @@
         variant = '',
         draggable = true,
         resizable = true,
-        dragHandle = '.paper-header',
+        dragHandle = '',
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
-        minSize = { width: 250, height: 80 },
+        minSize = $bindable({ width: 250, height: 80 }),
         maxSize = undefined,
         header = undefined,
         HeaderIcon = undefined,
@@ -52,7 +52,7 @@
         if (paperElement) {
             // Initialize InteractJS for draggable and resizable functionality
             if (draggable || resizable) {
-                initInteractForElement(paperElement, dragHandle, undefined, {
+                initInteractForElement(paperElement, {
                     enableDraggable: draggable,
                     enableResizable: resizable,
                     minSize: minSize,
@@ -97,6 +97,8 @@
                 //     autoResizePaper(textarea, minSize, maxSize);
                 // });
             }
+            paperElement.style.setProperty('--min-width', `${minSize.width}px`);
+            paperElement.style.setProperty('--min-height', `${minSize.height}px`);
         }
     });
 
@@ -114,16 +116,11 @@
     data-x="0" 
     data-y="0" 
     data-paper-id={paperId}
-    style={
-        minSize ? `min-width: ${minSize.width}px; min-height: ${minSize.height}px;` : ''
-    }
 >
     <div class="paper-content {additionalClasses}" bind:this={contentElement}>
         {#if header}
             <div class="paper-header">
-                <div class="paper-label">
-                    {@render header?.()}
-                </div>
+                {@render header?.()}
             </div>
         {/if}
         
@@ -135,10 +132,6 @@
 
 <style>
     /* Paper card container */
-    :root {
-        --min-width: 250px;
-        --min-height: 120px;
-    }
 
     .paper-card {
         cursor: default;
@@ -149,7 +142,7 @@
         transform: translateZ(0);
         backface-visibility: hidden;
         min-width: var(--min-width, 250px);
-        min-height: var(--min-height, 120px);
+        min-height: var(--min-height, 20px);
         max-width: 450px;
         width: fit-content;
         height: fit-content;
@@ -187,15 +180,6 @@
         justify-content: space-between;
         margin-bottom: 0.75rem;
         padding: 0.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        cursor: move;
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.2s ease;
-        flex-shrink: 0;
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        border-bottom-color: rgba(255, 255, 255, 0.1);
     }
 
     .paper-label {

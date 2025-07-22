@@ -37,7 +37,8 @@
         paperId="character-basic-info"
         initialPosition={initialCardPositions["character-basic-info"]}
         resizable={false}
-        minSize={{ width: 300, height: 50 }}
+        initialSize={{ width: 300, height: 90 }}
+        minSize={{ width: 300, height: 80 }}
         class="p-2"
     >
     {#snippet content()}

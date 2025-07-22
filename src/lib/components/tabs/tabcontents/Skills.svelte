@@ -3,11 +3,11 @@
     import { generateUniqueVariants } from '../../../utils/styleUtils';
     import { sheetState, characterActions } from '../../../states/character_sheet.svelte';
     import DraggableAddItem from '../../DraggableAddItem.svelte';
-    import { openInfoModal } from '../../../states/modals.svelte';
+    import { openDialogueOption, openInfoModal } from '../../../states/modals.svelte';
     import { initInteractForElement } from '../../../utils/interactjsUtils';
     import { getIconForAbility } from '../../../utils/iconUtils';
     import { Tooltip } from '@skeletonlabs/skeleton-svelte';
-    import { Dices, Info } from '@lucide/svelte';
+    import { Dices, Info, PlusCircle } from '@lucide/svelte';
     import { diceStates } from '../../../states/dice.svelte';
     import PaperCard from '../../PaperCard.svelte';
 
@@ -157,6 +157,12 @@
         );
     }
 
+    // Calculate min size based on the number of skills
+    let skillsMinSize = $derived({
+        width: 300,
+        height: (50 + sheetState.skills.length * 35)
+    });
+
 </script>
 
     <!-- Core Skills -->
@@ -166,11 +172,23 @@
             draggable={true}
             resizable={false}
             initialPosition={startPosition}
-            minSize={{ width: 300, height: 60 }}
+            initialSize={skillsMinSize}
+            bind:minSize={skillsMinSize}
             class="p-2 pt-3"
         >
-            {#snippet content()}
-            <span>Skills</span>
+
+    {#snippet header()}
+    <span>Färdigheter</span>
+        <button 
+            class="add-item-button"
+            onclick={() => openDialogueOption('optionalSkills')}
+            aria-label="Lägg till ny relation"
+            title="Lägg till ny relation"
+        >
+            <PlusCircle size={16} />
+        </button>
+    {/snippet}
+        {#snippet content()}
     {#each sheetState.skills as skill, index}
         {@const BaseAbilityIcon = getIconForAbility(skill.baseAbility as any) }
                 <div class="skill-content">
@@ -178,16 +196,18 @@
                         open={tooltipStates[`skill-${index}`] || false}
                         onOpenChange={(e) => (tooltipStates[`skill-${index}`] = e.open)}
                         positioning={{ placement: 'top' }}
-                        triggerBase="underline"
-                        contentBase="card preset-filled p-4 z-1000"
+                        contentBase="card preset-filled p-4 z-1001"
                         openDelay={200}
                         arrow
                     >
                         {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
                         {#snippet content()}
-                            <div class="tooltip-content">
+                            <div class="torn-paper-wrapper tooltip-wrapper">
+                                <div class="torn-paper-content tooltip max-w-100 justify-center align-center">
+                            
                                 <strong>{skill.baseAbility}</strong>
                                 <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                                </div>
                             </div>
                         {/snippet}
                     </Tooltip>
@@ -240,9 +260,12 @@
                     >
                         {#snippet trigger()}<BaseAbilityIcon size={16} />{/snippet}
                         {#snippet content()}
-                            <div class="tooltip-content">
+                            <div class="torn-paper-wrapper tooltip-wrapper">
+                                <div class="torn-paper-content tooltip max-w-100 justify-center align-center">
+                            
                                 <strong>{skill.baseAbility}</strong>
                                 <div class="tooltip-description">Grundegenskap för {skill.name}</div>
+                                </div>
                             </div>
                         {/snippet}
                     </Tooltip>
@@ -400,45 +423,7 @@
         transform: scale(1.1);
     }
 
-    /* Tooltip content styling */
-    .tooltip-content {
-        text-align: center;
-        font-family: var(--font-user), sans-serif;
-        background: var(--color-surface-50);
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--color-surface-200);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        min-width: 120px;
-    }
 
-    .tooltip-content strong {
-        display: block;
-        font-size: 1rem;
-        font-weight: bold;
-        color: var(--color-primary-600);
-        margin-bottom: 0.25rem;
-    }
-
-    .tooltip-description {
-        font-size: 0.8rem;
-        color: var(--color-surface-700);
-        font-style: italic;
-    }
-
-    :global(.dark) .tooltip-content {
-        background: var(--color-surface-800);
-        border-color: var(--color-surface-600);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    :global(.dark) .tooltip-content strong {
-        color: var(--color-primary-400);
-    }
-
-    :global(.dark) .tooltip-description {
-        color: var(--color-surface-300);
-    }
 
     /* Modal content styling */
     .skill-section {

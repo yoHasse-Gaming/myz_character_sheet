@@ -3,8 +3,6 @@ import { characterActions } from "../states/character_sheet.svelte";
 
 export function initInteractForElement(
     element: HTMLElement | string, 
-    headerElem: HTMLElement | string | undefined = undefined,
-    allowFrom: HTMLElement | string | undefined = undefined,
     options: {
         enableDraggable?: boolean;
         enableResizable?: boolean;
@@ -21,7 +19,6 @@ export function initInteractForElement(
     // Apply draggable functionality if enabled
     if (options.enableDraggable) {
         interactElement.draggable({
-            allowFrom: allowFrom, // Use component-specific selector
             listeners: {
                 start: (event) => {
                     // 
@@ -87,7 +84,7 @@ export function initInteractForElement(
                     let y = (parseFloat(target.getAttribute('data-y')) || 0);
 
                     // Calculate minimum height based on content
-                    const minHeight = headerElem ? getMinHeightForContent(target, headerElem, options.minSize, options.maxSize) : (options.minSize?.height || 120); // Default minimum height if no headerElem provided
+                    const minHeight = (options.minSize?.height || 120) ; // Default minimum height if no headerElem provided
                     
                     // Ensure height doesn't go below minimum
                     const newHeight = Math.max(event.rect.height, minHeight);

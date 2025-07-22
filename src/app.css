@@ -544,6 +544,46 @@ label {
 
 }
 
+    /* Tooltip content styling */
+    .tooltip-content {
+        text-align: center;
+        font-family: var(--font-user), sans-serif;
+        background: var(--color-surface-50);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--color-surface-200);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 120px;
+    }
+
+    .tooltip-content strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: bold;
+        color: var(--color-primary-600);
+        margin-bottom: 0.25rem;
+    }
+
+    .tooltip-description {
+        font-size: 0.8rem;
+        color: var(--color-surface-700);
+        font-style: italic;
+    }
+
+    .dark .tooltip-content {
+        background: var(--color-surface-800);
+        border-color: var(--color-surface-600);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .dark .tooltip-content strong {
+        color: var(--color-primary-400);
+    }
+
+    .dark .tooltip-description {
+        color: var(--color-surface-300);
+    }
+
 /* Ensure tooltips don't overflow on small screens */
 @media (max-width: 480px) {
     .floating-tooltip {
@@ -867,6 +907,17 @@ input[type=number]::-webkit-outer-spin-button {
 
 .dark .info-icon-button:hover {
     background: var(--color-surface-700);
+}
+
+.add-item-button {
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    pointer-events: auto;
+    opacity: 0.8;
+    color: var(--color-primary-200);
 }
 
 .remove-button {

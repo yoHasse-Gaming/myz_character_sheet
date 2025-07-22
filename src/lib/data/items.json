@@ -1,0 +1,276 @@
+[
+  {
+    "name": "Krubb",
+    "consume_cost": "1",
+    "weight": "¼",
+    "requirement": "",
+    "comment": "Återställer STY."
+  },
+  {
+    "name": "Vatten",
+    "consume_cost": "½",
+    "weight": "¼",
+    "requirement": "",
+    "comment": "Återställer KYL."
+  },
+  {
+    "name": "Sprit",
+    "consume_cost": "½-1 per flaska",
+    "weight": "",
+    "requirement": "",
+    "comment": "Se sidan 113. En flaska rymmer tio doser."
+  },
+  {
+    "name": "Pil",
+    "consume_cost": "½",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Rep",
+    "consume_cost": "1",
+    "weight": "1",
+    "requirement": "",
+    "comment": "Prylbonus +2 till vid klättring (slå för att fly)."
+  },
+  {
+    "name": "Änterhake",
+    "consume_cost": "1",
+    "weight": "1",
+    "requirement": "rep krävs",
+    "comment": "Prylbonus +2 till vid klättring."
+  },
+  {
+    "name": "Fackla",
+    "consume_cost": "½",
+    "weight": "¼",
+    "requirement": "",
+    "comment": "Skingrar mörker inom nära avstånd. Brinner i ca 4 timmar."
+  },
+  {
+    "name": "Spritlykta",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "sprit",
+    "comment": "Skingrar mörker. En dos räcker 24 timmar. Vindtålig."
+  },
+  {
+    "name": "Elddon",
+    "consume_cost": "1",
+    "weight": "¼",
+    "requirement": "",
+    "comment": "Krävs för att tända facklor/spritlyktor."
+  },
+  {
+    "name": "Batterilykta",
+    "consume_cost": "3-6",
+    "weight": "1",
+    "requirement": "verkstad, batteri",
+    "comment": "Skingrar mörker. Vindtålig."
+  },
+  {
+    "name": "Varm jacka/rock",
+    "consume_cost": "1",
+    "weight": "2",
+    "requirement": "",
+    "comment": "En pryltärning mot svår köld.",
+    "bonuses": [
+      {
+        "skill_id": "sk_7x9m2n8p",
+        "bonus": 2
+      }
+    ]
+  },
+  {
+    "name": "Rejäla kängor",
+    "consume_cost": "1",
+    "weight": "2",
+    "requirement": "",
+    "comment": "Prylbonus +1 till att kämpa på under vandring."
+  },
+  {
+    "name": "Spade",
+    "consume_cost": "1",
+    "weight": "1",
+    "requirement": "",
+    "comment": "Pryltärning till arbetsslag. Kan användas som tillhygge."
+  },
+  {
+    "name": "Filt",
+    "consume_cost": "1",
+    "weight": "½",
+    "requirement": "",
+    "comment": "Prylbonus +2 mot köld.",
+    "bonuses": [
+      {
+        "skill_id": "sk_7x9m2n8p",
+        "bonus": 2
+      }
+    ]
+  },
+  {
+    "name": "Tält",
+    "consume_cost": "3-6",
+    "weight": "2",
+    "requirement": "",
+    "comment": "Pryltärning mot köld för alla i tältet. Skyddar mot väder.",
+    "bonuses": [
+      {
+        "skill_id": "sk_7x9m2n8p",
+        "bonus": 2
+      }
+    ]
+  },
+  {
+    "name": "Rötdräkt",
+    "consume_cost": "4-8",
+    "weight": "",
+    "requirement": "verkstad 1",
+    "comment": "Se sidan 149."
+  },
+  {
+    "name": "Rötmask",
+    "consume_cost": "3-6",
+    "weight": "",
+    "requirement": "verkstad ½",
+    "comment": "Se sidan 149."
+  },
+  {
+    "name": "Skrotkikare",
+    "consume_cost": "3-6",
+    "weight": "",
+    "requirement": "verkstad 1",
+    "comment": "Prylbonus +1 till speja.",
+    "bonuses": [
+      {
+        "skill_id": "sk_1j7k9l3m",
+        "bonus": 1
+      }
+    ]
+  },
+  {
+    "name": "Verktyg",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "",
+    "comment": "Prylbonus +1 till mecka.",
+    "bonuses": [
+      {
+        "skill_id": "sk_2l5z8x1c",
+        "bonus": 1
+      }
+    ]
+  },
+  {
+    "name": "Kokkärl",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "",
+    "comment": "Pryltärning vid tillagning av rötskadad mat."
+  },
+  {
+    "name": "Knogjärn",
+    "consume_cost": "1",
+    "weight": "½",
+    "requirement": "",
+    "comment": "Prylbonus +1 till slåss, vapen skada 1.",
+    "bonuses": [
+      {
+        "skill_id": "sk_9q3w7e2r",
+        "bonus": 1
+      }
+    ]
+  },
+  {
+    "name": "Skrotkniv",
+    "consume_cost": "1",
+    "weight": "½",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Slagträ",
+    "consume_cost": "1",
+    "weight": "1",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Slagträ med spikar",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Huggare",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Skrotspjut",
+    "consume_cost": "1-2",
+    "weight": "1",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Skrotyxa",
+    "consume_cost": "3-6",
+    "weight": "2",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Slunga",
+    "consume_cost": "1",
+    "weight": "½",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Pilbåge",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Skrotpistol",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Skrotgevär",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Derringer",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Eldkastare",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": ""
+  },
+  {
+    "name": "Skrotkanon",
+    "consume_cost": "",
+    "weight": "",
+    "requirement": "",
+    "comment": "Monterad"
+  }
+]

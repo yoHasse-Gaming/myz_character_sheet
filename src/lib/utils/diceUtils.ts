@@ -1,6 +1,8 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { diceStates, type AvailabilityRequest, type AvailabilityResponse, type DiceRollConfig } from "../states/dice.svelte";
 
+
+
 export function getDiceRollerPluginId(path: string) {
     return `rodeo.owlbear.dice/${path}`;
 }
@@ -14,7 +16,7 @@ export async function focusDiceTray(): Promise<void> {
     }
 
     if (window.BroadcastChannel) {
-        const channel = new BroadcastChannel(getDiceRollerPluginId("focused-tray"));
+        const channel = new BroadcastChannel(getDiceRollerPluginId("focused-dice-tray"));
         channel.postMessage(playerConnectionId);
         channel.close();
     }
@@ -22,16 +24,47 @@ export async function focusDiceTray(): Promise<void> {
 
 export async function checkDicePluginAvailability(): Promise<void> {
     try {
-        console.log("🎲 Checking MYZ Dice plugin availability...");
-        // Use broadcast channel to check availability instead of direct window API calls
-        const availabilityCheck = await checkMYZDiceAvailability();
-
-        diceStates.isDicePluginAvailable = availabilityCheck.available;
         
-        if (availabilityCheck.available) {
-            console.log(`🎲 MYZ Dice plugin detected (version: ${availabilityCheck.version || 'unknown'})`);
+        // Use broadcast channel to check availability instead of direct window API calls
+        let metadataCheck = await checkDiceExtensionMetadata();
+
+        if(!metadataCheck.available && metadataCheck.outdated) {
+            console.warn("🎲 MYZ Dice plugin metadata is outdated, waiting for update before continuing...");
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            metadataCheck = await checkDiceExtensionMetadata();
+        }
+
+        if (!metadataCheck.available) {
+            
+            diceStates.isDicePluginAvailable = false;
+            return;
+        }
+
+
+
+        
+
+        diceStates.isDicePluginAvailable = true;
+
+        if(metadataCheck.available && !diceStates.broadCastAvailabilityCheck) {
+            // Wait 3 seconds before checking broadcast availability
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            
+            const broadcastCheck = await checkUsingBroadcastChannel();
+            if (!broadcastCheck.available) {
+                
+                diceStates.broadCastAvailabilityCheck = false;
+                return;
+            }
+            diceStates.broadCastAvailabilityCheck = true;
+        }
+
+        
+        if (metadataCheck.available) {
+            
         } else {
-            console.log("🎲 MYZ Dice plugin not found via broadcast");
+            
         }
     } catch (error) {
         console.warn("🎲 Failed to check dice plugin availability:", error);
@@ -66,34 +99,26 @@ export async function triggerRoll(config: DiceRollConfig): Promise<void> {
     channel.close();
 }
 
-async function checkMYZDiceAvailability(): Promise<{ available: boolean; version?: string }> {
+async function checkDiceExtensionMetadata(): Promise<{ available: boolean; version?: string, outdated?: boolean }> {
     const metadata = await OBR.room?.getMetadata();
     if (!metadata) {
         console.warn("[MYZDiceIntegration] No room metadata found", metadata);
         return { available: false };
     }
-
     const key = getDiceRollerPluginId("diceRollerReady");
-
     const metadataValue = metadata[key] as { timestamp?: number; version?: string };
     const { timestamp, version } = metadataValue;
-
-    
     if (!metadataValue || (!timestamp || !version)) {
         console.warn("[MYZDiceIntegration] MYZ Dice metadata not found:", metadata[key]);
-        // Check using BroadcastChannel as fallback
-        return await checkUsingBroadcastChannel();
+        return { available: false };
     }
-
-    if( Date.now() - timestamp > 60000) { // 1 minute timeout
-        console.warn("[MYZDiceIntegration] MYZ Dice metadata is outdated, checking using BroadcastChannel");
-        // Check using BroadcastChannel as fallback
-        return await checkUsingBroadcastChannel();
+    if (Date.now() - timestamp > 1200000) { 
+        console.warn("[MYZDiceIntegration] MYZ Dice metadata is outdated");
+        return { available: true, version: version, outdated: true };
     }
-
-    return { available: true, version: version };
-
+    return { available: true, version: version, outdated: false };
 }
+
 
 async function checkUsingBroadcastChannel(): Promise<{ available: boolean; version?: string }> {
     const timeoutMs = 10000; // Default timeout for availability check
@@ -108,12 +133,12 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
         const requestId = `availability-${Date.now()}-${Math.random()}`;
         let resolved = false;
 
-        console.log("[MYZDiceIntegration] Checking MYZ Dice availability...");
+        
 
         const timeout = setTimeout(() => {
             if (!resolved) {
                 resolved = true;
-                console.log("[MYZDiceIntegration] Availability check timed out");
+                
                 channel.close();
                 resolve({ available: false });
             }}, timeoutMs);
@@ -127,7 +152,7 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
             if (!resolved) {
                 resolved = true;
                 clearTimeout(timeout);
-                console.log("[MYZDiceIntegration] MYZ Dice availability confirmed:", response);
+                
                 channel.close();
                 resolve({ available: response.available, version: response.version });
             }
@@ -138,7 +163,7 @@ async function checkUsingBroadcastChannel(): Promise<{ available: boolean; versi
             requestId: requestId
         };
 
-        console.log("[MYZDiceIntegration] Sending availability check request:", request);
+        
             channel.postMessage(request);
     });
 }

@@ -1,134 +1,104 @@
-// Global character sheet state using Svelte 5 runes
-// This provides reactive state management across all components
+import type { BaseAbilityType, OptionalSkill, Mutation, Equipment, EquipmentTableItem, Weapon, Armor, RPRelation, Talent, Skill, SkillType, AbilityType } from '../types';
+import type { LayoutType } from '../utils/interactjsUtils';
+import skills from '../data/skills.json';
+import { openDiceRollModal } from '../states/modals.svelte';
 
-import type { BaseAbilityType, OptionalSkill, Mutation } from '../types';
-import { SvelteMap } from 'svelte/reactivity';
-import { useOwlbearSync } from '../utils/owlbearIntegration';
+// Main character data interface - this is the primary type for the entire app
 
-// Define the character sheet state structure
-export const sheetState = $state({
+export const initialCardPositions: Record<string, { x: number; y: number }> = {
+    "character-basic-info": { x: 20, y: 10 },
+    "character-looks": { x: 640, y: 10 },
+    "character-dream": { x: 640, y: 320 },
+    "experience-points": { x: 20, y: 550 },
+    "conditions": { x: 10, y: 340 },
+    "base-abilities": { x: 10, y: 110 },
+    "skills-core": { x: 320, y: 10 },
+    "mutations": { x: 310, y: 510 },
+    "mutation-points": { x: 0, y: 640 },
+    "equipment": { x: 570, y: 500 },
+    "armors": { x: 570, y: 660 },
+    "weapons": { x: 570, y: 790 },
+    "talents": { x: 275, y: 660 },
+    "occupational-talents": { x: 275, y: 790 },
+    // Relations positioning (base position for stacking)
+    "relations-start": { x: 20, y: 1035 },
+    "relations-additional": { x: 1495, y: 10 },
+    "zone-rot": { x: 20, y: 730 },
+    // Notes positioning (base position for stacking)
+    "notes-start": { x: 20, y: 20 },
+};
+
+export interface CharacterSheetData {
+    name: string;
+    occupation: string;
+    appearance: {
+        face: string;
+        body: string;
+        clothes: string;
+    };
+    dream: string;
+    baseAbilities: BaseAbilityType[];
+    skills: SkillType[];
+    optionalSkills: OptionalSkill[];
+    mutations: Mutation[];
+    mutationPoints: number;
+    experiencePoints: number;
+    zoneRot: number;
+    talents: Talent[];
+    conditions: {
+        isStarving: boolean;
+        isSleepDeprived: boolean;
+        isDehydrated: boolean;
+        isFreezing: boolean;
+    };
+    criticalInjuries: string;
+    equipment: Equipment[];
+    equipmentTable: EquipmentTableItem[];
+    weapons: Weapon[];
+    armor: Armor[];
+    relations: RPRelation[];
+    additionalRelations: RPRelation[];
+    notes: string[];
+    paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
+}
+
+export const sheetState: CharacterSheetData = $state({
     // Character basic info
-    name: "Okänd Mutant",
-    concept: "",
+    name: "",
     occupation: "",
-    age: 0,
-    
+    appearance: {
+        face: "",
+        body: "",
+        clothes: ""
+    },
+    dream: "",
     // Base abilities with damage tracking
     baseAbilities: [
-        { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0 },
-        { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0 },
-        { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0 },
-        { label: 'Känsla', damageLabel: 'Tvivel', value: 1, damage: 0 }
-    ] as BaseAbilityType[],
-    
-    // Skills with their values and descriptions
-    skills: [
-        { 
-            name: "Kämpa på", 
-            baseAbility: "STY", 
-            value: 0,
-            description: "<p>När Zonen kräver sin tribut - när du måste uthärda kyla, trötthet eller smärta - använder du denna färdighet för att fortsätta framåt.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong> kan du hjälpa en vän i samma situation - de slipper rulla tärning.</li><li>Du kan offra dig själv för att hjälpa en vän, även vid enbart ett lyckat <strong>☢️</strong>.</li></ul>",
-            examples: "<p>Används vid marsch i hårt väder, köld, utmattning.</p>"
-        },
-        { 
-            name: "Ta krafttag", 
-            baseAbility: "STY", 
-            value: 0,
-            description: "<p>Används för att lyfta, knuffa eller bryta upp föremål med ren styrka.</p>",
-            bonusEffects: "<ul><li>Kasta föremålet så att en fiende tar skada lika med antal extra <strong>☢️</strong>.</li><li>Upptäck en dold passage eller ett dolt föremål (SL avgör vad).</li></ul>",
-            examples: "<p>Lyfta bråte, forcera dörrar, dra upp fastklämda vänner.</p>"
-        },
-        { 
-            name: "Slåss", 
-            baseAbility: "STY", 
-            value: 0,
-            description: "<p>Används för närstrid - att slåss mot fiender med knytnävar eller vapen.</p>",
-            bonusEffects: "<ul><li>+1 skada (kan upprepas).</li><li>Fienden tar 1 stress.</li><li>+2 initiativ nästa runda.</li><li>Fienden tappar ett föremål.</li><li>Fienden faller eller knuffas bakåt.</li><li>Du greppar fienden (han kan inte agera utan att slå sig fri).</li></ul>",
-            examples: "<p>När du slåss i handgemäng, parerar eller tar någon till fånga.</p>"
-        },
-        { 
-            name: "Smyga", 
-            baseAbility: "KYL", 
-            value: 0,
-            description: "<p>Att tyst och osedd ta sig förbi fiender eller positionera sig för bakhåll.</p>",
-            bonusEffects: "<ul><li>+1 modifikation per extra <strong>☢️</strong> för smygattack.</li></ul>",
-            examples: "<p>Undvika strid, smyga upp på vakter, positionera sig för överraskning.</p>"
-        },
-        { 
-            name: "Fly", 
-            baseAbility: "KYL", 
-            value: 0,
-            description: "<p>För att ta dig ur konflikter, farliga situationer eller fysiskt svåra moment som hopp och balans.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong> kan du hjälpa en vän att fly utan att rulla.</li><li>Du kan offra dig för en vän även vid bara ett <strong>☢️</strong>.</li></ul>",
-            examples: "<p>Springa undan, klättra snabbt, kasta sig i skydd.</p>"
-        },
-        { 
-            name: "Skjuta", 
-            baseAbility: "KYL", 
-            value: 0,
-            description: "<p>Används för att träffa fiender med skjutvapen. Kräver ammunition. Lyckat slag gör vapenskada.</p>",
-            bonusEffects: "<ul><li>+1 skada per extra <strong>☢️</strong> (kan upprepas).</li><li>Fienden får 1 stress.</li><li>+2 initiativ nästa runda.</li></ul>",
-            examples: "<p>Avfyra pistol, gevär, improviserat vapen på avstånd.</p>"
-        },
-        { 
-            name: "Speja", 
-            baseAbility: "SKP", 
-            value: 0,
-            description: "<p>För att aktivt spana efter faror, platser eller individer i omgivningen.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong>, välj en fråga:<br>- Är det ute efter mig?<br>- Finns det fler?<br>- Hur tar jag mig in/förbi/undan?</li></ul>",
-            examples: "<p>Observera fiender, planera infallsväg, upptäcka fällor.</p>"
-        },
-        { 
-            name: "Förstå sig på", 
-            baseAbility: "SKP", 
-            value: 0,
-            description: "<p>För att förstå gammal teknologi, texter eller ruiner från den gamla världen.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong> kan du lära någon annan hur man använder artefakten.</li></ul>",
-            examples: "<p>Analysera artefakter, läsa forntekniska manualer.</p>"
-        },
-        { 
-            name: "Känna Zonen", 
-            baseAbility: "SKP", 
-            value: 0,
-            description: "<p>För att identifiera faror och fenomen ute i Zonen.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong>, välj en fråga:<br>- Hur kan det skada mig?<br>- Hur kan jag skada det?</li></ul>",
-            examples: "<p>Förstå mutantvarelser, farliga växter, zonfenomen.</p>"
-        },
-        { 
-            name: "Genomskåda", 
-            baseAbility: "KNS", 
-            value: 0,
-            description: "<p>För att tolka en annan mutants känslor och avsikter genom närkontakt och observation.</p>",
-            bonusEffects: "<ul><li>För varje extra <strong>☢️</strong>, välj en fråga:<br>- Talar han sanning?<br>- Vill han mig illa?<br>- Vill han ha något av mig?</li></ul>",
-            examples: "<p>Avläsa lögner, bedöma lojalitet, förstå motivation.</p>"
-        },
-        { 
-            name: "Manipulera", 
-            baseAbility: "KNS", 
-            value: 0,
-            description: "<p>För att övertala, hota eller förföra någon till att göra som du vill. Kräver rimlig motprestation.</p>",
-            bonusEffects: "<ul><li>+1 tvivel eller stress på motparten per extra <strong>☢️</strong>. Om de blir brutna går de med på kravet utan motprestation.</li></ul>",
-            examples: "<p>Förhandla, ljuga, utöva social press eller charm.</p>"
-        },
-        { 
-            name: "Vårda", 
-            baseAbility: "KNS", 
-            value: 0,
-            description: "<p>För att hela trauma och rädda liv - både fysiska och mentala skador.</p>",
-            bonusEffects: "<ul><li>Vid lyckat slag på en bruten vän återfår de antal poäng lika med antalet <strong>☢️</strong>.</li><li>Vid kritiska skador kan ett misslyckat slag innebära döden.</li></ul>",
-            examples: "<p>Första hjälpen, psykologisk tröst, stabilisera blödningar.</p>"
-        }
+        { label: 'Styrka', damageLabel: 'Skada', value: 1, damage: 0, type: 'STRENGTH', description: "Din råa kroppsstyrka. Avgör hur mycket skada du tål. Återhämtas med krubb." },
+        { label: 'Kyla', damageLabel: 'Stress', value: 1, damage: 0, type: 'AGILITY', description: "Avgör hur kall och kontrollerad du är i livshotande situationer. Avgör hur mycket stress du tål. Återhämtas med vatten." },
+        { label: 'Skärpa', damageLabel: 'Förvirring', value: 1, damage: 0, type: 'WITS', description: " Intelligens, vaksamhet och sinnesskärpa. Avgör hur mycket förvirring du tål. Återhämtas med sömn." },
+        { label: 'Känsla', damageLabel: 'Tvivel', value: 1, damage: 0, type: 'EMPATHY', description: "Din personliga utstrålning, empati och förmåga att manipulera andra. Avgör hur mycket tvivel du tål. Återhämtas med närhet." }
     ],
     
+    // Skills with their values and descriptions
+    skills: skills.skills as SkillType[],
+    
     // Optional skills selected by the user
-    optionalSkills: [] as OptionalSkill[],
+    optionalSkills: [] ,
     
     // Mutations selected by the user
-    mutations: [] as Mutation[],
+    mutations: [],
     
     // Mutation points available to spend
     mutationPoints: 0,
+
+    // Experience points for character progression
+    experiencePoints: 0,
+
+    // Zone rot level
+    zoneRot: 0,
+    // Talents selected by the user
+    talents: [],
     
     // Character conditions
     conditions: {
@@ -139,7 +109,34 @@ export const sheetState = $state({
     },
     
     // Critical injuries
-    criticalInjuries: ""
+    criticalInjuries: "",
+    
+    // Equipment and inventory
+    equipment: [],
+    equipmentTable: [],
+    
+    // Weapons
+    weapons: [],
+    
+    // Armor
+    armor: [],
+
+    // Relations with other characters
+    relations: [
+        {id: 'RP1', name: 'RP 1', description: '', isClose: true},
+        {id: 'RP2', name: 'RP 2', description: '', isClose: false},
+        {id: 'RP3', name: 'RP 3', description: '', isClose: false},
+        {id: 'RP4', name: 'RP 4', description: '', isClose: false},
+        {id: 'SL1', name: 'Jag Hatar', description: '', isClose: false},
+        {id: 'SL2', name: 'Jag vill skydda', description: '', isClose: false}
+    ],
+    additionalRelations: [],
+    
+    // Notes or miscellaneous information
+    notes: [],
+    
+    // Paper layout data for preserving positions and sizes across tab switches
+    paperLayouts: {}
 });
 
 // Helper functions for managing the state
@@ -185,6 +182,7 @@ export const characterActions = {
     // Optional skills management
     addOptionalSkill(optionalSkill: OptionalSkill) {
         // Check if skill is already added
+        const test = sheetState.optionalSkills;
         const existingIndex = sheetState.optionalSkills.findIndex(s => s.id === optionalSkill.id);
         if (existingIndex === -1) {
             sheetState.optionalSkills.push(optionalSkill);
@@ -224,22 +222,80 @@ export const characterActions = {
     setTotalMutationPoints(points: number) {
         sheetState.mutationPoints = Math.max(0, points);
     },
+
+    // Experience points management
+    setTotalExperiencePoints(points: number) {
+        sheetState.experiencePoints = Math.max(0, points);
+    },
+
+    setTotalZoneRot(rot: number) {
+        sheetState.zoneRot = Math.max(0, rot);
+    },
+
+    // Talents management
+    addTalent(talent: Talent) {
+        // Check if talent is already added
+        const existingIndex = sheetState.talents.findIndex(t => t.id === talent.id);
+        if (existingIndex === -1) {
+            sheetState.talents.push(talent);
+        }
+    },
+    
+    removeTalent(talentId: string) {
+        const index = sheetState.talents.findIndex(t => t.id === talentId);
+        if (index !== -1) {
+            sheetState.talents.splice(index, 1);
+        }
+    },
+    
+    // Helper functions for talent validation
+    canAddOccupationalTalent(): boolean {
+        const occupationalTalents = sheetState.talents.filter(t => t.occupation !== 'generic');
+        return occupationalTalents.length < 2;
+    },
+    
+    canAddSecondOccupationalTalent(): boolean {
+        const occupationalTalents = sheetState.talents.filter(t => t.occupation !== 'generic');
+        const genericTalents = sheetState.talents.filter(t => t.occupation === 'generic');
+        return occupationalTalents.length < 2 && genericTalents.length >= 3;
+    },
+    
+    canAddGenericTalent(): boolean {
+        const genericTalents = sheetState.talents.filter(t => t.occupation === 'generic');
+        return genericTalents.length < 5;
+    },
+    
+    getOccupationalTalentCount(): number {
+        return sheetState.talents.filter(t => t.occupation !== 'generic').length;
+    },
+    
+    getGenericTalentCount(): number {
+        return sheetState.talents.filter(t => t.occupation === 'generic').length;
+    },
     
     // Character info functions
     setName(name: string) {
         sheetState.name = name;
     },
     
-    setConcept(concept: string) {
-        sheetState.concept = concept;
-    },
-    
     setOccupation(occupation: string) {
         sheetState.occupation = occupation;
     },
     
-    setAge(age: number) {
-        sheetState.age = Math.max(0, age);
+    setAppearanceFace(face: string) {
+        sheetState.appearance.face = face;
+    },
+    
+    setAppearanceBody(body: string) {
+        sheetState.appearance.body = body;
+    },
+    
+    setAppearanceClothes(clothes: string) {
+        sheetState.appearance.clothes = clothes;
+    },
+    
+    setDream(dream: string) {
+        sheetState.dream = dream;
     },
     
     // Condition functions
@@ -249,6 +305,107 @@ export const characterActions = {
     
     setCriticalInjuries(injuries: string) {
         sheetState.criticalInjuries = injuries;
+    },
+    
+    // Equipment management
+    addEquipment(equipment: Equipment) {
+        // Check if equipment is already added
+        const existingIndex = sheetState.equipment.findIndex(e => e.id === equipment.id);
+        if (existingIndex === -1) {
+            sheetState.equipment.push(equipment);
+        }
+    },
+    
+    removeEquipment(equipmentId: string) {
+        const index = sheetState.equipment.findIndex(e => e.id === equipmentId);
+        if (index !== -1) {
+            sheetState.equipment.splice(index, 1);
+        }
+    },
+    
+    // Weapons management
+    addWeapon(weapon: Weapon) {
+        // Check if weapon is already added
+        const existingIndex = sheetState.weapons.findIndex(w => w.id === weapon.id);
+        if (existingIndex === -1) {
+            sheetState.weapons.push(weapon);
+        }
+    },
+    
+    removeWeapon(weaponId: string) {
+        const index = sheetState.weapons.findIndex(w => w.id === weaponId);
+        if (index !== -1) {
+            sheetState.weapons.splice(index, 1);
+        }
+    },
+    
+    // Armor management
+    addArmor(armor: Armor) {
+        // Check if armor is already added
+        const existingIndex = sheetState.armor.findIndex(a => a.id === armor.id);
+        if (existingIndex === -1) {
+            sheetState.armor.push(armor);
+        }
+    },
+    
+    removeArmor(armorId: string) {
+        const index = sheetState.armor.findIndex(a => a.id === armorId);
+        if (index !== -1) {
+            sheetState.armor.splice(index, 1);
+        }
+    },
+    
+    // Relations management
+    addRelation(relation: RPRelation) {
+        // Check if relation is already added
+        const existingIndex = sheetState.relations.findIndex(r => r.id === relation.id);
+        if (existingIndex === -1) {
+            sheetState.relations.push(relation);
+        }
+    },
+    
+    removeRelation(relationId: string) {
+        const index = sheetState.relations.findIndex(r => r.id === relationId);
+        const additionalIndex = sheetState.additionalRelations.findIndex(r => r.id === relationId);
+
+        if (index === -1 && additionalIndex === -1) {
+            return;
+        }
+
+        if (index !== -1) {
+            sheetState.relations.splice(index, 1);
+            return;
+        }
+
+        if (additionalIndex !== -1) {
+            sheetState.additionalRelations.splice(additionalIndex, 1);
+            return;
+        }
+
+    },
+
+    updateRelation(relationId: string, updates: Partial<RPRelation>) {
+        const index = sheetState.relations.findIndex(r => r.id === relationId);
+        if (index !== -1) {
+            Object.assign(sheetState.relations[index], updates);
+        }
+    },
+    
+    // Notes management
+    addNote(note: string) {
+        sheetState.notes.push(note.trim());
+    },
+    
+    removeNote(index: number) {
+        if (index >= 0 && index < sheetState.notes.length) {
+            sheetState.notes.splice(index, 1);
+        }
+    },
+    
+    updateNote(index: number, note: string) {
+        if (index >= 0 && index < sheetState.notes.length) {
+            sheetState.notes[index] = note.trim();
+        }
     },
     
     // Utility functions
@@ -274,107 +431,94 @@ export const characterActions = {
         }
     },
     
-    // Owlbear Rodeo integration
-    setupOwlbearSync() {
-        const owlbearSync = useOwlbearSync(() => ({
-            name: sheetState.name,
-            baseAbilities: sheetState.baseAbilities,
-            skills: sheetState.skills,
-            conditions: sheetState.conditions,
-            timestamp: Date.now()
-        }));
-        
-        if (owlbearSync.isInOwlbear) {
-            owlbearSync.setupAutoSync(60000); // Sync every minute
-            console.log('🦉 Owlbear Rodeo sync enabled');
-            
-            // Load existing character data
-            owlbearSync.loadData().then((data) => {
-                if (data) {
-                    console.log('Loading character data from Owlbear:', data);
-                    // Update local state with loaded data
-                    Object.assign(sheetState, data);
-                }
-            });
-        }
-        
-        return owlbearSync;
+    
+    // Paper layout management
+    savePaperLayout(paperId: string, layout: LayoutType) {
+        sheetState.paperLayouts[paperId] = layout;
     },
     
-    syncToOwlbear() {
-        const owlbearSync = useOwlbearSync(() => ({
-            name: sheetState.name,
-            baseAbilities: sheetState.baseAbilities,
-            skills: sheetState.skills,
-            conditions: sheetState.conditions,
-            timestamp: Date.now()
-        }));
+    getPaperLayout(paperId: string) {
+        return sheetState.paperLayouts[paperId] || null;
+    },
+    
+    clearPaperLayouts() {
+        sheetState.paperLayouts = {};
+    },
+
+    // Dice rolling functions
+    openSkillRollModal(
+        skillName: string, 
+        skillValue: number, 
+        baseAbilityLabel: string, 
+        baseAbilityType: AbilityType, 
+        baseAbilityValue: number, 
+        baseAbilityDamage: number) {
+        // Import the function dynamically to avoid circular dependencies
+    
+        const effectiveAbilityValue = Math.max(0, baseAbilityValue - baseAbilityDamage);
         
-        owlbearSync.syncNow();
-    }
-};
-
-// Define dialogue options for modals
-export type DialogueOption = 'optionalSkills' | 'mutations' | 'info';
-
-// Info modal state to hold content
-export const infoModalState = $state({
-    title: '',
-    content: '',
-    type: '' as 'skill' | 'trauma' | 'mutation' | ''
-});
-
-// Create a reactive map for dialogue states
-const openDialogue = new SvelteMap<DialogueOption, boolean>([
-    ['optionalSkills', false],
-    ['mutations', false],
-    ['info', false]
-]);
-
-// Convert to reactive state
-
-// Dialogue management functions
-export function isDialogueOpen(dialogue: DialogueOption | undefined = undefined) {
-    if (!dialogue) {
-        return Array.from(openDialogue.values()).some((value) => value === true);
-    }
-    return openDialogue.get(dialogue) ?? false;
-}
-
-export function toggleDialogueOption(dialogue: DialogueOption) {
-    const currentValue = openDialogue.get(dialogue) ?? false;
-    openDialogue.set(dialogue, !currentValue);
-}
-
-export function openDialogueOption(dialogue: DialogueOption) {
-    // Close all other dialogues first
-    console.log(`Opening dialogue: ${dialogue}`);
-    openDialogue.forEach((value, key) => {
-        if (key !== dialogue) {
-            openDialogue.set(key, false);
-        }
-    });
-    openDialogue.set(dialogue, true);
-}
-
-export function closeDialogueOption(dialogue: DialogueOption | undefined = undefined) {
-    if (!dialogue) {
-        // Close all dialogues
-        openDialogue.forEach((value, key) => {
-            openDialogue.set(key, false);
+        openDiceRollModal({
+            rollName: `${skillName}`,
+            baseDice: effectiveAbilityValue,
+            skillDice: skillValue,
+            gearDice: 0,
+            skillName: skillName,
+            abilityName: baseAbilityLabel,
+            abilityType: baseAbilityType
         });
-        return;
-    }
-    openDialogue.set(dialogue, false);
-}
+    },
 
-// Function to open info modal with specific content
-export function openInfoModal(title: string, content: string, type: 'skill' | 'trauma' | 'mutation' = 'skill') {
-    infoModalState.title = title;
-    infoModalState.content = content;
-    infoModalState.type = type;
-    openDialogueOption('info');
-}
+    openWeaponRollModal(
+        weapon: Weapon, 
+        skill: SkillType, 
+        baseAbility: BaseAbilityType
+        ) {
+        // Import the function dynamically to avoid circular dependencies
+        const effectiveAbilityValue = Math.max(0, baseAbility.value - baseAbility.damage);
+
+        openDiceRollModal({
+            rollName: `${weapon.name} - ${skill.name}`,
+            baseDice: effectiveAbilityValue,
+            skillDice: skill.value,
+            gearDice: weapon.bonus,
+            abilityName: baseAbility.label,
+            skillName: skill.name,
+            abilityType: baseAbility.type
+        });
+    },
+
+    openAbilityRollModal(abilityLabel: string, abilityValue: number, abilityDamage: number) {
+        // Import the function dynamically to avoid circular dependencies
+        const effectiveAbilityValue = Math.max(0, abilityValue - abilityDamage);
+        
+        openDiceRollModal({
+            rollName: `${abilityLabel}`,
+            baseDice: effectiveAbilityValue,
+            skillDice: 0,
+            gearDice: 0,
+            abilityName: abilityLabel
+        });
+    },
+
+    // Position helper functions for relations and notes
+    getRelationPosition(index: number): { x: number; y: number } {
+        const basePosition = initialCardPositions["relations-start"];
+        return {
+            x: basePosition.x,
+            y: basePosition.y + (index * 120)
+        };
+    },
+
+    getNotePosition(index: number): { x: number; y: number } {
+        const basePosition = initialCardPositions["notes-start"];
+        const relationCount = sheetState.relations.length;
+        return {
+            x: basePosition.x,
+            y: basePosition.y + (relationCount * 100) + (index * 100)
+        };
+    },
+
+};
 
 // Export types for TypeScript support
 export type CharacterSheet = typeof sheetState;

@@ -19,6 +19,21 @@ export function generateUniqueVariants(count: number): string[] {
     return variants;
 }
 
+/**
+ * Generate random rotation values for card grid layout
+ * Creates slight randomness for organic feel
+ */
+export function generateRandomRotations(count: number): number[] {
+    const rotations: number[] = [];
+    
+    for (let i = 0; i < count; i++) {
+        // Random rotation between -3 and 3 degrees
+        const rotation = (Math.random() - 0.5) * 6;
+        rotations.push(parseFloat(rotation.toFixed(1)));
+    }
+    
+    return rotations;
+}
 
 /**
  * Utility function to get a random variant class for torn paper inputs

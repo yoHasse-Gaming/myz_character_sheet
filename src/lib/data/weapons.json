@@ -1,0 +1,142 @@
+{
+  "meleeWeapons": [
+    {
+      "name": "Unarmed",
+      "bonus": 1,
+      "damage": 1,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised weapon"
+    },
+    {
+      "name": "Bike Chain",
+      "bonus": 1,
+      "damage": 1,
+      "type": "MELEE",
+      "range": "CLOSE",
+      "comment": ""
+    },
+    {
+      "name": "Brass Knuckles",
+      "bonus": 1,
+      "damage": 1,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised, light weapon"
+    },
+    {
+      "name": "Scrap Knife",
+      "bonus": 1,
+      "damage": 2,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised, light weapon"
+    },
+    {
+      "name": "Club",
+      "bonus": 2,
+      "damage": 1,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Can be found in the Zone"
+    },
+    {
+      "name": "Spiked Club",
+      "bonus": 2,
+      "damage": 2,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Cleaver",
+      "bonus": 2,
+      "damage": 2,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Scrap Spear",
+      "bonus": 1,
+      "damage": 2,
+      "type": "MELEE",
+      "range": "CLOSE",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Scrap Axe",
+      "bonus": 1,
+      "damage": 3,
+      "type": "MELEE",
+      "range": "MELEE",
+      "comment": "Improvised, heavy weapon"
+    }
+  ],
+  "rangedWeapons": [
+    {
+      "name": "Thrown Rock",
+      "bonus": 0,
+      "damage": 1,
+      "type": "RANGED",
+      "range": "SHORT",
+      "comment": ""
+    },
+    {
+      "name": "Sling",
+      "bonus": 1,
+      "damage": 1,
+      "type": "RANGED",
+      "range": "SHORT",
+      "comment": "Improvised, light weapon"
+    },
+    {
+      "name": "Bow",
+      "bonus": 1,
+      "damage": 1,
+      "type": "RANGED",
+      "range": "LONG",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Scrap Pistol",
+      "bonus": 1,
+      "damage": 2,
+      "type": "RANGED",
+      "range": "SHORT",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Derringer",
+      "bonus": 1,
+      "damage": 1,
+      "type": "RANGED",
+      "range": "CLOSE",
+      "comment": "Improvised, light weapon"
+    },
+    {
+      "name": "Scrap Rifle",
+      "bonus": 1,
+      "damage": 2,
+      "type": "RANGED",
+      "range": "LONG",
+      "comment": "Improvised"
+    },
+    {
+      "name": "Flamethrower",
+      "bonus": 1,
+      "damage": 2,
+      "type": "RANGED",
+      "range": "CLOSE",
+      "comment": "Improvised, heavy weapon"
+    },
+    {
+      "name": "Scrap Cannon",
+      "bonus": 1,
+      "damage": 4,
+      "type": "RANGED",
+      "range": "LONG",
+      "comment": "Improvised"
+    }
+  ]
+}

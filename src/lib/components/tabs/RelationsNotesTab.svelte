@@ -1,0 +1,382 @@
+<script lang="ts">
+    import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
+    import PaperCard from '../PaperCard.svelte';
+    import { Circle, CircleX, Handshake, HeartHandshake, Notebook, PlusCircle, Users } from '@lucide/svelte';
+    import ConfirmationModal from '../Modals/ConfirmationModal.svelte';
+    import { openDialogueOption } from '../../states/modals.svelte';
+
+    function updateNote(index: number, event: Event) {
+        const target = event.target as HTMLTextAreaElement;
+        characterActions.updateNote(index, target.value);
+    }
+
+    // Confirmation modal state
+    let confirmationOpen = $state(false);
+    let relationToDelete = $state<string | null>(null);
+    let relationNameToDelete = $state<string>("");
+
+    function requestDeleteRelation(relationId: string, relationName: string) {
+        relationToDelete = relationId;
+        relationNameToDelete = relationName;
+        confirmationOpen = true;
+    }
+
+    function confirmDeleteRelation() {
+        if (!relationToDelete) {
+            return;
+        }
+        characterActions.removeRelation(relationToDelete);
+        relationToDelete = null;
+        relationNameToDelete = "";
+    }
+
+    function cancelDeleteRelation() {
+        relationToDelete = null;
+        relationNameToDelete = "";
+    }
+
+    $effect(() => {
+        sheetState.additionalRelations.length;
+        minSizeForAdditionalRelations = {
+            width: 300,
+            height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100)
+        };
+    });
+
+    let minSizeForAdditionalRelations = $state({
+        width: 300,
+        height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100)
+    });
+
+</script>
+
+<!-- Relations Section -->
+
+    <PaperCard 
+        paperId={`relations`}
+        resizable={true}
+        initialSize={{ width: 1050, height: 740 }}
+        minSize={{ width: 1050, height: 640 }}
+        initialPosition={initialCardPositions["relations-start"]}
+        class="p-2"
+    >
+    {#snippet header()}
+    <span>Viktiga Relationer</span>
+        <!-- <button 
+            class="add-item-button"
+            onclick={() => sheetState.additionalRelations.push({ id: crypto.randomUUID(), name: '', description: '', isClose: false })}
+            aria-label="Lägg till ny relation"
+            title="Lägg till ny relation"
+        >
+            <PlusCircle size={16} />
+        </button> -->
+    {/snippet}
+    {#snippet content()}
+            
+        {#each sheetState.relations as relation, index}
+
+            <div class="compact-textarea-field">
+                <div class="relation-header">
+                    <div class="relation-name-section">
+                        <HeartHandshake
+                            fill={relation.isClose ? 'red' : 'none'}
+                        />
+                        <input
+                            type="text"
+                            class="relation-name-input font-user"
+                            bind:value={relation.name}
+                            oninput={(e) => characterActions.updateRelation(relation.id, { name: e.currentTarget.value })}
+                            placeholder="Namn på relation"
+                        />
+                    </div>
+                    <div class="relation-controls">
+                        <button 
+                            class="close-button {relation.isClose ? 'active' : ''}"
+                            onclick={() => characterActions.updateRelation(relation.id, { isClose: !relation.isClose })}
+                            aria-label="Markera som {relation.isClose ? 'vanlig' : 'nära'} relation"
+                            title={relation.isClose ? 'Nära relation' : 'Vanlig relation'}
+                        >
+                            <HeartHandshake size={16} fill={relation.isClose ? 'red' : 'none'} />
+                        </button>
+                        <!-- <button 
+                            class="remove-button" 
+                            onclick={() => requestDeleteRelation(relation.id, relation.name)}
+                            aria-label="Ta bort relation {relation.name}"
+                        >
+                            <CircleX size={16} />
+                        </button> -->
+                    </div>
+                </div>
+                <textarea
+                    class="compact-textarea font-user"
+                    placeholder="Skriv relation här..."
+                    bind:value={relation.description}
+                    oninput={(e) => characterActions.updateRelation(relation.id, { description: e.currentTarget.value })}
+                    rows="2"
+                ></textarea>
+            </div>
+
+
+        {/each}
+            {/snippet}
+        </PaperCard>
+
+<!-- Additional relations -->
+<PaperCard 
+    paperId={`additional-relations`}
+    draggable={true}
+    resizable={true}
+    initialSize={{ width: 450, height: Math.max(sheetState.additionalRelations.length * 100 + 100, 100) }}
+    minSize={minSizeForAdditionalRelations}
+    initialPosition={initialCardPositions["relations-additional"]}
+    class="p-2"
+>
+    {#snippet header()}
+    <span>Personer jag mött</span>
+    <button 
+        class="add-item-button"
+        onclick={() => sheetState.additionalRelations.push({ id: crypto.randomUUID(), name: 'A', description: 'd', isClose: false })}
+        aria-label="Lägg till ny relation"
+        title="Lägg till ny relation"
+    >
+        <PlusCircle size={16} />
+    </button>
+    {/snippet}
+    {#snippet content()}
+    {#each sheetState.additionalRelations as relation, index}
+        <div class="compact-textarea-field">
+            <div class="relation-header">
+                <div class="relation-name-section">
+                    <Handshake
+                        fill={relation.isClose ? 'red' : 'none'}
+                    />
+                    <input
+                        type="text"
+                        class="relation-name-input font-user"
+                        bind:value={relation.name}
+                        oninput={(e) => characterActions.updateRelation(relation.id, { name: e.currentTarget.value })}
+                        placeholder="Namn på relation"
+                    />
+                </div>
+                <div class="relation-controls">
+                    <button
+                        class="remove-button"
+                        onclick={() => requestDeleteRelation(relation.id, relation.name)}
+                        aria-label="Ta bort relation {relation.name}"
+                    >
+                        <CircleX size={16} />
+                    </button>
+                </div>
+            </div>
+            <textarea
+                class="compact-textarea font-user"
+                placeholder="Skriv relation här..."
+                bind:value={relation.description}
+                oninput={(e) => characterActions.updateRelation(relation.id, { description: e.currentTarget.value })}
+                rows="2"
+            ></textarea>
+        </div>
+    {/each}
+    {/snippet}
+    </PaperCard>
+    
+
+
+
+<!-- Notes Section -->
+<PaperCard 
+    paperId={`notes`}
+    class="p-1"
+    resizable={true}
+    minSize={{ width: 1000, height: 200 }}
+    initialPosition={{ x: 1200, y: 900 }}
+    >
+    {#snippet header()}
+    <span>Anteckningar</span>
+    <button 
+        class="add-item-button"
+        onclick={() => characterActions.addNote('')}
+        aria-label="Lägg till ny anteckning"
+        title="Lägg till ny anteckning"
+    >
+        <PlusCircle size={16} />
+    </button>
+    {/snippet}
+    {#snippet content()}
+    {#each sheetState.notes as note, index}
+    <div class="note-content">
+        <div class="note-header">
+            <span class="note-number"> <Notebook /> Anteckning #{index + 1}</span>
+            <button 
+                class="remove-button" 
+                onclick={() => characterActions.removeNote(index)}
+                aria-label="Ta bort anteckning #{index + 1}"
+            >
+                <CircleX size={16} />
+            </button>
+        </div>
+        <textarea 
+            class="note-text font-user"
+            rows="4"
+            value={note}
+            placeholder="Skriv din anteckning här..."
+            oninput={(e) => updateNote(index, e)}
+        ></textarea>
+    </div>
+
+    {/each}
+    {/snippet}
+</PaperCard>
+
+
+<!-- Confirmation Modal -->
+<ConfirmationModal 
+    bind:open={confirmationOpen}
+    title="Ta bort relation"
+    message={`Är du säker på att du vill ta bort relationen "${relationNameToDelete}"?`}
+    confirmText="Ta bort"
+    cancelText="Avbryt"
+    onConfirm={confirmDeleteRelation}
+    onCancel={cancelDeleteRelation}
+/>
+
+<style>
+
+    .note-content {
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+    }
+
+    /* Notes list - now part of items grid */
+    .relation-header,
+    .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .relation-name-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .relation-name-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        font-family: var(--form-labels), serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: var(--color-surface-900);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex: 1;
+        min-width: 0;
+    }
+
+    :global(.dark) .relation-name-input {
+        color: var(--color-surface-100);
+    }
+
+    .relation-name-input:focus {
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+    }
+
+    .relation-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .close-button {
+        padding: 0.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-surface-300);
+        background: transparent;
+        color: var(--color-surface-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .close-button:hover {
+        background: var(--color-surface-100);
+        transform: scale(1.1);
+    }
+
+    .close-button.active {
+        border-color: var(--color-error-500);
+        background: var(--color-error-50);
+        color: var(--color-error-600);
+    }
+
+    .close-button.active:hover {
+        background: var(--color-error-100);
+    }
+
+    :global(.dark) .close-button {
+        border-color: var(--color-surface-600);
+        color: var(--color-surface-400);
+    }
+
+    :global(.dark) .close-button:hover {
+        background: var(--color-surface-700);
+    }
+
+    :global(.dark) .close-button.active {
+        border-color: var(--color-error-400);
+        background: var(--color-error-900);
+        color: var(--color-error-300);
+    }
+
+    .note-number {
+        font-family: var(--form-labels), serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: var(--color-info-700);
+        flex: 1;
+    }
+
+    .note-text {
+        width: 100%;
+        background: transparent;
+        border: none;
+        resize: vertical;
+        height: 100%;
+        font-size: 0.9rem;
+        color: var(--color-surface-900);
+        line-height: 1.4;
+        font-family: var(--font-user), sans-serif;
+        resize: none;
+    }
+
+    :global(.dark) .note-text {
+        color: var(--color-surface-100);
+    }
+
+    .note-text:focus {
+        outline: none;
+        background: rgba(217, 119, 6, 0.05);
+        border-radius: 0.25rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .relation-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>

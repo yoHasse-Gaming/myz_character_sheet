@@ -1,53 +1,57 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
-    import { isDialogueOpen, closeDialogueOption, infoModalState } from '../../states/character_sheet.svelte';
+    import { closeDialogueOption, infoModalState, isDialogueOpen } from "../../states/modals.svelte";
+    import { Modal } from "@skeletonlabs/skeleton-svelte";
+
 
     function closeModal() {
         closeDialogueOption('info');
     }
 
-    // Close modal on Escape key
+    // Close modal on Escape key (handled by Modal component now)
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
             closeModal();
         }
     }
 
-    // Prevent modal close when clicking inside content
-    function handleContentClick(event: MouseEvent) {
-        event.stopPropagation();
-    }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<Modal
+  open={isDialogueOpen('info')}
+  onOpenChange={(e) => {
+    if (!e.open) {
+      closeModal();
+    }
+  }}
+  classes="panzoom-exclude"
+  backdropClasses="!z-[100] backdrop-blur-sm bg-black/50 left-0 top-0 h-screen w-screen"
+  contentBase="!z-[101] card p-0 shadow-xl max-w-2xl max-h-[90vh] overflow-hidden"
+  positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
+  closeOnInteractOutside={true}
+  closeOnEscape={true}
+>
+  {#snippet trigger()}
+    <!-- No trigger needed since modal is controlled externally -->
+  {/snippet}
+  
+  {#snippet content()}
+    <div class="info-modal-content">
+            <button 
+                class="modal-close-button" 
+                onclick={closeModal} 
+                aria-label="Stäng talangfönster"
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
 
-{#if isDialogueOpen('info')}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div 
-        class="modal-backdrop" 
-        onclick={closeModal}
-        transition:fade={{ duration: 200 }}
-    >
-        <div 
-            class="info-modal-container"
-            onclick={handleContentClick}
-            transition:scale={{ duration: 300, start: 0.8 }}
-        >
-            <div class="torn-input-wrapper variant-1 info-modal-wrapper">
+            </button>
+            <div class="torn-paper-wrapper variant-1 info-modal-wrapper">
                 <div class="info-modal-content">
                     <div class="info-modal-header">
                         <h2 class="info-modal-title">{infoModalState.title}</h2>
-                        <button 
-                            class="close-button" 
-                            onclick={closeModal} 
-                            aria-label="Stäng informationsfönster"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
                     </div>
                     
                     <div class="info-modal-body {infoModalState.type}">
@@ -55,29 +59,28 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
-{/if}
+  {/snippet}
+</Modal>
 
 <style>
-    .modal-backdrop {
-        position: fixed;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.75);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        transform: none;
+    /* Ensure modal appears on top and is properly styled */
+    :global(.skeleton-modal-backdrop) {
+        z-index: 100 !important;
     }
     
+    :global(.skeleton-modal-positioner) {
+        z-index: 100 !important;
+    }
+    
+    :global(.skeleton-modal-content) {
+        z-index: 101 !important;
+    }
+    
+    /* Info-specific styles that override common styles if needed */
+
     .info-modal-container {
-        max-width: min(90vw, 600px);
+        max-width: min(90vw, 800px);
         max-height: min(90vh, 700px);
         width: 100%;
         position: relative;

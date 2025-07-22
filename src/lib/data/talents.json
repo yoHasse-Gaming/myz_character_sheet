@@ -1,0 +1,146 @@
+[
+  {
+    "id": "hår-bd58-7fc2",
+    "name": "Hård jävel",
+    "description": "När du muckar med någon och ger offret stress tar han en poäng extra stress.",
+    "occupation": "Krossare"
+  },
+  {
+    "id": "nju-48cb-1eb3",
+    "name": "Njurslag",
+    "description": "Vapenskadan för dina obeväpnade attacker är 2 i stället för 1.",
+    "occupation": "Krossare"
+  },
+  {
+    "id": "öve-ee53-5624",
+    "name": "Övervåld",
+    "description": "Du kan fly med Styrka i stället för Kyla.",
+    "occupation": "Krossare"
+  },
+  {
+    "id": "mot-f4a7-242d",
+    "name": "Motorskalle",
+    "description": "Du får modifikation +1 när du använder ett fordon för att ramma någon eller för att fly från en konflikt, liksom när du meckar för att laga eller modifiera ett fordon.",
+    "occupation": "Skrotskalle"
+  },
+  {
+    "id": "rep-a965-e593",
+    "name": "Reparatör",
+    "description": "Du får modifikation +1 när du meckar för att reparera föremål - men inte när du bygger något nytt.",
+    "occupation": "Skrotskalle"
+  },
+  {
+    "id": "upp-b9a4-5315",
+    "name": "Uppfinnare",
+    "description": "Du får modifikation +1 när du meckar för att bygga ett nytt hemmabygge - men inte när du reparerar saker.",
+    "occupation": "Skrotskalle"
+  },
+  {
+    "id": "mon-8262-7c93",
+    "name": "Monsterjägare",
+    "description": "Du får modifikation +2 om du spejar mot en zonbest av något slag. SL ska ge dig denna bonus även när du inte vet att ett monster närmar sig.",
+    "occupation": "Zonstrykare"
+  },
+  {
+    "id": "röt-2004-6efe",
+    "name": "Rötnos",
+    "description": "När du slår för att leda vägen och får en bonuseffekt kan du lägga den på att hitta den mest rötfria vägen genom sektorn.",
+    "occupation": "Zonstrykare"
+  },
+  {
+    "id": "sak-8921-d1d4",
+    "name": "Sakletare",
+    "description": "Du får modifikation +2 på att leda vägen, men om slaget lyckas hittar du eventuella artefakter i sektorn. Att upptäcka hot blir i stället en bonuseffekt.",
+    "occupation": "Zonstrykare"
+  },
+  {
+    "id": "ela-9096-d4d0",
+    "name": "Elak jävel",
+    "description": "När du lyckas manipulera någon och ger offret tvivel tar han en poäng extra tvivel.",
+    "occupation": "Fixare"
+  },
+  {
+    "id": "hål-ea6a-b7d8",
+    "name": "Hållhake",
+    "description": "Välj ut en viktig SLP som du har en rejäl hållhake på. Du väljer själv vad hållhaken är och vem denna SLP är.",
+    "occupation": "Fixare"
+  },
+  {
+    "id": "sto-4294-1109",
+    "name": "Storhandlare",
+    "description": "När du schackrar för att göra småaffärer får du dubbelt så mycket av den resurs du väljer.",
+    "occupation": "Fixare"
+  },
+  {
+    "id": "blo-3b4e-cb60",
+    "name": "Blodhund",
+    "description": "Du får +2 när du använder hunden för att följa ett spår. Om hunden dör mister du denna talang.",
+    "occupation": "Mutant med hund"
+  },
+  {
+    "id": "kam-872e-4b83",
+    "name": "Kamphund",
+    "description": "Hundens Styrka ökar till 4 och du får modifikation +1 när du använder hunden för att slåss. Om hunden dör mister du denna talang.",
+    "occupation": "Mutant med hund"
+  },
+  {
+    "id": "mut-542e-518c",
+    "name": "Mutantens bästa vän",
+    "description": "Du kan använda hunden även när du ska kämpa på eller fly från något. Du slår för hundens GE och ditt FV i bussa på.",
+    "occupation": "Mutant med hund"
+  },
+  {
+    "id": "art-3e2b-7a95",
+    "name": "Artist",
+    "description": "En gång per spelmöte kan du hålla ett uppträdande. Slå för inspirera - varje / ger dig T6 patroner eller krubb.",
+    "occupation": "Krönikör"
+  },
+  {
+    "id": "ana-cafa-0dd9",
+    "name": "Anatomikunnig",
+    "description": "Du får modifikation +1 när du vårdar någon som är bruten av skada.",
+    "occupation": "Krönikör"
+  },
+  {
+    "id": "vål-7802-b685",
+    "name": "Våldshetsare",
+    "description": "Du får modifikation +1 när du inspirerar någon som slåss eller skjuter.",
+    "occupation": "Krönikör"
+  },
+  {
+    "id": "ark-6736-d4a2",
+    "name": "Arkens beskyddare",
+    "description": "Du får +2 när du använder kommendera till beskyddarverksamhet.",
+    "occupation": "Boss"
+  },
+  {
+    "id": "kom-9401-ca12",
+    "name": "Kommendant",
+    "description": "Du får modifikation +1 när du kommenderar ditt gäng att utföra dina order.",
+    "occupation": "Boss"
+  },
+  {
+    "id": "rev-5c01-4b17",
+    "name": "Revolvermän",
+    "description": "Ditt gäng har skjutvapen och patroner, och kan strida på avstånd.",
+    "occupation": "Boss"
+  },
+  {
+    "id": "obr-d406-1ae3",
+    "name": "Obrydd",
+    "description": "Du får modifikation +2 till att uthärda, men bara när du får tvivel.",
+    "occupation": "Slav"
+  },
+  {
+    "id": "sla-9d60-12bf",
+    "name": "Slagtålig",
+    "description": "Du får modifikation +1 till att uthärda, men bara när du får skada.",
+    "occupation": "Slav"
+  },
+  {
+    "id": "reb-dcdb-8621",
+    "name": "Rebell",
+    "description": "När du slår för att uthärda får du för varje / du slår modifikation +1 på din nästkommande handling.",
+    "occupation": "Slav"
+  }
+]

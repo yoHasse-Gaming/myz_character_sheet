@@ -1,7 +1,10 @@
+import type { Icon as IconType } from '@lucide/svelte';
 // Character-related types
 export type Talent = {
+    id: string;
     name: string;
     description: string;
+    occupation: string;
 }
 
 export type Mutation = {
@@ -25,42 +28,72 @@ export type SkillsData = {
     mutations: Mutation[];
 }
 
+export type SkillType = {
+    id: string;
+    name: string;
+    baseAbility: AbilityType;
+    value: number;
+    description: string;
+    bonusEffects: string;
+    examples?: string;
+}
+
 // New optional skill types
 export type OptionalSkill = {
     id: string;
     name: string;
     value: number;
-    baseAbility: string;
+    baseAbility: AbilityType;
     description: string;
     bonusEffects: string;
     examples?: string;
     occupation: string;
 }
 
-export type Equipment = {
+export type EquipmentTableItem = {
+    id: string;
     name: string;
-    description: string;
-    total: number;
+    quantity: number;
     weight: number;
 }
 
+export type WeaponDistance = "MELEE" | "CLOSE" | "SHORT" | "LONG";
+
+export type Equipment = {
+    id: string;
+    name: string;
+    description: string;
+    quantity: number;
+    weight: number;
+    bonuses: {
+        id: string;
+        value: number;
+    }[]; 
+}
+
 export type Armor = {
+    id: string;
     name: string;
     description: string;
     protection: number;
     weight: number;
+    equipped: boolean;
 }
 
 export type Weapon = {
+    id: string;
     name: string;
     description: string;
     bonus: number;
     damage: number;
     range: number;
     weight: number;
+    equipped: boolean;
+    type: "MELEE" | "RANGED";
 }
 
 export type RPRelation = {
+    id: string;
     name: string;
     description: string;
     isClose: boolean;
@@ -71,11 +104,16 @@ export type KeyValuePair = {
     value: string;
 }
 
+export type AbilityType = "STRENGTH" | "AGILITY" | "WITS" | "EMPATHY";
+
+
 export type BaseAbilityType = {
     label: string;
     damageLabel: string;
     value: number;
     damage: number;
+    type: AbilityType;
+    description: string;
 }
 
 export type MyCharSheet = {
@@ -117,6 +155,7 @@ export type MyCharSheet = {
     talentPoints: number;
     mutationPoints: number;
     equipment: Equipment[];
+    equipmentTable: EquipmentTableItem[];
     zoneRot: number;
     shells: number;
     armor: Armor[];

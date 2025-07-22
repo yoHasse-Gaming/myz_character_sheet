@@ -1,7 +1,5 @@
 <script lang="ts">
-    import DraggableAddItem from '../DraggableAddItem.svelte';
-        import { characterActions, sheetState, initialCardPositions } from '../../states/character_sheet.svelte';
-    import { generateUniqueVariants } from '../../utils/styleUtils';
+    import { characterActions, sheetState, initialCardPositions } from '../../states/character_sheet.svelte';
     import EquipmentModal from '../Modals/EquipmentModal.svelte';
     import WeaponModal from '../Modals/WeaponModal.svelte';
     import ArmorModal from '../Modals/ArmorModal.svelte';

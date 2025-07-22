@@ -10,8 +10,6 @@
     import TalentsTab from './tabs/TalentsTab.svelte';
     import EquipmentTab from './tabs/EquipmentTab.svelte';
     import RelationsNotesTab from './tabs/RelationsNotesTab.svelte';
-    import DraggableAddItem from './DraggableAddItem.svelte';
-    import DropZoneContainer from './DropZoneContainer.svelte';
     import AppControls from './AppControls.svelte';
 
     let containerElement: HTMLElement;
@@ -210,14 +208,6 @@
         </div>
     </div>
 
-        <!-- Draggable Add Item -->
-    <DraggableAddItem 
-        text="Lägg till"
-        ariaLabel="Dra för att lägga till nytt innehåll"
-        variant="variant-5"
-        dragType="add-item"
-    />
-
     <!-- Instructions -->
     <div class="instructions">
         <p>
@@ -228,9 +218,6 @@
             {/if}
         </p>
     </div>
-
-    <!-- Drop Zone Container for adding new items -->
-    <DropZoneContainer />
 </div>
 
 <style>
@@ -263,8 +250,8 @@
         display: block; /* Remove grid layout */
         position: relative;
         padding: 5rem 2rem 2rem 2rem; /* Add top padding for AppBar */
-        min-width: 300vw; /* Make content much wider for free-form layout */
-        min-height: 200vh; /* Make content taller for more space */
+        min-width: 2560px; /* Make content much wider for free-form layout */
+        min-height: 2560px; /* Make content taller for more space */
         width: max-content; /* Ensure content doesn't get clipped */
         /* Create a visible pattern that moves with panning */
         background-image: url('/img/sheet_bg.png') !important;

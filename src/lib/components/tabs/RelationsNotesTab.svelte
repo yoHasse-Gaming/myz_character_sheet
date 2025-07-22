@@ -53,14 +53,14 @@
 <!-- Relations Section -->
 
     <PaperCard 
-                paperId={`relations`}
-                resizable={true}
-                initialSize={{ width: 450, height: 640 }}
-                minSize={{ width: 300, height: Math.max(sheetState.relations.length * 100, 300) }}
-                initialPosition={initialCardPositions["relations-start"]}
-                class="p-2"
-            >
-                    {#snippet header()}
+        paperId={`relations`}
+        resizable={true}
+        initialSize={{ width: 1050, height: 740 }}
+        minSize={{ width: 1050, height: 640 }}
+        initialPosition={initialCardPositions["relations-start"]}
+        class="p-2"
+    >
+    {#snippet header()}
     <span>Viktiga Relationer</span>
         <!-- <button 
             class="add-item-button"
@@ -71,7 +71,7 @@
             <PlusCircle size={16} />
         </button> -->
     {/snippet}
-            {#snippet content()}
+    {#snippet content()}
             
         {#each sheetState.relations as relation, index}
 
@@ -188,7 +188,7 @@
     paperId={`notes`}
     class="p-1"
     resizable={true}
-    minSize={{ width: 500, height: 200 }}
+    minSize={{ width: 1000, height: 200 }}
     initialPosition={{ x: 1200, y: 900 }}
     >
     {#snippet header()}
@@ -204,27 +204,25 @@
     {/snippet}
     {#snippet content()}
     {#each sheetState.notes as note, index}
-
-
-            <div class="note-content">
-                <div class="note-header">
-                    <span class="note-number"> <Notebook /> Anteckning #{index + 1}</span>
-                    <button 
-                        class="remove-button" 
-                        onclick={() => characterActions.removeNote(index)}
-                        aria-label="Ta bort anteckning #{index + 1}"
-                    >
-                        <CircleX size={16} />
-                    </button>
-                </div>
-                <textarea 
-                    class="note-text font-user"
-                    rows="4"
-                    value={note}
-                    placeholder="Skriv din anteckning här..."
-                    oninput={(e) => updateNote(index, e)}
-                ></textarea>
-            </div>
+    <div class="note-content">
+        <div class="note-header">
+            <span class="note-number"> <Notebook /> Anteckning #{index + 1}</span>
+            <button 
+                class="remove-button" 
+                onclick={() => characterActions.removeNote(index)}
+                aria-label="Ta bort anteckning #{index + 1}"
+            >
+                <CircleX size={16} />
+            </button>
+        </div>
+        <textarea 
+            class="note-text font-user"
+            rows="4"
+            value={note}
+            placeholder="Skriv din anteckning här..."
+            oninput={(e) => updateNote(index, e)}
+        ></textarea>
+    </div>
 
     {/each}
     {/snippet}

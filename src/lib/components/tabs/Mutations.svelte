@@ -2,13 +2,9 @@
     import { onMount, tick } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
-    import FormSection from '../FormSection.svelte';
-    import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openDialogueOption, openInfoModal } from '../../states/modals.svelte';
     import MutationsModal from '../Modals/MutationsModal.svelte';
-    import { Circle, Dna, DnaOff, Info, Microscope, PlusCircle, Radiation, Radius, X } from '@lucide/svelte';
-    import { Rating } from '@skeletonlabs/skeleton-svelte';
-    import type { Mutation } from '../../types';
+    import { Circle, CircleX, Dna, DnaOff, Info, Microscope, PlusCircle, Radiation, Radius, X } from '@lucide/svelte';
     import PaperCard from '../PaperCard.svelte';
 
     // Generate unique variants for mutation items to make them look different
@@ -80,12 +76,6 @@
 
 <MutationsModal />
 
-    <!-- Draggable Add Item -->
-    <!-- <DraggableAddItem 
-        text="Dra för mutation"
-        ariaLabel="Dra för att lägga till mutation"
-        variant="variant-3"
-    /> -->
 <PaperCard 
     paperId={`mutations`}
     draggable={true}
@@ -120,14 +110,11 @@
                         <Info size={16} />
                     </button>
                     <button
-                        class="remove-mutation-button"
+                        class="remove-button"
                         onclick={() => removeMutation(mutation.id)}
                         aria-label="Ta bort {mutation.name}"
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <CircleX size={16} />
                     </button>
                 </div>
                 </div>

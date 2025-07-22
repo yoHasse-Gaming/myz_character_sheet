@@ -21,7 +21,7 @@ export const initialCardPositions: Record<string, { x: number; y: number }> = {
     "talents": { x: 275, y: 660 },
     "occupational-talents": { x: 275, y: 790 },
     // Relations positioning (base position for stacking)
-    "relations-start": { x: 1035, y: 10 },
+    "relations-start": { x: 20, y: 1035 },
     "relations-additional": { x: 1495, y: 10 },
     "zone-rot": { x: 20, y: 730 },
     // Notes positioning (base position for stacking)
@@ -393,9 +393,7 @@ export const characterActions = {
     
     // Notes management
     addNote(note: string) {
-        if (note.trim()) {
-            sheetState.notes.push(note.trim());
-        }
+        sheetState.notes.push(note.trim());
     },
     
     removeNote(index: number) {

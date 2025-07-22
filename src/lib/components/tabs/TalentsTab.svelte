@@ -2,8 +2,6 @@
     import { onMount } from 'svelte';
     import { generateUniqueVariants } from '../../utils/styleUtils';
     import { sheetState, characterActions, initialCardPositions } from '../../states/character_sheet.svelte';
-    import FormSection from '../FormSection.svelte';
-    import DraggableAddItem from '../DraggableAddItem.svelte';
     import { openDialogueOption, openInfoModal } from '../../states/modals.svelte';
     import TalentsModal from '../Modals/TalentsModal.svelte';
     import { initInteractForElement } from '../../utils/interactjsUtils';

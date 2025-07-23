@@ -29,6 +29,7 @@ export const initialCardPositions: Record<string, { x: number; y: number }> = {
 };
 
 export interface CharacterSheetData {
+    id: string;
     name: string;
     occupation: string;
     appearance: {
@@ -60,10 +61,13 @@ export interface CharacterSheetData {
     additionalRelations: RPRelation[];
     notes: string[];
     paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
+    lastUpdated?: number; // Timestamp for last update
+    isSaving?: boolean; // Flag to indicate if saving is in progress
 }
 
 export const sheetState: CharacterSheetData = $state({
     // Character basic info
+    id: "",
     name: "",
     occupation: "",
     appearance: {
@@ -136,7 +140,10 @@ export const sheetState: CharacterSheetData = $state({
     notes: [],
     
     // Paper layout data for preserving positions and sizes across tab switches
-    paperLayouts: {}
+    paperLayouts: {},
+    
+    // Track unsaved changes
+    hasUnsavedChanges: false
 });
 
 // Helper functions for managing the state

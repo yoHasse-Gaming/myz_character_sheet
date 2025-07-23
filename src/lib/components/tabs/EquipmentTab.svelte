@@ -19,13 +19,15 @@
         const total = sheetState.equipment.reduce((sum, item) => 
             sum + (item.quantity * item.weight), 0
         );
-        const weaponTotal = sheetState.weapons.reduce((sum, weapon) => 
-            sum + (1), 0 // TODO: update to weapon.weight when available
-        );
-        console.log('Total weight calculated:', total, 'from items:', sheetState.equipment);
-        return total + weaponTotal;
+        return total;
     });
 
+
+    let confirmationOptions = $state({
+        open: false,
+        itemToDelete: null as string | null,
+        itemNameToDelete: ''
+    });
 
     // Confirmation modal state for weapons
     let weaponConfirmationOpen = $state({
@@ -34,20 +36,6 @@
         weaponNameToDelete: ''
     });
 
-    // Confirmation modal state for equipment
-    let equipmentConfirmationOpen = $state({
-        open: false,
-        itemToDelete: null as string | null,
-        itemNameToDelete: ''
-    });
-
-
-    // confirmation modal state for armor
-    let armorConfirmState = $state({
-        open: false,
-        armorToDelete: null as string | null,
-        armorNameToDelete: ''
-    });
 
     const equipmentHeightCalc = () => {
         return (sheetState.equipment.length > 0 ? sheetState.equipment.length * 60 : 60) + 70; // Adjust height based on number of items
@@ -62,17 +50,17 @@
     };
 
     let minSizeForEquipment = $state({
-        width: 350,
+        width: 450,
         height: equipmentHeightCalc()
     });
 
     let minSizeForArmor = $state({
-        width: 350,
+        width: 450,
         height: armorHeightCalc()
     });
 
     let minSizeForWeapons = $state({
-        width: 350,
+        width: 450,
         height: weaponHeightCalc()
     });
 
@@ -82,6 +70,32 @@
         weaponConfirmationOpen.open = true;
     }
 
+    function requestDeleteItem(itemId: string, itemName: string) {
+        confirmationOptions.itemToDelete = itemId;
+        confirmationOptions.itemNameToDelete = itemName;
+        confirmationOptions.open = true;
+    }
+
+
+    function confirmDeleteItem() {
+        if (confirmationOptions.itemToDelete) {
+            // Remove the item based on its type
+            if (sheetState.equipment.some(e => e.id === confirmationOptions.itemToDelete)) {
+                characterActions.removeEquipment(confirmationOptions.itemToDelete);
+            } else if (sheetState.weapons.some(w => w.id === confirmationOptions.itemToDelete)) {
+                characterActions.removeWeapon(confirmationOptions.itemToDelete);
+            } else if (sheetState.armor.some(a => a.id === confirmationOptions.itemToDelete)) {
+                characterActions.removeArmor(confirmationOptions.itemToDelete);
+            }
+            confirmationOptions.itemToDelete = null;
+            confirmationOptions.itemNameToDelete = "";
+        }
+    }
+
+    function cancelDeleteEquipment() {
+        confirmationOptions.itemToDelete = null;
+        confirmationOptions.itemNameToDelete = "";
+    }
 
 
     function confirmDeleteWeapon() {
@@ -285,7 +299,7 @@
 
                 <button 
                     class="remove-button" 
-                    onclick={() => characterActions.removeEquipment(item.id)}
+                    onclick={() => requestDeleteItem(item.id, item.name)}
                     aria-label="Ta bort vapen {item.name}"
                 >
                     <CircleX size={16} />
@@ -369,7 +383,7 @@
                         </button>
                         <button 
                             class="remove-button" 
-                            onclick={() => requestDeleteWeapon(weapon.id, weapon.name)}
+                            onclick={() => requestDeleteItem(weapon.id, weapon.name)}
                             aria-label="Ta bort vapen {weapon.name}"
                         >
                             <CircleX size={16} />
@@ -468,7 +482,7 @@
                     </button>
                     <button
                         class="remove-button"
-                        onclick={() => characterActions.removeArmor(armor.id)}
+                        onclick={() => requestDeleteItem(armor.id, armor.name)}
                         aria-label="Ta bort {armor.name}"
                     >
                         <CircleX size={16} />

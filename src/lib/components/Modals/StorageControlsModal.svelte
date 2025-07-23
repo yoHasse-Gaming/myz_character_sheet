@@ -154,13 +154,14 @@ Provides a modal interface for all storage operations
         selectedCharacterId = '';
     }
 
+
     onMount(async () => {
         // Ensure the modal is closed when the component mounts
         if(localStorage.getItem('autoSave') === null) {
             localStorage.setItem('autoSave', selectedCharacterId !== '' ? 'true' : 'false');
         }
         isAutoSaving = localStorage.getItem('autoSave') === 'true';
-        
+        addEventListener('beforeunload', onBeforeUnload);
         
         if(OBR.isAvailable) {
             OBR.onReady(async () => {
@@ -189,9 +190,19 @@ Provides a modal interface for all storage operations
 
     });
 
+
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+        if (!isAutoSaving) {
+            e.preventDefault();
+            return '';
+        }
+    }
+    
+
     onDestroy(() => {
         // Cleanup if needed when the modal is destroyed
         storageHandler.stopAutoSave();
+        removeEventListener('beforeunload', onBeforeUnload);
     });
 
 

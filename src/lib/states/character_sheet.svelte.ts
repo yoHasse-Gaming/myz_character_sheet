@@ -139,7 +139,10 @@ export const sheetState: CharacterSheetData = $state({
     notes: [],
     
     // Paper layout data for preserving positions and sizes across tab switches
-    paperLayouts: {}
+    paperLayouts: {},
+    
+    // Track unsaved changes
+    hasUnsavedChanges: false
 });
 
 // Helper functions for managing the state

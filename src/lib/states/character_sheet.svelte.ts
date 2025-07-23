@@ -62,6 +62,7 @@ export interface CharacterSheetData {
     notes: string[];
     paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
     lastUpdated?: number; // Timestamp for last update
+    isSaving?: boolean; // Flag to indicate if saving is in progress
 }
 
 export const sheetState: CharacterSheetData = $state({

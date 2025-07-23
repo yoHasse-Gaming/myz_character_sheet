@@ -65,29 +65,6 @@ class StorageHandler {
         }
     }
 
-    private saveToLocalStorage(data: CharacterSheetData): void {
-        try {
-            data.lastUpdated = Date.now();
-            localStorage.setItem(this.storageOptions.storageKey + sheetState.id, JSON.stringify(data));
-            localStorage.setItem(this.storageOptions.currentCharacterKey, sheetState.id);
-        } catch (error) {
-            console.warn('Failed to save to localStorage:', error);
-        }
-    }
-
-    public async load(characterId: string): Promise<CharacterSheetData | null> {
-        // For file-based workflow, we don't need to load from localStorage
-        // The character data will be loaded from file when user selects "Load from File"
-        // This method is now mainly for backward compatibility
-        try {
-            const savedData = localStorage.getItem(this.storageOptions.storageKey + characterId);
-            return savedData ? JSON.parse(savedData) : null;
-        } catch (error) {
-            console.warn('Failed to load from localStorage:', error);
-            return null;
-        }
-    }
-
 
     public importFromJSON(): Promise<CharacterSheetData | null> {
         return new Promise((resolve, reject) => {

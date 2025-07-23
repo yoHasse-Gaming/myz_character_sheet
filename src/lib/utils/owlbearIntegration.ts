@@ -86,13 +86,14 @@ class OwlbearIntegration {
         if (!OBR.isAvailable) return;
         console.log('Setting up character data listener');
         // Listen for room metadata changes where character data might be stored
-        OBR.room.onMetadataChange(async (metadata: any) => {
-            console.log('Character data metadata changed:', metadata);
-            const characterKey = getExtensionId(await OBR.player.getId());
-            if (metadata[characterKey]) {
-                this.characterData = metadata[characterKey] as CharacterSheetData;
-            }
-        });
+        // TODO: Size limit on room.metadata. Need to find another way.
+        // OBR.room.onMetadataChange(async (metadata: any) => {
+        //     console.log('Character data metadata changed:', metadata);
+        //     const characterKey = getExtensionId(await OBR.player.getId());
+        //     if (metadata[characterKey]) {
+        //         this.characterData = metadata[characterKey] as CharacterSheetData;
+        //     }
+        // });
     }
 
     /**
@@ -107,7 +108,7 @@ class OwlbearIntegration {
         if (OBR.isAvailable) {
             try {
                 const characterKey = getExtensionId(await OBR.player.getId() + '-' + sheetState.id);
-                await OBR.room.setMetadata({
+                await OBR.player.setMetadata({
                     [characterKey]: data
                 });
             } catch (error) {
@@ -194,7 +195,7 @@ class OwlbearIntegration {
         }
 
         try {
-            const metadata = await OBR.room.getMetadata();
+            const metadata = await OBR.player.getMetadata();
             const characterKey = getExtensionId(await OBR.player.getId()) + '-' + characterId;
             const owlBearData = metadata[characterKey] as CharacterSheetData || null;
 
@@ -218,7 +219,7 @@ class OwlbearIntegration {
         }
 
         try {
-            const metadata = await OBR.room.getMetadata();
+            const metadata = await OBR.player.getMetadata();
             const characters: {id: string, name: string, occupation: string}[] = [];
             const characterKeyPrefix = getExtensionId(await OBR.player.getId());
 
@@ -433,7 +434,7 @@ class OwlbearIntegration {
 
         try {
             const characterKey = getExtensionId(await OBR.player.getId()) + '-' + characterId;
-            await OBR.room.setMetadata({
+            await OBR.player.setMetadata({
                 [characterKey]: null // Set to null to delete
             });
             console.log(`Character ${characterId} deleted from Owlbear`);
@@ -448,11 +449,11 @@ class OwlbearIntegration {
 
         try {
             // Clear all character data in Owlbear
-            const metadata = await OBR.room.getMetadata();
+            const metadata = await OBR.player.getMetadata();
             const characterKeyPrefix = getExtensionId(await OBR.player.getId());
             for (const key in metadata) {
                 if (key.startsWith(characterKeyPrefix)) {
-                    await OBR.room.setMetadata({
+                    await OBR.player.setMetadata({
                         [key]: null // Set to null to delete
                     });
                 }

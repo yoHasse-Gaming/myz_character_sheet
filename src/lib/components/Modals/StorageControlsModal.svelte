@@ -8,7 +8,7 @@ Provides a modal interface for all storage operations
     import { onDestroy, onMount } from "svelte";
     import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from "@lucide/svelte";
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
-    import owlbearIntegration from "../../utils/owlbearIntegration";
+    import { storageHandler } from "../../utils/storageHandler";
     import OBR from "@owlbear-rodeo/sdk";
     
     function closeModal() {
@@ -17,7 +17,7 @@ Provides a modal interface for all storage operations
 
         // Initialize storage utilities
 
-    let storageConfig = $state(owlbearIntegration.getStorageConfig());
+    let storageConfig = $state(storageHandler.getStorageConfig());
 
     let isAutoSaving = $state(false);
     let importStatus = $state('');
@@ -34,13 +34,13 @@ Provides a modal interface for all storage operations
     }
 
     function startAutoSave() {
-        owlbearIntegration.startAutoSave();
+        storageHandler.startAutoSave();
         isAutoSaving = true;
         localStorage.setItem('autoSave', 'true');
     }
 
     function stopAutoSave() {
-        owlbearIntegration.stopAutoSave();
+        storageHandler.stopAutoSave();
         isAutoSaving = false;
         localStorage.setItem('autoSave', 'false');
     }
@@ -49,14 +49,14 @@ Provides a modal interface for all storage operations
     // JSON export/import
     function exportToJSON() {
         const filename = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-        owlbearIntegration.exportToJSON(sheetState, filename);
+        storageHandler.exportToJSON(sheetState, filename);
         exportStatus = 'Character sheet exported';
         setTimeout(() => exportStatus = '', 3000);
     }
 
     async function importFromJSON() {
         try {
-            const data = await owlbearIntegration.importFromJSON();
+            const data = await storageHandler.importFromJSON();
             if (data) {
                 // Apply imported data to character sheet - include all fields
                 Object.assign(sheetState, data);
@@ -75,7 +75,7 @@ Provides a modal interface for all storage operations
 
     // Universal save/load (localStorage + Owlbear)
     async function save() {
-        await owlbearIntegration.save();
+        await storageHandler.save();
         exportStatus = OBR.isAvailable ? 
             'Saved to Owlbear and localStorage' : 
             'Saved to localStorage';
@@ -103,7 +103,7 @@ Provides a modal interface for all storage operations
     async function load(characterId: string = '') {
 
         if (!characterId) {
-            const storedCharacters = await owlbearIntegration.getStoredCharacters();
+            const storedCharacters = await storageHandler.getStoredCharacters();
             if (storedCharacters.length === 0) {
                 importStatus = 'Välkommen till Mutant: År noll karaktärsblad! Det finns inga tidigare sparade karaktärer. Välj nedan om du önskar att skapa en ny karaktär eller ladda in en tidigare sparad karaktär via JSON import.';
                 return;
@@ -116,7 +116,7 @@ Provides a modal interface for all storage operations
             selectedCharacterId = characterId;
         }
 
-        const data: CharacterSheetData | null = await owlbearIntegration.load(selectedCharacterId);
+        const data: CharacterSheetData | null = await storageHandler.load(selectedCharacterId);
 
         if (!data) {
             importStatus = 'Inget data hittades för vald karaktär.';
@@ -134,7 +134,7 @@ Provides a modal interface for all storage operations
     function updateAutoSaveInterval(event: Event) {
         const target = event.target as HTMLInputElement;
         const interval = parseInt(target.value) * 1000; // Convert seconds to milliseconds
-        owlbearIntegration.configureStorage({ autoSaveInterval: interval });
+        storageHandler.configureStorage({ autoSaveInterval: interval });
 
         if (isAutoSaving) {
             // Restart auto-save with new interval
@@ -144,10 +144,10 @@ Provides a modal interface for all storage operations
     }
     // Delete character
     async function clearAllData() {
-        const confirmed = confirm('Are you sure you want to clear all Owlbear data?');
+        const confirmed = confirm('Are you sure you want to clear all stored data?');
         if (!confirmed) return;
 
-        await owlbearIntegration.resetData();
+        await storageHandler.resetData();
         characters = [];
         selectedCharacterId = '';
     }
@@ -189,7 +189,7 @@ Provides a modal interface for all storage operations
 
     onDestroy(() => {
         // Cleanup if needed when the modal is destroyed
-        owlbearIntegration.stopAutoSave();
+        storageHandler.stopAutoSave();
     });
 
 
@@ -301,12 +301,12 @@ Provides a modal interface for all storage operations
     <div class="control-group">
         <h4><BrainCircuit size={16} /> Manual Save/Load {OBR.isAvailable ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
         <div class="control-row">
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
                 <button class="btn" onclick={save}>
                     <Save size={16} /> Save Character
                 </button>
             </div>
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
                 <button class="btn" onclick={() => load(selectedCharacterId)}>
                     <FolderDown size={16} /> Load Character
                 </button>
@@ -322,13 +322,13 @@ Provides a modal interface for all storage operations
         <h4><FileJson size={16} /> JSON Export/Import</h4>
         <div class="control-row">
             {#if selectedCharacterId}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
             <button class="btn btn-outline" onclick={exportToJSON}>
                 <FileDown size={16} /> Export JSON
             </button>
             </div>
             {/if}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
             <button class="btn btn-outline" onclick={importFromJSON}>
                 <FileUp size={16} /> Import JSON
             </button>
@@ -340,9 +340,9 @@ Provides a modal interface for all storage operations
     <div class="control-group">
         <h4><Trash size={16} /> Clear All Data</h4>
         <div class="control-row">
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w-full">
                 <button class="btn btn-danger" onclick={clearAllData}>
-                    <Trash size={16} /> Clear All Owlbear Data
+                    <Trash size={16} /> Clear All Stored Data
                 </button>
             </div>
         </div>
@@ -371,10 +371,13 @@ Provides a modal interface for all storage operations
         /* stroke: var(--color-surface-800); */
     }
 
-       .btn-wrapper {
+    .w250 {
         min-width: 250px;
         width: 250px;
-        
+    }
+
+    .btn-danger {
+        filter: sepia(100%) saturate(200%) brightness(80%) hue-rotate(300deg);
     }
     .storage-controls {
         /* background: var(--color-surface-100); */

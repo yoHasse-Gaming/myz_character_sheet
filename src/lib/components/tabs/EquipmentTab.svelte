@@ -19,11 +19,7 @@
         const total = sheetState.equipment.reduce((sum, item) => 
             sum + (item.quantity * item.weight), 0
         );
-        const weaponTotal = sheetState.weapons.reduce((sum, weapon) => 
-            sum + (1), 0 // TODO: update to weapon.weight when available
-        );
-        console.log('Total weight calculated:', total, 'from items:', sheetState.equipment);
-        return total + weaponTotal;
+        return total;
     });
 
 
@@ -62,17 +58,17 @@
     };
 
     let minSizeForEquipment = $state({
-        width: 350,
+        width: 450,
         height: equipmentHeightCalc()
     });
 
     let minSizeForArmor = $state({
-        width: 350,
+        width: 450,
         height: armorHeightCalc()
     });
 
     let minSizeForWeapons = $state({
-        width: 350,
+        width: 450,
         height: weaponHeightCalc()
     });
 

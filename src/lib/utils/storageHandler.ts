@@ -1,4 +1,6 @@
 import { sheetState, type CharacterSheetData } from "../states/character_sheet.svelte";
+import { googleDriveIntegration } from "./googleDriveIntegration";
+import { oneDriveIntegration } from "./oneDriveIntegration";
 
 
 
@@ -6,6 +8,8 @@ export interface StorageOptions {
     autoSaveInterval: number;
     storageKey: string;
     currentCharacterKey: string;
+    cloudProvider?: 'none' | 'google-drive' | 'onedrive';
+    syncWithCloud?: boolean;
 }
 
 
@@ -14,7 +18,9 @@ class StorageHandler {
     private storageOptions: StorageOptions = {
         autoSaveInterval: 5000,
         storageKey: 'myz-character-sheet-data',
-        currentCharacterKey: 'current-character-id'
+        currentCharacterKey: 'current-character-id',
+        cloudProvider: 'none',
+        syncWithCloud: false
     };
     private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
 
@@ -47,7 +53,14 @@ class StorageHandler {
     public async save(): Promise<void> {
         sheetState.lastUpdated = Date.now();
         const data = JSON.parse(JSON.stringify(sheetState));
+        
+        // Always save to localStorage first
         this.saveToLocalStorage(data);
+        
+        // Optionally sync to cloud storage
+        if (this.storageOptions.syncWithCloud) {
+            await this.syncToCloud(data);
+        }
     }
 
     private saveToLocalStorage(data: CharacterSheetData): void {
@@ -186,6 +199,218 @@ class StorageHandler {
             clearInterval(this.autoSaveTimer);
             this.autoSaveTimer = null;
             localStorage.removeItem(StorageHandler.TIMER_ID_KEY);
+        }
+    }
+
+    // Cloud storage integration methods
+    private async syncToCloud(data: CharacterSheetData): Promise<void> {
+        try {
+            switch (this.storageOptions.cloudProvider) {
+                case 'google-drive':
+                    if (googleDriveIntegration.isAvailable) {
+                        await googleDriveIntegration.saveCharacterSheet(data);
+                    }
+                    break;
+                case 'onedrive':
+                    if (oneDriveIntegration.isAvailable) {
+                        await oneDriveIntegration.saveCharacterSheet(data);
+                    }
+                    break;
+                default:
+                    // No cloud sync
+                    break;
+            }
+        } catch (error) {
+            console.warn('Failed to sync to cloud:', error);
+            // Don't throw error - localStorage save should still work
+        }
+    }
+
+    public async loadFromCloud(characterId: string): Promise<CharacterSheetData | null> {
+        try {
+            switch (this.storageOptions.cloudProvider) {
+                case 'google-drive':
+                    if (googleDriveIntegration.isAvailable) {
+                        const files = await googleDriveIntegration.listCharacterSheets();
+                        const targetFile = files.find(file => file.name.includes(characterId));
+                        if (targetFile) {
+                            return await googleDriveIntegration.loadCharacterSheet(targetFile.id);
+                        }
+                    }
+                    break;
+                case 'onedrive':
+                    if (oneDriveIntegration.isAvailable) {
+                        const files = await oneDriveIntegration.listCharacterSheets();
+                        const targetFile = files.find(file => file.name.includes(characterId));
+                        if (targetFile) {
+                            return await oneDriveIntegration.loadCharacterSheet(targetFile.id);
+                        }
+                    }
+                    break;
+                default:
+                    return null;
+            }
+        } catch (error) {
+            console.warn('Failed to load from cloud:', error);
+            return null;
+        }
+        return null;
+    }
+
+    public async getCloudCharacters(): Promise<{id: string, name: string, source: string, lastModified: string}[]> {
+        const characters: {id: string, name: string, source: string, lastModified: string}[] = [];
+        
+        try {
+            switch (this.storageOptions.cloudProvider) {
+                case 'google-drive':
+                    if (googleDriveIntegration.isAvailable) {
+                        const files = await googleDriveIntegration.listCharacterSheets();
+                        for (const file of files) {
+                            const match = file.name.match(/^(.+)_([a-f0-9-]+)\.json$/);
+                            if (match) {
+                                characters.push({
+                                    id: match[2],
+                                    name: match[1],
+                                    source: 'Google Drive',
+                                    lastModified: file.modifiedTime
+                                });
+                            }
+                        }
+                    }
+                    break;
+                case 'onedrive':
+                    if (oneDriveIntegration.isAvailable) {
+                        const files = await oneDriveIntegration.listCharacterSheets();
+                        for (const file of files) {
+                            const match = file.name.match(/^(.+)_([a-f0-9-]+)\.json$/);
+                            if (match) {
+                                characters.push({
+                                    id: match[2],
+                                    name: match[1],
+                                    source: 'OneDrive',
+                                    lastModified: file.lastModifiedDateTime
+                                });
+                            }
+                        }
+                    }
+                    break;
+            }
+        } catch (error) {
+            console.warn('Failed to get cloud characters:', error);
+        }
+        
+        return characters;
+    }
+
+    public async deleteFromCloud(characterId: string): Promise<boolean> {
+        try {
+            switch (this.storageOptions.cloudProvider) {
+                case 'google-drive':
+                    if (googleDriveIntegration.isAvailable) {
+                        const files = await googleDriveIntegration.listCharacterSheets();
+                        const targetFile = files.find(file => file.name.includes(characterId));
+                        if (targetFile) {
+                            return await googleDriveIntegration.deleteCharacterSheet(targetFile.id);
+                        }
+                    }
+                    break;
+                case 'onedrive':
+                    if (oneDriveIntegration.isAvailable) {
+                        const files = await oneDriveIntegration.listCharacterSheets();
+                        const targetFile = files.find(file => file.name.includes(characterId));
+                        if (targetFile) {
+                            return await oneDriveIntegration.deleteCharacterSheet(targetFile.id);
+                        }
+                    }
+                    break;
+            }
+        } catch (error) {
+            console.warn('Failed to delete from cloud:', error);
+            return false;
+        }
+        return false;
+    }
+
+    // Cloud provider initialization methods
+    public async initializeGoogleDrive(): Promise<boolean> {
+        try {
+            const success = await googleDriveIntegration.initialize();
+            if (success) {
+                this.storageOptions.cloudProvider = 'google-drive';
+                this.storageOptions.syncWithCloud = true;
+            }
+            return success;
+        } catch (error) {
+            console.error('Failed to initialize Google Drive:', error);
+            return false;
+        }
+    }
+
+    public async initializeOneDrive(): Promise<boolean> {
+        try {
+            const success = await oneDriveIntegration.initialize();
+            if (success) {
+                this.storageOptions.cloudProvider = 'onedrive';
+                this.storageOptions.syncWithCloud = true;
+            }
+            return success;
+        } catch (error) {
+            console.error('Failed to initialize OneDrive:', error);
+            return false;
+        }
+    }
+
+    public async signInToGoogleDrive(): Promise<boolean> {
+        return await googleDriveIntegration.signIn();
+    }
+
+    public async signInToOneDrive(): Promise<boolean> {
+        return await oneDriveIntegration.signIn();
+    }
+
+    public async signOutFromCloud(): Promise<void> {
+        switch (this.storageOptions.cloudProvider) {
+            case 'google-drive':
+                await googleDriveIntegration.signOut();
+                break;
+            case 'onedrive':
+                await oneDriveIntegration.signOut();
+                break;
+        }
+        this.storageOptions.cloudProvider = 'none';
+        this.storageOptions.syncWithCloud = false;
+    }
+
+    public getCloudUser(): any {
+        switch (this.storageOptions.cloudProvider) {
+            case 'google-drive':
+                return googleDriveIntegration.getCurrentUser();
+            case 'onedrive':
+                return oneDriveIntegration.getCurrentUser();
+            default:
+                return null;
+        }
+    }
+
+    public get isCloudAvailable(): boolean {
+        switch (this.storageOptions.cloudProvider) {
+            case 'google-drive':
+                return googleDriveIntegration.isAvailable;
+            case 'onedrive':
+                return oneDriveIntegration.isAvailable;
+            default:
+                return false;
+        }
+    }
+
+    public get cloudProviderName(): string {
+        switch (this.storageOptions.cloudProvider) {
+            case 'google-drive':
+                return 'Google Drive';
+            case 'onedrive':
+                return 'OneDrive';
+            default:
+                return 'None';
         }
     }
 }

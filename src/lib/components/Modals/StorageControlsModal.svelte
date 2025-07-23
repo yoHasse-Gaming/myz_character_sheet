@@ -6,7 +6,9 @@ Provides a modal interface for all storage operations
     import { Modal } from "@skeletonlabs/skeleton-svelte";
     import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from "@lucide/svelte";
+        import ConfirmationModal from './ConfirmationModal.svelte';
+    import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from '@lucide/svelte';
+    import CloudStorage from '../CloudStorage.svelte';
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     import { storageHandler } from "../../utils/storageHandler";
     import OBR from "@owlbear-rodeo/sdk";
@@ -229,6 +231,11 @@ Provides a modal interface for all storage operations
             <div class="storage-controls">
     <h3 class="storage-title"><Save /> Storage & Backup</h3>
 
+    <!-- Cloud Storage Integration -->
+     {#if false}
+    <CloudStorage />
+    {/if}
+
     <!-- Status Messages -->
     {#if exportStatus}
         <div class="status-message">{exportStatus}</div>
@@ -328,7 +335,8 @@ Provides a modal interface for all storage operations
             </button>
             </div>
             {/if}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper {selectedCharacterId ? 'w250' : ''}">
+            
             <button class="btn btn-outline" onclick={importFromJSON}>
                 <FileUp size={16} /> Import JSON
             </button>

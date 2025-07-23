@@ -148,6 +148,10 @@ export const sheetState: CharacterSheetData = $state({
 
 // Helper functions for managing the state
 export const characterActions = {
+
+    // Create a subscribable function to track when Character is loaded
+    
+
     // Base ability damage functions
     increaseAbilityDamage(abilityIndex: number) {
         const ability = sheetState.baseAbilities[abilityIndex];

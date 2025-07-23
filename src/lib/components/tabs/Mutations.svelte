@@ -29,46 +29,7 @@
         characterActions.removeMutation(mutationId);
     }
 
-    function resetMutationLayout() {
-        // Clear saved layout
-        characterActions.clearPaperLayouts();
-        
-        // Reset mutation points element to default position and size
-        const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
-        if (mutationPointsElement) {
-            // Reset transform
-            mutationPointsElement.style.transform = '';
-            mutationPointsElement.setAttribute('data-x', '0');
-            mutationPointsElement.setAttribute('data-y', '0');
-            // Reset size
-            mutationPointsElement.style.width = '';
-            mutationPointsElement.style.height = '';
-        }
-        
-        console.log('Mutation layout reset to defaults');
-    
-    }
-
     onMount(() => {
-        // Initialize InteractJS for the mutation points component
-        const mutationPointsElement = document.querySelector('.mutation-points-wrapper') as HTMLElement;
-        if (mutationPointsElement) {            
-            // Apply saved layout if it exists
-            const savedLayout = characterActions.getPaperLayout('mutation-points');
-            if (savedLayout) {
-                if (savedLayout.x !== undefined && savedLayout.y !== undefined) {
-                    mutationPointsElement.style.transform = `translate(${savedLayout.x}px, ${savedLayout.y}px)`;
-                    mutationPointsElement.setAttribute('data-x', savedLayout.x.toString());
-                    mutationPointsElement.setAttribute('data-y', savedLayout.y.toString());
-                }
-                if (savedLayout.width) {
-                    mutationPointsElement.style.width = `${savedLayout.width}px`;
-                }
-                if (savedLayout.height) {
-                    mutationPointsElement.style.height = `${savedLayout.height}px`;
-                }
-            }
-        }
 
     });
 

@@ -214,7 +214,7 @@
             {#if isPanMode}
                 🎯 <strong>PANORERA-LÄGE PÅ</strong> • Dra för att panorera • Släpp mittenknappen för att stoppa
             {:else}
-                🎯 Håll <strong>MITTENKNAPPEN</strong> för att panorera • 🔍 Ctrl + Scroll för zooma • ⌨️ R för återställa
+                🎯 Håll <strong>MITTENKNAPPEN</strong> för att panorera • 🔍 Ctrl + Scroll för zooma
             {/if}
         </p>
     </div>

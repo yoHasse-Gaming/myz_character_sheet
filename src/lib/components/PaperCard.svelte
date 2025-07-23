@@ -2,7 +2,7 @@
     import { onMount, type Snippet } from 'svelte';
     import { generateUniqueVariants } from '../utils/styleUtils';
     import { autoResizePaper, initInteractForElement } from '../utils/interactjsUtils';
-    import { characterActions } from '../states/character_sheet.svelte';
+    import { characterActions, sheetState } from '../states/character_sheet.svelte';
     import type { Icon as IconType } from '@lucide/svelte';
 
     // Props
@@ -48,11 +48,40 @@
 
     $effect(() => {
         // Ensure the paperId is unique and valid
-        minSize;
-        paperElement.style.setProperty('--min-width', `${minSize.width}px`);
-        paperElement.style.setProperty('--min-height', `${minSize.height}px`);
+        minSize.width;
+        minSize.height;
+
+        setTimeout(() => {
+            paperElement.style.setProperty('--min-width', `${minSize.width}px`);
+            paperElement.style.setProperty('--min-height', `${minSize.height}px`);
+        }, 0);
+
 
     });
+
+    $effect(() => {
+        // Update the paper layout when the component is mounted or updated
+        sheetState.id; // Trigger on sheet ID change
+
+        setTimeout(() => {
+            setPaperLayouts();
+        }, 0);
+    });
+
+    function setPaperLayouts() {
+        const paperLayout = characterActions.getPaperLayout(paperId);
+
+        if (paperElement && paperLayout) {
+            paperElement.style.transform = `translate(${paperLayout.x}px, ${paperLayout.y}px)`;
+            paperElement.setAttribute('data-x', paperLayout.x.toString());
+            paperElement.setAttribute('data-y', paperLayout.y.toString());
+            
+            // Apply saved size if available
+            if (paperLayout.width) paperElement.style.width = paperLayout.width + 'px';
+            if (paperLayout.height) paperElement.style.height = paperLayout.height + 'px';
+        }
+    }
+
 
     onMount(() => {
         if (paperElement) {

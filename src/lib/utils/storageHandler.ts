@@ -23,7 +23,7 @@ class StorageHandler {
         currentCharacterKey: 'current-character-id',
         cloudProvider: 'none',
         syncWithCloud: false,
-        autoSaveToFile: false
+        autoSaveToFile: true
     };
     private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
 
@@ -43,10 +43,7 @@ class StorageHandler {
     public configureStorage(options: Partial<StorageOptions>): void {
         this.storageOptions = { ...this.storageOptions, ...options };
         
-        // Restart auto-save if interval changed and auto-save is active
-        if (this.autoSaveTimer && options.autoSaveInterval) {
-            this.stopAutoSave();
-        }
+
     }
 
     public getStorageConfig(): StorageOptions {
@@ -57,17 +54,14 @@ class StorageHandler {
         sheetState.lastUpdated = Date.now();
         const data = JSON.parse(JSON.stringify(sheetState));
         
-        // Always save to localStorage first
-        this.saveToLocalStorage(data);
+        // Primary save method: save to file if available
+        if (this.storageOptions.autoSaveToFile && this.fileHandle) {
+            await this.saveToFile(data);
+        }
         
         // Optionally sync to cloud storage
         if (this.storageOptions.syncWithCloud) {
             await this.syncToCloud(data);
-        }
-
-        // Optionally save to local file if enabled and file handle exists
-        if (this.storageOptions.autoSaveToFile && this.fileHandle) {
-            await this.saveToFile(data);
         }
     }
 
@@ -82,6 +76,9 @@ class StorageHandler {
     }
 
     public async load(characterId: string): Promise<CharacterSheetData | null> {
+        // For file-based workflow, we don't need to load from localStorage
+        // The character data will be loaded from file when user selects "Load from File"
+        // This method is now mainly for backward compatibility
         try {
             const savedData = localStorage.getItem(this.storageOptions.storageKey + characterId);
             return savedData ? JSON.parse(savedData) : null;
@@ -91,71 +88,6 @@ class StorageHandler {
         }
     }
 
-    public async getStoredCharacters(): Promise<{id: string, name: string, occupation: string}[]> {
-        const characters: {id: string, name: string, occupation: string}[] = [];
-        try {
-            const keys = Object.keys(localStorage).filter(key => key.startsWith(this.storageOptions.storageKey));
-            for (const key of keys) {
-                const data = JSON.parse(localStorage.getItem(key) || '{}');
-                if (data?.id && data?.name) {
-                    characters.push({
-                        id: data.id,
-                        name: data.name,
-                        occupation: data.occupation || ''
-                    });
-                }
-            }
-        } catch (error) {
-            console.warn('Failed to get stored characters:', error);
-        }
-        return characters;
-    }
-
-    public async deleteCharacter(characterId: string): Promise<void> {
-        try {
-            localStorage.removeItem(this.storageOptions.storageKey + characterId);
-        } catch (error) {
-            console.warn(`Failed to delete character ${characterId}:`, error);
-        }
-    }
-
-    public async resetData(): Promise<void> {
-        try {
-            const keys = Object.keys(localStorage).filter(key => key.startsWith(this.storageOptions.storageKey));
-            keys.forEach(key => localStorage.removeItem(key));
-            localStorage.removeItem(this.storageOptions.currentCharacterKey);
-        } catch (error) {
-            console.warn('Failed to reset data:', error);
-        }
-    }
-
-
-
-        // Export/Import methods
-    public exportToJSON(data: CharacterSheetData, filename?: string): void {
-        try {
-            const dataToExport = {
-                ...data,
-                exportedAt: new Date().toISOString(),
-                version: '1.0'
-            };
-
-            const jsonString = JSON.stringify(dataToExport, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename || `myz-character-${data.name || 'unnamed'}-${new Date().toISOString().split('T')[0]}.json`;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            console.warn('Failed to export character data:', error);
-        }
-    }
 
     public importFromJSON(): Promise<CharacterSheetData | null> {
         return new Promise((resolve, reject) => {
@@ -190,36 +122,6 @@ class StorageHandler {
     // File System Access API methods (for browsers that support it)
     public get supportsFileSystemAccess(): boolean {
         return 'showSaveFilePicker' in window && 'showOpenFilePicker' in window;
-    }
-
-    public async selectFileForAutoSave(data: CharacterSheetData): Promise<boolean> {
-        if (!this.supportsFileSystemAccess) {
-            console.warn('File System Access API not supported');
-            return false;
-        }
-
-        try {
-            const filename = `${data.name || 'unnamed'}-character-sheet.json`;
-            const fileHandle = await (window as any).showSaveFilePicker({
-                suggestedName: filename,
-                types: [{
-                    description: 'JSON files',
-                    accept: {
-                        'application/json': ['.json']
-                    }
-                }]
-            });
-
-            this.fileHandle = fileHandle;
-            
-            // Immediately save to the selected file
-            await this.saveToFile(data);
-            
-            return true;
-        } catch (error) {
-            console.warn('Failed to select file for auto-save:', error);
-            return false;
-        }
     }
 
     public async saveToFile(data: CharacterSheetData): Promise<boolean> {
@@ -276,6 +178,36 @@ class StorageHandler {
         }
     }
 
+    public async createNewCharacterFile(data: CharacterSheetData): Promise<boolean> {
+        if (!this.supportsFileSystemAccess) {
+            console.warn('File System Access API not supported');
+            return false;
+        }
+
+        try {
+            const filename = `${data.name || 'unnamed'}-character-sheet.json`;
+            const fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'JSON files',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }]
+            });
+
+            this.fileHandle = fileHandle;
+            
+            // Immediately save to the selected file
+            await this.saveToFile(data);
+            
+            return true;
+        } catch (error) {
+            console.warn('Failed to create new character file:', error);
+            return false;
+        }
+    }
+
     public clearFileHandle(): void {
         this.fileHandle = null;
     }
@@ -285,11 +217,13 @@ class StorageHandler {
     }
 
     // Auto-save methods
-    public startAutoSave(): void {
+    public startAutoSave(onSavingStarted: () => Promise<void>, onSavingCompleted: () => Promise<void>): void {
         if (this.autoSaveTimer) return;
 
         this.autoSaveTimer = window.setInterval(async () => {
+            await onSavingStarted();
             await this.save();
+            await onSavingCompleted();
         }, this.storageOptions.autoSaveInterval);
 
         try {

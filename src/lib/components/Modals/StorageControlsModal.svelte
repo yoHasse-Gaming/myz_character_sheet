@@ -7,7 +7,7 @@ Provides a modal interface for all storage operations
     import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
         import ConfirmationModal from './ConfirmationModal.svelte';
-    import { Archive, BrainCircuit, File, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from '@lucide/svelte';
+    import { Archive, File, FileDown, FileJson, FileUp, Save, SquareCheckBig, Trash, UserPen } from '@lucide/svelte';
     import CloudStorage from '../CloudStorage.svelte';
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     import { storageHandler } from "../../utils/storageHandler";
@@ -27,28 +27,6 @@ Provides a modal interface for all storage operations
     let importStatus = $state('');
     let exportStatus = $state('');
 
-        // Auto-save toggle
-    function toggleAutoSave() {
-        if (isAutoSaving) {
-            stopAutoSave();
-
-        } else {
-            startAutoSave();
-        }
-    }
-
-    function startAutoSave() {
-        storageHandler.startAutoSave();
-        isAutoSaving = true;
-        localStorage.setItem('autoSave', 'true');
-    }
-
-    function stopAutoSave() {
-        storageHandler.stopAutoSave();
-        isAutoSaving = false;
-        localStorage.setItem('autoSave', 'false');
-    }
-
     // File auto-save functions
     async function setupFileAutoSave() {
         if (!storageHandler.supportsFileSystemAccess) {
@@ -57,29 +35,36 @@ Provides a modal interface for all storage operations
             return;
         }
 
-        const success = await storageHandler.selectFileForAutoSave(sheetState);
+        const success = await storageHandler.createNewCharacterFile(sheetState);
         if (success) {
             isAutoSavingToFile = true;
             storageHandler.configureStorage({ autoSaveToFile: true });
-            exportStatus = 'File selected for auto-save. Changes will automatically save to your chosen file.';
+            await startAutoSave();
+            exportStatus = 'File selected! All changes will automatically save to your chosen file.';
             
             // Update current file name for display
             if (storageHandler.hasActiveFile) {
                 currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
             }
         } else {
-            exportStatus = 'Failed to set up file auto-save.';
+            exportStatus = 'Failed to select file.';
         }
         setTimeout(() => exportStatus = '', 3000);
     }
 
-    function stopFileAutoSave() {
-        storageHandler.configureStorage({ autoSaveToFile: false });
-        storageHandler.clearFileHandle();
-        isAutoSavingToFile = false;
-        currentFileName = '';
-        exportStatus = 'File auto-save disabled.';
-        setTimeout(() => exportStatus = '', 3000);
+    async function startAutoSave(){
+        storageHandler.startAutoSave(
+            async () => {
+                // Callback before saving
+                console.log('Saving character sheet to file...');
+                sheetState.isSaving = true; // Set saving flag
+            },
+            async () => {
+                // Callback after saving
+                console.log('Character sheet saved to file successfully.');
+                sheetState.isSaving = false; // Clear saving flag
+            }
+        );
     }
 
     async function loadFromFileSystem() {
@@ -94,28 +79,19 @@ Provides a modal interface for all storage operations
             if (data) {
                 Object.assign(sheetState, data);
                 selectedCharacterId = sheetState.id;
-                await save();
                 
                 // Enable file auto-save since we now have a file handle
                 isAutoSavingToFile = true;
                 storageHandler.configureStorage({ autoSaveToFile: true });
+                await startAutoSave();
                 currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
                 
-                importStatus = 'Character loaded from file and file auto-save enabled.';
+                importStatus = 'Character loaded from file. All changes will automatically save to this file.';
             }
         } catch (error) {
             importStatus = 'Failed to load from file: ' + (error as Error).message;
         }
         setTimeout(() => importStatus = '', 5000);
-    }
-
-
-    // JSON export/import
-    function exportToJSON() {
-        const filename = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-        storageHandler.exportToJSON(sheetState, filename);
-        exportStatus = 'Character sheet exported';
-        setTimeout(() => exportStatus = '', 3000);
     }
 
     async function importFromJSON() {
@@ -127,7 +103,7 @@ Provides a modal interface for all storage operations
                 importStatus = 'Character sheet imported successfully';
                 selectedCharacterId = sheetState.id; // Update selected character ID
                 // Save the imported character to Owlbear if available
-                await save();
+                
             } else {
                 importStatus = 'Import cancelled';
             }
@@ -137,126 +113,37 @@ Provides a modal interface for all storage operations
         setTimeout(() => importStatus = '', 5000);
     }
 
-    // Universal save/load (localStorage + Owlbear)
-    async function save() {
-        await storageHandler.save();
-        exportStatus = OBR.isAvailable ? 
-            'Saved to Owlbear and localStorage' : 
-            'Saved to localStorage';
-        setTimeout(() => exportStatus = '', 3000);
-    }
 
-    let characters: { id: string, name: string, occupation: string }[] = $state([]);
     let selectedCharacterId: string = $state('');
     
     async function createNewCharacter() {
-        // Generate a new ID using crypto if it doesn't exist
+        // Generate a new ID and set default values
         sheetState.id = crypto.randomUUID();
-        sheetState.name = 'Ny karaktär'; // Default name
-        sheetState.occupation = 'Krossare'; // Default occupation
-        await save(); // Save the new character
-        characters.push({
-            id: sheetState.id,
-            name: sheetState.name,
-            occupation: sheetState.occupation || ''
-        });
+        sheetState.name = 'New Character'; // Default name
+        sheetState.occupation = 'Enforcer'; // Default occupation
+
         selectedCharacterId = sheetState.id; // Select the new character
-        importStatus = 'En ny karaktär har skapats och sparats.';
-    }
-
-    async function load(characterId: string = '') {
-
-        if (!characterId) {
-            const storedCharacters = await storageHandler.getStoredCharacters();
-            if (storedCharacters.length === 0) {
-                importStatus = 'Välkommen till Mutant: År noll karaktärsblad! Det finns inga tidigare sparade karaktärer. Välj nedan om du önskar att skapa en ny karaktär eller ladda in en tidigare sparad karaktär via JSON import.';
-                return;
-            } else {
-                console.log('Loaded stored characters:', storedCharacters);
-                characters = storedCharacters;
-                selectedCharacterId = characters[0].id;
-            }
-        }else {
-            selectedCharacterId = characterId;
-        }
-
-        const data: CharacterSheetData | null = await storageHandler.load(selectedCharacterId);
-
-        if (!data) {
-            importStatus = 'Inget data hittades för vald karaktär.';
-            return;
-        }
-        // Apply loaded data to character sheet - include all fields
-        Object.assign(sheetState, data);
-        importStatus = OBR.isAvailable ? 
-            'Loaded from Owlbear (or localStorage fallback)' : 
-            'Loaded from localStorage';
-        setTimeout(() => importStatus = '', 3000);
-    }
-
-    // Update storage configuration
-    function updateAutoSaveInterval(event: Event) {
-        const target = event.target as HTMLInputElement;
-        const interval = parseInt(target.value) * 1000; // Convert seconds to milliseconds
-        storageHandler.configureStorage({ autoSaveInterval: interval });
-
-        if (isAutoSaving) {
-            // Restart auto-save with new interval
-            stopAutoSave();
-            startAutoSave();
-        }
-    }
-    // Delete character
-    async function clearAllData() {
-        const confirmed = confirm('Are you sure you want to clear all stored data?');
-        if (!confirmed) return;
-
-        await storageHandler.resetData();
-        characters = [];
-        selectedCharacterId = '';
+        importStatus = 'New character created! All changes will automatically save to your selected file.';
+        
+        // Automatically set up file auto-save for the new character
+        await setupFileAutoSave();
     }
 
 
     onMount(async () => {
-        // Ensure the modal is closed when the component mounts
-        if(localStorage.getItem('autoSave') === null) {
-            localStorage.setItem('autoSave', selectedCharacterId !== '' ? 'true' : 'false');
-        }
-        isAutoSaving = localStorage.getItem('autoSave') === 'true';
-        
         // Check if file auto-save was previously enabled
         isAutoSavingToFile = storageConfig.autoSaveToFile || false;
         if (isAutoSavingToFile && storageHandler.hasActiveFile) {
             currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
         }
+
+
+        if(!selectedCharacterId) {
+            importStatus = 'Welcome to Mutant: Year Zero Character Sheet! Create a new character or load an existing one from a file.';
+            openDialogueOption('storageControls');
+        }
         
         addEventListener('beforeunload', onBeforeUnload);
-        
-        if(OBR.isAvailable) {
-            OBR.onReady(async () => {
-
-                await load(); // Wait for OBR to be ready before loading data
-                if(!selectedCharacterId) {
-                    // If no character is selected, load the first available character
-                    openDialogueOption('storageControls');
-
-                }
-                if (isAutoSaving) {
-                    startAutoSave();
-                }
-            });
-        }else {
-            // If Owlbear is not available, just load from localStorage immediately
-            await load();
-            if (!selectedCharacterId) {
-                // If no character is selected, load the first available character
-                openDialogueOption('storageControls');
-            }
-            if (isAutoSaving) {
-                startAutoSave();
-            }
-        }
-
     });
 
 
@@ -309,7 +196,7 @@ Provides a modal interface for all storage operations
     <div class="torn-paper-wrapper variant-1">
         <div class="card-content">
             <div class="storage-controls">
-    <h3 class="storage-title"><Save /> Storage & Backup</h3>
+    <h3 class="storage-title"><Save /> File Storage & Backup</h3>
 
     <!-- Cloud Storage Integration -->
      {#if false}
@@ -324,165 +211,79 @@ Provides a modal interface for all storage operations
         <div class="status-message">{importStatus}</div>
     {/if}
 
+    {#if !selectedCharacterId}
     <div class="control-group">
-        <h4><Archive size={16} /> Stored Characters</h4>
-        <div class="control-row">
-            {#if characters.length === 0}
-                <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                    <button 
-                        class="btn "
-                        onclick={createNewCharacter}
-                    >
-                    <UserPen size={20} /> Skapa ny karaktär
-                    </button>
-                </div>
-            {:else}
-                <select 
-                    bind:value={selectedCharacterId} 
-                    onchange={() => load(selectedCharacterId)}
-                    class="character-select"
-                >
-                    <option value="" disabled>Select a character</option>
-                    {#each characters as character}
-                        <option value={character.id} selected={true}>{character.name} - {character.occupation}</option>
-                    {/each}
-                </select>
-            {/if}
-
-        </div>
-    </div>
-
-    {#if selectedCharacterId}
-    <!-- Auto-save Controls -->
-    <div class="control-group">
-        <h4>Auto-Save</h4>
+        <h4><Archive size={16} /> Character</h4>
         <div class="control-row">
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
                 <button 
-                    class="btn {isAutoSaving ? 'btn-danger' : 'btn-primary'}"
-                    onclick={toggleAutoSave}
+                    class="btn "
+                    onclick={createNewCharacter}
                 >
-                    {#if isAutoSaving}
-                        <Square size={16} /> Stop Auto-Save
-                    {:else}
-                        <Play size={16} /> Start Auto-Save
-                    {/if}
+                <UserPen size={20} /> Create New Character
                 </button>
             </div>
-            
-            <label class="interval-control">
-                Interval (seconds):
-                <input 
-                    type="number" 
-                    min="1" 
-                    max="300" 
-                    value={storageConfig.autoSaveInterval / 1000}
-                    onchange={updateAutoSaveInterval}
-                    class="interval-input"
-                />
-            </label>
         </div>
     </div>
+    {/if}
 
-    <!-- File Auto-save Controls -->
+
+    {#if selectedCharacterId}
+    <!-- File Auto-save Status -->
     {#if storageHandler.supportsFileSystemAccess}
     <div class="control-group">
-        <h4><File size={16} /> Auto-Save to Local File</h4>
+        <h4><File size={16} /> File:</h4>
         <div class="control-row">
-            {#if !isAutoSavingToFile}
-                <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                    <button 
-                        class="btn btn-primary"
-                        onclick={setupFileAutoSave}
-                    >
-                        <FileDown size={16} /> Set Up File Auto-Save
-                    </button>
-                </div>
-            {:else}
-                <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                    <button 
-                        class="btn btn-danger"
-                        onclick={stopFileAutoSave}
-                    >
-                        <Square size={16} /> Stop File Auto-Save
-                    </button>
-                </div>
-                {#if currentFileName}
-                    <span class="file-name">Saving to: {currentFileName}</span>
-                {/if}
-            {/if}
-        </div>
-        <div class="help-text">
-            Similar to draw.io: Select a file once, and all changes will automatically save to that file.
+
+            <div class="file-status">
+                <span class="file-indicator"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to:</span>
+                <span class="file-name">{currentFileName}</span>
+            </div>
+            <div class="help-text">
+                All changes are automatically saved to your file. No manual saving needed!
+            </div>
+
         </div>
     </div>
     {:else}
     <div class="control-group">
-        <h4><File size={16} /> Auto-Save to Local File</h4>
+        <h4><File size={16} /> File Auto-Save</h4>
         <div class="help-text">
             File System Access API not supported in this browser. Please use Chrome, Edge, or another compatible browser for this feature.
         </div>
     </div>
     {/if}
 
-    <!-- Universal Save/Load (Best of both worlds) -->
-    <div class="control-group">
-        <h4><BrainCircuit size={16} /> Manual Save/Load {OBR.isAvailable ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
-        <div class="control-row">
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
-                <button class="btn" onclick={save}>
-                    <Save size={16} /> Save Character
-                </button>
-            </div>
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
-                <button class="btn" onclick={() => load(selectedCharacterId)}>
-                    <FolderDown size={16} /> Load Character
-                </button>
-            </div>
-        </div>
-        
-    </div>
-
     {/if}
 
-    <!-- JSON Export/Import -->
+    <!-- Load from File -->
     <div class="control-group">
-        <h4><FileJson size={16} /> JSON Export/Import</h4>
+        <h4><FileJson size={16} /> Load Character from File</h4>
         <div class="control-row">
-            {#if selectedCharacterId}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
-            <button class="btn btn-outline" onclick={exportToJSON}>
-                <FileDown size={16} /> Export JSON
-            </button>
-            </div>
-            {/if}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper {selectedCharacterId ? 'w250' : ''}">
-            
-            <button class="btn btn-outline" onclick={importFromJSON}>
-                <FileUp size={16} /> Import JSON
-            </button>
-            </div>
             {#if storageHandler.supportsFileSystemAccess}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper">
                 <button class="btn btn-outline" onclick={loadFromFileSystem}>
                     <File size={16} /> Load from File
                 </button>
             </div>
+            {:else}
+            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                <button class="btn btn-outline" onclick={importFromJSON}>
+                    <FileUp size={16} /> Import JSON (Fallback)
+                </button>
+            </div>
+            {/if}
+        </div>
+        <div class="help-text">
+            {#if storageHandler.supportsFileSystemAccess}
+                Load a character file and automatically enable auto-save to that file.
+            {:else}
+                Use the file picker to import a character JSON file.
             {/if}
         </div>
     </div>
 
-    <!-- Clear All Data -->
-    <div class="control-group">
-        <h4><Trash size={16} /> Clear All Data</h4>
-        <div class="control-row">
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w-full">
-                <button class="btn btn-danger" onclick={clearAllData}>
-                    <Trash size={16} /> Clear All Stored Data
-                </button>
-            </div>
-        </div>
-    </div>
+
     </div>
 
     </div>
@@ -506,15 +307,7 @@ Provides a modal interface for all storage operations
         height: 24px;
         /* stroke: var(--color-surface-800); */
     }
-
-    .w250 {
-        min-width: 250px;
-        width: 250px;
-    }
-
-    .btn-danger {
-        filter: sepia(100%) saturate(200%) brightness(80%) hue-rotate(300deg);
-    }
+    
     .storage-controls {
         /* background: var(--color-surface-100); */
         /* border: 1px solid var(--color-surface-300); */
@@ -567,22 +360,6 @@ Provides a modal interface for all storage operations
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .interval-control {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        color: var(--color-surface-900);
-    }
-
-    :global(.dark) .interval-control {
-        color: var(--color-surface-100);
-    }
-
-    :global(.dark) .interval-input {
-        color: var(--color-surface-100);
-    }
-
     .status-message {
         padding: 0.5rem;
         border-radius: 4px;
@@ -592,30 +369,36 @@ Provides a modal interface for all storage operations
         font-style: italic;
     }
 
-        .status-message.success {
-        background: var(--color-success-100);
-        color: var(--color-success-800);
-        border: 1px solid var(--color-success-300);
-    }
-
-    .status-message.info {
-        background: var(--color-tertiary-100);
-        color: var(--color-tertiary-800);
-        border: 1px solid var(--color-tertiary-300);
-    }
-
     .file-name {
         font-size: 0.8rem;
         color: var(--color-surface-600);
         font-style: italic;
-        max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     :global(.dark) .file-name {
-        color: var(--color-surface-400);
+        color: var(--color-surface-200);
+    }
+
+    .file-status {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        width: 100%;
+    }
+
+    .file-indicator {
+        font-size: 0.8rem;
+        color: var(--color-success-700);
+        font-weight: 600;
+    }
+
+    :global(.dark) .file-indicator {
+        color: var(--color-success-400);
     }
 
     .help-text {
@@ -626,7 +409,7 @@ Provides a modal interface for all storage operations
     }
 
     :global(.dark) .help-text {
-        color: var(--color-surface-400);
+        color: var(--color-surface-200);
     }
 
         @container (max-width: 500px) {
@@ -637,10 +420,6 @@ Provides a modal interface for all storage operations
 
         .btn {
             text-align: center;
-        }
-
-        .interval-control {
-            justify-content: space-between;
         }
     }
 

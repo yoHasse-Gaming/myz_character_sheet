@@ -2,8 +2,9 @@
     import { onMount } from "svelte";
     import { AppBar } from '@skeletonlabs/skeleton-svelte';
     import { openDialogueOption } from "../states/modals.svelte";
-    import { Moon, RotateCcw, Ruler, Save, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
+    import { Moon, RotateCcw, Ruler, Save, SaveAll, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
     import OBR from "@owlbear-rodeo/sdk";
+    import { sheetState } from "../states/character_sheet.svelte";
 
     // Theme functionality
     let isDarkMode = $state(true);

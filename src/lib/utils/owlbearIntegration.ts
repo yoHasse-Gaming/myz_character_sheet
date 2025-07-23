@@ -98,7 +98,7 @@ class OwlbearIntegration {
      * Smart save - saves to both Owlbear (if available) and localStorage
      */
     public async save(): Promise<void> {
-        const data = sheetState;
+        const data = JSON.parse(JSON.stringify(sheetState)); // Deep copy to avoid reactivity issues
         
         // Always save to localStorage as backup
         this.saveToLocalStorage(data);
@@ -106,18 +106,13 @@ class OwlbearIntegration {
         // Also save to Owlbear if available
         if (OBR.isAvailable) {
             try {
-                try {
-                    const characterKey = getExtensionId(await OBR.player.getId());
-                    await OBR.room.setMetadata({
-                        [characterKey]: {
-                            ...data,
-                            lastUpdated: Date.now()
-                        }
-                    });
-                    
-                } catch (error) {
-                    console.warn('Failed to save character data:', error);
-                }
+                const characterKey = getExtensionId(await OBR.player.getId());
+                await OBR.room.setMetadata({
+                    [characterKey]: {
+                        ...data,
+                        lastUpdated: Date.now()
+                    }
+                });
                 console.log('Saved to both Owlbear and localStorage');
             } catch (error) {
                 console.warn('Failed to save to Owlbear, but saved to localStorage:', error);

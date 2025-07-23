@@ -4,20 +4,20 @@ Provides a modal interface for all storage operations
 -->
 <script lang="ts">
     import { Modal } from "@skeletonlabs/skeleton-svelte";
-    import { closeDialogueOption, isDialogueOpen } from "../../states/modals.svelte";
+    import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash } from "@lucide/svelte";
-    import { useOwlbearSync } from "../../utils/owlbearIntegration";
+    import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from "@lucide/svelte";
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
+    import owlbearIntegration from "../../utils/owlbearIntegration";
+    import OBR from "@owlbear-rodeo/sdk";
     
     function closeModal() {
         closeDialogueOption('storageControls');
     }
 
         // Initialize storage utilities
-    const owlbearSync = useOwlbearSync();
 
-    let storageConfig = $state(owlbearSync.getStorageConfig());
+    let storageConfig = $state(owlbearIntegration.getStorageConfig());
 
     let isAutoSaving = $state(false);
     let importStatus = $state('');
@@ -34,13 +34,13 @@ Provides a modal interface for all storage operations
     }
 
     function startAutoSave() {
-        owlbearSync.startAutoSave();
+        owlbearIntegration.startAutoSave();
         isAutoSaving = true;
         localStorage.setItem('autoSave', 'true');
     }
 
     function stopAutoSave() {
-        owlbearSync.stopAutoSave();
+        owlbearIntegration.stopAutoSave();
         isAutoSaving = false;
         localStorage.setItem('autoSave', 'false');
     }
@@ -49,18 +49,21 @@ Provides a modal interface for all storage operations
     // JSON export/import
     function exportToJSON() {
         const filename = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-        owlbearSync.exportJSON(filename);
+        owlbearIntegration.exportToJSON(sheetState, filename);
         exportStatus = 'Character sheet exported';
         setTimeout(() => exportStatus = '', 3000);
     }
 
     async function importFromJSON() {
         try {
-            const data = await owlbearSync.importJSON();
+            const data = await owlbearIntegration.importFromJSON();
             if (data) {
                 // Apply imported data to character sheet - include all fields
                 Object.assign(sheetState, data);
                 importStatus = 'Character sheet imported successfully';
+                selectedCharacterId = sheetState.id; // Update selected character ID
+                // Save the imported character to Owlbear if available
+                await save();
             } else {
                 importStatus = 'Import cancelled';
             }
@@ -72,24 +75,58 @@ Provides a modal interface for all storage operations
 
     // Universal save/load (localStorage + Owlbear)
     async function save() {
-        await owlbearSync.save();
-        exportStatus = owlbearSync.isInOwlbear ? 
+        await owlbearIntegration.save();
+        exportStatus = OBR.isAvailable ? 
             'Saved to Owlbear and localStorage' : 
             'Saved to localStorage';
         setTimeout(() => exportStatus = '', 3000);
     }
 
-    async function load() {
-        const data = await owlbearSync.load();
-        if (data) {
-            // Apply loaded data to character sheet - include all fields
-            Object.assign(sheetState, data);
-            importStatus = owlbearSync.isInOwlbear ? 
-                'Loaded from Owlbear (or localStorage fallback)' : 
-                'Loaded from localStorage';
-        } else {
-            importStatus = 'No saved data found';
+    let characters: { id: string, name: string, occupation: string }[] = $state([]);
+    let selectedCharacterId: string = $state('');
+    
+    async function createNewCharacter() {
+        // Generate a new ID using crypto if it doesn't exist
+        sheetState.id = crypto.randomUUID();
+        sheetState.name = 'Ny karaktär'; // Default name
+        sheetState.occupation = 'Krossare'; // Default occupation
+        await save(); // Save the new character
+        characters.push({
+            id: sheetState.id,
+            name: sheetState.name,
+            occupation: sheetState.occupation || ''
+        });
+        selectedCharacterId = sheetState.id; // Select the new character
+        importStatus = 'En ny karaktär har skapats och sparats.';
+    }
+
+    async function load(characterId: string = '') {
+
+        if (!characterId) {
+            const storedCharacters = await owlbearIntegration.getStoredCharacters();
+            if (storedCharacters.length === 0) {
+                importStatus = 'Välkommen till Mutant: År noll karaktärsblad! Det finns inga tidigare sparade karaktärer. Välj nedan om du önskar att skapa en ny karaktär eller ladda in en tidigare sparad karaktär via JSON import.';
+                return;
+            } else {
+                console.log('Loaded stored characters:', storedCharacters);
+                characters = storedCharacters;
+                selectedCharacterId = characters[0].id;
+            }
+        }else {
+            selectedCharacterId = characterId;
         }
+
+        const data: CharacterSheetData | null = await owlbearIntegration.load(selectedCharacterId);
+
+        if (!data) {
+            importStatus = 'Inget data hittades för vald karaktär.';
+            return;
+        }
+        // Apply loaded data to character sheet - include all fields
+        Object.assign(sheetState, data);
+        importStatus = OBR.isAvailable ? 
+            'Loaded from Owlbear (or localStorage fallback)' : 
+            'Loaded from localStorage';
         setTimeout(() => importStatus = '', 3000);
     }
 
@@ -97,7 +134,7 @@ Provides a modal interface for all storage operations
     function updateAutoSaveInterval(event: Event) {
         const target = event.target as HTMLInputElement;
         const interval = parseInt(target.value) * 1000; // Convert seconds to milliseconds
-        owlbearSync.configureStorage({ autoSaveInterval: interval });
+        owlbearIntegration.configureStorage({ autoSaveInterval: interval });
 
         if (isAutoSaving) {
             // Restart auto-save with new interval
@@ -105,22 +142,54 @@ Provides a modal interface for all storage operations
             startAutoSave();
         }
     }
+    // Delete character
+    async function clearAllData() {
+        const confirmed = confirm('Are you sure you want to clear all Owlbear data?');
+        if (!confirmed) return;
+
+        await owlbearIntegration.resetData();
+        characters = [];
+        selectedCharacterId = '';
+    }
 
     onMount(async () => {
         // Ensure the modal is closed when the component mounts
-        await load();
         if(localStorage.getItem('autoSave') === null) {
-            localStorage.setItem('autoSave', 'true');
+            localStorage.setItem('autoSave', selectedCharacterId !== '' ? 'true' : 'false');
         }
         isAutoSaving = localStorage.getItem('autoSave') === 'true';
-        if (isAutoSaving) {
-            startAutoSave();
+        
+        
+        if(OBR.isAvailable) {
+            OBR.onReady(async () => {
+
+                await load(); // Wait for OBR to be ready before loading data
+                if(!selectedCharacterId) {
+                    // If no character is selected, load the first available character
+                    openDialogueOption('storageControls');
+
+                }
+                if (isAutoSaving) {
+                    startAutoSave();
+                }
+            });
+        }else {
+            // If Owlbear is not available, just load from localStorage immediately
+            await load();
+            if (!selectedCharacterId) {
+                // If no character is selected, load the first available character
+                openDialogueOption('storageControls');
+            }
+            if (isAutoSaving) {
+                startAutoSave();
+            }
         }
+
     });
 
     onDestroy(() => {
         // Cleanup if needed when the modal is destroyed
-        owlbearSync.stopAutoSave();
+        owlbearIntegration.stopAutoSave();
     });
 
 
@@ -137,12 +206,13 @@ Provides a modal interface for all storage operations
     backdropClasses="!z-[100] backdrop-blur-sm bg-black/50 left-0 top-0 h-screen w-screen"
     contentBase="!z-[101] card p-0 shadow-xl max-w-2xl max-h-[90vh] overflow-hidden"
     positionerClasses="!z-[100] items-center justify-center p-4 fixed inset-0"
-    closeOnInteractOutside={true}
-    closeOnEscape={true}
+    closeOnInteractOutside={selectedCharacterId !== ''}
+    closeOnEscape={selectedCharacterId !== ''}
 
 >
     {#snippet content()}
     <div class="storage-content">
+        {#if selectedCharacterId}
         <button 
             class="modal-close-button" 
             onclick={closeModal} 
@@ -153,6 +223,7 @@ Provides a modal interface for all storage operations
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
+        {/if}
     <div class="torn-paper-wrapper variant-1">
         <div class="card-content">
             <div class="storage-controls">
@@ -160,12 +231,41 @@ Provides a modal interface for all storage operations
 
     <!-- Status Messages -->
     {#if exportStatus}
-        <div class="status-message success">{exportStatus}</div>
+        <div class="status-message">{exportStatus}</div>
     {/if}
     {#if importStatus}
-        <div class="status-message info">{importStatus}</div>
+        <div class="status-message">{importStatus}</div>
     {/if}
 
+    <div class="control-group">
+        <h4><Archive size={16} /> Stored Characters</h4>
+        <div class="control-row">
+            {#if characters.length === 0}
+                <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                    <button 
+                        class="btn "
+                        onclick={createNewCharacter}
+                    >
+                    <UserPen size={20} /> Skapa ny karaktär
+                    </button>
+                </div>
+            {:else}
+                <select 
+                    bind:value={selectedCharacterId} 
+                    onchange={() => load(selectedCharacterId)}
+                    class="character-select"
+                >
+                    <option value="" disabled>Select a character</option>
+                    {#each characters as character}
+                        <option value={character.id} selected={true}>{character.name} - {character.occupation}</option>
+                    {/each}
+                </select>
+            {/if}
+
+        </div>
+    </div>
+
+    {#if selectedCharacterId}
     <!-- Auto-save Controls -->
     <div class="control-group">
         <h4>Auto-Save</h4>
@@ -199,7 +299,7 @@ Provides a modal interface for all storage operations
 
     <!-- Universal Save/Load (Best of both worlds) -->
     <div class="control-group">
-        <h4><BrainCircuit size={16} /> Manual Save/Load {owlbearSync.isInOwlbear ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
+        <h4><BrainCircuit size={16} /> Manual Save/Load {OBR.isAvailable ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
         <div class="control-row">
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
                 <button class="btn" onclick={save}>
@@ -207,22 +307,27 @@ Provides a modal interface for all storage operations
                 </button>
             </div>
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn" onclick={load}>
+                <button class="btn" onclick={() => load(selectedCharacterId)}>
                     <FolderDown size={16} /> Load Character
                 </button>
             </div>
         </div>
+        
     </div>
+
+    {/if}
 
     <!-- JSON Export/Import -->
     <div class="control-group">
         <h4><FileJson size={16} /> JSON Export/Import</h4>
         <div class="control-row">
+            {#if selectedCharacterId}
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
             <button class="btn btn-outline" onclick={exportToJSON}>
                 <FileDown size={16} /> Export JSON
             </button>
             </div>
+            {/if}
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
             <button class="btn btn-outline" onclick={importFromJSON}>
                 <FileUp size={16} /> Import JSON
@@ -231,10 +336,23 @@ Provides a modal interface for all storage operations
         </div>
     </div>
 
-</div>
+    <!-- Clear All Data -->
+    <div class="control-group">
+        <h4><Trash size={16} /> Clear All Data</h4>
+        <div class="control-row">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                <button class="btn btn-danger" onclick={clearAllData}>
+                    <Trash size={16} /> Clear All Owlbear Data
+                </button>
+            </div>
         </div>
     </div>
     </div>
+
+    </div>
+    </div>
+    </div>
+
     {/snippet}
 </Modal>
 
@@ -332,6 +450,7 @@ Provides a modal interface for all storage operations
         margin-bottom: 1rem;
         font-size: 0.85rem;
         font-weight: 500;
+        font-style: italic;
     }
 
         .status-message.success {

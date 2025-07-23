@@ -29,6 +29,7 @@ export const initialCardPositions: Record<string, { x: number; y: number }> = {
 };
 
 export interface CharacterSheetData {
+    id: string;
     name: string;
     occupation: string;
     appearance: {
@@ -60,10 +61,12 @@ export interface CharacterSheetData {
     additionalRelations: RPRelation[];
     notes: string[];
     paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
+    lastUpdated?: number; // Timestamp for last update
 }
 
 export const sheetState: CharacterSheetData = $state({
     // Character basic info
+    id: "",
     name: "",
     occupation: "",
     appearance: {

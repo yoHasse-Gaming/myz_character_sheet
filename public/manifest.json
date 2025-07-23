@@ -1,6 +1,6 @@
 {
   "name": "Mutant: Year Zero Character Sheet - BETA",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "manifest_version": 1,
   "description": "A responsive character sheet for Mutant: Year Zero RPG with real-time sync capabilities",
   "action": {

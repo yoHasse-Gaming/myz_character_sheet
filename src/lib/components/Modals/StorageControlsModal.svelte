@@ -7,7 +7,7 @@ Provides a modal interface for all storage operations
     import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
         import ConfirmationModal from './ConfirmationModal.svelte';
-    import { Archive, BrainCircuit, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from '@lucide/svelte';
+    import { Archive, BrainCircuit, File, FileDown, FileJson, FileUp, FolderDown, Play, Save, Square, Trash, UserPen } from '@lucide/svelte';
     import CloudStorage from '../CloudStorage.svelte';
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     import { storageHandler } from "../../utils/storageHandler";
@@ -22,6 +22,8 @@ Provides a modal interface for all storage operations
     let storageConfig = $state(storageHandler.getStorageConfig());
 
     let isAutoSaving = $state(false);
+    let isAutoSavingToFile = $state(false);
+    let currentFileName = $state('');
     let importStatus = $state('');
     let exportStatus = $state('');
 
@@ -45,6 +47,66 @@ Provides a modal interface for all storage operations
         storageHandler.stopAutoSave();
         isAutoSaving = false;
         localStorage.setItem('autoSave', 'false');
+    }
+
+    // File auto-save functions
+    async function setupFileAutoSave() {
+        if (!storageHandler.supportsFileSystemAccess) {
+            exportStatus = 'File System Access API not supported in this browser. Please use Chrome, Edge, or another compatible browser.';
+            setTimeout(() => exportStatus = '', 5000);
+            return;
+        }
+
+        const success = await storageHandler.selectFileForAutoSave(sheetState);
+        if (success) {
+            isAutoSavingToFile = true;
+            storageHandler.configureStorage({ autoSaveToFile: true });
+            exportStatus = 'File selected for auto-save. Changes will automatically save to your chosen file.';
+            
+            // Update current file name for display
+            if (storageHandler.hasActiveFile) {
+                currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+            }
+        } else {
+            exportStatus = 'Failed to set up file auto-save.';
+        }
+        setTimeout(() => exportStatus = '', 3000);
+    }
+
+    function stopFileAutoSave() {
+        storageHandler.configureStorage({ autoSaveToFile: false });
+        storageHandler.clearFileHandle();
+        isAutoSavingToFile = false;
+        currentFileName = '';
+        exportStatus = 'File auto-save disabled.';
+        setTimeout(() => exportStatus = '', 3000);
+    }
+
+    async function loadFromFileSystem() {
+        if (!storageHandler.supportsFileSystemAccess) {
+            importStatus = 'File System Access API not supported in this browser.';
+            setTimeout(() => importStatus = '', 3000);
+            return;
+        }
+
+        try {
+            const data = await storageHandler.loadFromFile();
+            if (data) {
+                Object.assign(sheetState, data);
+                selectedCharacterId = sheetState.id;
+                await save();
+                
+                // Enable file auto-save since we now have a file handle
+                isAutoSavingToFile = true;
+                storageHandler.configureStorage({ autoSaveToFile: true });
+                currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                
+                importStatus = 'Character loaded from file and file auto-save enabled.';
+            }
+        } catch (error) {
+            importStatus = 'Failed to load from file: ' + (error as Error).message;
+        }
+        setTimeout(() => importStatus = '', 5000);
     }
 
 
@@ -161,6 +223,13 @@ Provides a modal interface for all storage operations
             localStorage.setItem('autoSave', selectedCharacterId !== '' ? 'true' : 'false');
         }
         isAutoSaving = localStorage.getItem('autoSave') === 'true';
+        
+        // Check if file auto-save was previously enabled
+        isAutoSavingToFile = storageConfig.autoSaveToFile || false;
+        if (isAutoSavingToFile && storageHandler.hasActiveFile) {
+            currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+        }
+        
         addEventListener('beforeunload', onBeforeUnload);
         
         if(OBR.isAvailable) {
@@ -315,6 +384,47 @@ Provides a modal interface for all storage operations
         </div>
     </div>
 
+    <!-- File Auto-save Controls -->
+    {#if storageHandler.supportsFileSystemAccess}
+    <div class="control-group">
+        <h4><File size={16} /> Auto-Save to Local File</h4>
+        <div class="control-row">
+            {#if !isAutoSavingToFile}
+                <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                    <button 
+                        class="btn btn-primary"
+                        onclick={setupFileAutoSave}
+                    >
+                        <FileDown size={16} /> Set Up File Auto-Save
+                    </button>
+                </div>
+            {:else}
+                <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                    <button 
+                        class="btn btn-danger"
+                        onclick={stopFileAutoSave}
+                    >
+                        <Square size={16} /> Stop File Auto-Save
+                    </button>
+                </div>
+                {#if currentFileName}
+                    <span class="file-name">Saving to: {currentFileName}</span>
+                {/if}
+            {/if}
+        </div>
+        <div class="help-text">
+            Similar to draw.io: Select a file once, and all changes will automatically save to that file.
+        </div>
+    </div>
+    {:else}
+    <div class="control-group">
+        <h4><File size={16} /> Auto-Save to Local File</h4>
+        <div class="help-text">
+            File System Access API not supported in this browser. Please use Chrome, Edge, or another compatible browser for this feature.
+        </div>
+    </div>
+    {/if}
+
     <!-- Universal Save/Load (Best of both worlds) -->
     <div class="control-group">
         <h4><BrainCircuit size={16} /> Manual Save/Load {OBR.isAvailable ? '(Owlbear + localStorage)' : '(localStorage only)'}</h4>
@@ -352,6 +462,13 @@ Provides a modal interface for all storage operations
                 <FileUp size={16} /> Import JSON
             </button>
             </div>
+            {#if storageHandler.supportsFileSystemAccess}
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
+                <button class="btn btn-outline" onclick={loadFromFileSystem}>
+                    <File size={16} /> Load from File
+                </button>
+            </div>
+            {/if}
         </div>
     </div>
 
@@ -485,6 +602,31 @@ Provides a modal interface for all storage operations
         background: var(--color-tertiary-100);
         color: var(--color-tertiary-800);
         border: 1px solid var(--color-tertiary-300);
+    }
+
+    .file-name {
+        font-size: 0.8rem;
+        color: var(--color-surface-600);
+        font-style: italic;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    :global(.dark) .file-name {
+        color: var(--color-surface-400);
+    }
+
+    .help-text {
+        font-size: 0.75rem;
+        color: var(--color-surface-600);
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
+
+    :global(.dark) .help-text {
+        color: var(--color-surface-400);
     }
 
         @container (max-width: 500px) {

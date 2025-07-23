@@ -10,17 +10,20 @@ export interface StorageOptions {
     currentCharacterKey: string;
     cloudProvider?: 'none' | 'google-drive' | 'onedrive';
     syncWithCloud?: boolean;
+    autoSaveToFile?: boolean;
 }
 
 
 class StorageHandler {
     private autoSaveTimer: number | null = null;
+    private fileHandle: FileSystemFileHandle | null = null;
     private storageOptions: StorageOptions = {
         autoSaveInterval: 5000,
         storageKey: 'myz-character-sheet-data',
         currentCharacterKey: 'current-character-id',
         cloudProvider: 'none',
-        syncWithCloud: false
+        syncWithCloud: false,
+        autoSaveToFile: false
     };
     private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
 
@@ -60,6 +63,11 @@ class StorageHandler {
         // Optionally sync to cloud storage
         if (this.storageOptions.syncWithCloud) {
             await this.syncToCloud(data);
+        }
+
+        // Optionally save to local file if enabled and file handle exists
+        if (this.storageOptions.autoSaveToFile && this.fileHandle) {
+            await this.saveToFile(data);
         }
     }
 
@@ -179,12 +187,109 @@ class StorageHandler {
         });
     }
 
+    // File System Access API methods (for browsers that support it)
+    public get supportsFileSystemAccess(): boolean {
+        return 'showSaveFilePicker' in window && 'showOpenFilePicker' in window;
+    }
+
+    public async selectFileForAutoSave(data: CharacterSheetData): Promise<boolean> {
+        if (!this.supportsFileSystemAccess) {
+            console.warn('File System Access API not supported');
+            return false;
+        }
+
+        try {
+            const filename = `${data.name || 'unnamed'}-character-sheet.json`;
+            const fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'JSON files',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }]
+            });
+
+            this.fileHandle = fileHandle;
+            
+            // Immediately save to the selected file
+            await this.saveToFile(data);
+            
+            return true;
+        } catch (error) {
+            console.warn('Failed to select file for auto-save:', error);
+            return false;
+        }
+    }
+
+    public async saveToFile(data: CharacterSheetData): Promise<boolean> {
+        if (!this.fileHandle || !this.supportsFileSystemAccess) {
+            return false;
+        }
+
+        try {
+            const dataToExport = {
+                ...data,
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            const writable = await this.fileHandle.createWritable();
+            await writable.write(jsonString);
+            await writable.close();
+            
+            return true;
+        } catch (error) {
+            console.warn('Failed to save to file:', error);
+            return false;
+        }
+    }
+
+    public async loadFromFile(): Promise<CharacterSheetData | null> {
+        if (!this.supportsFileSystemAccess) {
+            console.warn('File System Access API not supported');
+            return null;
+        }
+
+        try {
+            const [fileHandle] = await (window as any).showOpenFilePicker({
+                types: [{
+                    description: 'JSON files',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }]
+            });
+
+            const file = await fileHandle.getFile();
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            // Store the file handle for future auto-saves
+            this.fileHandle = fileHandle;
+            
+            return data;
+        } catch (error) {
+            console.warn('Failed to load from file:', error);
+            return null;
+        }
+    }
+
+    public clearFileHandle(): void {
+        this.fileHandle = null;
+    }
+
+    public get hasActiveFile(): boolean {
+        return this.fileHandle !== null;
+    }
+
     // Auto-save methods
     public startAutoSave(): void {
         if (this.autoSaveTimer) return;
 
-        this.autoSaveTimer = window.setInterval(() => {
-            this.save();
+        this.autoSaveTimer = window.setInterval(async () => {
+            await this.save();
         }, this.storageOptions.autoSaveInterval);
 
         try {

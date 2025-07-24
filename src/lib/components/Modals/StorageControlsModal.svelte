@@ -6,19 +6,16 @@ Provides a modal interface for all storage operations
     import { Modal } from "@skeletonlabs/skeleton-svelte";
     import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
-        import ConfirmationModal from './ConfirmationModal.svelte';
-    import { Archive, File, FileDown, FileJson, FileUp, Save, SquareCheckBig, Trash, UserPen } from '@lucide/svelte';
+    import { Archive, File, FileDown, FileJson, FileUp, Save, SquareCheckBig, Trash, UserPen, ChevronDown, RefreshCcw } from '@lucide/svelte';
     import CloudStorage from '../CloudStorage.svelte';
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     import { storageHandler } from "../../utils/storageHandler";
-    import OBR from "@owlbear-rodeo/sdk";
+    import { toaster } from '../../utils/toaster';
     
     function closeModal() {
         closeDialogueOption('storageControls');
     }
     let currentFileName = $state('');
-    let importStatus = $state('');
-    let exportStatus = $state('');
     let opfsCharacters = $state<{id: string, name: string, lastModified: string}[]>([]);
     let selectedOPFSCharacterId = $state('');
 
@@ -28,28 +25,53 @@ Provides a modal interface for all storage operations
             const success = await storageHandler.createNewCharacterFile(sheetState);
             if (success) {
                 await startAutoSave();
-                exportStatus = 'File selected! All changes will automatically save to your chosen file.';
+                toaster.create({
+                    title: 'File selected!',
+                    description: 'All changes will save to your selected file.',
+                    duration: 5000,
+                    type: 'info'
+                });
                 
                 // Update current file name for display
                 if (storageHandler.hasActiveFile) {
                     currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
                 }
             } else {
-                exportStatus = 'Failed to select file.';
+                toaster.create({
+                    title: 'File Selection Failed',
+                    description: 'Failed to select file.',
+                    duration: 5000,
+                    type: 'error'
+                });
             }
         } else if (storageHandler.supportsOPFS) {
             const success = await storageHandler.createNewCharacterOPFS(sheetState);
             if (success) {
                 await startAutoSave();
-                exportStatus = 'Auto-save enabled! All changes will be saved to browser storage.';
+                
+                toaster.create({
+                    title: 'Auto-save Enabled',
+                    description: 'All changes will be saved to browser storage.',
+                    duration: 5000,
+                    type: 'info'
+                });
                 currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
             } else {
-                exportStatus = 'Failed to set up auto-save.';
+                toaster.create({
+                    title: 'Auto-save Failed',
+                    description: 'Failed to set up auto-save.',
+                    duration: 5000,
+                    type: 'error'
+                });
             }
         } else {
-            exportStatus = 'File auto-save not supported in this browser.';
+            toaster.create({
+                title: 'Auto-save Not Supported',
+                description: 'File auto-save not supported in this browser.',
+                duration: 5000,
+                type: 'error'
+            });
         }
-        setTimeout(() => exportStatus = '', 3000);
     }
 
     async function startAutoSave(){
@@ -79,11 +101,21 @@ Provides a modal interface for all storage operations
                     storageHandler.configureStorage({ autoSaveToFile: true });
                     await startAutoSave();
                     currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-                    
-                    importStatus = 'Character loaded from file. All changes will automatically save to this file.';
+                    toaster.create({
+                        title: 'Character Loaded',
+                        description: `Character loaded from file. All changes will automatically save to this file.`,
+                        duration: 10000,
+                        type: 'success'
+                    });
                 }
             } catch (error) {
-                importStatus = 'Failed to load from file: ' + (error as Error).message;
+                // importStatus = 'Failed to load from file: ' + (error as Error).message;
+                toaster.create({
+                    title: 'Load Failed',
+                    description: 'Failed to load character from file: ' + (error as Error).message,
+                    duration: 5000,
+                    type: 'error'
+                });
             }
         } else if (storageHandler.supportsOPFS) {
             try {
@@ -97,17 +129,113 @@ Provides a modal interface for all storage operations
                     await startAutoSave();
                     currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
                     
-                    importStatus = 'Character loaded from browser storage. All changes will automatically save.';
+                    toaster.create({
+                        title: 'Character Loaded',
+                        description: `Character loaded from browser storage. All changes will automatically save.`,
+                        duration: 10000,
+                        type: 'success'
+                    });
                 } else {
-                    importStatus = 'No character found in browser storage.';
+                    toaster.create({
+                        title: 'No Character Found',
+                        description: 'No character data found in browser storage.',
+                        duration: 5000,
+                        type: 'info'
+                    });
                 }
             } catch (error) {
-                importStatus = 'Failed to load from browser storage: ' + (error as Error).message;
+                toaster.create({
+                    title: 'Load Failed',
+                    description: 'Failed to load character from browser storage: ' + (error as Error).message,
+                    duration: 5000,
+                    type: 'error'
+                });
             }
         } else {
-            importStatus = 'File loading not supported in this browser.';
+            toaster.create({
+                title: 'Load Failed',
+                description: 'File loading not supported in this browser.',
+                duration: 5000,
+                type: 'error'
+            });
         }
-        setTimeout(() => importStatus = '', 5000);
+    }
+
+    async function loadOPFSCharacter(characterId: string) {
+        if (!characterId) return;
+        
+        try {
+            const data = await storageHandler.loadFromOPFSWithId(characterId);
+            if (data) {
+                Object.assign(sheetState, data);
+                selectedCharacterId = sheetState.id;
+                
+                // Enable OPFS auto-save
+                storageHandler.configureStorage({ autoSaveToFile: true });
+                await startAutoSave();
+                currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                
+                toaster.create({
+                    title: 'Character Loaded',
+                    description: `Character "${data.name}" loaded from browser storage.`,
+                    duration: 10000,
+                    type: 'success'
+                });
+                
+                selectedOPFSCharacterId = characterId;
+            }
+        } catch (error) {
+            toaster.create({
+                title: 'Load Failed',
+                description: 'Failed to load character from browser storage: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
+        }
+    }
+
+    async function deleteOPFSCharacter(characterId: string) {
+        if (!characterId) return;
+        
+        try {
+            const success = await storageHandler.deleteFromOPFS(characterId);
+            if (success) {
+                await refreshOPFSCharacters();
+                
+                toaster.create({
+                    title: 'Character Deleted',
+                    description: `Character deleted from browser storage.`,
+                    duration: 5000,
+                    type: 'success'
+                });
+                
+                // If we deleted the currently selected character, clear the selection
+                if (selectedCharacterId === characterId) {
+                    selectedCharacterId = '';
+                    currentFileName = '';
+                }
+            } else {
+                toaster.create({
+                    title: 'Delete Failed',
+                    description: 'Failed to delete character from browser storage.',
+                    duration: 5000,
+                    type: 'error'
+                });
+            }
+        } catch (error) {
+            toaster.create({
+                title: 'Delete Failed',
+                description: 'Failed to delete character from browser storage: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
+        }
+    }
+
+    async function refreshOPFSCharacters() {
+        if (storageHandler.supportsOPFS) {
+            opfsCharacters = await storageHandler.getOPFSCharacters();
+        }
     }
 
     async function importFromJSON() {
@@ -116,27 +244,50 @@ Provides a modal interface for all storage operations
             if (data) {
                 // Apply imported data to character sheet - include all fields
                 Object.assign(sheetState, data);
-                importStatus = 'Character sheet imported successfully';
+                toaster.create({
+                    title: 'Character Imported',
+                    description: `Character "${sheetState.name}" imported successfully.`,
+                    duration: 5000,
+                    type: 'success'
+                });
                 selectedCharacterId = sheetState.id; // Update selected character ID
                 // Save the imported character to Owlbear if available
                 
             } else {
-                importStatus = 'Import cancelled';
+                toaster.create({
+                    title: 'Import Cancelled',
+                    description: 'No character data found in the imported file.',
+                    duration: 5000,
+                    type: 'info'
+                });
             }
         } catch (error) {
-            importStatus = 'Import failed: ' + (error as Error).message;
+            toaster.create({
+                title: 'Import Failed',
+                description: 'Import failed: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
         }
-        setTimeout(() => importStatus = '', 5000);
     }
 
     async function exportToJson() {
         try {
             await storageHandler.exportToJSON(sheetState);
-            exportStatus = 'Character sheet exported successfully';
+            toaster.create({
+                title: 'Export Successful',
+                description: 'Character sheet exported successfully.',
+                duration: 5000,
+                type: 'success'
+            });
         } catch (error) {
-            exportStatus = 'Export failed: ' + (error as Error).message;
+            toaster.create({
+                title: 'Export Failed',
+                description: 'Export failed: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
         }
-        setTimeout(() => exportStatus = '', 5000);
     }
 
 
@@ -153,23 +304,49 @@ Provides a modal interface for all storage operations
     // Automatically set up auto-save for the new character
         if (storageHandler.supportsFileSystemAccess) {
             await setupFileAutoSave();
-            importStatus = 'New character created! Select a file location for auto-save.';
+            toaster.create({
+                title: 'New Character Created',
+                description: 'Select a file location for auto-save.',
+                duration: 5000,
+                type: 'info'
+            });
         } else if (storageHandler.supportsOPFS) {
             const success = await storageHandler.createNewCharacterOPFS(sheetState);
             if (success) {
                 await startAutoSave();
                 currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-                importStatus = 'New character created! All changes will automatically save to browser storage.';
+                toaster.create({
+                    title: 'New Character Created',
+                    description: 'All changes will automatically save to browser storage.',
+                    duration: 5000,
+                    type: 'info'
+                });
+                selectedOPFSCharacterId = sheetState.id;
+                // Refresh the character list to show the new character
+                await refreshOPFSCharacters();
             } else {
-                importStatus = 'New character created! Auto-save setup failed.';
+                toaster.create({
+                    title: 'New Character Created',
+                    description: 'Auto-save setup failed.',
+                    duration: 5000,
+                    type: 'error'
+                });
             }
         } else {
-            importStatus = 'New character created! Use export/import for saving.';
+            toaster.create({
+                title: 'New Character Created',
+                description: 'Use export/import for saving.',
+                duration: 5000,
+                type: 'info'
+            });
         }
     }
 
 
     onMount(async () => {
+        // Refresh OPFS characters list
+        await refreshOPFSCharacters();
+        
         // Check if file auto-save was previously enabled
         if (storageHandler.hasActiveFile) {
             currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
@@ -181,6 +358,7 @@ Provides a modal interface for all storage operations
                 if (data) {
                     Object.assign(sheetState, data);
                     selectedCharacterId = sheetState.id;
+                    selectedOPFSCharacterId = sheetState.id;
                     currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
                     storageHandler.configureStorage({ autoSaveToFile: true });
                     await startAutoSave();
@@ -191,7 +369,6 @@ Provides a modal interface for all storage operations
         }
 
         if(!selectedCharacterId) {
-            importStatus = 'Welcome to Mutant: Year Zero Character Sheet! Create a new character or load an existing one from a file.';
             openDialogueOption('storageControls');
         }
         
@@ -253,12 +430,8 @@ Provides a modal interface for all storage operations
     <CloudStorage />
     {/if}
 
-    <!-- Status Messages -->
-    {#if exportStatus}
-        <div class="status-message">{exportStatus}</div>
-    {/if}
-    {#if importStatus}
-        <div class="status-message">{importStatus}</div>
+    {#if !selectedCharacterId}
+        <div class="status-message">Welcome to Mutant: Year Zero Character Sheet! Create a new character or load an existing one from a file.</div>
     {/if}
 
     {#if !selectedCharacterId}
@@ -330,20 +503,60 @@ Provides a modal interface for all storage operations
                 </button>
             </div>
             {:else if storageHandler.supportsOPFS}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn btn-outline" onclick={loadFromFileSystem}>
-                    <File size={16} /> Load from Browser Storage
-                </button>
+            <div class="opfs-character-selector">
+                {#if opfsCharacters.length > 0}
+                <div class="character-dropdown">
+                    <select 
+                        bind:value={selectedOPFSCharacterId} 
+                        onchange={() => loadOPFSCharacter(selectedOPFSCharacterId)}
+                        class="character-select"
+                    >
+                        <option value="">Select a character...</option>
+                        {#each opfsCharacters as character}
+                        <option value={character.id}>
+                            {character.name} - (modified: {new Date(character.lastModified).toLocaleDateString()})
+                        </option>
+                        {/each}
+                    </select>
+                </div>
+                <div class="character-actions">
+                    {#if selectedOPFSCharacterId}
+                    <button 
+                        class="btn w-full" 
+                        onclick={() => deleteOPFSCharacter(selectedOPFSCharacterId)}
+                        title="Delete selected character"
+                    >
+                        <Trash size={14} />
+                    </button>
+                    {/if}
+                    <button 
+                        class="btn w-full" 
+                        onclick={refreshOPFSCharacters}
+                        title="Refresh character list"
+                    >
+                        <RefreshCcw size={16} />
+                    </button>
+                </div>
+                {:else}
+                <div class="no-characters">
+                    <p>No characters found in browser storage.</p>
+                    <button class="btn" onclick={refreshOPFSCharacters}>
+                        <File size={16} /> Refresh
+                    </button>
+                </div>
+                {/if}
+
             </div>
             {/if}
             {#if !storageHandler.supportsFileSystemAccess}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper {selectedCharacterId ? 'w250' : ''}">
+            <h4 class="mt-4"><FileUp size={16} /> Import/Export</h4>
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w-full ">
                 <button class="btn btn-outline" onclick={importFromJSON}>
                     <FileUp size={16} /> Import JSON
                 </button>
             </div>
             {#if selectedCharacterId}
-            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w-full">
                 <button class="btn btn-outline" onclick={exportToJson}>
                     <FileDown size={16} /> Export to JSON
                 </button>
@@ -355,7 +568,7 @@ Provides a modal interface for all storage operations
             {#if storageHandler.supportsFileSystemAccess}
                 Load a character file and automatically enable auto-save to that file.
             {:else if storageHandler.supportsOPFS}
-                Load a character from browser storage or use JSON import/export for file management.
+                Select from saved characters in browser storage, or use JSON import/export for file management.
             {:else}
                 Use the file picker to import a character JSON file.
             {/if}
@@ -372,11 +585,9 @@ Provides a modal interface for all storage operations
     {/snippet}
 </Modal>
 
-<style>
 
-    .w250 {
-        width: 250px;
-    }
+
+<style>
     .storage-content {
         padding: 1rem;
     }
@@ -492,6 +703,90 @@ Provides a modal interface for all storage operations
     }
 
     :global(.dark) .help-text {
+        color: var(--color-surface-200);
+    }
+
+    /* OPFS Character Selector Styles */
+    .opfs-character-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .character-dropdown {
+        position: relative;
+        flex: 1;
+    }
+
+    .character-select {
+        width: 100%;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        border: 1px solid var(--color-surface-300);
+        border-radius: 0.5rem;
+        background: var(--color-surface-50);
+        color: var(--color-surface-900);
+        font-size: 0.85rem;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    :global(.dark) .character-select {
+        background: var(--color-surface-800);
+        color: var(--color-surface-100);
+        border-color: var(--color-surface-600);
+    }
+
+    .character-select:focus {
+        outline: none;
+        border-color: var(--color-primary-500);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .select-icon {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--color-surface-500);
+    }
+
+    .character-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        min-width: auto;
+    }
+
+    .btn-danger {
+        background: var(--color-error-600);
+        color: white;
+        border: 1px solid var(--color-error-500);
+    }
+
+    .btn-danger:hover {
+        background: var(--color-error-700);
+        transform: translateY(-1px);
+    }
+
+    .no-characters {
+        text-align: center;
+        padding: 1rem;
+        color: var(--color-surface-600);
+    }
+
+    .no-characters p {
+        margin: 0 0 0.5rem 0;
+        font-style: italic;
+    }
+
+    :global(.dark) .no-characters {
         color: var(--color-surface-200);
     }
 

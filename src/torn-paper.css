@@ -903,3 +903,19 @@
     }
 }
 
+
+.w300 {
+    width: 300px;
+}
+
+.toaster-title {
+    font-family: var(--form-labels), serif;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--color-primary-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-primary-600);
+    margin-bottom: 0.5rem;
+}

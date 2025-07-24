@@ -7,6 +7,8 @@
     import StorageControlsModal from './lib/components/Modals/StorageControlsModal.svelte';
     import PanZoomContainer from './lib/components/PanZoomContainer.svelte';
     import SvgContent from './lib/components/contents/SvgContent.svelte';
+    import { Toaster } from '@skeletonlabs/skeleton-svelte';
+    import { toaster } from './lib/utils/toaster';
 
 
 
@@ -43,14 +45,23 @@ TODO: Use this instead of the AppBar component
 </main>
 
 
+<Toaster {toaster}
+    titleBase="toaster-title"
+    classes="torn-paper-wrapper w300"
+    messageBase="relative torn-paper-content z-3"
+    messageClasses=""
+    
+></Toaster>
 
 
 
 
-<!-- Modals -->
+
 
 
 <style>
+
+
 
 
 </style>

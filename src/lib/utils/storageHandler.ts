@@ -1,3 +1,4 @@
+import OBR from "@owlbear-rodeo/sdk";
 import { sheetState, type CharacterSheetData } from "../states/character_sheet.svelte";
 import { googleDriveIntegration } from "./googleDriveIntegration";
 import { oneDriveIntegration } from "./oneDriveIntegration";
@@ -17,6 +18,8 @@ export interface StorageOptions {
 class StorageHandler {
     private autoSaveTimer: number | null = null;
     private fileHandle: FileSystemFileHandle | null = null;
+    private opfsFileHandle: FileSystemFileHandle | null = null;
+    private opfsRoot: FileSystemDirectoryHandle | null = null;
     private storageOptions: StorageOptions = {
         autoSaveInterval: 5000,
         storageKey: 'myz-character-sheet-data',
@@ -26,9 +29,22 @@ class StorageHandler {
         autoSaveToFile: true
     };
     private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
+    private static readonly OPFS_FILENAME = 'character-sheet.json';
+    private static readonly OPFS_CHARACTERS_DIR = 'characters';
 
     constructor() {
         this.clearExistingTimers();
+        this.initializeOPFS();
+    }
+
+    private async initializeOPFS(): Promise<void> {
+        try {
+            if ('storage' in navigator && 'getDirectory' in navigator.storage) {
+                this.opfsRoot = await navigator.storage.getDirectory();
+            }
+        } catch (error) {
+            console.warn('Failed to initialize OPFS:', error);
+        }
     }
 
     private clearExistingTimers(): void {
@@ -57,6 +73,10 @@ class StorageHandler {
         // Primary save method: save to file if available
         if (this.storageOptions.autoSaveToFile && this.fileHandle) {
             await this.saveToFile(data);
+        }
+        // Fallback to OPFS if File System Access API is not available
+        else if (this.storageOptions.autoSaveToFile && this.supportsOPFS) {
+            await this.saveToOPFS(data);
         }
         
         // Optionally sync to cloud storage
@@ -96,9 +116,29 @@ class StorageHandler {
         });
     }
 
+    public async exportToJSON(data: CharacterSheetData): Promise<void> {
+        const jsonString = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${data.name || 'character-sheet'}.json`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     // File System Access API methods (for browsers that support it)
     public get supportsFileSystemAccess(): boolean {
-        return 'showSaveFilePicker' in window && 'showOpenFilePicker' in window;
+        return 'showSaveFilePicker' in window && 'showOpenFilePicker' in window && !OBR.isAvailable;
+    }
+
+    public get supportsOPFS(): boolean {
+        return 'storage' in navigator && 'getDirectory' in navigator.storage;
     }
 
     public async saveToFile(data: CharacterSheetData): Promise<boolean> {
@@ -187,10 +227,187 @@ class StorageHandler {
 
     public clearFileHandle(): void {
         this.fileHandle = null;
+        this.opfsFileHandle = null;
     }
 
     public get hasActiveFile(): boolean {
-        return this.fileHandle !== null;
+        return this.fileHandle !== null || this.opfsFileHandle !== null;
+    }
+
+    // OPFS (Origin Private File System) methods
+    public async saveToOPFS(data: CharacterSheetData): Promise<boolean> {
+        if (!data.id) {
+            console.warn('Cannot save character without ID to OPFS');
+            return false;
+        }
+        return await this.saveToOPFSWithId(data, data.id);
+    }
+
+    public async loadFromOPFS(): Promise<CharacterSheetData | null> {
+        if (!this.supportsOPFS || !this.opfsRoot) {
+            console.warn('OPFS not supported');
+            return null;
+        }
+
+        try {
+            // First try to load from the old single file format for backward compatibility
+            try {
+                const fileHandle = await this.opfsRoot.getFileHandle(StorageHandler.OPFS_FILENAME);
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Migrate to new format if successful
+                if (data.id) {
+                    await this.saveToOPFSWithId(data, data.id);
+                    // Remove old file
+                    await this.opfsRoot.removeEntry(StorageHandler.OPFS_FILENAME);
+                }
+                
+                return data;
+            } catch {
+                // Old format doesn't exist, try to load the most recent character
+                const characters = await this.getOPFSCharacters();
+                if (characters.length > 0) {
+                    return await this.loadFromOPFSWithId(characters[0].id);
+                }
+                return null;
+            }
+        } catch (error) {
+            console.warn('Failed to load from OPFS:', error);
+            return null;
+        }
+    }
+
+    public async createNewCharacterOPFS(data: CharacterSheetData): Promise<boolean> {
+        if (!data.id) {
+            console.warn('Cannot create character without ID in OPFS');
+            return false;
+        }
+        return await this.saveToOPFSWithId(data, data.id);
+    }
+
+    public clearOPFSHandle(): void {
+        this.opfsFileHandle = null;
+    }
+
+    // Multiple character support for OPFS
+    public async getOPFSCharacters(): Promise<{id: string, name: string, lastModified: string}[]> {
+        if (!this.supportsOPFS || !this.opfsRoot) {
+            return [];
+        }
+
+        try {
+            const characters: {id: string, name: string, lastModified: string}[] = [];
+            
+            // Try to get the characters directory
+            let charactersDir: FileSystemDirectoryHandle;
+            try {
+                charactersDir = await this.opfsRoot.getDirectoryHandle(StorageHandler.OPFS_CHARACTERS_DIR);
+            } catch {
+                // Directory doesn't exist, no characters saved yet
+                return [];
+            }
+
+            // List all character files
+            for await (const [fileName, handle] of charactersDir.entries()) {
+                if (handle.kind === 'file' && fileName.endsWith('.json')) {
+                    try {
+                        const file = await (handle as FileSystemFileHandle).getFile();
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        
+                        characters.push({
+                            id: data.id || fileName.replace('.json', ''),
+                            name: data.name || 'Unnamed Character',
+                            lastModified: new Date(file.lastModified).toISOString()
+                        });
+                    } catch (error) {
+                        console.warn(`Failed to read character file ${fileName}:`, error);
+                    }
+                }
+            }
+
+            // Sort by last modified date (newest first)
+            return characters.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+        } catch (error) {
+            console.warn('Failed to get OPFS characters:', error);
+            return [];
+        }
+    }
+
+    public async saveToOPFSWithId(data: CharacterSheetData, characterId: string): Promise<boolean> {
+        if (!this.supportsOPFS || !this.opfsRoot) {
+            return false;
+        }
+
+        try {
+            const dataToExport = {
+                ...data,
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            
+            // Create characters directory if it doesn't exist
+            const charactersDir = await this.opfsRoot.getDirectoryHandle(
+                StorageHandler.OPFS_CHARACTERS_DIR, 
+                { create: true }
+            );
+
+            // Create or get character file
+            const fileName = `${characterId}.json`;
+            const fileHandle = await charactersDir.getFileHandle(fileName, { create: true });
+
+            const writable = await fileHandle.createWritable();
+            await writable.write(jsonString);
+            await writable.close();
+            
+            return true;
+        } catch (error) {
+            console.warn('Failed to save to OPFS with ID:', error);
+            return false;
+        }
+    }
+
+    public async loadFromOPFSWithId(characterId: string): Promise<CharacterSheetData | null> {
+        if (!this.supportsOPFS || !this.opfsRoot) {
+            return null;
+        }
+
+        try {
+            const charactersDir = await this.opfsRoot.getDirectoryHandle(StorageHandler.OPFS_CHARACTERS_DIR);
+            const fileName = `${characterId}.json`;
+            const fileHandle = await charactersDir.getFileHandle(fileName);
+            const file = await fileHandle.getFile();
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            // Store the file handle for future auto-saves
+            this.opfsFileHandle = fileHandle;
+            
+            return data;
+        } catch (error) {
+            console.warn('Failed to load from OPFS with ID:', error);
+            return null;
+        }
+    }
+
+    public async deleteFromOPFS(characterId: string): Promise<boolean> {
+        if (!this.supportsOPFS || !this.opfsRoot) {
+            return false;
+        }
+
+        try {
+            const charactersDir = await this.opfsRoot.getDirectoryHandle(StorageHandler.OPFS_CHARACTERS_DIR);
+            const fileName = `${characterId}.json`;
+            await charactersDir.removeEntry(fileName);
+            return true;
+        } catch (error) {
+            console.warn('Failed to delete from OPFS:', error);
+            return false;
+        }
     }
 
     // Auto-save methods

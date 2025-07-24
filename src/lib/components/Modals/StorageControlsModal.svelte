@@ -16,38 +16,38 @@ Provides a modal interface for all storage operations
     function closeModal() {
         closeDialogueOption('storageControls');
     }
-
-        // Initialize storage utilities
-
-    let storageConfig = $state(storageHandler.getStorageConfig());
-
-    let isAutoSaving = $state(false);
-    let isAutoSavingToFile = $state(false);
     let currentFileName = $state('');
     let importStatus = $state('');
     let exportStatus = $state('');
+    let opfsCharacters = $state<{id: string, name: string, lastModified: string}[]>([]);
+    let selectedOPFSCharacterId = $state('');
 
     // File auto-save functions
     async function setupFileAutoSave() {
-        if (!storageHandler.supportsFileSystemAccess) {
-            exportStatus = 'File System Access API not supported in this browser. Please use Chrome, Edge, or another compatible browser.';
-            setTimeout(() => exportStatus = '', 5000);
-            return;
-        }
-
-        const success = await storageHandler.createNewCharacterFile(sheetState);
-        if (success) {
-            isAutoSavingToFile = true;
-            storageHandler.configureStorage({ autoSaveToFile: true });
-            await startAutoSave();
-            exportStatus = 'File selected! All changes will automatically save to your chosen file.';
-            
-            // Update current file name for display
-            if (storageHandler.hasActiveFile) {
+        if (storageHandler.supportsFileSystemAccess) {
+            const success = await storageHandler.createNewCharacterFile(sheetState);
+            if (success) {
+                await startAutoSave();
+                exportStatus = 'File selected! All changes will automatically save to your chosen file.';
+                
+                // Update current file name for display
+                if (storageHandler.hasActiveFile) {
+                    currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                }
+            } else {
+                exportStatus = 'Failed to select file.';
+            }
+        } else if (storageHandler.supportsOPFS) {
+            const success = await storageHandler.createNewCharacterOPFS(sheetState);
+            if (success) {
+                await startAutoSave();
+                exportStatus = 'Auto-save enabled! All changes will be saved to browser storage.';
                 currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+            } else {
+                exportStatus = 'Failed to set up auto-save.';
             }
         } else {
-            exportStatus = 'Failed to select file.';
+            exportStatus = 'File auto-save not supported in this browser.';
         }
         setTimeout(() => exportStatus = '', 3000);
     }
@@ -68,28 +68,44 @@ Provides a modal interface for all storage operations
     }
 
     async function loadFromFileSystem() {
-        if (!storageHandler.supportsFileSystemAccess) {
-            importStatus = 'File System Access API not supported in this browser.';
-            setTimeout(() => importStatus = '', 3000);
-            return;
-        }
-
-        try {
-            const data = await storageHandler.loadFromFile();
-            if (data) {
-                Object.assign(sheetState, data);
-                selectedCharacterId = sheetState.id;
-                
-                // Enable file auto-save since we now have a file handle
-                isAutoSavingToFile = true;
-                storageHandler.configureStorage({ autoSaveToFile: true });
-                await startAutoSave();
-                currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
-                
-                importStatus = 'Character loaded from file. All changes will automatically save to this file.';
+        if (storageHandler.supportsFileSystemAccess) {
+            try {
+                const data = await storageHandler.loadFromFile();
+                if (data) {
+                    Object.assign(sheetState, data);
+                    selectedCharacterId = sheetState.id;
+                    
+                    // Enable file auto-save since we now have a file handle
+                    storageHandler.configureStorage({ autoSaveToFile: true });
+                    await startAutoSave();
+                    currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                    
+                    importStatus = 'Character loaded from file. All changes will automatically save to this file.';
+                }
+            } catch (error) {
+                importStatus = 'Failed to load from file: ' + (error as Error).message;
             }
-        } catch (error) {
-            importStatus = 'Failed to load from file: ' + (error as Error).message;
+        } else if (storageHandler.supportsOPFS) {
+            try {
+                const data = await storageHandler.loadFromOPFS();
+                if (data) {
+                    Object.assign(sheetState, data);
+                    selectedCharacterId = sheetState.id;
+                    
+                    // Enable OPFS auto-save since we now have a file handle
+                    storageHandler.configureStorage({ autoSaveToFile: true });
+                    await startAutoSave();
+                    currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                    
+                    importStatus = 'Character loaded from browser storage. All changes will automatically save.';
+                } else {
+                    importStatus = 'No character found in browser storage.';
+                }
+            } catch (error) {
+                importStatus = 'Failed to load from browser storage: ' + (error as Error).message;
+            }
+        } else {
+            importStatus = 'File loading not supported in this browser.';
         }
         setTimeout(() => importStatus = '', 5000);
     }
@@ -113,6 +129,16 @@ Provides a modal interface for all storage operations
         setTimeout(() => importStatus = '', 5000);
     }
 
+    async function exportToJson() {
+        try {
+            await storageHandler.exportToJSON(sheetState);
+            exportStatus = 'Character sheet exported successfully';
+        } catch (error) {
+            exportStatus = 'Export failed: ' + (error as Error).message;
+        }
+        setTimeout(() => exportStatus = '', 5000);
+    }
+
 
     let selectedCharacterId: string = $state('');
     
@@ -123,20 +149,46 @@ Provides a modal interface for all storage operations
         sheetState.occupation = 'Enforcer'; // Default occupation
 
         selectedCharacterId = sheetState.id; // Select the new character
-        importStatus = 'New character created! All changes will automatically save to your selected file.';
         
-        // Automatically set up file auto-save for the new character
-        await setupFileAutoSave();
+    // Automatically set up auto-save for the new character
+        if (storageHandler.supportsFileSystemAccess) {
+            await setupFileAutoSave();
+            importStatus = 'New character created! Select a file location for auto-save.';
+        } else if (storageHandler.supportsOPFS) {
+            const success = await storageHandler.createNewCharacterOPFS(sheetState);
+            if (success) {
+                await startAutoSave();
+                currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                importStatus = 'New character created! All changes will automatically save to browser storage.';
+            } else {
+                importStatus = 'New character created! Auto-save setup failed.';
+            }
+        } else {
+            importStatus = 'New character created! Use export/import for saving.';
+        }
     }
 
 
     onMount(async () => {
         // Check if file auto-save was previously enabled
-        isAutoSavingToFile = storageConfig.autoSaveToFile || false;
-        if (isAutoSavingToFile && storageHandler.hasActiveFile) {
+        if (storageHandler.hasActiveFile) {
             currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
         }
-
+        // Check for existing OPFS data if File System Access API is not available
+        else if (!storageHandler.supportsFileSystemAccess && storageHandler.supportsOPFS) {
+            try {
+                const data = await storageHandler.loadFromOPFS();
+                if (data) {
+                    Object.assign(sheetState, data);
+                    selectedCharacterId = sheetState.id;
+                    currentFileName = `${sheetState.name || 'unnamed'}-character-sheet.json`;
+                    storageHandler.configureStorage({ autoSaveToFile: true });
+                    await startAutoSave();
+                }
+            } catch (error) {
+                console.warn('Failed to load existing OPFS data:', error);
+            }
+        }
 
         if(!selectedCharacterId) {
             importStatus = 'Welcome to Mutant: Year Zero Character Sheet! Create a new character or load an existing one from a file.';
@@ -148,10 +200,8 @@ Provides a modal interface for all storage operations
 
 
     function onBeforeUnload(e: BeforeUnloadEvent) {
-        if (!isAutoSaving) {
-            e.preventDefault();
-            return '';
-        }
+        e.preventDefault();
+        return '';
     }
     
 
@@ -245,11 +295,24 @@ Provides a modal interface for all storage operations
 
         </div>
     </div>
+    {:else if storageHandler.supportsOPFS}
+    <div class="control-group">
+        <h4><File size={16} /> Browser Storage:</h4>
+        <div class="control-row">
+            <div class="file-status">
+                <span class="file-indicator"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to browser storage:</span>
+                <span class="file-name">{currentFileName}</span>
+            </div>
+            <div class="help-text">
+                All changes are automatically saved to secure browser storage. Data persists between sessions.
+            </div>
+        </div>
+    </div>
     {:else}
     <div class="control-group">
         <h4><File size={16} /> File Auto-Save</h4>
         <div class="help-text">
-            File System Access API not supported in this browser. Please use Chrome, Edge, or another compatible browser for this feature.
+            File auto-save not supported in this browser. Please use manual export/import or a modern browser.
         </div>
     </div>
     {/if}
@@ -258,7 +321,7 @@ Provides a modal interface for all storage operations
 
     <!-- Load from File -->
     <div class="control-group">
-        <h4><FileJson size={16} /> Load Character from File</h4>
+        <h4><FileJson size={16} /> Load Character</h4>
         <div class="control-row">
             {#if storageHandler.supportsFileSystemAccess}
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
@@ -266,17 +329,33 @@ Provides a modal interface for all storage operations
                     <File size={16} /> Load from File
                 </button>
             </div>
-            {:else}
+            {:else if storageHandler.supportsOPFS}
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn btn-outline" onclick={importFromJSON}>
-                    <FileUp size={16} /> Import JSON (Fallback)
+                <button class="btn btn-outline" onclick={loadFromFileSystem}>
+                    <File size={16} /> Load from Browser Storage
                 </button>
             </div>
+            {/if}
+            {#if !storageHandler.supportsFileSystemAccess}
+            <div class="torn-paper-wrapper variant-7 btn-wrapper {selectedCharacterId ? 'w250' : ''}">
+                <button class="btn btn-outline" onclick={importFromJSON}>
+                    <FileUp size={16} /> Import JSON
+                </button>
+            </div>
+            {#if selectedCharacterId}
+            <div class="torn-paper-wrapper variant-7 btn-wrapper w250">
+                <button class="btn btn-outline" onclick={exportToJson}>
+                    <FileDown size={16} /> Export to JSON
+                </button>
+            </div>
+            {/if}
             {/if}
         </div>
         <div class="help-text">
             {#if storageHandler.supportsFileSystemAccess}
                 Load a character file and automatically enable auto-save to that file.
+            {:else if storageHandler.supportsOPFS}
+                Load a character from browser storage or use JSON import/export for file management.
             {:else}
                 Use the file picker to import a character JSON file.
             {/if}
@@ -294,6 +373,10 @@ Provides a modal interface for all storage operations
 </Modal>
 
 <style>
+
+    .w250 {
+        width: 250px;
+    }
     .storage-content {
         padding: 1rem;
     }

@@ -78,12 +78,10 @@ Provides a modal interface for all storage operations
         storageHandler.startAutoSave(
             async () => {
                 // Callback before saving
-                console.log('Saving character sheet to file...');
                 sheetState.isSaving = true; // Set saving flag
             },
             async () => {
                 // Callback after saving
-                console.log('Character sheet saved to file successfully.');
                 sheetState.isSaving = false; // Clear saving flag
             }
         );

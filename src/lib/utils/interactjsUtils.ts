@@ -19,6 +19,7 @@ export function initInteractForElement(
     // Apply draggable functionality if enabled
     if (options.enableDraggable) {
         interactElement.draggable({
+            allowFrom: '.interactable',
             listeners: {
                 start: (event) => {
                     // 
@@ -57,9 +58,6 @@ export function initInteractForElement(
                     }
                 }
             },
-            modifiers: [
-
-            ],
             cursorChecker(action, interactable, element, interacting) {
                 // return 'grab or grabbing based on interaction state
                 if (interacting) {
@@ -73,6 +71,7 @@ export function initInteractForElement(
     // Apply resizable functionality if enabled
     if (options.enableResizable) {
         interactElement.resizable({
+            allowFrom: '.interactable',
             edges: { left: true, right: true, bottom: true, top: true },
             listeners: {
                 start: (event) => {

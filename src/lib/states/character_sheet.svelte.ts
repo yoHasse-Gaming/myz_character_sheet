@@ -63,6 +63,7 @@ export interface CharacterSheetData {
     paperLayouts: Record<string, { x: number; y: number; width?: number; height?: number }>;
     lastUpdated?: number; // Timestamp for last update
     isSaving?: boolean; // Flag to indicate if saving is in progress
+    isLocked?: boolean; // Flag to indicate if the sheet is locked for editing
 }
 
 export const sheetState: CharacterSheetData = $state({
@@ -143,7 +144,10 @@ export const sheetState: CharacterSheetData = $state({
     paperLayouts: {},
     
     // Track unsaved changes
-    hasUnsavedChanges: false
+    hasUnsavedChanges: false,
+    
+    // Layout lock state
+    isLocked: false
 });
 
 // Helper functions for managing the state

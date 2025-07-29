@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { AppBar } from '@skeletonlabs/skeleton-svelte';
     import { openDialogueOption } from "../states/modals.svelte";
-    import { Moon, RotateCcw, Ruler, Save, SaveAll, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
+    import { Lock, LockOpen, Moon, RotateCcw, Ruler, Save, SaveAll, Sun, ZoomIn, ZoomOut } from "@lucide/svelte";
     import OBR from "@owlbear-rodeo/sdk";
     import { sheetState } from "../states/character_sheet.svelte";
 
@@ -47,6 +47,10 @@
 
     function openStorageControls() {
         openDialogueOption('storageControls');
+    }
+
+    function toggleLayoutLock() {
+        sheetState.isLocked = !sheetState.isLocked;
     }
 
     onMount(() => {
@@ -115,6 +119,20 @@
             title="Spara & Ladda Data"
         >
             <Save size={16} />
+        </button>
+
+        <!-- Layout Lock Toggle -->
+        <button 
+            class="btn btn-sm variant-filled-primary"
+            onclick={toggleLayoutLock}
+            aria-label={sheetState.isLocked ? "Lås upp layout" : "Lås layout"}
+            title={sheetState.isLocked ? "Lås upp layout - Tillåt flyttning och storleksändring" : "Lås layout - Förhindra flyttning och storleksändring"}
+        >
+            {#if sheetState.isLocked}
+                <Lock size={16} />
+            {:else}
+                <LockOpen size={16} />
+            {/if}
         </button>
 
         <!-- Theme Toggle -->

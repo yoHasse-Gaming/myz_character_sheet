@@ -1,9 +1,7 @@
 <script lang="ts">
     import { onMount, type Snippet } from 'svelte';
-    import { generateUniqueVariants } from '../utils/styleUtils';
     import { autoResizePaper, initInteractForElement } from '../utils/interactjsUtils';
     import { characterActions, sheetState } from '../states/character_sheet.svelte';
-    import type { Icon as IconType } from '@lucide/svelte';
 
     // Props
     let {
@@ -11,13 +9,11 @@
         variant = '',
         draggable = true,
         resizable = true,
-        dragHandle = '',
         initialPosition = { x: 0, y: 0 },
         initialSize = { width: 'auto', height: 'auto' },
         minSize = { width: 250, height: 80 },
         maxSize = undefined,
         header = undefined,
-        HeaderIcon = undefined,
         content,
         autoResize = false,
         class: additionalClasses = ''
@@ -26,13 +22,11 @@
         variant?: string;
         draggable?: boolean;
         resizable?: boolean;
-        dragHandle?: string;
         initialPosition?: { x: number; y: number };
         initialSize?: { width: string | number; height: string | number };
         minSize?: { width: number; height: number };
         maxSize?: { width: number; height: number };
         header?: Snippet;
-        HeaderIcon?: typeof IconType;
         content?: Snippet;
         autoResize?: boolean;
         class?: string;

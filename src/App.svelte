@@ -10,16 +10,7 @@
     import { Toaster } from '@skeletonlabs/skeleton-svelte';
     import { toaster } from './lib/utils/toaster';
 
-
-
 </script>
-
-
-
-
-
-<!-- Add test component for the new dice roll modal -->
-<!-- <DiceRollTest /> -->
 
 <!-- Main Content -->
 <main class="sheet-container">

@@ -317,7 +317,7 @@
     height: 100%;
     padding-top: 1rem;
     padding-right: 1rem;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
     resize: none;
     box-sizing: border-box;
     font-size: 1rem;

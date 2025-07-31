@@ -24,6 +24,7 @@
     "@owlbear-rodeo/sdk": "^3.1.0",
     "@panzoom/panzoom": "^4.6.0",
     "@skeletonlabs/floating-ui-svelte": "^0.3.9",
+    "@supabase/supabase-js": "^2.53.0",
     "@tailwindcss/vite": "^4.1.11",
     "interactjs": "^1.10.27",
     "panzoom": "^9.4.3",

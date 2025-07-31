@@ -24,7 +24,7 @@
         } else {
             html.classList.add('light');
         }
-        
+
         document.body.setAttribute('data-theme', 'vintage');
     }
 

@@ -2,6 +2,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { sheetState, type CharacterSheetData } from "../states/character_sheet.svelte";
 import { googleDriveIntegration } from "./googleDriveIntegration";
 import { oneDriveIntegration } from "./oneDriveIntegration";
+import { supabaseIntegration } from "./supaBaseIntegration";
 
 
 
@@ -9,7 +10,7 @@ export interface StorageOptions {
     autoSaveInterval: number;
     storageKey: string;
     currentCharacterKey: string;
-    cloudProvider?: 'none' | 'google-drive' | 'onedrive';
+    cloudProvider?: 'none' | 'google-drive' | 'onedrive' | 'supabase';
     syncWithCloud?: boolean;
     autoSaveToFile?: boolean;
 }
@@ -31,6 +32,7 @@ class StorageHandler {
     private static readonly TIMER_ID_KEY = 'myz-autosave-timer-id';
     private static readonly OPFS_FILENAME = 'character-sheet.json';
     private static readonly OPFS_CHARACTERS_DIR = 'characters';
+    private static readonly STATE_COMPARISON_KEY = 'myz-last-saved-state';
 
     constructor() {
         this.clearExistingTimers();
@@ -53,13 +55,26 @@ class StorageHandler {
             clearInterval(parseInt(savedTimerId));
             localStorage.removeItem(StorageHandler.TIMER_ID_KEY);
         }
+        // Also clean up any leftover comparison state
+        localStorage.removeItem(StorageHandler.STATE_COMPARISON_KEY);
     }
 
         // Storage methods
     public configureStorage(options: Partial<StorageOptions>): void {
         this.storageOptions = { ...this.storageOptions, ...options };
-        
+    }
 
+    /**
+     * Auto-configure storage based on environment
+     */
+    public async autoConfigureStorage(): Promise<void> {
+        // If in Owlbear environment, enable Supabase cloud sync
+        if (OBR.isAvailable && supabaseIntegration.isAvailable) {
+            this.configureStorage({
+                cloudProvider: 'supabase',
+                syncWithCloud: true
+            });
+        }
     }
 
     public getStorageConfig(): StorageOptions {
@@ -80,9 +95,12 @@ class StorageHandler {
         }
         
         // Optionally sync to cloud storage
-        if (this.storageOptions.syncWithCloud) {
+        if (this.storageOptions.syncWithCloud && false) {
             await this.syncToCloud(data);
         }
+
+        // Update comparison state after successful save
+        this.storeCurrentStateForComparison();
     }
 
 
@@ -410,14 +428,52 @@ class StorageHandler {
         }
     }
 
+    // State comparison methods for optimized auto-save
+    private storeCurrentStateForComparison(): void {
+        try {
+            const currentState = JSON.stringify(sheetState);
+            localStorage.setItem(StorageHandler.STATE_COMPARISON_KEY, currentState);
+        } catch (error) {
+            console.warn('Failed to store state for comparison:', error);
+        }
+    }
+
+    private hasStateChanged(): boolean {
+        try {
+            const currentState = JSON.stringify(sheetState);
+            const lastSavedState = localStorage.getItem(StorageHandler.STATE_COMPARISON_KEY);
+            return currentState !== lastSavedState;
+        } catch (error) {
+            console.warn('Failed to compare state changes:', error);
+            // If we can't compare, assume state has changed to be safe
+            return true;
+        }
+    }
+
+    /**
+     * Update the stored state for comparison after loading from external sources
+     * Call this after loading a character from file, OPFS, or cloud storage
+     */
+    public updateComparisonState(): void {
+        this.storeCurrentStateForComparison();
+    }
+
     // Auto-save methods
     public startAutoSave(onSavingStarted: () => Promise<void>, onSavingCompleted: () => Promise<void>): void {
         if (this.autoSaveTimer) return;
 
+        // Store initial state for comparison
+        this.storeCurrentStateForComparison();
+
         this.autoSaveTimer = window.setInterval(async () => {
-            await onSavingStarted();
-            await this.save();
-            await onSavingCompleted();
+            // Only save if there are actual changes
+            if (this.hasStateChanged()) {
+                await onSavingStarted();
+                await this.save();
+                await onSavingCompleted();
+                // Update stored state after successful save
+                this.storeCurrentStateForComparison();
+            }
         }, this.storageOptions.autoSaveInterval);
 
         try {
@@ -432,6 +488,8 @@ class StorageHandler {
             clearInterval(this.autoSaveTimer);
             this.autoSaveTimer = null;
             localStorage.removeItem(StorageHandler.TIMER_ID_KEY);
+            // Clean up comparison state
+            localStorage.removeItem(StorageHandler.STATE_COMPARISON_KEY);
         }
     }
 
@@ -447,6 +505,11 @@ class StorageHandler {
                 case 'onedrive':
                     if (oneDriveIntegration.isAvailable) {
                         await oneDriveIntegration.saveCharacterSheet(data);
+                    }
+                    break;
+                case 'supabase':
+                    if (supabaseIntegration.isAvailable) {
+                        await supabaseIntegration.saveCharacterSheet(data);
                     }
                     break;
                 default:

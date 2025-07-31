@@ -6,11 +6,14 @@ Provides a modal interface for all storage operations
     import { Modal } from "@skeletonlabs/skeleton-svelte";
     import { closeDialogueOption, isDialogueOpen, openDialogueOption } from "../../states/modals.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { Archive, File, FileDown, FileJson, FileUp, Save, SquareCheckBig, Trash, UserPen, ChevronDown, RefreshCcw } from '@lucide/svelte';
+    import { Archive, File, FileDown, FileJson, FileUp, Save, SquareCheckBig, Trash, UserPen, ChevronDown, RefreshCcw, Cloud } from '@lucide/svelte';
     import CloudStorage from '../CloudStorage.svelte';
     import { sheetState, type CharacterSheetData } from "../../states/character_sheet.svelte";
     import { storageHandler } from "../../utils/storageHandler";
     import { toaster } from '../../utils/toaster';
+    import { supabaseIntegration } from '../../utils/supaBaseIntegration';
+    import { owlbearIntegration } from '../../utils/owlbearIntegration';
+    import OBR from "@owlbear-rodeo/sdk";
     
     function closeModal() {
         closeDialogueOption('storageControls');
@@ -18,6 +21,9 @@ Provides a modal interface for all storage operations
     let currentFileName = $state('');
     let opfsCharacters = $state<{id: string, name: string, lastModified: string}[]>([]);
     let selectedOPFSCharacterId = $state('');
+    let supabaseCharacters = $state<{id: string, name: string, playerId: string, lastModified: string}[]>([]);
+    let selectedSupabaseCharacterId = $state('');
+    let isSupabaseAvailable = $state(false);
 
     // File auto-save functions
     async function setupFileAutoSave() {
@@ -236,6 +242,132 @@ Provides a modal interface for all storage operations
         }
     }
 
+    // Supabase functions
+    async function initializeSupabase() {
+        isSupabaseAvailable = await supabaseIntegration.initialize();
+        if (isSupabaseAvailable) {
+            await refreshSupabaseCharacters();
+            // Auto-configure storage handler to use Supabase
+            await storageHandler.autoConfigureStorage();
+            toaster.create({
+                title: 'Supabase Connected',
+                description: 'Connected to Owlbear room storage. Auto-sync enabled.',
+                duration: 5000,
+                type: 'success'
+            });
+        } else {
+            toaster.create({
+                title: 'Supabase Connection Failed',
+                description: 'Failed to connect to room storage.',
+                duration: 5000,
+                type: 'error'
+            });
+        }
+        
+    }
+
+    async function refreshSupabaseCharacters() {
+        if (isSupabaseAvailable) {
+            supabaseCharacters = await supabaseIntegration.getCharacterSheetList();
+        }
+    }
+
+    async function saveToSupabase() {
+        if (!isSupabaseAvailable) {
+            toaster.create({
+                title: 'Save Failed',
+                description: 'Supabase not available.',
+                duration: 5000,
+                type: 'error'
+            });
+            return;
+        }
+
+        const success = await supabaseIntegration.saveCharacterSheet(sheetState);
+        if (success) {
+            await refreshSupabaseCharacters();
+            toaster.create({
+                title: 'Character Saved',
+                description: 'Character saved to room storage.',
+                duration: 5000,
+                type: 'success'
+            });
+        } else {
+            toaster.create({
+                title: 'Save Failed',
+                description: 'Failed to save character to room storage.',
+                duration: 5000,
+                type: 'error'
+            });
+        }
+    }
+
+    async function loadFromSupabase(characterId: string) {
+        if (!characterId || !isSupabaseAvailable) return;
+
+        try {
+            const data = await supabaseIntegration.loadCharacterSheet(characterId);
+            if (data) {
+                Object.assign(sheetState, data);
+                selectedCharacterId = sheetState.id;
+                selectedSupabaseCharacterId = characterId;
+                
+                toaster.create({
+                    title: 'Character Loaded',
+                    description: `Character "${data.name}" loaded from room storage.`,
+                    duration: 10000,
+                    type: 'success'
+                });
+            }
+        } catch (error) {
+            toaster.create({
+                title: 'Load Failed',
+                description: 'Failed to load character from room storage: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
+        }
+    }
+
+    async function deleteFromSupabase(characterId: string) {
+        if (!characterId || !isSupabaseAvailable) return;
+
+        try {
+            const success = await supabaseIntegration.deleteCharacterSheet(characterId);
+            if (success) {
+                await refreshSupabaseCharacters();
+                
+                toaster.create({
+                    title: 'Character Deleted',
+                    description: 'Character deleted from room storage.',
+                    duration: 5000,
+                    type: 'success'
+                });
+                
+                // If we deleted the currently selected character, clear the selection
+                if (selectedCharacterId === characterId) {
+                    selectedCharacterId = '';
+                    currentFileName = '';
+                    selectedSupabaseCharacterId = '';
+                }
+            } else {
+                toaster.create({
+                    title: 'Delete Failed',
+                    description: 'Failed to delete character from room storage.',
+                    duration: 5000,
+                    type: 'error'
+                });
+            }
+        } catch (error) {
+            toaster.create({
+                title: 'Delete Failed',
+                description: 'Failed to delete character from room storage: ' + (error as Error).message,
+                duration: 5000,
+                type: 'error'
+            });
+        }
+    }
+
     async function importFromJSON() {
         try {
             const data = await storageHandler.importFromJSON();
@@ -342,6 +474,11 @@ Provides a modal interface for all storage operations
 
 
     onMount(async () => {
+        // Initialize Supabase if in Owlbear environment
+        if (OBR.isAvailable) {
+            await initializeSupabase();
+        }
+        
         // Refresh OPFS characters list
         await refreshOPFSCharacters();
         
@@ -573,6 +710,82 @@ Provides a modal interface for all storage operations
         </div>
     </div>
 
+    <!-- Supabase Room Storage (Owlbear Only) -->
+    {#if owlbearIntegration.isOwlbearEnvironment}
+    <div class="control-group">
+        <h4><Cloud size={16} /> Owlbear Room Storage</h4>
+        <div class="control-row">
+            {#if isSupabaseAvailable}
+                {#if selectedCharacterId}
+                <div class="torn-paper-wrapper variant-7 btn-wrapper">
+                    <button class="btn" onclick={saveToSupabase}>
+                        <Cloud size={16} /> Save to Room
+                    </button>
+                </div>
+                {/if}
+                
+                <div class="supabase-character-selector">
+                    {#if supabaseCharacters.length > 0}
+                    <div class="character-dropdown">
+                        <select 
+                            bind:value={selectedSupabaseCharacterId} 
+                            onchange={() => loadFromSupabase(selectedSupabaseCharacterId)}
+                            class="character-select"
+                        >
+                            <option value="">Select a character from room...</option>
+                            {#each supabaseCharacters as character}
+                            <option value={character.id}>
+                                {character.name} - Player: {character.playerId} - (modified: {new Date(character.lastModified).toLocaleDateString()})
+                            </option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="character-actions">
+                        {#if selectedSupabaseCharacterId}
+                        <button 
+                            class="btn btn-danger btn-sm" 
+                            onclick={() => deleteFromSupabase(selectedSupabaseCharacterId)}
+                            title="Delete selected character"
+                        >
+                            <Trash size={14} />
+                        </button>
+                        {/if}
+                        <button 
+                            class="btn btn-sm" 
+                            onclick={refreshSupabaseCharacters}
+                            title="Refresh character list"
+                        >
+                            <RefreshCcw size={16} />
+                        </button>
+                    </div>
+                    {:else}
+                    <div class="no-characters">
+                        <p>No characters found in room storage.</p>
+                        <button class="btn" onclick={refreshSupabaseCharacters}>
+                            <RefreshCcw size={16} /> Refresh
+                        </button>
+                    </div>
+                    {/if}
+                </div>
+            {:else}
+                <div class="supabase-unavailable">
+                    <p>Room storage not available.</p>
+                    <button class="btn" onclick={initializeSupabase}>
+                        <Cloud size={16} /> Connect to Room Storage
+                    </button>
+                </div>
+            {/if}
+        </div>
+        <div class="help-text">
+            {#if isSupabaseAvailable}
+                Share character sheets with other players in this Owlbear room. GMs can see all characters, players can only see their own.
+            {:else}
+                Connect to room storage to share characters with other players in this Owlbear session.
+            {/if}
+        </div>
+    </div>
+    {/if}
+
 
     </div>
 
@@ -741,15 +954,6 @@ Provides a modal interface for all storage operations
         box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
     }
 
-    .select-icon {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-        color: var(--color-surface-500);
-    }
-
     .character-actions {
         display: flex;
         gap: 0.5rem;
@@ -786,6 +990,32 @@ Provides a modal interface for all storage operations
 
     :global(.dark) .no-characters {
         color: var(--color-surface-200);
+    }
+
+    /* Supabase Character Selector Styles */
+    .supabase-character-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .supabase-unavailable {
+        text-align: center;
+        padding: 1rem;
+        color: var(--color-surface-600);
+        border: 1px dashed var(--color-surface-300);
+        border-radius: 0.5rem;
+    }
+
+    .supabase-unavailable p {
+        margin: 0 0 0.5rem 0;
+        font-style: italic;
+    }
+
+    :global(.dark) .supabase-unavailable {
+        color: var(--color-surface-200);
+        border-color: var(--color-surface-600);
     }
 
         @container (max-width: 500px) {

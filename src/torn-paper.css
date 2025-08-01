@@ -534,15 +534,22 @@
 .btn-wrapper .btn {
     width: 100%;
     z-index: 10;
-    background: transparent;
+    background: none;
     border: none;
     font-weight: bold;
     position: inherit;
     font-size: 0.9rem;
+    box-shadow: none;
 }
 
 :global(.dark) .btn-wrapper .btn {
     color: var(--color-surface-900);
+}
+
+.btn-wrapper .btn:hover {
+    border: none;
+    background: transparent;
+    box-shadow: none;
 }
 
 .btn-wrapper:hover {

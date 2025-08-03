@@ -258,7 +258,6 @@
         border: none;
         border-radius: 0.5rem;
         cursor: pointer;
-        font-family: var(--font-user), sans-serif;
         font-size: 0.875rem;
         font-weight: 600;
         text-transform: uppercase;

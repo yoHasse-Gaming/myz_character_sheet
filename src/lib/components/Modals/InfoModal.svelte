@@ -112,7 +112,7 @@
     }
     
     .info-modal-title {
-        font-family: var(--form-labels), serif;
+        
         font-size: 1.8rem;
         font-weight: bold;
         color: var(--color-surface-900);
@@ -174,7 +174,7 @@
     
     /* Style HTML content within the modal */
     .info-modal-body :global(h3) {
-        font-family: var(--form-labels), serif;
+        
         font-size: 1.3rem;
         font-weight: bold;
         color: var(--color-primary-600);

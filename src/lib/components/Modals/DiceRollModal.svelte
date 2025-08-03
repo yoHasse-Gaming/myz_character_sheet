@@ -380,7 +380,7 @@
     }
 
     .modal-title {
-        font-family: var(--form-labels), serif;
+        
         font-size: 1.5rem;
         font-weight: bold;
         color: var(--color-surface-900);

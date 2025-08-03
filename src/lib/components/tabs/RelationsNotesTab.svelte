@@ -270,7 +270,7 @@
         background: transparent;
         border: none;
         outline: none;
-        font-family: var(--form-labels), serif;
+        
         font-size: 0.9rem;
         font-weight: bold;
         color: var(--color-surface-900);
@@ -341,7 +341,7 @@
     }
 
     .note-number {
-        font-family: var(--form-labels), serif;
+        
         font-size: 0.9rem;
         font-weight: bold;
         color: var(--color-info-700);
@@ -357,7 +357,6 @@
         font-size: 0.9rem;
         color: var(--color-surface-900);
         line-height: 1.4;
-        font-family: var(--font-user), sans-serif;
         resize: none;
     }
 

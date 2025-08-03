@@ -642,14 +642,14 @@ Provides a modal interface for all storage operations
 >
 {#snippet content()}
 
-    <div class="storage-content">
+    <div class="p-4 max-h-[90vh] overflow-y-auto">
         {#if selectedCharacterId !== '' && !needsStorageSelection}
         <button 
-            class="modal-close-button" 
+            class="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-10" 
             onclick={closeModal} 
             aria-label="Stäng storlekskontroller"
         >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-600 dark:text-gray-400">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -657,9 +657,9 @@ Provides a modal interface for all storage operations
         {/if}
     <div class="torn-paper-wrapper variant-1">
         <div class="card-content">
-            <div class="storage-controls">
-    <div >
-        <span class="storage-title">
+            <div class="rounded-lg p-4 my-4">
+    <div class="mb-4">
+        <span class="text-primary-600 dark:text-primary-400 text-lg font-semibold flex items-center gap-2">
         {#if storagePreference === 'discord'}
             <Cloud size={16} /> Cloud Storage
         {:else if storagePreference === 'opfs'}
@@ -673,43 +673,43 @@ Provides a modal interface for all storage operations
     </div>
     <!-- Storage Preference Selection -->
     {#if needsStorageSelection}
-        <div class="status-message">Welcome to Mutant: Year Zero Character Sheet! Before creating a new character, please select your preferred storage option.</div>
+        <div class="p-2 rounded mb-4 text-sm font-medium italic">Welcome to Mutant: Year Zero Character Sheet! Before creating a new character, please select your preferred storage option.</div>
     {/if}
     {#if needsStorageSelection && OBR.isAvailable}
-    <div class="control-group storage-selection">
-        <h4>Choose Your Storage Option</h4>
-        <div class="storage-options">
+    <div class="mb-4">
+        <h4 class="text-base font-medium mb-4">Choose Your Storage Option</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
                 <button 
-                    class="storage-option-btn" 
+                    class="flex flex-col items-center gap-4 p-6 rounded-lg text-gray-900 dark:text-gray-100 cursor-pointer transition-all duration-200 text-center min-h-[160px] z-[1] w-full" 
                     onclick={() => selectStoragePreference('opfs')}
                 >
-                    <div class="option-icon">
+                    <div class="text-primary-600 dark:text-primary-400">
                         <File size={32} />
                     </div>
-                    <div class="option-content">
-                        <h5>Store in Browser</h5>
-                        <p>Save characters locally in your browser's storage. Data stays on this device only.</p>
+                    <div class="space-y-2">
+                        <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 m-0">Store in Browser</h5>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed m-0">Save characters locally in your browser's storage. Data stays on this device only.</p>
                     </div>
                 </button>
             </div>
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
             
                 <button 
-                    class="storage-option-btn" 
+                    class="flex flex-col items-center gap-4 p-6 rounded-lg text-gray-900 dark:text-gray-100 cursor-pointer transition-all duration-200 text-center min-h-[160px] z-[1] w-full" 
                     onclick={() => selectStoragePreference('discord')}
                 >
-                    <div class="option-icon">
+                    <div class="text-primary-600 dark:text-primary-400">
                         <Cloud size={32} />
                     </div>
-                    <div class="option-content">
-                        <h5>Cloud Storage</h5>
-                        <p>Sign in with Discord and sync characters across devices and with your gaming group.</p>
+                    <div class="space-y-2">
+                        <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 m-0">Cloud Storage</h5>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed m-0">Sign in with Discord and sync characters across devices and with your gaming group.</p>
                     </div>
                 </button>
             </div>
         </div>
-        <div class="help-text">
+        <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
             You can change this preference later in the storage settings.
         </div>
     </div>
@@ -719,45 +719,45 @@ Provides a modal interface for all storage operations
 
     <!-- Supabase Room Storage (Owlbear Only) -->
     {#if OBR.isAvailable && storagePreference === 'discord' && !needsStorageSelection}
-    <div class="control-group">
+    <div class="mb-4">
         
-        <div class="control-row">
+        <div class="flex gap-2 items-center flex-wrap">
             {#if currentUser}
-                <hr />
+                <hr class="border-none border-t border-gray-300 dark:border-gray-600 my-2 w-full" />
 
                 <!-- Authentication Status -->
-                <div class="auth-status">
-                    <div class="auth-info">
+                <div class="flex mt-4 w-full mb-2">
+                    <div class="flex items-center justify-center gap-2 p-4 rounded-lg text-sm w-full">
                         
-                        <span class="flex-1 status txt">Signed in as: {currentUser?.user_metadata?.full_name || currentUser?.email || 'Discord User'} <DiscordIcon size={16} /></span>
+                        <span class="flex-1 font-medium z-[1]">Signed in as: {currentUser?.user_metadata?.full_name || currentUser?.email || 'Discord User'} <DiscordIcon size={16} /></span>
                         <div class="flex-1">
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="btn" onclick={signOutSupabase} title="Sign out">
+                            <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={signOutSupabase} title="Sign out">
                                 <LogOut size={14} /> Sign out
                             </button>
                         </div>
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="btn" onclick={changeStoragePreference}><ServerCog size={14} /> Change type</button>
+                            <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={changeStoragePreference}><ServerCog size={14} /> Change type</button>
                         </div>
                         </div>
                     </div>
                 </div>
-                <hr />
+                <hr class="border-none border-t border-gray-300 dark:border-gray-600 my-2 w-full" />
                 {#if selectedCharacterId}
                 <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                    <button class="btn" onclick={saveToSupabase}>
+                    <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={saveToSupabase}>
                         <Cloud size={16} /> Save to Cloud
                     </button>
                 </div>
                 {/if}
                 
-                <div class="supabase-character-selector">
+                <div class="flex flex-col gap-2 w-full">
                     {#if supabaseCharacters.length > 0}
-                    <div class="character-dropdown">
+                    <div class="relative flex-1">
                         <select 
                             bind:value={selectedSupabaseCharacterId} 
                             onchange={() => loadFromSupabase(selectedSupabaseCharacterId)}
-                            class="character-select"
+                            class="w-full py-2 pr-8 pl-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-primary-500 text-gray-900 dark:text-gray-100 text-sm appearance-none cursor-pointer focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.1)]"
                         >
                             <option value="">Select a character from cloud storage...</option>
                             {#each supabaseCharacters as character}
@@ -767,10 +767,10 @@ Provides a modal interface for all storage operations
                             {/each}
                         </select>
                     </div>
-                    <div class="character-actions">
+                    <div class="flex gap-2 items-center">
                         {#if selectedSupabaseCharacterId}
                         <button 
-                            class="btn btn-danger btn-sm" 
+                            class="px-2 py-1 text-xs min-w-0 bg-red-600 text-white border border-red-500 rounded-2xl cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:bg-red-700 hover:transform hover:-translate-y-0.5" 
                             onclick={() => deleteFromSupabase(selectedSupabaseCharacterId)}
                             title="Delete selected character"
                         >
@@ -778,7 +778,7 @@ Provides a modal interface for all storage operations
                         </button>
                         {/if}
                         <button 
-                            class="btn btn-sm" 
+                            class="px-2 py-1 text-xs min-w-0 rounded-2xl cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" 
                             onclick={refreshSupabaseCharacters}
                             title="Refresh character list"
                         >
@@ -786,17 +786,17 @@ Provides a modal interface for all storage operations
                         </button>
                     </div>
                     {:else}
-                    <div class="no-characters">
-                        <p>No characters found in cloud storage.</p>
+                    <div class="text-center p-4 text-gray-600 dark:text-gray-200">
+                        <p class="mb-2 italic m-0">No characters found in cloud storage.</p>
                         {#if selectedCharacterId}
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="btn" onclick={saveToSupabase}>
+                            <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={saveToSupabase}>
                                 <Cloud size={16} /> Save Current Character
                             </button>
                         </div>
                         {/if}
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="btn" onclick={refreshSupabaseCharacters}>
+                            <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={refreshSupabaseCharacters}>
                                 <RefreshCcw size={16} /> Refresh
                             </button>
                         </div>
@@ -805,11 +805,11 @@ Provides a modal interface for all storage operations
                     {/if}
                 </div>
             {:else}
-                <div class="supabase-unavailable">
-                    <p>Sign in to access cloud storage and character sheets.</p>
+                <div class="text-center p-2">
+                    <p class="mb-2 italic m-0">Sign in to access cloud storage and character sheets.</p>
                     <div class="flex gap-2">
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="btn sign-in-btn" onclick={signInWithDiscord}>
+                            <button class="flex flex-col items-center gap-4 p-6 rounded-lg text-gray-900 dark:text-gray-100 cursor-pointer transition-all duration-200 text-center min-h-[160px] z-[1]" onclick={signInWithDiscord}>
                                 <DiscordIcon size={42} />
                                 Sign in with Discord
                             </button>
@@ -820,7 +820,7 @@ Provides a modal interface for all storage operations
                 </div>
             {/if}
         </div>
-        <div class="help-text">
+        <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
             {#if isSupabaseAvailable}
                 Share character sheets that are connected to your account.
             {:else}
@@ -831,14 +831,14 @@ Provides a modal interface for all storage operations
     {/if}
 
     {#if !selectedCharacterId && !needsStorageSelection && currentUser}
-    <hr />
+    <hr class="border-none border-t border-gray-300 dark:border-gray-600 my-2 w-full" />
 
-    <div class="control-group">
-        <h4><Archive size={16} /> Character</h4>
-        <div class="control-row">
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2"><Archive size={16} /> Character</h4>
+        <div class="flex gap-2 items-center flex-wrap">
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
                 <button 
-                    class="btn "
+                    class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md"
                     onclick={createNewCharacter}
                 >
                 <UserPen size={20} /> Create New Character
@@ -851,37 +851,37 @@ Provides a modal interface for all storage operations
     {#if selectedCharacterId && !needsStorageSelection && (!OBR.isAvailable || storagePreference === 'opfs')}
     <!-- File Auto-save Status -->
     {#if storageHandler.supportsFileSystemAccess}
-    <div class="control-group">
-        <h4><File size={16} /> File:</h4>
-        <div class="control-row">
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2"><File size={16} /> File:</h4>
+        <div class="flex gap-2 items-center flex-wrap">
 
-            <div class="file-status">
-                <span class="file-indicator"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to:</span>
-                <span class="file-name">{currentFileName}</span>
+            <div class="flex flex-col gap-1 p-2 rounded-lg w-full">
+                <span class="text-sm text-green-700 dark:text-green-400 font-semibold flex items-center gap-2"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to:</span>
+                <span class="text-xs text-gray-600 dark:text-gray-200 italic overflow-hidden text-ellipsis whitespace-nowrap">{currentFileName}</span>
             </div>
-            <div class="help-text">
+            <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
                 All changes are automatically saved to your file. No manual saving needed!
             </div>
 
         </div>
     </div>
     {:else if storageHandler.supportsOPFS}
-    <div class="control-group">
-        <h4><File size={16} /> Browser Storage:</h4>
-        <div class="control-row">
-            <div class="file-status">
-                <span class="file-indicator"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to browser storage:</span>
-                <span class="file-name">{currentFileName}</span>
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2"><File size={16} /> Browser Storage:</h4>
+        <div class="flex gap-2 items-center flex-wrap">
+            <div class="flex flex-col gap-1 p-2 rounded-lg w-full">
+                <span class="text-sm text-green-700 dark:text-green-400 font-semibold flex items-center gap-2"><SquareCheckBig color={"var(--color-success-700)"} /> Auto-saving to browser storage:</span>
+                <span class="text-xs text-gray-600 dark:text-gray-200 italic overflow-hidden text-ellipsis whitespace-nowrap">{currentFileName}</span>
             </div>
-            <div class="help-text">
+            <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
                 All changes are automatically saved to secure browser storage. Data persists between sessions.
             </div>
         </div>
     </div>
     {:else}
-    <div class="control-group">
-        <h4><File size={16} /> File Auto-Save</h4>
-        <div class="help-text">
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2"><File size={16} /> File Auto-Save</h4>
+        <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
             File auto-save not supported in this browser. Please use manual export/import or a modern browser.
         </div>
     </div>
@@ -891,23 +891,23 @@ Provides a modal interface for all storage operations
 
     <!-- Load from File -->
     {#if !needsStorageSelection && (!OBR.isAvailable || storagePreference === 'opfs')}
-    <div class="control-group">
-        <h4><FileJson size={16} /> Load Character</h4>
-        <div class="control-row">
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2"><FileJson size={16} /> Load Character</h4>
+        <div class="flex gap-2 items-center flex-wrap">
             {#if storageHandler.supportsFileSystemAccess}
             <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                <button class="btn btn-outline" onclick={loadFromFileSystem}>
+                <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md border border-gray-300 dark:border-gray-600" onclick={loadFromFileSystem}>
                     <File size={16} /> Load from File
                 </button>
             </div>
             {:else if storageHandler.supportsOPFS}
-            <div class="opfs-character-selector">
+            <div class="flex flex-col gap-2 w-full">
                 {#if opfsCharacters.length > 0}
-                <div class="character-dropdown">
+                <div class="relative flex-1">
                     <select 
                         bind:value={selectedOPFSCharacterId} 
                         onchange={() => loadOPFSCharacter(selectedOPFSCharacterId)}
-                        class="character-select"
+                        class="w-full py-2 pr-8 pl-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm appearance-none cursor-pointer focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.1)]"
                     >
                         <option value="">Select a character...</option>
                         {#each opfsCharacters as character}
@@ -917,10 +917,10 @@ Provides a modal interface for all storage operations
                         {/each}
                     </select>
                 </div>
-                <div class="character-actions">
+                <div class="flex gap-2 items-center">
                     {#if selectedOPFSCharacterId}
                     <button 
-                        class="btn w-full" 
+                        class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md w-full" 
                         onclick={() => deleteOPFSCharacter(selectedOPFSCharacterId)}
                         title="Delete selected character"
                     >
@@ -928,7 +928,7 @@ Provides a modal interface for all storage operations
                     </button>
                     {/if}
                     <button 
-                        class="btn w-full" 
+                        class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md w-full" 
                         onclick={refreshOPFSCharacters}
                         title="Refresh character list"
                     >
@@ -936,9 +936,9 @@ Provides a modal interface for all storage operations
                     </button>
                 </div>
                 {:else}
-                <div class="no-characters">
-                    <p>No characters found in browser storage.</p>
-                    <button class="btn" onclick={refreshOPFSCharacters}>
+                <div class="text-center p-4 text-gray-600 dark:text-gray-200">
+                    <p class="mb-2 italic m-0">No characters found in browser storage.</p>
+                    <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md" onclick={refreshOPFSCharacters}>
                         <File size={16} /> Refresh
                     </button>
                 </div>
@@ -947,22 +947,22 @@ Provides a modal interface for all storage operations
             </div>
             {/if}
             {#if !storageHandler.supportsFileSystemAccess}
-            <h4 class="mt-4"><FileUp size={16} /> Import/Export</h4>
+            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2 mt-4"><FileUp size={16} /> Import/Export</h4>
             <div class="torn-paper-wrapper variant-7 btn-wrapper w-full ">
-                <button class="btn btn-outline" onclick={importFromJSON}>
+                <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md border border-gray-300 dark:border-gray-600" onclick={importFromJSON}>
                     <FileUp size={16} /> Import JSON
                 </button>
             </div>
             {#if selectedCharacterId}
             <div class="torn-paper-wrapper variant-7 btn-wrapper w-full">
-                <button class="btn btn-outline" onclick={exportToJson}>
+                <button class="px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all duration-200 whitespace-nowrap z-[1] hover:transform hover:-translate-y-0.5 hover:shadow-md border border-gray-300 dark:border-gray-600" onclick={exportToJson}>
                     <FileDown size={16} /> Export to JSON
                 </button>
             </div>
             {/if}
             {/if}
         </div>
-        <div class="help-text">
+        <div class="text-xs text-gray-600 dark:text-gray-200 mt-1 italic">
             {#if storageHandler.supportsFileSystemAccess}
                 Load a character file and automatically enable auto-save to that file.
             {:else if storageHandler.supportsOPFS}
@@ -989,374 +989,17 @@ Provides a modal interface for all storage operations
 
 
 <style>
-
-    hr {
-        border: none;
-        border-top: 1px solid var(--color-surface-700);
-        margin: 0.5rem 0;
-        width: 100%;
-    }
-
-    :global(.dark) hr {
-        border-top: 1px solid var(--color-surface-400);
-    }
-
+    /* Keep only essential custom styles that don't have Tailwind equivalents */
+    
     .storage-content {
-        padding: 1rem;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    .modal-close-button {
-        position: absolute;
-    }
-
-    .modal-close-button svg {
-        width: 24px;
-        height: 24px;
-        /* stroke: var(--color-surface-800); */
+        container-type: inline-size;
     }
     
-    .storage-controls {
-        /* background: var(--color-surface-100); */
-        /* border: 1px solid var(--color-surface-300); */
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        
-    }
-
-    .storage-title {
-        margin: 0 0 1rem 0;
-        color: var(--color-primary-600);
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
-
-    .control-group {
-        margin-bottom: 1rem;
-    }
-
-    .control-group h4 {
-        margin: 0 0 0.5rem 0;
-        font-size: 0.9rem;
-        color: var(--color-surface-900);
-        font-weight: 500;
-    }
-
-    :global(.dark) .control-group h4 {
-        color: var(--color-surface-100);
-    }
-
-    .control-row {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 1rem;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-        z-index: 1;
-    }
     span {
         z-index: 1;
     }
 
-    .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .status-message {
-        padding: 0.5rem;
-        border-radius: 4px;
-        margin-bottom: 1rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        font-style: italic;
-    }
-
-    .file-name {
-        font-size: 0.8rem;
-        color: var(--color-surface-600);
-        font-style: italic;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    :global(.dark) .file-name {
-        color: var(--color-surface-200);
-    }
-
-    .file-status {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        width: 100%;
-    }
-
-    .file-indicator {
-        font-size: 0.8rem;
-        color: var(--color-success-700);
-        font-weight: 600;
-    }
-
-    :global(.dark) .file-indicator {
-        color: var(--color-success-400);
-    }
-
-    .help-text {
-        font-size: 0.75rem;
-        color: var(--color-surface-600);
-        margin-top: 0.25rem;
-        font-style: italic;
-    }
-
-    :global(.dark) .help-text {
-        color: var(--color-surface-200);
-    }
-
-    /* OPFS Character Selector Styles */
-    .opfs-character-selector {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    .character-dropdown {
-        position: relative;
-        flex: 1;
-    }
-
-    .character-select {
-        width: 100%;
-        padding: 0.5rem 2rem 0.5rem 0.75rem;
-        border: 1px solid var(--color-surface-300);
-        border-radius: 0.5rem;
-        background: var(--color-surface-50);
-        color: var(--color-surface-900);
-        font-size: 0.85rem;
-        appearance: none;
-        cursor: pointer;
-    }
-
-    :global(.dark) .character-select {
-        background: var(--color-surface-800);
-        color: var(--color-surface-100);
-        border-color: var(--color-surface-600);
-    }
-
-    .character-select:focus {
-        outline: none;
-        border-color: var(--color-primary-500);
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-    }
-
-    .character-actions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        min-width: auto;
-    }
-
-    .btn-danger {
-        background: var(--color-error-600);
-        color: white;
-        border: 1px solid var(--color-error-500);
-    }
-
-    .btn-danger:hover {
-        background: var(--color-error-700);
-        transform: translateY(-1px);
-    }
-
-    .no-characters {
-        text-align: center;
-        padding: 1rem;
-        color: var(--color-surface-600);
-    }
-
-    .no-characters p {
-        margin: 0 0 0.5rem 0;
-        font-style: italic;
-    }
-
-    :global(.dark) .no-characters {
-        color: var(--color-surface-200);
-    }
-
-    /* Supabase Character Selector Styles */
-    .supabase-character-selector {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    .supabase-unavailable {
-        text-align: center;
-        padding: 0.5rem;
-    }
-
-    .supabase-unavailable p {
-        margin: 0 0 0.5rem 0;
-        font-style: italic;
-    }
-
-    :global(.dark) .supabase-unavailable {
-        color: var(--color-surface-200);
-        border-color: var(--color-surface-600);
-    }
-
-    /* Authentication UI Styles */
-    .auth-status {
-        display: flex;
-        margin-top: 1rem;
-        width: 100%;
-        margin-bottom: 0.5rem;
-        
-    }
-
-    .auth-info {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        gap: 0.5rem;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        font-size: 0.85rem;
-        width: 100%;
-    }
-
-    :global(.dark) .auth-info {
-        color: var(--color-success-400);
-    }
-
-
-    /* Storage Preference Selection Styles */
-    .storage-selection {
-        border-radius: 8px;
-        padding: 1.5rem;
-    }
-
-    .storage-options {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-
-
-    .storage-option-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.5rem;
-        border-radius: 8px;
-        color: var(--color-surface-900);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: center;
-        min-height: 160px;
-        z-index: 1;
-    }
-
-    .sign-in-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.5rem;
-        border-radius: 8px;
-        color: var(--color-surface-900);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: center;
-        min-height: 160px;
-        
-        z-index: 1;
-    }
-
-    :global(.dark) .sign-in-btn {
-        color: var(--color-surface-100);
-    }
-
-
-    .option-icon {
-        color: var(--color-primary-600);
-    }
-
-    :global(.dark) .option-icon {
-        color: var(--color-primary-400);
-    }
-
-    .option-content h5 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--color-surface-900);
-    }
-
-    :global(.dark) .option-content h5 {
-        color: var(--color-surface-100);
-    }
-
-    .option-content p {
-        margin: 0;
-        font-size: 0.85rem;
-        color: var(--color-surface-600);
-        line-height: 1.4;
-    }
-
-    :global(.dark) .option-content p {
-        color: var(--color-surface-300);
-    }
-
-    .storage-preference-display {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem;
-        background: var(--color-surface-100);
-        border: 1px solid var(--color-surface-300);
-        border-radius: 0.5rem;
-        width: 100%;
-    }
-
-    :global(.dark) .storage-preference-display {
-        background: var(--color-surface-800);
-        border-color: var(--color-surface-600);
-        color: var(--color-surface-100);
-    }
-
-    @media (max-width: 600px) {
-        .storage-options {
-            grid-template-columns: 1fr;
-        }
-        
-        .storage-option-btn {
-            min-height: 120px;
-        }
-    }
-
-        @container (max-width: 500px) {
+    @container (max-width: 500px) {
         .control-row {
             flex-direction: column;
             align-items: stretch;
@@ -1366,5 +1009,4 @@ Provides a modal interface for all storage operations
             text-align: center;
         }
     }
-
 </style>

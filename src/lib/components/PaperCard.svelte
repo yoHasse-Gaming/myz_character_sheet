@@ -213,7 +213,7 @@
 
     .paper-label {
         pointer-events: none;
-        font-family: var(--form-labels), serif;
+        
         font-weight: bold;
         font-size: 1.1rem;
         letter-spacing: 0.05em;
@@ -242,7 +242,6 @@
         font-size: 1rem;
         padding: 0.5rem 0;
         box-sizing: border-box;
-        font-family: var(--font-user), sans-serif;
         color: var(--color-surface-900);
     }
 
@@ -256,7 +255,6 @@
         box-sizing: border-box;
         flex: 1;
         min-height: 3rem;
-        font-family: var(--font-user), sans-serif;
         color: var(--color-surface-900);
     }
 

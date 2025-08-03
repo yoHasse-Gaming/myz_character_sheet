@@ -4,8 +4,9 @@
 @import 'tailwindcss';
 
 @import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/themes/vintage';
+@import './myz-theme.css';
 @import './torn-paper.css';
+
 
 
 /* Import torn paper input styles */
@@ -37,18 +38,6 @@ h4>.lucide {
 
 /* Post-Apocalyptic Custom Styles for Mutant: Year Zero */
 :root {
-    /* Override theme colors for post-apocalyptic feel */
-    --color-surface-50: #f5f5f5;
-    --color-surface-100: #e5e5e5;
-    --color-surface-200: #d4d4d4;
-    --color-surface-300: #a3a3a3;
-    --color-surface-400: #737373;
-    --color-surface-500: #525252;
-    --color-surface-600: #404040;
-    --color-surface-700: #262626;
-    --color-surface-800: #1a1a1a;
-    --color-surface-900: #0f0f0f;
-    
     /* Dynamic filters based on theme colors */
     --svg-filter-surface-100: brightness(0) saturate(100%) invert(89%) sepia(4%) saturate(134%) hue-rotate(186deg) brightness(97%) contrast(85%);
     --svg-filter-surface-300: brightness(0) saturate(100%) invert(68%) sepia(7%) saturate(134%) hue-rotate(186deg) brightness(95%) contrast(87%);
@@ -61,20 +50,6 @@ h4>.lucide {
     --svg-filter-primary-400: brightness(0) saturate(100%) invert(63%) sepia(96%) saturate(664%) hue-rotate(356deg) brightness(99%) contrast(94%);
     --svg-filter-primary-900: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
     --svg-filter-warning-500: brightness(0) saturate(100%) invert(19%) sepia(89%) saturate(1847%) hue-rotate(346deg) brightness(97%) contrast(96%);
-    
-    --color-primary-50: #fef3c7;
-    --color-primary-100: #fde68a;
-    --color-primary-200: #fcd34d;
-    --color-primary-300: #fbbf24;
-    --color-primary-400: #f59e0b;
-    --color-primary-500: #d97706;
-    --color-primary-600: #b45309;
-    --color-primary-700: #92400e;
-    --color-primary-800: #78350f;
-    --color-primary-900: #451a03;
-    
-    --font-user: Architects Daughter, sans-serif;
-    --form-labels: Architects Daughter, sans-serif;
 }
 
 /* Dark mode SVG filter overrides */
@@ -119,7 +94,7 @@ body {
     min-height: 100vh;
     position: relative;
 
-    font-family: var(--form-labels), serif;
+    
     letter-spacing: 0.15em;
 }
 
@@ -495,11 +470,10 @@ dialog {
 
 
 .input.font-user {
-    font-family: var(--font-user), sans-serif;
 }
 
 label {
-    font-family: var(--form-labels), serif;
+    
     letter-spacing: 0.15em;
     font-size: large;
     font-weight: bold;
@@ -677,7 +651,7 @@ label {
     }
 
     .points-label {
-        font-family: var(--form-labels), serif;
+        
         font-size: 0.9rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -729,7 +703,7 @@ label {
 }
 
 .points-title {
-    font-family: var(--form-labels), serif;
+    
     font-weight: bold;
     color: var(--color-surface-900);
     text-transform: uppercase;

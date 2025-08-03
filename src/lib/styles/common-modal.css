@@ -118,7 +118,7 @@
 }
 
 .card-name {
-    font-family: var(--form-labels), serif;
+    
     font-size: 1.3rem;
     font-weight: bold;
     color: var(--color-surface-900);

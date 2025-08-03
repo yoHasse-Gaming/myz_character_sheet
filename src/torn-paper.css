@@ -1,14 +1,13 @@
 :root {
     --torn-filter-effect: url('#squiggle');
-    --font-user: Kalam, sans-serif;
+     --font-user: Kalam, sans-serif; 
     --form-labels: Kalam, sans-serif;
-    --heading-font-family: Kalam, sans-serif;
+    
     
     
 }
 
 .h4 {
-    font-family: var(--form-labels), serif;
 }
 
 /* Wasteland styling */
@@ -73,7 +72,6 @@
     position: relative;
     border-radius: 0;
 
-    font-family: var(--font-user);
     color: var(--color-surface-900);
     
     z-index: 2;
@@ -268,7 +266,6 @@
     box-shadow: none !important;
     width: 100%;
     padding: 1rem;
-    font-family: var(--font-user);
     color: var(--color-surface-800);
     resize: none;
     
@@ -470,7 +467,7 @@
     background: transparent !important;
     border: none !important;
     
-    font-family: var(--form-labels), serif;
+    
     
     letter-spacing: 0.1em;
     white-space: nowrap;
@@ -627,7 +624,6 @@
         border: none !important;
         outline: none !important;
         width: 100%;
-        font-family: var(--font-user), sans-serif;
         font-size: 1rem;
         color: var(--color-surface-900);
         padding: 0;
@@ -640,7 +636,6 @@
         border: 1px solid var(--color-surface-300) !important;
         border-radius: 0.25rem !important;
         padding: 0.5rem !important;
-        font-family: var(--font-user), sans-serif;
         font-size: 1rem;
         color: var(--color-surface-900);
         cursor: pointer;
@@ -662,7 +657,6 @@
         background: var(--color-surface-50);
         color: var(--color-surface-900);
         padding: 0.5rem;
-        font-family: var(--font-user), sans-serif;
     }
 
     .dark select.torn-input option {
@@ -718,7 +712,7 @@
 }
 
 .modal-title {
-    font-family: var(--form-labels), serif;
+    
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--color-surface-900);
@@ -754,7 +748,7 @@
 }
 
 .form-group label {
-    font-family: var(--form-labels), serif;
+    
     font-weight: bold;
     color: var(--color-surface-800);
     text-transform: uppercase;
@@ -786,7 +780,6 @@
     border: none !important;
     outline: none !important;
     width: 100%;
-    font-family: var(--font-user), sans-serif;
     font-size: 1rem;
     color: var(--color-surface-900);
     padding: 0;
@@ -916,7 +909,7 @@
 }
 
 .toaster-title {
-    font-family: var(--form-labels), serif;
+    
     font-size: 1rem;
     font-weight: bold;
     color: var(--color-primary-600);

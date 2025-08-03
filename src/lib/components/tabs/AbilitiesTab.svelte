@@ -123,7 +123,7 @@
 }
 
 .condition-label {
-    font-family: var(--form-labels), serif;
+    
     font-size: 0.8rem;
     font-weight: bold;
     text-transform: uppercase;

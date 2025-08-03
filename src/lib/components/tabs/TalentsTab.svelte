@@ -173,7 +173,6 @@
 
 
     .talent-name {
-        font-family: var(--font-user), serif;
         font-weight: bold;
         font-size: 0.9rem;
         letter-spacing: 0.05em;

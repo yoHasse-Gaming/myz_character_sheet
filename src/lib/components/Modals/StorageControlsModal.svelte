@@ -645,7 +645,7 @@ Provides a modal interface for all storage operations
     <div class="p-4 max-h-[90vh] overflow-y-auto">
         {#if selectedCharacterId !== '' && !needsStorageSelection}
         <button 
-            class="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-10" 
+            class="absolute top-6 right-6 p-2 bg-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-300 transition-colors z-10" 
             onclick={closeModal} 
             aria-label="Stäng storlekskontroller"
         >
@@ -757,7 +757,7 @@ Provides a modal interface for all storage operations
                         <select 
                             bind:value={selectedSupabaseCharacterId} 
                             onchange={() => loadFromSupabase(selectedSupabaseCharacterId)}
-                            class="w-full py-2 pr-8 pl-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-primary-500 text-gray-900 dark:text-gray-100 text-sm appearance-none cursor-pointer focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.1)]"
+                            class="w-full py-2 pr-8 pl-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-secondary-500 text-gray-900 dark:text-gray-900 text-sm appearance-none cursor-pointer focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.1)]"
                         >
                             <option value="">Select a character from cloud storage...</option>
                             {#each supabaseCharacters as character}
@@ -809,7 +809,13 @@ Provides a modal interface for all storage operations
                     <p class="mb-2 italic m-0">Sign in to access cloud storage and character sheets.</p>
                     <div class="flex gap-2">
                         <div class="torn-paper-wrapper variant-7 btn-wrapper">
-                            <button class="flex flex-col items-center gap-4 p-6 rounded-lg text-gray-900 dark:text-gray-100 cursor-pointer transition-all duration-200 text-center min-h-[160px] z-[1]" onclick={signInWithDiscord}>
+                            <button class="
+                                w-full
+                                flex items-center 
+                                gap-4 p-6 
+                                rounded-lg 
+                                text-gray-900 
+                                dark:text-gray-100 cursor-pointer transition-all duration-200 justify-center align-center z-[1]" onclick={signInWithDiscord}>
                                 <DiscordIcon size={42} />
                                 Sign in with Discord
                             </button>
